@@ -1,0 +1,28 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using System.IO;
+using System.Linq;
+using System.Data;
+using System.Collections.Generic;
+using IQToolkit;
+using IQToolkit.Data;
+using IQToolkit.Data.Mapping;
+using LinqEditor.Backend.Dumper;
+using LinqEditor.Backend.Interfaces;
+using <#=GeneratedSchemaNamespace#>.Schema;
+
+namespace <#=GeneratedQueryNamespace#> {
+
+    public class Program : ProgramBase
+    {
+        protected override void Query() 
+        {
+<#=SourceCode#>
+        }
+    }
+
+}

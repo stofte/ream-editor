@@ -81,6 +81,7 @@
     <Compile Include="Compiler\CompilerResults.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Compiler\ICSharpCompiler.cs" />
+    <Compile Include="CSharpCodeService.cs" />
     <Compile Include="Dumper\Dumper.cs" />
     <Compile Include="Dumper\DumperResult.cs" />
     <Compile Include="Installer\Installer.cs" />

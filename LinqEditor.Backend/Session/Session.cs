@@ -56,8 +56,8 @@ namespace LinqEditor.Backend.Session
                 _sqlTables = _schemaProvider.GetSchema(_connectionString);
                 _schemaNamespace = "";
                 var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, _sqlTables);
-                var result = _compiler.Compile(schemaSource, _schemaNamespace);
-                _schemaPath = result.CompiledAssemblyPath;
+                var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
+                _schemaPath = result.AssemblyPath;
                 // loads schema in new appdomain
                 _container = new Isolated<QueryContainer>();
                 _container.Value.Initialize(_schemaPath, _connectionString);
@@ -71,8 +71,8 @@ namespace LinqEditor.Backend.Session
             {
                 string queryNamespace;
                 var querySource = _generator.GenerateQuery(_queryId++, out queryNamespace, sourceFragment, _schemaNamespace);
-                var result = _compiler.Compile(querySource, queryNamespace, _schemaPath);
-                return _container.Value.Execute(result.CompiledAssemblyImage);
+                var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
+                return _container.Value.Execute(result.AssemblyBytes);
             });
         }
 

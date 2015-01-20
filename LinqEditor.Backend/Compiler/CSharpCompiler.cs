@@ -38,7 +38,7 @@ namespace LinqEditor.Backend.Compiler
             return guid;
         }
 
-        public CompilerResult Compile(string src, string assemblyName, params string[] otherReferences) {
+        public CompilerResult Compile(string src, string assemblyName, bool generateFiles, params string[] otherReferences) {
 
             try
             {
@@ -50,31 +50,38 @@ namespace LinqEditor.Backend.Compiler
                 // does not seem loadable for queries trying to load schema dependency
                 var filename = AppDomain.CurrentDomain.BaseDirectory + "gendlls\\" + assemblyName;
 
-                EmitResult compilationResult;
-                using (var dllStream = new FileStream(filename + ".dll", FileMode.OpenOrCreate))
-                using (var pdbStream = new FileStream(filename + ".pdb", FileMode.OpenOrCreate))
-                {
-                    compilationResult = compilation.Emit(peStream: dllStream,
-                        pdbStream: pdbStream,
-                        options: new EmitOptions(pdbFilePath: filename + ".pdb")
-                        );
-                    
-                }
+                EmitResult compilationResult = null;
+                MemoryStream stream = null;
 
-                using (var file = File.CreateText(filename + ".cs")) 
+                if (generateFiles) 
                 {
-                    file.Write(src);
-                }
+                
+                    using (var dllStream = new FileStream(filename + ".dll", FileMode.OpenOrCreate))
+                    using (var pdbStream = new FileStream(filename + ".pdb", FileMode.OpenOrCreate))
+                    {
+                        compilationResult = compilation.Emit(peStream: dllStream,
+                            pdbStream: pdbStream,
+                            options: new EmitOptions(pdbFilePath: filename + ".pdb")
+                            );
+                    }
 
-                var stream = new MemoryStream();
-                compilation.Emit(stream);
+                    using (var file = File.CreateText(filename + ".cs")) 
+                    {
+                        file.Write(src);
+                    }
+
+                } else {
+                    stream = new MemoryStream();
+                    compilationResult = compilation.Emit(stream);
+                
+                }
 
                 return new CompilerResult
                 {
-                    //CompiledAssembly = compilationResult.Success ? Assembly.LoadFile(filename + ".dll") : null,
-                    CompilationErrors = compilationResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray(),
-                    CompiledAssemblyImage = compilationResult.Success ? stream.ToArray() : null,
-                    CompiledAssemblyPath = filename + ".dll"
+                    Errors = compilationResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray(),
+                    Warnings = compilationResult.Diagnostics.Where(w => w.Severity == DiagnosticSeverity.Warning).ToArray(),
+                    AssemblyBytes = compilationResult.Success && !generateFiles ? stream.ToArray() : null,
+                    AssemblyPath = filename + ".dll"
                 };
             }
             catch (Exception exn)

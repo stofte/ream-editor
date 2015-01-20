@@ -10,6 +10,6 @@ namespace LinqEditor.Backend.Compiler
 {
     public interface ICSharpCompiler
     {
-        CompilerResult Compile(string src, string assemblyName, params string[] references);
+        CompilerResult Compile(string src, string assemblyName, bool generateFiles, params string[] references);
     }
 }

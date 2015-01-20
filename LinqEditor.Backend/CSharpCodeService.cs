@@ -13,14 +13,6 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Backend
 {
-    internal static class Foo
-    {
-        public static string FooTest(this string str)
-        {
-            return str;
-        }
-    }
-
     public class CSharpCodeService
     {
         public CSharpSyntaxNode FindEntry()

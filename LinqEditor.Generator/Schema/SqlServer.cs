@@ -229,65 +229,31 @@ foreach(var table in Tables) {
             
             #line default
             #line hidden
-            this.Write("\r\n    }\r\n\r\n    public static class SqlSchema\r\n    {\r\n        public static IDicti" +
-                    "onary<string, IDictionary<string, int>> Tables;\r\n\r\n        static SqlSchema() \r\n" +
-                    "        {\r\n            Tables = new Dictionary<string, IDictionary<string, int>>" +
-                    "();\r\n\r\n");
+            this.Write("\r\n    }\r\n\r\n    public abstract class ProgramBase : IQueryUnit\r\n    {\r\n        pri" +
+                    "vate Database _db;\r\n\r\n");
             
-            #line 94 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
- foreach(var table in Tables) { 
-            
-            #line default
-            #line hidden
-            this.Write("            Tables[\"");
-            
-            #line 95 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"] = new Dictionary<string, int> {\r\n                ");
-            
-            #line 96 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
-
-                Write(string.Join(string.Format(",\n{0}", new String(' ', 16)), // indents
-                      table.Columns.Select(x => string.Format("{{ \"{0}\", {1} }}", x.Name, x.Index)))); 
-                
-            
-            #line default
-            #line hidden
-            this.Write("\r\n            };\r\n");
-            
-            #line 102 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
- } 
-            
-            #line default
-            #line hidden
-            this.Write("        }\r\n    }\r\n\r\n    public abstract class ProgramBase : IQueryUnit\r\n    {\r\n  " +
-                    "      private Database _db;\r\n\r\n");
-            
-            #line 110 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 90 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
  foreach(var table in Tables) { 
             
             #line default
             #line hidden
             this.Write("        protected IEntityTable<");
             
-            #line 111 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 91 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));
             
             #line default
             #line hidden
             this.Write("> ");
             
-            #line 111 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 91 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 112 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 92 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
  } 
             
             #line default
@@ -302,34 +268,62 @@ foreach(var table in Tables) {
             }
 
             var result = new DumperResult();
-            result.SqlColumns = SqlSchema.Tables;
-            Dumper.Result = result;
-            
-
+            result.SqlColumns = new Dictionary<string, IDictionary<string, int>>();
 ");
             
-            #line 127 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 104 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+ foreach(var table in Tables) { 
+            
+            #line default
+            #line hidden
+            this.Write("            result.SqlColumns[\"");
+            
+            #line 105 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\"] = new Dictionary<string, int> {\r\n                ");
+            
+            #line 106 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+
+                Write(string.Join(string.Format(",\n{0}", new String(' ', 16)), // indents
+                      table.Columns.Select(x => string.Format("{{ \"{0}\", {1} }}", x.Name, x.Index)))); 
+                
+            
+            #line default
+            #line hidden
+            this.Write("\r\n            };\r\n");
+            
+            #line 112 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\r\n            Dumper.Result = result;\r\n            \r\n\r\n");
+            
+            #line 117 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
  foreach(var table in Tables) { 
             
             #line default
             #line hidden
             this.Write("            ");
             
-            #line 128 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 118 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));
             
             #line default
             #line hidden
             this.Write(" = _db.");
             
-            #line 128 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 118 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 129 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
+            #line 119 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Schema\SqlServer.tt"
  } 
             
             #line default

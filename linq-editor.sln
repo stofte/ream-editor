@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor", "LinqEditor\LinqEditor.csproj", "{4540D92F-4F25-4713-ABCB-D4FA078CCEEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.WinForm", "LinqEditor.WinForm\LinqEditor.WinForm.csproj", "{4540D92F-4F25-4713-ABCB-D4FA078CCEEA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Generator", "LinqEditor.Generator\LinqEditor.Generator.csproj", "{800D694F-1037-4D5F-A860-DBD724DDCE5E}"
 EndProject

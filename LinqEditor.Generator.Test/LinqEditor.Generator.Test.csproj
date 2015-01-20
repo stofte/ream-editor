@@ -84,9 +84,9 @@
       <Project>{800d694f-1037-4d5f-a860-dbd724ddce5e}</Project>
       <Name>LinqEditor.Generator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LinqEditor\LinqEditor.csproj">
+    <ProjectReference Include="..\LinqEditor.WinForm\LinqEditor.WinForm.csproj">
       <Project>{4540d92f-4f25-4713-abcb-d4fa078cceea}</Project>
-      <Name>LinqEditor</Name>
+      <Name>LinqEditor.WinForm</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

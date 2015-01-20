@@ -83,26 +83,6 @@ foreach(var table in Tables) {
 
     }
 
-    public static class SqlSchema
-    {
-        public static IDictionary<string, IDictionary<string, int>> Tables;
-
-        static SqlSchema() 
-        {
-            Tables = new Dictionary<string, IDictionary<string, int>>();
-
-<# foreach(var table in Tables) { #>
-            Tables["<#=table.Name#>"] = new Dictionary<string, int> {
-                <#
-                Write(string.Join(string.Format(",\n{0}", new String(' ', 16)), // indents
-                      table.Columns.Select(x => string.Format("{{ \"{0}\", {1} }}", x.Name, x.Index)))); 
-                #>
-
-            };
-<# } #>
-        }
-    }
-
     public abstract class ProgramBase : IQueryUnit
     {
         private Database _db;
@@ -120,7 +100,17 @@ foreach(var table in Tables) {
             }
 
             var result = new DumperResult();
-            result.SqlColumns = SqlSchema.Tables;
+            result.SqlColumns = new Dictionary<string, IDictionary<string, int>>();
+<# foreach(var table in Tables) { #>
+            result.SqlColumns["<#=table.Name#>"] = new Dictionary<string, int> {
+                <#
+                Write(string.Join(string.Format(",\n{0}", new String(' ', 16)), // indents
+                      table.Columns.Select(x => string.Format("{{ \"{0}\", {1} }}", x.Name, x.Index)))); 
+                #>
+
+            };
+<# } #>
+
             Dumper.Result = result;
             
 

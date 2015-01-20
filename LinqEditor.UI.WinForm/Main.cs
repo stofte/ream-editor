@@ -199,8 +199,10 @@ namespace LinqEditor.UI.WinForm
 
         private async Task<IEnumerable<DataTable>> Execute()
         {
+            
             var tables = await ConnectionSession.Execute(Editor.Text);
             return tables;
+            
         }
 
         void MainContainer_SizeChanged(object sender, EventArgs e)

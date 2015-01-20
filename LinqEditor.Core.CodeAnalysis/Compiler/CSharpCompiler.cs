@@ -36,12 +36,23 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             return guid;
         }
 
+        public CompilerResult Compile(string src, string assemblyName, bool generateFiles, byte[] reference = null)
+        {
+            var refs = References.Concat(new[] { MetadataReference.CreateFromImage(reference) });
+            return Compile(src, assemblyName, generateFiles, refs.ToArray());
+        }
+
         public CompilerResult Compile(string src, string assemblyName, bool generateFiles, params string[] otherReferences)
         {
+            var refs = References.Concat(otherReferences.Length > 0 ? otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
+            return Compile(src, assemblyName, generateFiles, refs.ToArray());
+        }
 
+
+        private CompilerResult Compile(string src, string assemblyName, bool generateFiles, MetadataReference[] references)
+        {
             try
             {
-                var references = otherReferences.Length > 0 ? References.Concat(otherReferences.Select(x => MetadataReference.CreateFromFile(x))) : References;
                 var compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
                 var compilation = CSharpCompilation.Create(assemblyName, new[] { CSharpSyntaxTree.ParseText(src) }, references, compilerOptions);
 

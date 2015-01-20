@@ -16,9 +16,19 @@ namespace LinqEditor.Core.Backend.Isolated
         private string _dbType;
         private string _connectionString;
 
-        public void Initialize(string schemaAssemblyPath, string connectionString)
+        public void Initialize(byte[] assemblyImage, string connectionString)
         {
-            _schema = Assembly.LoadFile(schemaAssemblyPath);
+            Initialize(Assembly.Load(assemblyImage), connectionString);
+        }
+
+        public void Initialize(string assemblyPath, string connectionString)
+        {
+            Initialize(Assembly.LoadFile(assemblyPath), connectionString);
+        }
+
+        private void Initialize(Assembly assm, string connectionString)
+        {
+            _schema = assm;
             _dbType = string.Format("{0}.DatabaseWithAttributes", _schema.GetTypes()[0].Namespace);
             _connectionString = connectionString;
         }

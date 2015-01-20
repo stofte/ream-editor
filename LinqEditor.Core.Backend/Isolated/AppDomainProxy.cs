@@ -45,5 +45,11 @@ namespace LinqEditor.Core.Backend.Isolated
             provider.Connection.Close();
             return dumps;
         }
+
+        // http://blogs.microsoft.co.il/sasha/2008/07/19/appdomains-and-remoting-life-time-service/
+        public override object InitializeLifetimeService()
+        {   
+            return null;
+        }
     }
 }

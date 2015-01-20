@@ -26,6 +26,8 @@ namespace LinqEditor
         TabPage ConsoleTab;
         TabPage ResultTab;
         DataGridView ResultDataGrid;
+        StatusStrip StatusBar;
+        ToolStripStatusLabel EditorStatusBarLabel;
 
         TextBox ConnectionTextBox;
 
@@ -59,7 +61,7 @@ namespace LinqEditor
             FormClosed += Main_FormClosed;
 
             this.Load += Main_Load;
-            SuspendLayout();
+            
 
             MainContainer = new SplitContainer();
             MainContainer.Orientation = Orientation.Horizontal;
@@ -67,6 +69,13 @@ namespace LinqEditor
             MainContainer.TabStop = false;
             MainContainer.SizeChanged += MainContainer_SizeChanged;
 
+            // status
+            StatusBar = new StatusStrip();
+            StatusBar.Dock = DockStyle.Bottom;
+            StatusBar.GripStyle = ToolStripGripStyle.Hidden;
+            StatusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            EditorStatusBarLabel = new ToolStripStatusLabel();
+            
             // connection
             ConnectionTextBox = new TextBox();
             ConnectionTextBox.Dock = DockStyle.Top;
@@ -93,8 +102,8 @@ namespace LinqEditor
             executeButton = new ToolStripButton();
             executeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             executeButton.Image = Icons.play;
-            //executeButton.Size = new System.Drawing.Size(16, 16);
             executeButton.Click += executeButton_Click;
+            executeButton.Enabled = false;
             Toolbar.Items.Add(executeButton);
 
             // tabControl
@@ -117,15 +126,24 @@ namespace LinqEditor
             ResultDataGrid.AllowUserToAddRows = false;
             ResultDataGrid.DataBindingComplete += ResultDataGrid_DataBindingComplete;
             ResultTab.Controls.Add(ResultDataGrid);
-            
+
+            StatusBar.SuspendLayout();
+            SuspendLayout();
             // add controls
-            Controls.Add(MainContainer);
-            Controls.Add(Toolbar);
+
             MainContainer.Panel1.Controls.Add(Editor);
             MainContainer.Panel1.Controls.Add(ConnectionTextBox);
             MainContainer.Panel2.Controls.Add(TabControl);
-            executeButton.Enabled = false;
+
+            Controls.Add(MainContainer);
+            Controls.Add(Toolbar);
+            Controls.Add(StatusBar);
+
+            StatusBar.ResumeLayout(false);
+            StatusBar.PerformLayout();
+
             ResumeLayout(false);
+            PerformLayout();
 
             Editor.ConfigurationManager.Language = "cs";
 

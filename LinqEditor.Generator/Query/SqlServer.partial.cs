@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Generator.Query
 {
-    public partial class SqlServer : IQueryGenerator
+    public partial class SqlServer 
     {
         public int NamespaceId { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }
@@ -18,7 +18,7 @@ namespace LinqEditor.Generator.Query
         // todo duplicated from schema
         public string GeneratedQueryNamespace
         {
-            get { return "LinqEditorGeneratedQuery" + NamespaceId; }
+            get { return "q" + NamespaceId; }
         }
     }
 }

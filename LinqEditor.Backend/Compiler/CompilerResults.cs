@@ -13,6 +13,7 @@ namespace LinqEditor.Backend.Compiler
     {
         public Exception Error { get; set; }
         public Assembly CompiledAssembly { get; set; }
+        public byte[] CompiledAssemblyImage { get; set; }
         public string CompiledAssemblyPath { get; set; }
         public Diagnostic[] CompilationErrors { get; set; }
     }

@@ -43,10 +43,7 @@ namespace LinqEditor.Backend.Compiler
             try
             {
                 var references = otherReferences.Length > 0 ? References.Concat(otherReferences.Select(x => MetadataReference.CreateFromFile(x))) : References;
-
                 var compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
-                
-
                 var compilation = CSharpCompilation.Create(assemblyName, new[] { CSharpSyntaxTree.ParseText(src) }, references, compilerOptions);
 
                 // generate dll, assemblies generated in memory by roslyn,
@@ -68,15 +65,15 @@ namespace LinqEditor.Backend.Compiler
                 {
                     file.Write(src);
                 }
-                
 
-                //var stream = new MemoryStream();
-                //var compilationResult = compilation.Emit(stream);
+                var stream = new MemoryStream();
+                compilation.Emit(stream);
 
                 return new CompilerResult
                 {
                     //CompiledAssembly = compilationResult.Success ? Assembly.LoadFile(filename + ".dll") : null,
                     CompilationErrors = compilationResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray(),
+                    CompiledAssemblyImage = compilationResult.Success ? stream.ToArray() : null,
                     CompiledAssemblyPath = filename + ".dll"
                 };
             }

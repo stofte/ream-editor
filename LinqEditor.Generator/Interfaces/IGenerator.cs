@@ -9,8 +9,7 @@ namespace LinqEditor.Generator.Interfaces
 {
     public interface IGenerator
     {
-        int NamespaceId { get; set; }
-        IEnumerable<TableSchema> Tables { get; set; }
-        string TransformText();
+        string GenerateSchema(int schemaId, out string assemblyNamespace, IEnumerable<TableSchema> tables);
+        string GenerateQuery(int queryId, out string assemblyNamespace, string sourceFragment, string schemaAssemblyNamespace);
     }
 }

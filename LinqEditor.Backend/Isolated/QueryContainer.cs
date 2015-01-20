@@ -25,10 +25,21 @@ namespace LinqEditor.Backend.Isolated
             _connectionString = connectionString;
         }
 
+        public IEnumerable<DataTable> Execute(byte[] assembly)
+        {
+            var assm = Assembly.Load(assembly);
+            return Execute(assm);
+        }
+
         public IEnumerable<DataTable> Execute(string queryAssemblyPath)
         {
-            var queryAssembly = Assembly.LoadFile(queryAssemblyPath);
-            var queryType = queryAssembly.GetType(string.Format("{0}.Program", queryAssembly.GetTypes()[0].Namespace));
+            var assm = Assembly.LoadFile(queryAssemblyPath);
+            return Execute(assm);
+        }
+
+        private IEnumerable<DataTable> Execute(Assembly assm)
+        {
+            var queryType = assm.GetType(string.Format("{0}.Program", assm.GetTypes()[0].Namespace));
             var instance = Activator.CreateInstance(queryType) as IQueryUnit;
             var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", _connectionString, _dbType);
             provider.Connection.Open();

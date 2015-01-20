@@ -50,10 +50,9 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator.cs" />
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Interfaces\IGenerator.cs" />
-    <Compile Include="Interfaces\IQueryGenerator.cs" />
-    <Compile Include="Interfaces\ISchemaGenerator.cs" />
     <Compile Include="Schema\SqlServer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

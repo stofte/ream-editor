@@ -17,6 +17,7 @@ namespace IQToolkit.Data
 {
     using Common;
     using Mapping;
+    using System.Configuration;
 
     public class DbEntityProvider : EntityProvider
     {
@@ -85,9 +86,9 @@ namespace IQToolkit.Data
 
         public static DbEntityProvider FromApplicationSettings()
         {
-            var provider = System.Configuration.ConfigurationSettings.AppSettings["Provider"];
-            var connection = System.Configuration.ConfigurationSettings.AppSettings["Connection"];
-            var mapping = System.Configuration.ConfigurationSettings.AppSettings["Mapping"];
+            var provider = ConfigurationManager.AppSettings["Provider"];
+            var connection = ConfigurationManager.AppSettings["Connection"];
+            var mapping = ConfigurationManager.AppSettings["Mapping"];
             return From(provider, connection, mapping);
         }
 

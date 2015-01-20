@@ -14,8 +14,7 @@ namespace LinqEditor.Generator.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<IQueryGenerator>().ImplementedBy<Query.SqlServer>());
-            container.Register(Component.For<ISchemaGenerator>().ImplementedBy<Schema.SqlServer>());
+            container.Register(Component.For<IGenerator>().ImplementedBy<Generator>());
         }
     }
 }

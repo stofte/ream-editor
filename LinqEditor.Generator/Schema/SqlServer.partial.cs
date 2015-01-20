@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Generator.Schema
 {
-    public partial class SqlServer : ISchemaGenerator
+    public partial class SqlServer
     {
         public int NamespaceId { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }

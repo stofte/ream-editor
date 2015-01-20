@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.WinForm", "LinqEditor.WinForm\LinqEditor.WinForm.csproj", "{4540D92F-4F25-4713-ABCB-D4FA078CCEEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.UI.WinForm", "LinqEditor.UI.WinForm\LinqEditor.UI.WinForm.csproj", "{4540D92F-4F25-4713-ABCB-D4FA078CCEEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Generator", "LinqEditor.Generator\LinqEditor.Generator.csproj", "{800D694F-1037-4D5F-A860-DBD724DDCE5E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Generator.Test", "LinqEditor.Generator.Test\LinqEditor.Generator.Test.csproj", "{C954BDB2-F717-48B4-A4A7-2851A01F2B09}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Templates", "LinqEditor.Core.Templates\LinqEditor.Core.Templates.csproj", "{800D694F-1037-4D5F-A860-DBD724DDCE5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit", "IQToolkit\IQToolkit.csproj", "{0DA62A7C-3B40-456F-A4B2-B3E19ED4080E}"
 EndProject
@@ -13,11 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Data", "IQToolkit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Data.SqlClient", "IQToolkit.Data.SqlClient\IQToolkit.Data.SqlClient.csproj", "{3F003957-1B67-440B-BAFE-C2B32886A429}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Backend", "LinqEditor.Backend\LinqEditor.Backend.csproj", "{D390945F-63A1-4037-B3AB-1367DD1FF493}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Schema", "LinqEditor.Core.Schema\LinqEditor.Core.Schema.csproj", "{2BEA4DEC-069D-4C2C-A022-F9696C268E64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Backend.Test", "LinqEditor.Backend.Test\LinqEditor.Backend.Test.csproj", "{4FFEB651-1E35-4AD3-876E-ED9E957E437E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Backend", "LinqEditor.Core.Backend\LinqEditor.Core.Backend.csproj", "{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Schema", "LinqEditor.Schema\LinqEditor.Schema.csproj", "{2BEA4DEC-069D-4C2C-A022-F9696C268E64}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.CodeAnalysis", "LinqEditor.Core.CodeAnalysis\LinqEditor.Core.CodeAnalysis.csproj", "{A9A7B56D-772C-4475-ACE4-2B4B495794DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Utility", "LinqEditor.Utility\LinqEditor.Utility.csproj", "{53F0654D-867F-49B8-8443-4C3486FB8309}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,6 @@ Global
 		{800D694F-1037-4D5F-A860-DBD724DDCE5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{800D694F-1037-4D5F-A860-DBD724DDCE5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{800D694F-1037-4D5F-A860-DBD724DDCE5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C954BDB2-F717-48B4-A4A7-2851A01F2B09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C954BDB2-F717-48B4-A4A7-2851A01F2B09}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C954BDB2-F717-48B4-A4A7-2851A01F2B09}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C954BDB2-F717-48B4-A4A7-2851A01F2B09}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0DA62A7C-3B40-456F-A4B2-B3E19ED4080E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0DA62A7C-3B40-456F-A4B2-B3E19ED4080E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DA62A7C-3B40-456F-A4B2-B3E19ED4080E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -49,18 +45,22 @@ Global
 		{3F003957-1B67-440B-BAFE-C2B32886A429}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F003957-1B67-440B-BAFE-C2B32886A429}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F003957-1B67-440B-BAFE-C2B32886A429}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D390945F-63A1-4037-B3AB-1367DD1FF493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D390945F-63A1-4037-B3AB-1367DD1FF493}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D390945F-63A1-4037-B3AB-1367DD1FF493}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D390945F-63A1-4037-B3AB-1367DD1FF493}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FFEB651-1E35-4AD3-876E-ED9E957E437E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FFEB651-1E35-4AD3-876E-ED9E957E437E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FFEB651-1E35-4AD3-876E-ED9E957E437E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FFEB651-1E35-4AD3-876E-ED9E957E437E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2BEA4DEC-069D-4C2C-A022-F9696C268E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2BEA4DEC-069D-4C2C-A022-F9696C268E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BEA4DEC-069D-4C2C-A022-F9696C268E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BEA4DEC-069D-4C2C-A022-F9696C268E64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A7B56D-772C-4475-ACE4-2B4B495794DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A7B56D-772C-4475-ACE4-2B4B495794DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A7B56D-772C-4475-ACE4-2B4B495794DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A7B56D-772C-4475-ACE4-2B4B495794DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F0654D-867F-49B8-8443-4C3486FB8309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F0654D-867F-49B8-8443-4C3486FB8309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F0654D-867F-49B8-8443-4C3486FB8309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F0654D-867F-49B8-8443-4C3486FB8309}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,125 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using System.IO;
+using System.Linq;
+using System.Data;
+using System.Collections.Generic;
+using IQToolkit;
+using IQToolkit.Data;
+using IQToolkit.Data.Mapping;
+using LinqEditor.Core.CodeAnalysis.Injected;
+
+namespace <#=GeneratedSchemaNamespace#>.Schema {
+
+<#
+foreach(var table in Tables) {
+#>
+    public class <#=table.Name#> {
+<#
+    foreach(var column in table.Columns) {
+#>
+        public <#=column.Type#> <#=column.Name#> { get; set; }
+<#
+    }
+#>
+    }
+<#
+}
+#>
+
+    public class Database 
+    {
+        private IEntityProvider provider;
+
+        public Database(IEntityProvider provider) {
+            this.provider = provider;
+        }
+
+        public IEntityProvider Provider
+        {
+            get { return this.provider; }
+        }
+
+<#
+foreach(var table in Tables) {
+#>
+        public virtual IEntityTable<<#=table.Name#>> <#=table.Name#>
+        {
+            get { return this.provider.GetTable<<#=table.Name#>>("<#=table.Name#>"); }
+        }
+<#
+}
+#>
+    }
+
+    public class DatabaseWithAttributes : Database
+    {
+        public DatabaseWithAttributes(IEntityProvider provider) 
+            : base(provider) { }
+
+<#
+foreach(var table in Tables) {
+#>
+        [Table]
+<#
+        foreach(var column in table.Columns) {
+#>
+        [Column(Member = "<#=column.Name#>")]
+<#
+}
+#>
+        public override IEntityTable<<#=table.Name#>> <#=table.Name#>
+        {
+            get { return this.<#=table.Name#>; }
+        }
+<#
+}
+#>
+
+    }
+
+    public abstract class ProgramBase : IDynamicQuery
+    {
+        private Database _db;
+
+<# foreach(var table in Tables) { #>
+        protected IEntityTable<<#=table.Name#>> <#=table.Name#>;
+<# } #>
+
+        // entry point for static code
+        public IEnumerable<DataTable> Execute(IEntityProvider provider) 
+        {
+            if (_db == null) 
+            {
+                _db = new Database(provider);
+            }
+
+
+            Dumper.SqlColumns = new Dictionary<string, IDictionary<string, int>>();
+<# foreach(var table in Tables) { #>
+            Dumper.SqlColumns["<#=table.Name#>"] = new Dictionary<string, int> {
+                <#
+                Write(string.Join(string.Format(",\n{0}", new String(' ', 16)), // indents
+                      table.Columns.Select(x => string.Format("{{ \"{0}\", {1} }}", x.Name, x.Index)))); 
+                #>
+
+            };
+<# } #>
+
+
+<# foreach(var table in Tables) { #>
+            <#=table.Name#> = _db.<#=table.Name#>;
+<# } #>
+
+            Query();
+
+            return Dumper.FlushDumps();
+        }
+
+        protected abstract void Query();
+    }
+}

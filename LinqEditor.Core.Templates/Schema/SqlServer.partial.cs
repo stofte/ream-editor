@@ -11,12 +11,12 @@ namespace LinqEditor.Core.Templates.Schema
 {
     public partial class SqlServer
     {
-        public int NamespaceId { get; set; }
+        public Guid NamespaceId { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }
 
         public string GeneratedSchemaNamespace
         {
-            get { return "s" + NamespaceId; }
+            get { return "s" + NamespaceId.ToString().Replace("-", ""); }
         }
     }
 }

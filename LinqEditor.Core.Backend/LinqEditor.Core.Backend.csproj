@@ -58,10 +58,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IQToolkit.Data.SqlClient\IQToolkit.Data.SqlClient.csproj">
-      <Project>{3f003957-1b67-440b-bafe-c2b32886a429}</Project>
-      <Name>IQToolkit.Data.SqlClient</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IQToolkit.Data\IQToolkit.Data.csproj">
       <Project>{3a356510-9c25-4a94-87b9-eeb31b6a1303}</Project>
       <Name>IQToolkit.Data</Name>
@@ -81,6 +77,10 @@
     <ProjectReference Include="..\LinqEditor.Core.Schema\LinqEditor.Core.Schema.csproj">
       <Project>{2bea4dec-069d-4c2c-a022-f9696c268e64}</Project>
       <Name>LinqEditor.Core.Schema</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Utility\LinqEditor.Utility.csproj">
+      <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
+      <Name>LinqEditor.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

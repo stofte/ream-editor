@@ -1,5 +1,5 @@
 ﻿using IQToolkit.Data;
-using LinqEditor.Core.CodeAnalysis.Injected;
+using LinqEditor.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data;

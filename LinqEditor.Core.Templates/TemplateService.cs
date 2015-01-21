@@ -8,7 +8,7 @@ namespace LinqEditor.Core.Templates
 {
     public class TemplateService : ITemplateService
     {
-        public string GenerateSchema(int schemaId, out string schemaNamespace, IEnumerable<LinqEditor.Core.Schema.Models.TableSchema> tables)
+        public string GenerateSchema(Guid schemaId, out string schemaNamespace, IEnumerable<LinqEditor.Core.Schema.Models.TableSchema> tables)
         {
             var gen = new Schema.SqlServer()
             {
@@ -22,7 +22,7 @@ namespace LinqEditor.Core.Templates
 
         }
 
-        public string GenerateQuery(int queryId, out string assemblyNamespace, string sourceFragment, string schemaNamespace)
+        public string GenerateQuery(Guid queryId, out string assemblyNamespace, string sourceFragment, string schemaNamespace)
         {
             var gen = new Query.SqlServer()
             {

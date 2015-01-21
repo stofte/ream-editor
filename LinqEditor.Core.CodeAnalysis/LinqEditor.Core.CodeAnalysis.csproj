@@ -90,8 +90,6 @@
     <Compile Include="Compiler\CompilerResults.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Compiler\ICSharpCompiler.cs" />
-    <Compile Include="Injected\Dumper.cs" />
-    <Compile Include="Injected\IDynamicQuery.cs" />
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -110,6 +108,10 @@
     <ProjectReference Include="..\IQToolkit\IQToolkit.csproj">
       <Project>{0da62a7c-3b40-456f-a4b2-b3e19ed4080e}</Project>
       <Name>IQToolkit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Utility\LinqEditor.Utility.csproj">
+      <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
+      <Name>LinqEditor.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

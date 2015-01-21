@@ -18,7 +18,7 @@ namespace LinqEditor.Core.Templates.Query
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Query\SqlServer.tt"
+    #line 1 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "11.0.0.0")]
     public partial class SqlServer : SqlServerBase
     {
@@ -30,16 +30,17 @@ namespace LinqEditor.Core.Templates.Query
         {
             this.Write("using System;\r\nusing System.IO;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing Sy" +
                     "stem.Collections.Generic;\r\nusing IQToolkit;\r\nusing IQToolkit.Data;\r\nusing IQTool" +
-                    "kit.Data.Mapping;\r\nusing LinqEditor.Core.CodeAnalysis.Injected;\r\nusing ");
+                    "kit.Data.Mapping;\r\nusing LinqEditor.Utility;\r\nusing LinqEditor.Utility.Helpers;\r" +
+                    "\nusing ");
             
-            #line 15 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Query\SqlServer.tt"
+            #line 16 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedSchemaNamespace));
             
             #line default
             #line hidden
             this.Write(".Schema;\r\n\r\nnamespace ");
             
-            #line 17 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Query\SqlServer.tt"
+            #line 18 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedQueryNamespace));
             
             #line default
@@ -47,7 +48,7 @@ namespace LinqEditor.Core.Templates.Query
             this.Write(" {\r\n\r\n    public class Program : ProgramBase\r\n    {\r\n        protected override v" +
                     "oid Query() \r\n        {\r\n");
             
-            #line 23 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Generator\Query\SqlServer.tt"
+            #line 24 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SourceCode));
             
             #line default

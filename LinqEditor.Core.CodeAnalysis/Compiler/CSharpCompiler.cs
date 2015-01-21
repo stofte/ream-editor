@@ -26,7 +26,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.QueryProvider).Assembly), // IQToolkit.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.DbEntityProvider).Assembly), // IQToolkit.Data.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.SqlClient.TSqlLanguage).Assembly), // IQToolkit.Data.SqlClient.dll
-                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Core.CodeAnalysis.Injected.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
+                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Utility.Helpers.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
             };
         }
 
@@ -84,8 +84,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 else
                 {
                     stream = new MemoryStream();
-                    compilationResult = compilation.Emit(stream);
-
+                    compilationResult = compilation.Emit(stream, options: new EmitOptions());
                 }
 
                 return new CompilerResult

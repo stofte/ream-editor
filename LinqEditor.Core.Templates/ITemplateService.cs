@@ -9,7 +9,7 @@ namespace LinqEditor.Core.Templates
 {
     public interface ITemplateService
     {
-        string GenerateSchema(int schemaId, out string assemblyNamespace, IEnumerable<TableSchema> tables);
-        string GenerateQuery(int queryId, out string assemblyNamespace, string sourceFragment, string schemaAssemblyNamespace);
+        string GenerateSchema(Guid schemaId, out string assemblyNamespace, IEnumerable<TableSchema> tables);
+        string GenerateQuery(Guid queryId, out string assemblyNamespace, string sourceFragment, string schemaAssemblyNamespace);
     }
 }

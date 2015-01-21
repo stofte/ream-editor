@@ -20,8 +20,8 @@ namespace LinqEditor.Core.Backend.Repository
         private string _schemaPath;
         private byte[] _schemaImage;
         private string _schemaNamespace;
-        private int _sessionId = SessionCounter++; // should be ok
-        private int _queryId = 0;
+        private Guid _sessionId = Guid.NewGuid();
+        private Guid _queryId = Guid.NewGuid();
 
         //private AppDomain _executionDomain;
 
@@ -50,13 +50,12 @@ namespace LinqEditor.Core.Backend.Repository
                 _sqlTables = _schemaProvider.GetSchema(_connectionString);
                 _schemaNamespace = "";
                 var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, _sqlTables);
-                var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: false);
+                var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
                 _schemaPath = result.AssemblyPath;
                 _schemaImage = result.AssemblyBytes;
                 // loads schema in new appdomain
                 _container = new Isolated<AppDomainProxy>();
-                _container.Value.Initialize(_schemaImage, _connectionString);
-
+                _container.Value.Initialize(_schemaPath, _connectionString);
             });
         }
 
@@ -65,8 +64,8 @@ namespace LinqEditor.Core.Backend.Repository
             return await Task.Run(() =>
             {
                 string queryNamespace;
-                var querySource = _generator.GenerateQuery(_queryId++, out queryNamespace, sourceFragment, _schemaNamespace);
-                var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, reference: _schemaImage);
+                var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
+                var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
                 return _container.Value.Execute(result.AssemblyBytes);
             });
         }

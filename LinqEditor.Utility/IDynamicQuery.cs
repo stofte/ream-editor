@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.CodeAnalysis.Injected
+namespace LinqEditor.Utility
 {
     /// <summary>
     /// Dynamic query class implements this interface to make working with it easier.

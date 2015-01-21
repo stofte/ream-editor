@@ -1,7 +1,9 @@
 ﻿using Castle.MicroKernel;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
+using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.Backend.Repository;
+using ScintillaNET;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -61,7 +63,6 @@ namespace LinqEditor.UI.WinForm
 
             this.Load += Main_Load;
             
-
             MainContainer = new SplitContainer();
             MainContainer.Orientation = Orientation.Horizontal;
             MainContainer.Dock = DockStyle.Fill;
@@ -151,7 +152,7 @@ namespace LinqEditor.UI.WinForm
 
         async void Main_Load(object sender, EventArgs e)
         {
-            await ConnectionSession.Initialize();
+            var result = await ConnectionSession.Initialize(ConnectionTextBox.Text);
             executeButton.Enabled = true;
         }
 
@@ -185,6 +186,14 @@ namespace LinqEditor.UI.WinForm
                 executeButton.PerformClick();
                 return true;
             }
+            else if (keyData == Keys.F6)
+            {
+                var rr = Editor.GetRange(0, 3);
+                var indicator = Editor.Indicators[0];
+                indicator.Color = Color.Red;
+                rr.SetIndicator(indicator.Index);
+                return true;
+            }
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
@@ -192,17 +201,17 @@ namespace LinqEditor.UI.WinForm
         {
             var btn = sender as ToolStripButton;
             btn.Enabled = false;
-            var tables = await Execute();
-            ResultDataGrid.DataSource = tables.First();
+            var result = await Execute();
+            if (result.Success)
+            {
+                ResultDataGrid.DataSource = result.Tables.First();
+            }
             btn.Enabled = true;
         }
 
-        private async Task<IEnumerable<DataTable>> Execute()
+        private async Task<ExecuteResult> Execute()
         {
-            
-            var tables = await ConnectionSession.Execute(Editor.Text);
-            return tables;
-            
+            return await ConnectionSession.Execute(Editor.Text);
         }
 
         void MainContainer_SizeChanged(object sender, EventArgs e)

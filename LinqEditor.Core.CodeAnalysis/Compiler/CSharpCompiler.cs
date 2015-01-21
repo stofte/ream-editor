@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LinqEditor.Core.CodeAnalysis.Models;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using System;
@@ -89,8 +90,37 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
                 return new CompilerResult
                 {
-                    Errors = compilationResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray(),
-                    Warnings = compilationResult.Diagnostics.Where(w => w.Severity == DiagnosticSeverity.Warning).ToArray(),
+                    Success = compilationResult.Success,
+                    Errors = compilationResult.Diagnostics.Where(e => e.Severity == DiagnosticSeverity.Error).Select(x =>
+                    {
+                        var loc = x.Location.GetMappedLineSpan().Span;
+                        return new Error
+                        {
+                            Location = new LocationSpan
+                            {
+                                StartLine = loc.Start.Line,
+                                StartColumn = loc.Start.Character,
+                                EndLine = loc.End.Line,
+                                EndColumn = loc.End.Character
+                            },
+                            Message = x.GetMessage()
+                        };
+                    }),
+                    Warnings = compilationResult.Diagnostics.Where(w => w.Severity == DiagnosticSeverity.Warning).Select(x =>
+                    {
+                        var loc = x.Location.GetMappedLineSpan().Span;
+                        return new Warning
+                        {
+                            Location = new LocationSpan
+                            {
+                                StartLine = loc.Start.Line,
+                                StartColumn = loc.Start.Character,
+                                EndLine = loc.End.Line,
+                                EndColumn = loc.End.Character
+                            },
+                            Message = x.GetMessage()
+                        };
+                    }),
                     AssemblyBytes = compilationResult.Success && !generateFiles ? stream.ToArray() : null,
                     AssemblyPath = generateFiles ? filename + ".dll" : null
                 };

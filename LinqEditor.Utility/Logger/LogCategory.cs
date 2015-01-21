@@ -8,6 +8,8 @@ namespace LinqEditor.Utility.Logger
 {
     public enum LogCategory
     {
-
+        Information,
+        Warning,
+        Error
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqEditor.Core.Backend.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace LinqEditor.Core.Backend.Repository
 {
     public interface ISession
     {
-        Task Initialize();
-        Task<IEnumerable<DataTable>> Execute(string sourceFragment);
+        Task<InitializeResult> Initialize(string connectionString);
+        Task<ExecuteResult> Execute(string sourceFragment);
     }
 }

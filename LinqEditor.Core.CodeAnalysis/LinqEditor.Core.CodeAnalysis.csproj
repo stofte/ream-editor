@@ -91,6 +91,9 @@
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Compiler\ICSharpCompiler.cs" />
     <Compile Include="Installers\Installer.cs" />
+    <Compile Include="Models\Error.cs" />
+    <Compile Include="Models\LocationSpan.cs" />
+    <Compile Include="Models\Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.Backend.Models;
+using LinqEditor.Core.CodeAnalysis.Models;
 
 namespace LinqEditor.Core.Backend.Repository
 {
@@ -31,22 +33,22 @@ namespace LinqEditor.Core.Backend.Repository
 
         //private DbEntityProvider _entityProvider;
 
-        private Isolated<AppDomainProxy> _container;
+        private Isolated<Runner> _container;
 
-        public Session(string connectionString, ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator)
+        public Session(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator)
         {
-            _connectionString = connectionString;
             _compiler = compiler;
             _schemaProvider = schemaProvider;
             _generator = generator;
         }
 
-        public async Task Initialize()
+        public async Task<InitializeResult> Initialize(string connectionString)
         {
             // ok to use Task.Run when "just" offloading from UI thread
             // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
+                _connectionString = connectionString;
                 _sqlTables = _schemaProvider.GetSchema(_connectionString);
                 _schemaNamespace = "";
                 var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, _sqlTables);
@@ -54,19 +56,52 @@ namespace LinqEditor.Core.Backend.Repository
                 _schemaPath = result.AssemblyPath;
                 _schemaImage = result.AssemblyBytes;
                 // loads schema in new appdomain
-                _container = new Isolated<AppDomainProxy>();
-                _container.Value.Initialize(_schemaPath, _connectionString);
+                _container = new Isolated<Runner>();
+                return _container.Value.Initialize(_schemaPath, _connectionString);
             });
         }
 
-        public async Task<IEnumerable<DataTable>> Execute(string sourceFragment)
+        public async Task<ExecuteResult> Execute(string sourceFragment)
         {
             return await Task.Run(() =>
             {
-                string queryNamespace;
-                var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
-                var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
-                return _container.Value.Execute(result.AssemblyBytes);
+                bool execSuccess = false;
+                IEnumerable<DataTable> tables = null;
+                IEnumerable<Warning> warnings = null;
+                Exception execException = null;
+                Exception userException = null;
+
+                try
+                {
+                    string queryNamespace;
+                    
+                    var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
+                    var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
+
+                    warnings = result.Warnings;
+
+                    if (result.Success)
+                    {
+                        var containerResult = _container.Value.Execute(result.AssemblyBytes);
+                        execSuccess = containerResult.Success;
+                        userException = containerResult.Exception;
+                        tables = containerResult.Tables;
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    execException = e;
+                }
+
+                return new ExecuteResult
+                {
+                    Success = execSuccess,
+                    Tables = tables,
+                    Warnings = warnings,
+                    Exception = userException,
+                    InternalException = execException
+                };
             });
         }
 

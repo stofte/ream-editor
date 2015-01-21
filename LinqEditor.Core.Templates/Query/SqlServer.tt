@@ -21,6 +21,7 @@ namespace <#=GeneratedQueryNamespace#> {
     {
         protected override void Query() 
         {
+#line 1 "Dynamic"
 <#=SourceCode#>
         }
     }

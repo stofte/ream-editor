@@ -96,12 +96,13 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                         var loc = x.Location.GetMappedLineSpan().Span;
                         return new Error
                         {
+                            // errors are for display purposes, so offsetting one
                             Location = new LocationSpan
                             {
-                                StartLine = loc.Start.Line,
-                                StartColumn = loc.Start.Character,
-                                EndLine = loc.End.Line,
-                                EndColumn = loc.End.Character
+                                StartLine = loc.Start.Line+1,
+                                StartColumn = loc.Start.Character+1,
+                                EndLine = loc.End.Line+1,
+                                EndColumn = loc.End.Character+1
                             },
                             Message = x.GetMessage()
                         };
@@ -113,10 +114,10 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                         {
                             Location = new LocationSpan
                             {
-                                StartLine = loc.Start.Line,
-                                StartColumn = loc.Start.Character,
-                                EndLine = loc.End.Line,
-                                EndColumn = loc.End.Character
+                                StartLine = loc.Start.Line+1,
+                                StartColumn = loc.Start.Character+1,
+                                EndLine = loc.End.Line+1,
+                                EndColumn = loc.End.Character+1
                             },
                             Message = x.GetMessage()
                         };

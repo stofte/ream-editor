@@ -25,7 +25,7 @@ namespace LinqEditor.UI.WinForm
         ToolStripButton executeButton;
         TabControl TabControl;
         TabPage ConsoleTab;
-        TabPage ResultTab;
+        TabPage DiagnosticsTab;
         DataGridView ResultDataGrid;
         StatusStrip StatusBar;
         ToolStripStatusLabel EditorStatusBarLabel;
@@ -83,6 +83,7 @@ namespace LinqEditor.UI.WinForm
             // connection
             ConnectionTextBox = new TextBox();
             ConnectionTextBox.Dock = DockStyle.Top;
+            ConnectionTextBox.ReadOnly = true;
             ConnectionTextBox.Text = TestConnectionString;
 
             // scintilla
@@ -114,8 +115,6 @@ namespace LinqEditor.UI.WinForm
             TabControl = new TabControl();
             TabControl.Dock = DockStyle.Fill;
             ConsoleTab = new TabPage("Console");
-            //ResultTab = new TabPage("Results");
-            //ResultTab.ClientSizeChanged += ResultTab_ClientSizeChanged;
             TabControl.TabPages.AddRange(new[] { ConsoleTab });
 
             Console = new RichTextBox();
@@ -125,16 +124,9 @@ namespace LinqEditor.UI.WinForm
             Console.BackColor = Color.White;
             ConsoleTab.Controls.Add(Console);
 
-            //ResultDataGrid = new DataGridView();
-            //ResultDataGrid.ReadOnly = true;
-            //ResultDataGrid.AllowUserToAddRows = false;
-            //ResultDataGrid.DataBindingComplete += ResultDataGrid_DataBindingComplete;
-            //ResultTab.Controls.Add(ResultDataGrid);
-
+            // add controls
             StatusBar.SuspendLayout();
             SuspendLayout();
-            // add controls
-
             MainContainer.Panel1.Controls.Add(Editor);
             MainContainer.Panel1.Controls.Add(ConnectionTextBox);
             MainContainer.Panel2.Controls.Add(TabControl);
@@ -207,7 +199,10 @@ namespace LinqEditor.UI.WinForm
             var result = await Execute();
             if (result.Success)
             {
+                Console.AppendText("Query Text");
+                Console.AppendText(result.QueryText);
                 BindResults(result.Tables);
+
                 if (TabControl.TabPages.Count > 0)
                 {
                     TabControl.SelectedTab = TabControl.TabPages[1];
@@ -226,24 +221,6 @@ namespace LinqEditor.UI.WinForm
             var container = sender as SplitContainer;
             ConnectionTextBox.Width = container.ClientSize.Width;
         }
-
-        //void ResultTab_ClientSizeChanged(object sender, EventArgs e)
-        //{
-        //    var tab = sender as TabPage;
-        //    ResultDataGrid.Height = tab.ClientSize.Height;
-        //    ResultDataGrid.Width = tab.ClientSize.Width;
-        //}
-
-        //void ResultDataGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        //{
-        //    var view = sender as DataGridView;
-        //    for (var i = 0; i < view.Columns.Count; i++)
-        //    {
-        //        view.Columns[i].AutoSizeMode = i < view.Columns.Count - 1 ?
-        //            DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
-        //    }
-        //    TabControl.SelectedTab = ResultTab;
-        //}
 
         private void BindResults(IEnumerable<DataTable> tables)
         {
@@ -270,11 +247,6 @@ namespace LinqEditor.UI.WinForm
             TabControl.TabPages.AddRange(ResultTabs.ToArray());
             ResumeLayout();
 
-            //foreach (var tab in ResultTabs)
-            //{
-            //    var grid = tab.Controls[0] as DataGridView;
-                
-            //}
         }
 
         void grid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

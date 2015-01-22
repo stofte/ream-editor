@@ -4,6 +4,7 @@ using LinqEditor.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -75,6 +76,7 @@ namespace LinqEditor.Core.Backend.Isolated
                 var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
                 var instance = Activator.CreateInstance(queryType) as IDynamicQuery;
                 var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", _connectionString, _dbType);
+                provider.Log = new StringWriter(); 
                 provider.Connection.Open();
                 var dumps = instance.Execute(provider);
                 provider.Connection.Close();
@@ -82,7 +84,8 @@ namespace LinqEditor.Core.Backend.Isolated
                 return new ExecuteResult
                 {
                     Tables = dumps,
-                    Success = true
+                    Success = true,
+                    QueryText = provider.Log.ToString()
                 };
             }
             catch (Exception e)

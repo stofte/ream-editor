@@ -65,43 +65,30 @@ namespace LinqEditor.Core.Backend.Repository
         {
             return await Task.Run(() =>
             {
-                bool execSuccess = false;
-                IEnumerable<DataTable> tables = null;
-                IEnumerable<Warning> warnings = null;
-                Exception execException = null;
-                Exception userException = null;
+                string queryNamespace;
+                var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
+                var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
 
-                try
+                if (result.Success)
                 {
-                    string queryNamespace;
-                    
-                    var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
-                    var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
+                    var containerResult = _container.Value.Execute(result.AssemblyBytes);
 
-                    warnings = result.Warnings;
-
-                    if (result.Success)
+                    return new ExecuteResult
                     {
-                        var containerResult = _container.Value.Execute(result.AssemblyBytes);
-                        execSuccess = containerResult.Success;
-                        userException = containerResult.Exception;
-                        tables = containerResult.Tables;
-                    }
-                    
-                }
-                catch (Exception e)
-                {
-                    execException = e;
+                        Success = containerResult.Success,
+                        QueryText = containerResult.QueryText,
+                        Tables = containerResult.Tables,
+                        Warnings = result.Warnings
+                    };
                 }
 
                 return new ExecuteResult
                 {
-                    Success = execSuccess,
-                    Tables = tables,
-                    Warnings = warnings,
-                    Exception = userException,
-                    InternalException = execException
+                    Success = false,
+                    Errors = result.Errors,
+                    Warnings = result.Warnings
                 };
+                    
             });
         }
 

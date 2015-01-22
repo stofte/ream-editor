@@ -39,15 +39,15 @@ namespace LinqEditor.Utility.Test
         [TestMethod]
         public void Can_Dump_Anonymous_Types()
         {
-            Repository.Select(x => new { foo = x.Id, bar = x.Value }).Dump();
+            Repository.Select(x => new { foo = x.Id }).Dump();
             
             var dump = Dumper.FlushDumps();
             Assert.AreEqual(6, dump.First().Rows.Count);
-            Assert.AreEqual(2, dump.First().Columns.Count);
+            Assert.AreEqual(1, dump.First().Columns.Count);
         }
 
         [TestMethod]
-        public void Dumps_Anymous_Types_With_DisplayName()
+        public void Dumps_Anymous_Types_With_Friendly_DisplayName()
         {
             Repository.Select(x => new { foo = x.Id, bar = x.Value }).Dump();
 

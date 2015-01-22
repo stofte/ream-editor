@@ -36,6 +36,8 @@ namespace LinqEditor.UI.WinForm
         RichTextBox Console;
         ISession ConnectionSession;
 
+        List<TabPage> ResultTabs;
+
         private IWindsorContainer IOCContainer;
 
         private void InitializeContainer()
@@ -60,6 +62,8 @@ namespace LinqEditor.UI.WinForm
             Width = 800;
             Height = 500;
             FormClosed += Main_FormClosed;
+
+            ResultTabs = new List<TabPage>();
 
             this.Load += Main_Load;
             
@@ -110,9 +114,9 @@ namespace LinqEditor.UI.WinForm
             TabControl = new TabControl();
             TabControl.Dock = DockStyle.Fill;
             ConsoleTab = new TabPage("Console");
-            ResultTab = new TabPage("Results");
-            ResultTab.ClientSizeChanged += ResultTab_ClientSizeChanged;
-            TabControl.TabPages.AddRange(new[] { ConsoleTab, ResultTab });
+            //ResultTab = new TabPage("Results");
+            //ResultTab.ClientSizeChanged += ResultTab_ClientSizeChanged;
+            TabControl.TabPages.AddRange(new[] { ConsoleTab });
 
             Console = new RichTextBox();
             Console.Dock = DockStyle.Fill;
@@ -121,11 +125,11 @@ namespace LinqEditor.UI.WinForm
             Console.BackColor = Color.White;
             ConsoleTab.Controls.Add(Console);
 
-            ResultDataGrid = new DataGridView();
-            ResultDataGrid.ReadOnly = true;
-            ResultDataGrid.AllowUserToAddRows = false;
-            ResultDataGrid.DataBindingComplete += ResultDataGrid_DataBindingComplete;
-            ResultTab.Controls.Add(ResultDataGrid);
+            //ResultDataGrid = new DataGridView();
+            //ResultDataGrid.ReadOnly = true;
+            //ResultDataGrid.AllowUserToAddRows = false;
+            //ResultDataGrid.DataBindingComplete += ResultDataGrid_DataBindingComplete;
+            //ResultTab.Controls.Add(ResultDataGrid);
 
             StatusBar.SuspendLayout();
             SuspendLayout();
@@ -142,8 +146,7 @@ namespace LinqEditor.UI.WinForm
             StatusBar.ResumeLayout(false);
             StatusBar.PerformLayout();
 
-            ResumeLayout(false);
-            PerformLayout();
+            ResumeLayout();
 
             Editor.ConfigurationManager.Language = "cs";
 
@@ -204,7 +207,11 @@ namespace LinqEditor.UI.WinForm
             var result = await Execute();
             if (result.Success)
             {
-                ResultDataGrid.DataSource = result.Tables.First();
+                BindResults(result.Tables);
+                if (TabControl.TabPages.Count > 0)
+                {
+                    TabControl.SelectedTab = TabControl.TabPages[1];
+                }
             }
             btn.Enabled = true;
         }
@@ -220,14 +227,57 @@ namespace LinqEditor.UI.WinForm
             ConnectionTextBox.Width = container.ClientSize.Width;
         }
 
-        void ResultTab_ClientSizeChanged(object sender, EventArgs e)
+        //void ResultTab_ClientSizeChanged(object sender, EventArgs e)
+        //{
+        //    var tab = sender as TabPage;
+        //    ResultDataGrid.Height = tab.ClientSize.Height;
+        //    ResultDataGrid.Width = tab.ClientSize.Width;
+        //}
+
+        //void ResultDataGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        //{
+        //    var view = sender as DataGridView;
+        //    for (var i = 0; i < view.Columns.Count; i++)
+        //    {
+        //        view.Columns[i].AutoSizeMode = i < view.Columns.Count - 1 ?
+        //            DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
+        //    }
+        //    TabControl.SelectedTab = ResultTab;
+        //}
+
+        private void BindResults(IEnumerable<DataTable> tables)
         {
-            var tab = sender as TabPage;
-            ResultDataGrid.Height = tab.ClientSize.Height;
-            ResultDataGrid.Width = tab.ClientSize.Width;
+            SuspendLayout();
+            foreach (var tab in ResultTabs)
+            {
+                TabControl.TabPages.Remove(tab);
+            }
+            var newTabs = new List<TabPage>();
+            foreach (var table in tables)
+            {
+                var tab = new TabPage(table.TableName);
+                tab.ClientSizeChanged += tab_ClientSizeChanged;
+
+                var grid = new DataGridView();
+                grid.ReadOnly = true;
+                grid.AllowUserToAddRows = false;
+                grid.DataBindingComplete += grid_DataBindingComplete;
+                grid.DataSource = table;
+                tab.Controls.Add(grid);
+                newTabs.Add(tab);
+            }
+            ResultTabs = newTabs;
+            TabControl.TabPages.AddRange(ResultTabs.ToArray());
+            ResumeLayout();
+
+            //foreach (var tab in ResultTabs)
+            //{
+            //    var grid = tab.Controls[0] as DataGridView;
+                
+            //}
         }
 
-        void ResultDataGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        void grid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             var view = sender as DataGridView;
             for (var i = 0; i < view.Columns.Count; i++)
@@ -235,7 +285,14 @@ namespace LinqEditor.UI.WinForm
                 view.Columns[i].AutoSizeMode = i < view.Columns.Count - 1 ?
                     DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
             }
-            TabControl.SelectedTab = ResultTab;
+        }
+
+        void tab_ClientSizeChanged(object sender, EventArgs e)
+        {
+            var tab = sender as TabPage;
+            var grid = tab.Controls[0] as DataGridView;
+            grid.Height = tab.ClientSize.Height;
+            grid.Width = tab.ClientSize.Width;
         }
     }
 }

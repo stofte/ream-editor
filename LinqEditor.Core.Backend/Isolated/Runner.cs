@@ -72,7 +72,7 @@ namespace LinqEditor.Core.Backend.Isolated
             {
                 var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
 
-                var queryType = assm.GetType(string.Format("{0}.Program", assm.GetTypes()[0].Namespace));
+                var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
                 var instance = Activator.CreateInstance(queryType) as IDynamicQuery;
                 var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", _connectionString, _dbType);
                 provider.Connection.Open();

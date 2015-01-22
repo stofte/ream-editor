@@ -19,6 +19,7 @@ namespace LinqEditor.Utility.Helpers
         private class TypeMap
         {
             public IEnumerable<Column> Columns;
+            public int TypeCount = 1; // for display purposes only
         }
 
         private enum ColumnType
@@ -36,13 +37,16 @@ namespace LinqEditor.Utility.Helpers
         }
 
         private static List<DataTable> _dumps = new List<DataTable>();
+        private static IDictionary<string, TypeMap> _typeMaps = new Dictionary<string, TypeMap>();
 
         public static IDictionary<string, IDictionary<string, int>> SqlColumns { get; set; }
+        
 
         public static IEnumerable<DataTable> FlushDumps()
         {
             var tbs = _dumps.AsEnumerable();
             _dumps = new List<DataTable>();
+            _typeMaps = new Dictionary<string, TypeMap>();
             return tbs;
         }
 
@@ -53,10 +57,17 @@ namespace LinqEditor.Utility.Helpers
                 _dumps = new List<DataTable>();
             }
 
+            if (_typeMaps == null) 
+            {
+                _typeMaps = new Dictionary<string, TypeMap>();
+            }
+
             if (o != null)
             {
                 var table = new DataTable();
+                
                 Type objectType = o.GetType();
+                int dumpCount = 1;
 
                 TypeMap objectMap = null;
 
@@ -69,7 +80,8 @@ namespace LinqEditor.Utility.Helpers
                 {
                     if (!(o is IEnumerable)) // single object 
                     {
-                        objectMap = MapType(objectType, SqlColumns);
+                        objectMap = MapType(objectType);
+                        dumpCount = objectMap.TypeCount++;
                         table.Columns.AddRange(MapColumns(objectMap));
                         table.Rows.Add(MapRow(objectMap, o));
                     }
@@ -82,7 +94,8 @@ namespace LinqEditor.Utility.Helpers
                             if (objectMap == null)
                             {
                                 objectType = item.GetType();
-                                objectMap = MapType(objectType, SqlColumns);
+                                objectMap = MapType(objectType);
+                                dumpCount = objectMap.TypeCount++;
                                 table.Columns.AddRange(MapColumns(objectMap));
                             }
 
@@ -91,6 +104,7 @@ namespace LinqEditor.Utility.Helpers
                     }
                 }
 
+                table.TableName = string.Format("{0} {1}", objectType.Name, dumpCount);
                 _dumps.Add(table);
             }
 
@@ -126,13 +140,19 @@ namespace LinqEditor.Utility.Helpers
             return rowValues;
         }
 
-        private static TypeMap MapType(Type type, IDictionary<string, IDictionary<string, int>> sqlColumns)
+        private static TypeMap MapType(Type type)
         {
+            if (_typeMaps.ContainsKey(type.AssemblyQualifiedName))
+            {
+                return _typeMaps[type.AssemblyQualifiedName];
+            }
+
+            var sqlColumns = SqlColumns;
             var typeName = type.Name;
             var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead);
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             var autoIndex = 0;
-
+            
             Func<string, string, int> getIndex = (string name, string column) =>
             {
                 // todo: might mix indeces depending on name parameter
@@ -145,7 +165,7 @@ namespace LinqEditor.Utility.Helpers
                 return autoIndex++;
             };
 
-            return new TypeMap
+            _typeMaps[type.AssemblyQualifiedName] = new TypeMap
             {
                 Columns = props.Select(p => new Column
                 {
@@ -161,6 +181,8 @@ namespace LinqEditor.Utility.Helpers
                     Type = f.FieldType
                 }))
             };
+
+            return _typeMaps[type.AssemblyQualifiedName];
         }
     }
 }

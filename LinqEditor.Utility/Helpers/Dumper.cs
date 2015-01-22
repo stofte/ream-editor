@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -104,11 +105,29 @@ namespace LinqEditor.Utility.Helpers
                     }
                 }
 
-                table.TableName = string.Format("{0} {1}", objectType.Name, dumpCount);
+                table.TableName = string.Format("{0} {1}", GetTypeDisplayName(objectType), dumpCount);
                 _dumps.Add(table);
             }
 
             return o;
+        }
+
+        private static string GetTypeDisplayName(Type type)
+        {
+            return CheckIfAnonymousType(type) ? "Anonymous" : type.Name;
+        }
+
+        //http://stackoverflow.com/questions/2483023/how-to-test-if-a-type-is-anonymous
+        private static bool CheckIfAnonymousType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+
+            // HACK: The only way to detect anonymous types right now.
+            return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
+                && type.IsGenericType && type.Name.Contains("AnonymousType")
+                && (type.Name.StartsWith("<>") || type.Name.StartsWith("VB$"))
+                && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
         }
 
         private static bool IsSingular(Type type)
@@ -151,9 +170,8 @@ namespace LinqEditor.Utility.Helpers
             var typeName = type.Name;
             var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead);
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            var autoIndex = 0;
-            
-            Func<string, string, int> getIndex = (string name, string column) =>
+
+            Func<string, string, int, int> getIndex = (string name, string column, int count) =>
             {
                 // todo: might mix indeces depending on name parameter
                 if (sqlColumns.ContainsKey(name) &&
@@ -162,21 +180,22 @@ namespace LinqEditor.Utility.Helpers
                     return sqlColumns[name][column];
                 }
 
-                return autoIndex++;
+                // the number of the underlying collection
+                return count;
             };
 
             _typeMaps[type.AssemblyQualifiedName] = new TypeMap
             {
-                Columns = props.Select(p => new Column
+                Columns = props.Select((p, idx) => new Column
                 {
                     Kind = ColumnType.Property,
-                    Index = getIndex(typeName, p.Name),
+                    Index = getIndex(typeName, p.Name, idx),
                     Name = p.Name,
                     Type = p.PropertyType
-                }).Concat(fields.Select(f => new Column
+                }).Concat(fields.Select((f, idx) => new Column
                 {
                     Kind = ColumnType.Field,
-                    Index = getIndex(typeName, f.Name),
+                    Index = getIndex(typeName, f.Name, props.Count() + idx),
                     Name = f.Name,
                     Type = f.FieldType
                 }))

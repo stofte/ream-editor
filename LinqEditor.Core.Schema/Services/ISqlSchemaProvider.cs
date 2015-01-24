@@ -9,6 +9,6 @@ namespace LinqEditor.Core.Schema.Services
 {
     public interface ISqlSchemaProvider
     {
-        IEnumerable<TableSchema> GetSchema(string connectionString);
+        DatabaseSchema GetSchema(string connectionString);
     }
 }

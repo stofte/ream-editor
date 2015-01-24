@@ -11,7 +11,7 @@ namespace LinqEditor.Core.Schema.Services
 {
     public class SqlSchemaProvider : ISqlSchemaProvider
     {
-        public IEnumerable<Models.TableSchema> GetSchema(string connectionString)
+        public DatabaseSchema GetSchema(string connectionString)
         {
             var tables = new List<TableSchema>();
 
@@ -54,7 +54,10 @@ namespace LinqEditor.Core.Schema.Services
                 }
             }
 
-            return tables;
+            return new DatabaseSchema
+            {
+                Tables = tables
+            };
         }
 
         private string SqlTypeToDotNetType(string type, string nullable)

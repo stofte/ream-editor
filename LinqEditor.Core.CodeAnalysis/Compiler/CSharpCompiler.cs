@@ -59,7 +59,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
                 // generate dll, assemblies generated in memory by roslyn,
                 // does not seem loadable for queries trying to load schema dependency
-                var filename = AppDomain.CurrentDomain.BaseDirectory + "gendlls\\" + assemblyName;
+                var filename = Utility.Utility.CachePath() + assemblyName;
 
                 EmitResult compilationResult = null;
                 MemoryStream stream = null;

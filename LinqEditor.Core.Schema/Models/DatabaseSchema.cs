@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 namespace LinqEditor.Core.Schema.Models
 {
     [Serializable]
-    public class ColumnSchema
+    public class DatabaseSchema
     {
-        public string Name;
-        public string Type;
-        public int Index;
+        public IEnumerable<TableSchema> Tables;
     }
 }

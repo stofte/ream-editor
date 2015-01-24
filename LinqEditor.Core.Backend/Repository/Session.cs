@@ -16,9 +16,8 @@ namespace LinqEditor.Core.Backend.Repository
 {
     public class Session : ISession, IDisposable
     {
-        private static int SessionCounter = 0;
         private string _connectionString;
-        private IEnumerable<TableSchema> _sqlTables;
+        private DatabaseSchema _sqlSchema;
         private string _schemaPath;
         private byte[] _schemaImage;
         private string _schemaNamespace;
@@ -49,9 +48,9 @@ namespace LinqEditor.Core.Backend.Repository
             return await Task.Run(() =>
             {
                 _connectionString = connectionString;
-                _sqlTables = _schemaProvider.GetSchema(_connectionString);
+                _sqlSchema = _schemaProvider.GetSchema(_connectionString);
                 _schemaNamespace = "";
-                var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, _sqlTables);
+                var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, _sqlSchema);
                 var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
                 _schemaPath = result.AssemblyPath;
                 _schemaImage = result.AssemblyBytes;

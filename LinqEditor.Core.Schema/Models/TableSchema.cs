@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Schema.Models
 {
+    [Serializable]
     public class TableSchema
     {
         public string Catalog { get; set; }

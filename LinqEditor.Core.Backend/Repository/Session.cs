@@ -11,15 +11,15 @@ using System.Threading.Tasks;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.CodeAnalysis.Models;
+using LinqEditor.Core.Backend.Settings;
+using System.IO;
 
 namespace LinqEditor.Core.Backend.Repository
 {
     public class Session : ISession, IDisposable
     {
         private string _connectionString;
-        private DatabaseSchema _sqlSchema;
         private string _schemaPath;
-        private byte[] _schemaImage;
         private string _schemaNamespace;
         private Guid _sessionId = Guid.NewGuid();
         private Guid _queryId = Guid.NewGuid();
@@ -29,16 +29,18 @@ namespace LinqEditor.Core.Backend.Repository
         private ICSharpCompiler _compiler;
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
+        private IUserSettings _userSettings;
 
         //private DbEntityProvider _entityProvider;
 
         private Isolated<Runner> _container;
 
-        public Session(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator)
+        public Session(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator, IUserSettings userSettings)
         {
             _compiler = compiler;
             _schemaProvider = schemaProvider;
             _generator = generator;
+            _userSettings = userSettings;
         }
 
         public async Task<InitializeResult> Initialize(string connectionString)
@@ -48,12 +50,26 @@ namespace LinqEditor.Core.Backend.Repository
             return await Task.Run(() =>
             {
                 _connectionString = connectionString;
-                _sqlSchema = _schemaProvider.GetSchema(_connectionString);
-                _schemaNamespace = "";
-                var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, _sqlSchema);
-                var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
-                _schemaPath = result.AssemblyPath;
-                _schemaImage = result.AssemblyBytes;
+                // check cache
+                _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
+                if (string.IsNullOrEmpty(_schemaPath))
+                {
+                    var sqlSchema = _schemaProvider.GetSchema(_connectionString);
+                    _schemaNamespace = "";
+                    var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, sqlSchema);
+                    var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
+                    _schemaPath = result.AssemblyPath;
+
+                    if (result.Success)
+                    {
+                        _userSettings.PersistSchema(_connectionString, sqlSchema, _schemaPath);
+                    }
+                }
+                else
+                {
+                    // todo: probably want to store namespace in settings also
+                    _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
+                }
                 // loads schema in new appdomain
                 _container = new Isolated<Runner>();
                 return _container.Value.Initialize(_schemaPath, _connectionString);

@@ -12,14 +12,14 @@ namespace LinqEditor.Utility.Helpers
 {
     public static class SerializationHelper
     {
-        public static string Hash<T>(T obj) where T : ISerializable
+        public static string Hash(object o)
         {
             var formatter = new BinaryFormatter();
             var stream = new MemoryStream();
             var hasher = SHA256Cng.Create(); // not sure if instance can be shared, so recreating instance each time
             hasher.Initialize();
 
-            formatter.Serialize(stream, obj);
+            formatter.Serialize(stream, o);
             stream.Position = 0;
             var byteKey = hasher.ComputeHash(stream);
 

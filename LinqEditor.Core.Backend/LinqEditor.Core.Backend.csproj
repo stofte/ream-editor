@@ -53,6 +53,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\ISession.cs" />
     <Compile Include="Repository\Session.cs" />
+    <Compile Include="Settings\IUserSettings.cs" />
+    <Compile Include="Settings\UserSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

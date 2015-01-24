@@ -49,6 +49,7 @@ namespace LinqEditor.Core.Backend.Settings
 
         public string GetCachedAssembly(string connectionString)
         {
+            Reset();
             if (SchemaHashes.ContainsKey(connectionString))
             {
                 return CachedSchemas[SchemaHashes[connectionString]];

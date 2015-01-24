@@ -41,9 +41,14 @@ namespace LinqEditor.Core.Backend.Isolated
                 {
                     _schema = Assembly.Load(assemblyImage);
                 }
-                
-                _dbType = string.Format("{0}.DatabaseWithAttributes", _schema.GetTypes()[0].Namespace);
+
+                _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _schema.GetName().Name);
                 _connectionString = connectionString;
+
+                // warm up connection
+                var warmupType = _schema.GetType(string.Format("{0}.Schema.WarmUpConnection", _schema.GetName().Name));
+                var instance = Activator.CreateInstance(warmupType) as IDynamicQuery;
+                var res = ExecuteInstance(instance);
             }
             catch (Exception e)
             {
@@ -75,18 +80,7 @@ namespace LinqEditor.Core.Backend.Isolated
 
                 var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
                 var instance = Activator.CreateInstance(queryType) as IDynamicQuery;
-                var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", _connectionString, _dbType);
-                provider.Log = new StringWriter(); 
-                provider.Connection.Open();
-                var dumps = instance.Execute(provider);
-                provider.Connection.Close();
-
-                return new ExecuteResult
-                {
-                    Tables = dumps,
-                    Success = true,
-                    QueryText = provider.Log.ToString()
-                };
+                return ExecuteInstance(instance);
             }
             catch (Exception e)
             {
@@ -103,6 +97,22 @@ namespace LinqEditor.Core.Backend.Isolated
         public override object InitializeLifetimeService()
         {   
             return null;
+        }
+
+        private ExecuteResult ExecuteInstance(IDynamicQuery instance)
+        {
+            var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", _connectionString, _dbType);
+            provider.Log = new StringWriter();
+            provider.Connection.Open();
+            var dumps = instance.Execute(provider);
+            provider.Connection.Close();
+
+            return new ExecuteResult
+            {
+                Tables = dumps,
+                Success = true,
+                QueryText = provider.Log.ToString()
+            };
         }
     }
 }

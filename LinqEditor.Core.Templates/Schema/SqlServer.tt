@@ -123,4 +123,13 @@ foreach(var table in Tables) {
 
         protected abstract void Query();
     }
+
+    // creates a dummy class that queries the db, this makes subsequent queries much faster
+    public class WarmUpConnection : ProgramBase 
+    {
+        protected override void Query() 
+        {
+            <#= Tables.First().Name #>.Count().Dump();
+        }
+    }
 }

@@ -82,13 +82,13 @@ namespace Generated
             AssertEntries(VSCompletionTestData.MyStaticClass, s);
         }
 
-//        [Test]
+        [Test]
         public void Can_Suggestion_Completions_For_MemberAccessExpression_Of_int()
         {
             var str = "int.";
             _completion.UpdateFragment(str);
             var s = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
-
+            
             AssertEntries(VSCompletionTestData.IntegerAlias, s);
         }
 

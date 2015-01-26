@@ -37,8 +37,8 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
         public static Tuple<string, SuggestionType>[] IntegerAlias = new Tuple<string, SuggestionType>[] 
         {
             T.Create("Equals", SuggestionType.Method),
-            T.Create("MaxValue", SuggestionType.Property),
-            T.Create("MinValue", SuggestionType.Property),
+            T.Create("MaxValue", SuggestionType.Field),
+            T.Create("MinValue", SuggestionType.Field),
             T.Create("Parse", SuggestionType.Method),
             T.Create("ReferenceEquals", SuggestionType.Method),
             T.Create("TryParse", SuggestionType.Method),

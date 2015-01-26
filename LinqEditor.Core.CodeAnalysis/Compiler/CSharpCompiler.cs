@@ -13,16 +13,13 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 {
     public class CSharpCompiler : ICSharpCompiler
     {
-        MetadataReference[] References;
-
-        public CSharpCompiler()
+        public static MetadataReference[] GetStandardReferences()
         {
-            References = new[] {
+            return new[] {
                 MetadataReference.CreateFromAssembly(typeof(System.Object).Assembly), // mscorlib.dll
                 MetadataReference.CreateFromAssembly(typeof(System.ComponentModel.Component).Assembly), // System.Core.dll 4.0
                 MetadataReference.CreateFromAssembly(typeof(System.Data.DataColumn).Assembly), // System.Data.dll
                 MetadataReference.CreateFromAssembly(typeof(System.Xml.XmlDocument).Assembly), // System.Xml.dll
-                // todo: check if still needed
                 MetadataReference.CreateFromAssembly(typeof(System.Linq.Enumerable).Assembly), // System.Core.dll 3.5 for some reason also needed?
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.QueryProvider).Assembly), // IQToolkit.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.DbEntityProvider).Assembly), // IQToolkit.Data.dll
@@ -39,13 +36,13 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
         public CompilerResult Compile(string src, string assemblyName, bool generateFiles, byte[] reference = null)
         {
-            var refs = References.Concat(new[] { MetadataReference.CreateFromImage(reference) });
+            var refs = GetStandardReferences().Concat(new[] { MetadataReference.CreateFromImage(reference) });
             return Compile(src, assemblyName, generateFiles, refs.ToArray());
         }
 
         public CompilerResult Compile(string src, string assemblyName, bool generateFiles, params string[] otherReferences)
         {
-            var refs = References.Concat(otherReferences.Length > 0 ? otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
+            var refs = GetStandardReferences().Concat(otherReferences.Length > 0 ? otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
             return Compile(src, assemblyName, generateFiles, refs.ToArray());
         }
 

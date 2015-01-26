@@ -28,27 +28,25 @@ namespace LinqEditor.Core.Templates.Query
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System;\r\nusing System.IO;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing Sy" +
-                    "stem.Collections.Generic;\r\nusing IQToolkit;\r\nusing IQToolkit.Data;\r\nusing IQTool" +
-                    "kit.Data.Mapping;\r\nusing LinqEditor.Utility;\r\nusing LinqEditor.Utility.Helpers;\r" +
-                    "\nusing ");
+            this.Write("using System;\r\nusing System.Linq;\r\nusing System.Collections.Generic;\r\nusing LinqE" +
+                    "ditor.Utility.Helpers;\r\n\r\nnamespace ");
             
-            #line 16 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedSchemaNamespace));
-            
-            #line default
-            #line hidden
-            this.Write(".Schema;\r\n\r\nnamespace ");
-            
-            #line 18 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
+            #line 11 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedQueryNamespace));
             
             #line default
             #line hidden
-            this.Write(" {\r\n\r\n    public class Program : ProgramBase\r\n    {\r\n        protected override v" +
-                    "oid Query() \r\n        {\r\n#line 1 \"Dynamic\"\r\n");
+            this.Write(" {\r\n\r\n    public class Program : ");
             
-            #line 25 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
+            #line 13 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedSchemaNamespace));
+            
+            #line default
+            #line hidden
+            this.Write(".Schema.ProgramBase\r\n    {\r\n        protected override void Query() \r\n        {\r\n" +
+                    "#line 1 \"Dynamic\"\r\n");
+            
+            #line 18 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SourceCode));
             
             #line default

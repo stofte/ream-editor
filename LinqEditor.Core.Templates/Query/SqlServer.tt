@@ -4,20 +4,13 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 using System;
-using System.IO;
 using System.Linq;
-using System.Data;
 using System.Collections.Generic;
-using IQToolkit;
-using IQToolkit.Data;
-using IQToolkit.Data.Mapping;
-using LinqEditor.Utility;
 using LinqEditor.Utility.Helpers;
-using <#=GeneratedSchemaNamespace#>.Schema;
 
 namespace <#=GeneratedQueryNamespace#> {
 
-    public class Program : ProgramBase
+    public class Program : <#=GeneratedSchemaNamespace#>.Schema.ProgramBase
     {
         protected override void Query() 
         {

@@ -114,17 +114,18 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             };
 
             // get methods and properties of object itself
-            var methods = lhsType.GetMembers().OfType<IMethodSymbol>().Where(x => x.CanBeReferencedByName)
+            // excludes unreferencable names and statics
+            var methods = lhsType.GetMembers().OfType<IMethodSymbol>().Where(x => x.CanBeReferencedByName && !x.IsStatic)
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Method, Value = x });
             var properties = lhsType.GetMembers().OfType<IPropertySymbol>()
-                .Where(x => x.CanBeReferencedByName && !x.IsIndexer)
+                .Where(x => x.CanBeReferencedByName && !x.IsIndexer && !x.IsStatic)
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Property, Value = x });
             var fields = lhsType.GetMembers().OfType<IFieldSymbol>()
-                .Where(x => x.CanBeReferencedByName)
+                .Where(x => x.CanBeReferencedByName && !x.IsStatic)
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Field, Value = x });

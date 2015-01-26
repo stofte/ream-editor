@@ -41,7 +41,6 @@
   <ItemGroup>
     <Compile Include="Helpers\Dumper.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
-    <Compile Include="Helpers\TypeHelper.cs" />
     <Compile Include="IDynamicQuery.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\LogCategory.cs" />

@@ -17,7 +17,7 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
         private static ITemplateService _templateService;
 
         [TestFixtureSetUp]
-        public static void Class_Initialie(TestContext ctx)
+        public void Initialize()
         {
             var ns = "ns";
             var programSource = @"
@@ -49,7 +49,27 @@ namespace Generated
         }
 
         [Test]
-        public void Can_Suggest_Completions_For_MemberAccessExpression_Of_Generic_Int_List()
+        public void Can_Suggest_Completions_For_MemberAccessExpression_Of_Integer_Inside_Lambda()
+        {
+            var completion = new Completion(_templateService) as ICompletion;
+            completion.Initialize();
+            var x = new List<int>();
+            var str = "var x = new List<int>();x.Where(y => y.";
+            completion.UpdateFragment(str);
+            var s = completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
+            var vsEntries = new Tuple<string, SuggestionType>[] 
+            {
+                T.Create("Add", SuggestionType.Method),
+            };
+
+            for (var i = 0; i < vsEntries.Length; i++)
+            {
+                Assert.IsTrue(s[i].Value == vsEntries[i].Item1 && s[i].Kind == vsEntries[i].Item2);
+            }
+        }
+
+        [Test]
+        public void Can_Suggest_Completions_For_MemberAccessExpression_Of_Integer_List()
         {
             var completion = new Completion(_templateService) as ICompletion;
             completion.Initialize();

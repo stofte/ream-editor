@@ -36,7 +36,7 @@ namespace LinqEditor.UI.WinForm
 
         ScintillaNET.Scintilla Editor;
         RichTextBox Console;
-        ISession ConnectionSession;
+        IBackgroundSession ConnectionSession;
 
         List<TabPage> ResultTabs;
 
@@ -46,6 +46,8 @@ namespace LinqEditor.UI.WinForm
         {
             IOCContainer = new WindsorContainer();
             IOCContainer.Install(FromAssembly.This());
+
+            ConnectionSession = IOCContainer.Resolve<IBackgroundSession>(new Arguments(new { connectionString = ConnectionTextBox.Text }));
         }
 
         public static Main Create()
@@ -55,8 +57,6 @@ namespace LinqEditor.UI.WinForm
 
         public Main()
         {
-            InitializeContainer();
-
             var font = new System.Drawing.Font("Consolas", 10);
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -160,7 +160,7 @@ namespace LinqEditor.UI.WinForm
 
             Editor.ConfigurationManager.Language = "cs";
 
-            ConnectionSession = IOCContainer.Resolve<ISession>(new Arguments(new { connectionString = ConnectionTextBox.Text }));
+            InitializeContainer();
         }
 
 
@@ -184,7 +184,7 @@ namespace LinqEditor.UI.WinForm
 
         private async Task<ExecuteResult> Execute()
         {
-            return await ConnectionSession.Execute(Editor.Text);
+            return await ConnectionSession.ExecuteAsync(Editor.Text);
         }
 
         private void BindResults(IEnumerable<DataTable> tables)
@@ -297,7 +297,7 @@ namespace LinqEditor.UI.WinForm
 
         async void Main_Load(object sender, EventArgs e)
         {
-            var result = await ConnectionSession.Initialize(ConnectionTextBox.Text);
+            var result = await ConnectionSession.InitializeAsync(ConnectionTextBox.Text);
             executeButton.Enabled = true;
         }
 

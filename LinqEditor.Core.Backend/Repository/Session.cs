@@ -43,70 +43,61 @@ namespace LinqEditor.Core.Backend.Repository
             _userSettings = userSettings;
         }
 
-        public async Task<InitializeResult> Initialize(string connectionString)
+        public InitializeResult Initialize(string connectionString)
         {
-            // ok to use Task.Run when "just" offloading from UI thread
-            // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true
-            return await Task.Run(() =>
+            _connectionString = connectionString;
+            // check cache
+            _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
+            if (string.IsNullOrEmpty(_schemaPath))
             {
-                _connectionString = connectionString;
-                // check cache
-                _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
-                if (string.IsNullOrEmpty(_schemaPath))
-                {
-                    var sqlSchema = _schemaProvider.GetSchema(_connectionString);
-                    _schemaNamespace = "";
-                    var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, sqlSchema);
-                    var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
-                    _schemaPath = result.AssemblyPath;
-
-                    if (result.Success)
-                    {
-                        _userSettings.PersistSchema(_connectionString, sqlSchema, _schemaPath);
-                    }
-                }
-                else
-                {
-                    // todo: probably want to store namespace in settings also
-                    _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
-                }
-                // loads schema in new appdomain
-                _container = new Isolated<Runner>();
-                var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
-
-                return initResult;
-            });
-        }
-
-        public async Task<ExecuteResult> Execute(string sourceFragment)
-        {
-            return await Task.Run(() =>
-            {
-                string queryNamespace;
-                var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
-                var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
+                var sqlSchema = _schemaProvider.GetSchema(_connectionString);
+                _schemaNamespace = "";
+                var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, sqlSchema);
+                var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
+                _schemaPath = result.AssemblyPath;
 
                 if (result.Success)
                 {
-                    var containerResult = _container.Value.Execute(result.AssemblyBytes);
-
-                    return new ExecuteResult
-                    {
-                        Success = containerResult.Success,
-                        QueryText = containerResult.QueryText,
-                        Tables = containerResult.Tables,
-                        Warnings = result.Warnings
-                    };
+                    _userSettings.PersistSchema(_connectionString, sqlSchema, _schemaPath);
                 }
+            }
+            else
+            {
+                // todo: probably want to store namespace in settings also
+                _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
+            }
+            // loads schema in new appdomain
+            _container = new Isolated<Runner>();
+            var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
+
+            return initResult;
+        }
+
+        public ExecuteResult Execute(string sourceFragment)
+        {
+            string queryNamespace;
+            var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
+            var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
+
+            if (result.Success)
+            {
+                var containerResult = _container.Value.Execute(result.AssemblyBytes);
 
                 return new ExecuteResult
                 {
-                    Success = false,
-                    Errors = result.Errors,
+                    Success = containerResult.Success,
+                    QueryText = containerResult.QueryText,
+                    Tables = containerResult.Tables,
                     Warnings = result.Warnings
                 };
-                    
-            });
+            }
+
+            return new ExecuteResult
+            {
+                Success = false,
+                Errors = result.Errors,
+                Warnings = result.Warnings
+            };
         }
 
         public void Dispose()

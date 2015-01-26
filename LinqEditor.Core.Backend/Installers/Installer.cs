@@ -14,7 +14,7 @@ namespace LinqEditor.Core.Backend.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<ISession>().ImplementedBy<Repository.Session>());
+            container.Register(Component.For<IBackgroundSession>().ImplementedBy<Repository.BackgroundSession>());
             container.Register(Component.For<Settings.IUserSettings>().ImplementedBy<Settings.UserSettings>());
         }
     }

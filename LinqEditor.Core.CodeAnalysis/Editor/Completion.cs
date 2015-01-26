@@ -89,56 +89,22 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var semanticModel = GetModel(tree);
             var dotTextSpan = new TextSpan(_sourceOffset + fragmentIndex, 1);
             var memberAccessNode = (MemberAccessExpressionSyntax)tree.GetRoot().DescendantNodes(dotTextSpan).Last();
+            var lhs = semanticModel.GetTypeInfo(memberAccessNode.Expression);
             var lhsType = semanticModel.GetTypeInfo(memberAccessNode.Expression).Type;
             var symInfo = semanticModel.GetSymbolInfo(memberAccessNode.Expression);
-            
-            // fqn of interfaces the type implements
-            var interfaceNames = lhsType.AllInterfaces.Select(x =>
-                x.ConstructedFrom != null && x.ConstructedFrom != x ?
-                x.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : 
-                x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
 
-            // unique names for extensions methods matching interfaces
-            var possibleExtensions = interfaceNames
-                .SelectMany(x => _extensionMethods.ContainsKey(x) ? _extensionMethods[x].Methods.Select(m => m.Name).Distinct() : new string[] { })
-                .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.ExtensionMethod, Value = x });
-
-            // object methods isn't included in GetMembers()
-            var objectMethods = new[] 
-            { 
-                new SuggestionEntry{ Value = "Equals", Kind = SuggestionType.Method },
-                new SuggestionEntry{ Value = "GetHashCode", Kind = SuggestionType.Method },
-                new SuggestionEntry{ Value = "GetType", Kind = SuggestionType.Method },
-                new SuggestionEntry{ Value = "ToString", Kind = SuggestionType.Method },
-            };
-
-            // get methods and properties of object itself
-            // excludes unreferencable names and statics
-            var methods = lhsType.GetMembers().OfType<IMethodSymbol>().Where(x => x.CanBeReferencedByName && !x.IsStatic)
-                .Select(x => x.Name)
-                .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.Method, Value = x });
-            var properties = lhsType.GetMembers().OfType<IPropertySymbol>()
-                .Where(x => x.CanBeReferencedByName && !x.IsIndexer && !x.IsStatic)
-                .Select(x => x.Name)
-                .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.Property, Value = x });
-            var fields = lhsType.GetMembers().OfType<IFieldSymbol>()
-                .Where(x => x.CanBeReferencedByName && !x.IsStatic)
-                .Select(x => x.Name)
-                .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.Field, Value = x });
+            var typeEntries = GetTypeEntries(lhs, symInfo.Symbol);
+            var typeExtensions = GetTypeExtensionMethods(lhs);
 
             // methods might contain overrides of int functions i guess
-            var total = possibleExtensions.Concat(objectMethods.Where(x => methods.All(y => y.Value != x.Value))).Concat(methods).Concat(properties).Concat(fields);
-
-            return new SuggestionList
+            var list = new SuggestionList
             {
                 // vs sorts by regular methods first, then by extensions, 
                 // which the enum should ensure
-                Suggestions = total.OrderBy(x => x.Value).ThenBy(x => x.Kind)
+                Suggestions = typeExtensions.Concat(typeEntries).OrderBy(x => x.Value).ThenBy(x => x.Kind)
             };
+
+            return list;
         }
 
         private SemanticModel GetModel(SyntaxTree tree)
@@ -149,6 +115,61 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
                 .WithOptions(compilerOptions)
                 .AddSyntaxTrees(tree)
                 .GetSemanticModel(tree);
+        }
+
+        private IEnumerable<SuggestionEntry> GetTypeEntries(TypeInfo typeInfo, ISymbol symbolInfo)
+        {
+            var t = typeInfo.Type;
+            var staticAccess = symbolInfo.IsStatic;
+
+            var methods = t.GetMembers().OfType<IMethodSymbol>()
+                .Where(x => x.CanBeReferencedByName && x.IsStatic == staticAccess)
+                .Select(x => x.Name)
+                .Distinct()
+                .Select(x => new SuggestionEntry { Kind = SuggestionType.Method, Value = x });
+
+            var properties = t.GetMembers().OfType<IPropertySymbol>()
+                .Where(x => x.CanBeReferencedByName && !x.IsIndexer && x.IsStatic == staticAccess)
+                .Select(x => x.Name)
+                .Distinct()
+                .Select(x => new SuggestionEntry { Kind = SuggestionType.Property, Value = x });
+
+            var fields = t.GetMembers().OfType<IFieldSymbol>()
+                .Where(x => x.CanBeReferencedByName && x.IsStatic && staticAccess)
+                .Select(x => x.Name)
+                .Distinct()
+                .Select(x => new SuggestionEntry { Kind = SuggestionType.Field, Value = x });
+
+            var objectEntries = (staticAccess ? new[]
+            {
+                new SuggestionEntry {Value = "Equals", Kind = SuggestionType.Method },
+                new SuggestionEntry {Value = "ReferenceEquals", Kind = SuggestionType.Method }
+            } : new[] { 
+                new SuggestionEntry{ Value = "Equals", Kind = SuggestionType.Method },
+                new SuggestionEntry{ Value = "GetHashCode", Kind = SuggestionType.Method },
+                new SuggestionEntry{ Value = "GetType", Kind = SuggestionType.Method },
+                new SuggestionEntry{ Value = "ToString", Kind = SuggestionType.Method },
+                // filter out entries that appear in methods
+            }).Where(x => methods.All(y => y.Value != x.Value));
+
+            return methods.Concat(properties).Concat(fields).Concat(objectEntries);
+        }
+
+        private IEnumerable<SuggestionEntry> GetTypeExtensionMethods(TypeInfo typeInfo)
+        {
+            // fqn of interfaces the type implements
+            var interfaceNames = typeInfo.Type.AllInterfaces.Select(x =>
+                x.ConstructedFrom != null && x.ConstructedFrom != x ?
+                x.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) :
+                x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+            // unique names for extensions methods matching interfaces
+            var possibleExtensions = interfaceNames
+                .SelectMany(x => _extensionMethods.ContainsKey(x) ? _extensionMethods[x].Methods.Select(m => m.Name).Distinct() : new string[] { })
+                .Distinct()
+                .Select(x => new SuggestionEntry { Kind = SuggestionType.ExtensionMethod, Value = x });
+
+            return possibleExtensions;
         }
     }
 }

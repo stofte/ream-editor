@@ -1,5 +1,6 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +9,15 @@ using LinqEditor.Utility.Helpers;
 
 namespace LinqEditor.Utility.Test
 {
-    [TestClass]
+    [TestFixture]
     public class TypeHelperTests
     {
-        [TestMethod]
+        [Test]
         public void Can_Map_Type_As_DataTable()
         {
             var foo = new { Foo = 1, Bar = 1 };
             var table = foo.GetType().GetTypeSchemaAsDataTable();
-
+            Assert.IsNotNull(table);
         }
     }
 }

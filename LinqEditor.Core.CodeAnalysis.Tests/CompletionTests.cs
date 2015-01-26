@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using LinqEditor.Core.Templates;
 using Moq;
 using LinqEditor.Core.CodeAnalysis.Editor;
@@ -10,11 +11,12 @@ using T = System.Tuple;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class CompletionTests
     {
         private static ITemplateService _templateService;
-        [ClassInitialize]
+
+        [TestFixtureSetUp]
         public static void Class_Initialie(TestContext ctx)
         {
             var ns = "ns";
@@ -39,14 +41,14 @@ namespace Generated
             _templateService = m.Object;
         }
 
-        [TestMethod]
+        [Test]
         public void Can_Initialize_Completion()
         {
             var completion = new Completion(_templateService);
             completion.Initialize();
         }
 
-        [TestMethod]
+        [Test]
         public void Can_Suggest_Completions_For_MemberAccessExpression_Of_Generic_Int_List()
         {
             var completion = new Completion(_templateService) as ICompletion;

@@ -1,12 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using System.Collections.Generic;
 using LinqEditor.Utility.Helpers;
 
 namespace LinqEditor.Utility.Test
 {
-    [TestClass]
+    [TestFixture]
     public class DumperTests
     {
         public class Foo 
@@ -18,7 +19,7 @@ namespace LinqEditor.Utility.Test
 
         protected IQueryable<Foo> Repository { get; set; }
 
-        [TestInitialize]
+        [TestFixtureSetUp]
         public void Initialize()
         {
             var data = new List<Foo>()
@@ -36,7 +37,7 @@ namespace LinqEditor.Utility.Test
             Repository = data.AsQueryable<Foo>();
         }
 
-        [TestMethod]
+        [Test]
         public void Can_Dump_Anonymous_Types()
         {
             Repository.Select(x => new { foo = x.Id }).Dump();
@@ -46,7 +47,7 @@ namespace LinqEditor.Utility.Test
             Assert.AreEqual(1, dump.First().Columns.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void Dumps_Anymous_Types_With_Friendly_DisplayName()
         {
             Repository.Select(x => new { foo = x.Id, bar = x.Value }).Dump();

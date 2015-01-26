@@ -59,9 +59,14 @@ namespace Generated
             var s = completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
             var vsEntries = new Tuple<string, SuggestionType>[] 
             {
-                T.Create("Add", SuggestionType.Method),
+                T.Create("CompareTo", SuggestionType.Method),
+                T.Create("Equals", SuggestionType.Method),
+                T.Create("GetHashCode", SuggestionType.Method),
+                T.Create("GetType", SuggestionType.Method),
+                T.Create("GetTypeCode", SuggestionType.Method),
+                T.Create("ToString", SuggestionType.Method),
             };
-
+            
             for (var i = 0; i < vsEntries.Length; i++)
             {
                 Assert.IsTrue(s[i].Value == vsEntries[i].Item1 && s[i].Kind == vsEntries[i].Item2);

@@ -129,7 +129,8 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Field, Value = x });
 
-            var total = possibleExtensions.Concat(objectMethods).Concat(methods).Concat(properties).Concat(fields);
+            // methods might contain overrides of int functions i guess
+            var total = possibleExtensions.Concat(objectMethods.Where(x => methods.All(y => y.Value != x.Value))).Concat(methods).Concat(properties).Concat(fields);
 
             return new SuggestionList
             {

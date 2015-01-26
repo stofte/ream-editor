@@ -17,6 +17,33 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
             T.Create("ReferenceEquals", SuggestionType.Method),
         };
 
+        public static Tuple<string, SuggestionType>[] MyStructInstance = new Tuple<string, SuggestionType>[] 
+        {
+            T.Create("Bar", SuggestionType.Property),
+            T.Create("Baz", SuggestionType.Method),
+            T.Create("Equals", SuggestionType.Method),
+            T.Create("GetHashCode", SuggestionType.Method),
+            T.Create("GetType", SuggestionType.Method),
+            T.Create("ToString", SuggestionType.Method),
+        };
+
+        public static Tuple<string, SuggestionType>[] MyStructStatic = new Tuple<string, SuggestionType>[] 
+        {
+            T.Create("Equals", SuggestionType.Method),
+            T.Create("Foo", SuggestionType.Field),
+            T.Create("ReferenceEquals", SuggestionType.Method),
+        };
+
+        public static Tuple<string, SuggestionType>[] IntegerAlias = new Tuple<string, SuggestionType>[] 
+        {
+            T.Create("Equals", SuggestionType.Method),
+            T.Create("MaxValue", SuggestionType.Property),
+            T.Create("MinValue", SuggestionType.Property),
+            T.Create("Parse", SuggestionType.Method),
+            T.Create("ReferenceEquals", SuggestionType.Method),
+            T.Create("TryParse", SuggestionType.Method),
+        };
+
         public static Tuple<string, SuggestionType>[] IntegerValueInstance = new Tuple<string, SuggestionType>[] 
         {
             T.Create("CompareTo", SuggestionType.Method),

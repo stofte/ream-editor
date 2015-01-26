@@ -17,6 +17,13 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
         private static ITemplateService _templateService;
         private ICompletion _completion;
 
+        public struct MyStruct
+        {
+            public static uint Foo = 0xdeadbeef;
+            public int Bar { get; set; }
+            public int Baz() { return 42; }
+        }
+
         [TestFixtureSetUp]
         public void Initialize()
         {
@@ -29,6 +36,12 @@ using System.Collections.Generic;
 namespace Generated
 {
     public static class MyStatic { public static int MyValue = 42; }
+    public struct MyStruct 
+    { 
+        public static uint Foo = 0xdeadbeef; 
+        public int Bar { get; set; } 
+        public int Baz() { return 42; }
+    }
     public class Proram
     {
         public void Query() 
@@ -60,13 +73,42 @@ namespace Generated
         }
 
         [Test]
-        public void Can_Suggestion_Completions_For_MemberAccessExpression_Of_Static_Class()
+        public void Can_Suggestion_Completions_For_MemberAccessExpression_Of_Custom_Static_Class()
         {
             var str = "MyStatic.";
             _completion.UpdateFragment(str);
             var s = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
 
             AssertEntries(VSCompletionTestData.MyStaticClass, s);
+        }
+
+//        [Test]
+        public void Can_Suggestion_Completions_For_MemberAccessExpression_Of_int()
+        {
+            var str = "int.";
+            _completion.UpdateFragment(str);
+            var s = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
+
+            AssertEntries(VSCompletionTestData.IntegerAlias, s);
+        }
+
+        [Test]
+        public void Can_Suggestion_Completions_For_MemberAccessExpression_Of_Custom_Struct_Instance()
+        {
+            var str = "var s = new MyStruct { Bar = 22 }; s.";
+            _completion.UpdateFragment(str);
+            var suggestions = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
+            AssertEntries(VSCompletionTestData.MyStructInstance, suggestions);
+        }
+
+        [Test]
+        public void Can_Suggestion_Completions_For_MemberAccessExpression_Of_Custom_Static_Struct_Type()
+        {
+            var str = "MyStruct.";
+            _completion.UpdateFragment(str);
+            var s = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
+            
+            AssertEntries(VSCompletionTestData.MyStructStatic, s);
         }
 
         [Test]

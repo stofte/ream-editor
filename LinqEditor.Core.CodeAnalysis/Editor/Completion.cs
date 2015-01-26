@@ -89,8 +89,8 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var semanticModel = GetModel(tree);
             var dotTextSpan = new TextSpan(_sourceOffset + fragmentIndex, 1);
             var memberAccessNode = (MemberAccessExpressionSyntax)tree.GetRoot().DescendantNodes(dotTextSpan).Last();
+            
             var lhs = semanticModel.GetTypeInfo(memberAccessNode.Expression);
-            var lhsType = semanticModel.GetTypeInfo(memberAccessNode.Expression).Type;
             var symInfo = semanticModel.GetSymbolInfo(memberAccessNode.Expression);
 
             var typeEntries = GetTypeEntries(lhs, symInfo.Symbol);
@@ -120,8 +120,8 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
         private IEnumerable<SuggestionEntry> GetTypeEntries(TypeInfo typeInfo, ISymbol symbolInfo)
         {
             var t = typeInfo.Type;
-            var staticAccess = symbolInfo.IsStatic;
-
+            var staticAccess = symbolInfo.IsStatic || symbolInfo.Kind == SymbolKind.NamedType;
+            
             var methods = t.GetMembers().OfType<IMethodSymbol>()
                 .Where(x => x.CanBeReferencedByName && x.IsStatic == staticAccess)
                 .Select(x => x.Name)

@@ -341,7 +341,7 @@ foreach(var table in Tables) {
             
             #line default
             #line hidden
-            this.Write(".Count().Dump();\r\n        }\r\n    }\r\n}");
+            this.Write(".Take(1).Dump();\r\n        }\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

@@ -26,7 +26,6 @@ namespace LinqEditor.UI.WinForm
         ToolStrip Toolbar;
         SplitContainer MainContainer;
         ToolStripButton executeButton;
-        ToolStripButton debugButton;
         TabControl TabControl;
         TabPage ConsoleTab;
         TabPage DiagnosticsTab;
@@ -105,12 +104,7 @@ namespace LinqEditor.UI.WinForm
             executeButton.Click += executeButton_Click;
             executeButton.Enabled = false;
 
-            debugButton = new ToolStripButton();
-            debugButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            debugButton.Image = Icons.console;
-            debugButton.Click += debugButton_Click;
             Toolbar.Items.Add(executeButton);
-            Toolbar.Items.Add(debugButton);
 
             // tabControl
             TabControl = new TabControl();
@@ -261,6 +255,7 @@ namespace LinqEditor.UI.WinForm
         void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
             IOCContainer.Release(ConnectionSession);
+            IOCContainer.Release(CompletionHelper);
             IOCContainer.Dispose();
         }
 
@@ -269,6 +264,9 @@ namespace LinqEditor.UI.WinForm
             var result = await ConnectionSession.InitializeAsync(ConnectionTextBox.Text);
             // init the completion helper with schema data
             await CompletionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
+            Console.AppendText("Completion Initialized\n");
+            // passes helper to editor control
+            Editor.CompletionHelper = CompletionHelper; 
             executeButton.Enabled = true;
         }
 
@@ -300,17 +298,6 @@ namespace LinqEditor.UI.WinForm
                 }
             }
             btn.Enabled = true;
-        }
-
-        async void debugButton_Click(object sender, EventArgs e)
-        {
-            await CompletionHelper.UpdateFragmentAsync(Editor.SourceCode());
-            var list = await CompletionHelper.MemberAccessExpressionCompletionsAsync(Editor.SourceCode().Length - 1);
-            Console.AppendText("Completions:\n");
-            foreach (var elm in list.Suggestions)
-            {
-                Console.AppendText(string.Format("{0}:{1}\n", elm.Value, elm.Kind));
-            }
         }
     }
 }

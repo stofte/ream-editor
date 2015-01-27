@@ -129,7 +129,7 @@ foreach(var table in Tables) {
     {
         protected override void Query() 
         {
-            <#= Tables.First().Name #>.Count().Dump();
+            <#= Tables.First().Name #>.Take(1).Dump();
         }
     }
 }

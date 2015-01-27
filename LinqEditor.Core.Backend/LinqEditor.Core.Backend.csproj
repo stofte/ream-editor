@@ -56,8 +56,8 @@
     <Compile Include="Repository\IBackgroundSession.cs" />
     <Compile Include="Repository\ISession.cs" />
     <Compile Include="Repository\Session.cs" />
-    <Compile Include="Settings\IUserSettings.cs" />
-    <Compile Include="Settings\UserSettings.cs" />
+    <Compile Include="Settings\ISchemaStore.cs" />
+    <Compile Include="Settings\SchemaStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

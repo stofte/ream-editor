@@ -27,7 +27,7 @@ namespace LinqEditor.UI.WinForm
         SplitContainer _mainContainer;
         ToolStripButton _executeButton;
         StatusStrip _statusBar;
-        ToolStripStatusLabel _editorStatusBarLabel;
+        ToolStripStatusLabel _statusLabel;
         TextBox _connectionTextBox;
         CodeEditor _editor;
         OutputPane _outputPane;
@@ -68,7 +68,12 @@ namespace LinqEditor.UI.WinForm
             _statusBar.Dock = DockStyle.Bottom;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
             _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            _editorStatusBarLabel = new ToolStripStatusLabel();
+            _statusLabel = new ToolStripStatusLabel();
+            //_editorStatusBarLabel.Size = new System.Drawing.Size(246, 20);
+            _statusLabel.BorderStyle = Border3DStyle.SunkenOuter;
+            _statusLabel.Alignment = ToolStripItemAlignment.Left;
+            _statusLabel.Text = "Loading";
+            _statusBar.Items.Add(_statusLabel);
             
             // connection
             _connectionTextBox = new TextBox();
@@ -98,17 +103,17 @@ namespace LinqEditor.UI.WinForm
             _toolbar.Items.Add(_executeButton);
 
             // add controls
-            SuspendLayout();
             _statusBar.SuspendLayout();
+            SuspendLayout();
             _mainContainer.Panel1.Controls.Add(_editor);
             _mainContainer.Panel1.Controls.Add(_connectionTextBox);
             _mainContainer.Panel2.Controls.Add(_outputPane);
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);
             Controls.Add(_statusBar);
+            _statusBar.ResumeLayout(false);
             _statusBar.PerformLayout();
-            ResumeLayout();
-
+            ResumeLayout(false);
             InitializeWindsor();
         }
 
@@ -147,8 +152,10 @@ namespace LinqEditor.UI.WinForm
             await _completionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
             // passes helper to editor control
             _editor.CompletionHelper = _completionHelper;
+            _statusLabel.Text = "Editor ready";
             // loads appdomain and initializes connection
             await _connectionSession.LoadAppDomainAsync();
+            _statusLabel.Text = "Query ready";
             _executeButton.Enabled = true;
         }
 

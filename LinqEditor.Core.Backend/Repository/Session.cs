@@ -29,13 +29,13 @@ namespace LinqEditor.Core.Backend.Repository
         private ICSharpCompiler _compiler;
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
-        private IUserSettings _userSettings;
+        private ISchemaStore _userSettings;
 
         //private DbEntityProvider _entityProvider;
 
         private Isolated<Runner> _container;
 
-        public Session(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator, IUserSettings userSettings)
+        public Session(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings)
         {
             _compiler = compiler;
             _schemaProvider = schemaProvider;

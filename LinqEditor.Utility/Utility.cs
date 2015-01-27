@@ -11,6 +11,7 @@ namespace LinqEditor.Utility
     {
         public static string CachePath()
         {
+            // should match AppDomain.CurrentDomain.BaseDirectory
             var doc = XDocument.Load(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
             var paths = doc.Descendants(XName.Get("probing", "urn:schemas-microsoft-com:asm.v1"));
             return AppDomain.CurrentDomain.BaseDirectory + paths.First().Attribute("privatePath").Value + "\\";

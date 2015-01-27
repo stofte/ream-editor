@@ -15,7 +15,7 @@ namespace LinqEditor.Core.Backend.Repository
     // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true
     public class BackgroundSession : Session, IBackgroundSession
     {
-        public BackgroundSession(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator, IUserSettings userSettings) :
+        public BackgroundSession(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings) :
             base(compiler, schemaProvider, generator, userSettings) { }
 
         public async Task<InitializeResult> InitializeAsync(string connectionString)

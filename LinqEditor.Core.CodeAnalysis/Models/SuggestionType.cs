@@ -8,7 +8,7 @@ namespace LinqEditor.Core.CodeAnalysis.Models
 {
     public enum SuggestionType
     {
-        Field,
+        Field = 0,
         Property,
         Method,
         ExtensionMethod

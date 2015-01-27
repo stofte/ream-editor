@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Editor;
+using LinqEditor.Core.CodeAnalysis.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,9 +13,11 @@ namespace LinqEditor.UI.WinForm.Controls
     public class CodeEditor : UserControl
     {
         ScintillaNET.Scintilla _editor;
+        IDictionary<SuggestionType, int> _iconMap;
 
         public IBackgroundCompletion CompletionHelper { get; set; }
         public string SourceCode { get { return _editor.Text; } }
+
         
         public CodeEditor()
         {
@@ -35,13 +38,41 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.Name = "_scintilla";
             _editor.TabIndex = 0;
             _editor.Text = "CodeListItem.Take(10).Dump();";
+            _editor.CharAdded += _editor_CharAdded;
             initEditor.EndInit();
 
             SuspendLayout();
             Controls.Add(_editor);
             ResumeLayout();
 
+            var imageList = new ImageList();
+            // same order as enum order
+            imageList.Images.Add(Resources.Types.Field);
+            imageList.Images.Add(Resources.Types.Property);
+            imageList.Images.Add(Resources.Types.Method);
+            imageList.Images.Add(Resources.Types.ExtensionMethod);
+            
+            _editor.AutoComplete.RegisterImages(imageList, System.Drawing.Color.Magenta);
+            _editor.AutoComplete.MaxHeight = 10;
+            
             _editor.ConfigurationManager.Language = "cs";
+        }
+
+        async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
+        {
+            if (e.Ch == '.')
+            {
+                await CompletionHelper.UpdateFragmentAsync(_editor.Text);
+                var result = await CompletionHelper.MemberAccessExpressionCompletionsAsync(_editor.CurrentPos);
+                _editor.AutoComplete.FillUpCharacters = "";
+                _editor.AutoComplete.List = GetAutoCompleteList(result.Suggestions);
+                _editor.AutoComplete.Show();
+            }
+        }
+
+        private List<string> GetAutoCompleteList(IEnumerable<SuggestionEntry> suggestions)
+        {
+            return suggestions.Select(x => string.Format("{0}?{1}", x.Value, (int)x.Kind)).ToList();
         }
     }
 }

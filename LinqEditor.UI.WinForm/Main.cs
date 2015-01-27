@@ -36,16 +36,13 @@ namespace LinqEditor.UI.WinForm
         ToolStripStatusLabel EditorStatusBarLabel;
 
         TextBox ConnectionTextBox;
-
+        List<TabPage> ResultTabs;
         CodeEditor Editor;
-        //ScintillaNET.Scintilla Editor;
         RichTextBox Console;
+
         IBackgroundSession ConnectionSession;
         IBackgroundCompletion CompletionHelper;
-
-        List<TabPage> ResultTabs;
-
-        private IWindsorContainer IOCContainer;
+        IWindsorContainer IOCContainer;
 
         private void InitializeContainer()
         {
@@ -63,7 +60,6 @@ namespace LinqEditor.UI.WinForm
 
         public Main()
         {
-            var font = new System.Drawing.Font("Consolas", 10);
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             Text = "Linq Editor";
@@ -141,7 +137,6 @@ namespace LinqEditor.UI.WinForm
             Console = new RichTextBox();
             Console.Dock = DockStyle.Fill;
             Console.ReadOnly = true;
-            Console.Font = font;
             Console.BackColor = Color.White;
             ConsoleTab.Controls.Add(Console);
 

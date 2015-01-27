@@ -35,6 +35,8 @@ namespace LinqEditor.UI.WinForm.Controls
             SuspendLayout();
             Controls.Add(Editor);
             ResumeLayout();
+
+            Editor.ConfigurationManager.Language = "cs";
         }
 
         public string SourceCode()

@@ -1,5 +1,5 @@
-Linq Editor ![Build Status](https://travis-ci.org/stofte/linq-editor.svg?branch=master "Build Status")
-=====================================================================================================
+Linq Editor [![Build status](https://travis-ci.org/stofte/linq-editor.svg?branch=master)](https://travis-ci.org/stofte/linq-editor)
+===================================================================================================================================
 
 ![Linq Editor screenshot](http://i.imgur.com/Muuvfnz.png "Query databases using familiar C#/LINQ syntax.")
 

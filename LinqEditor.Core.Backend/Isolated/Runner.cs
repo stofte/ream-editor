@@ -18,17 +18,17 @@ namespace LinqEditor.Core.Backend.Isolated
         private string _dbType;
         private string _connectionString;
 
-        public InitializeResult Initialize(byte[] assemblyImage, string connectionString)
+        public LoadAppDomainResult Initialize(byte[] assemblyImage, string connectionString)
         {
             return Initialize(assemblyImage, null, connectionString);
         }
 
-        public InitializeResult Initialize(string assemblyPath, string connectionString)
+        public LoadAppDomainResult Initialize(string assemblyPath, string connectionString)
         {
             return Initialize(null, assemblyPath, connectionString);
         }
 
-        private InitializeResult Initialize(byte[] assemblyImage, string assemblyPath, string connectionString)
+        private LoadAppDomainResult Initialize(byte[] assemblyImage, string assemblyPath, string connectionString)
         {
             Exception exn = null;
             try
@@ -55,9 +55,9 @@ namespace LinqEditor.Core.Backend.Isolated
                 exn = e;
             }
 
-            return new InitializeResult
+            return new LoadAppDomainResult
             {
-                Exception = exn
+                Error = exn
             };
             
         }

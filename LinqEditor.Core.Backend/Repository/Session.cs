@@ -66,13 +66,9 @@ namespace LinqEditor.Core.Backend.Repository
                 // todo: probably want to store namespace in settings also
                 _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
             }
-            // loads schema in new appdomain
-            _container = new Isolated<Runner>();
-            var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
 
             return new InitializeResult
             {
-                Exception = initResult.Exception, // only member set in runner
                 AssemblyPath = _schemaPath,
                 SchemaNamespace = _schemaNamespace
             };
@@ -102,6 +98,19 @@ namespace LinqEditor.Core.Backend.Repository
                 Success = false,
                 Errors = result.Errors,
                 Warnings = result.Warnings
+            };
+        }
+
+        public LoadAppDomainResult LoadAppDomain()
+        {
+            
+            // loads schema in new appdomain
+            _container = new Isolated<Runner>();
+            var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
+
+            return new LoadAppDomainResult
+            {
+                Error = initResult.Error, // only member set in runner
             };
         }
 

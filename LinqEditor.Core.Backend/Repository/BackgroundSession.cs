@@ -27,5 +27,10 @@ namespace LinqEditor.Core.Backend.Repository
         {
             return await Task.Run(() => Execute(sourceFragment));
         }
+
+        public async Task<LoadAppDomainResult> LoadAppDomainAsync()
+        {
+            return await Task.Run(() => LoadAppDomain());
+        }
     }
 }

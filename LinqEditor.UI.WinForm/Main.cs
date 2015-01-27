@@ -266,7 +266,9 @@ namespace LinqEditor.UI.WinForm
             await CompletionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
             Console.AppendText("Completion Initialized\n");
             // passes helper to editor control
-            Editor.CompletionHelper = CompletionHelper; 
+            Editor.CompletionHelper = CompletionHelper;
+            // loads appdomain and initializes connection
+            await ConnectionSession.LoadAppDomainAsync();
             executeButton.Enabled = true;
         }
 

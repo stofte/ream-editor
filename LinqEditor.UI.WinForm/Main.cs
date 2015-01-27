@@ -3,6 +3,7 @@ using Castle.Windsor;
 using Castle.Windsor.Installer;
 using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.Backend.Repository;
+using LinqEditor.Core.CodeAnalysis.Editor;
 using LinqEditor.Core.CodeAnalysis.Models;
 using ScintillaNET;
 using System;
@@ -24,6 +25,7 @@ namespace LinqEditor.UI.WinForm
         ToolStrip Toolbar;
         SplitContainer MainContainer;
         ToolStripButton executeButton;
+        ToolStripButton debugButton;
         TabControl TabControl;
         TabPage ConsoleTab;
         TabPage DiagnosticsTab;
@@ -37,6 +39,7 @@ namespace LinqEditor.UI.WinForm
         ScintillaNET.Scintilla Editor;
         RichTextBox Console;
         IBackgroundSession ConnectionSession;
+        IBackgroundCompletion CompletionHelper;
 
         List<TabPage> ResultTabs;
 
@@ -48,6 +51,7 @@ namespace LinqEditor.UI.WinForm
             IOCContainer.Install(FromAssembly.This());
 
             ConnectionSession = IOCContainer.Resolve<IBackgroundSession>(new Arguments(new { connectionString = ConnectionTextBox.Text }));
+            CompletionHelper = IOCContainer.Resolve<IBackgroundCompletion>();
         }
 
         public static Main Create()
@@ -111,7 +115,13 @@ namespace LinqEditor.UI.WinForm
             executeButton.Image = Icons.play;
             executeButton.Click += executeButton_Click;
             executeButton.Enabled = false;
+
+            debugButton = new ToolStripButton();
+            debugButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            debugButton.Image = Icons.console;
+            debugButton.Click += debugButton_Click;
             Toolbar.Items.Add(executeButton);
+            Toolbar.Items.Add(debugButton);
 
             // tabControl
             TabControl = new TabControl();
@@ -162,7 +172,6 @@ namespace LinqEditor.UI.WinForm
 
             InitializeContainer();
         }
-
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -298,6 +307,8 @@ namespace LinqEditor.UI.WinForm
         async void Main_Load(object sender, EventArgs e)
         {
             var result = await ConnectionSession.InitializeAsync(ConnectionTextBox.Text);
+            // init the completion helper with schema data
+            await CompletionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
             executeButton.Enabled = true;
         }
 
@@ -329,6 +340,17 @@ namespace LinqEditor.UI.WinForm
                 }
             }
             btn.Enabled = true;
+        }
+
+        async void debugButton_Click(object sender, EventArgs e)
+        {
+            await CompletionHelper.UpdateFragmentAsync(Editor.Text);
+            var list = await CompletionHelper.MemberAccessExpressionCompletionsAsync(Editor.Text.Length - 1);
+            Console.AppendText("Completions:\n");
+            foreach (var elm in list.Suggestions)
+            {
+                Console.AppendText(string.Format("{0}:{1}\n", elm.Value, elm.Kind));
+            }
         }
     }
 }

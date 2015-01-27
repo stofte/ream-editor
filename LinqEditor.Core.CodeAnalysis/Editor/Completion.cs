@@ -29,13 +29,22 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             _references = CSharpCompiler.GetStandardReferences();
         }
 
-        public void Initialize(string assemblyPath = null)
+        public void Initialize(string assemblyPath = null, string schemaNamespace = null)
         {
+            // update references
+            if (!string.IsNullOrEmpty(assemblyPath))
+            {
+                _references = _references.Concat(new[] { MetadataReference.CreateFromFile(assemblyPath) }).ToArray();
+            }
+
             var queryNamespace = "";
-            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), out queryNamespace, "", "Schema");
+            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), out queryNamespace, Marker, schemaNamespace);
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
             var semanticModel = GetModel(tree);
             _sourceOffset = _initialSource.IndexOf(Marker);
+
+
+
             // find entry point
             var methodBody = tree.GetRoot()
                 .DescendantNodes().OfType<MethodDeclarationSyntax>().Last()
@@ -96,11 +105,9 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var typeEntries = GetTypeEntries(lhs, symInfo.Symbol);
             var typeExtensions = GetTypeExtensionMethods(lhs);
 
-            // methods might contain overrides of int functions i guess
             var list = new SuggestionList
             {
-                // vs sorts by regular methods first, then by extensions, 
-                // which the enum should ensure
+                // vs sorts by regular methods first, then by extensions
                 Suggestions = typeExtensions.Concat(typeEntries).OrderBy(x => x.Value).ThenBy(x => x.Kind)
             };
 
@@ -110,11 +117,13 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
         private SemanticModel GetModel(SyntaxTree tree)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            return CSharpCompilation.Create("d" + Guid.NewGuid().ToString().Replace("-", ""))
+            var comp = CSharpCompilation.Create("d" + Guid.NewGuid().ToString().Replace("-", ""))
                 .AddReferences(_references)
                 .WithOptions(compilerOptions)
-                .AddSyntaxTrees(tree)
-                .GetSemanticModel(tree);
+                .AddSyntaxTrees(tree);
+            
+            var diag = comp.GetDiagnostics();
+            return comp.GetSemanticModel(tree);
         }
 
         private IEnumerable<SuggestionEntry> GetTypeEntries(TypeInfo typeInfo, ISymbol symbolInfo)

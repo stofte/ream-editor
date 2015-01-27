@@ -90,7 +90,9 @@
     <Compile Include="Compiler\CompilerResults.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Compiler\ICSharpCompiler.cs" />
+    <Compile Include="Editor\BackgroundCompletion.cs" />
     <Compile Include="Editor\Completion.cs" />
+    <Compile Include="Editor\IBackgroundCompletion.cs" />
     <Compile Include="Editor\ICompletion.cs" />
     <Compile Include="Editor\IValidation.cs" />
     <Compile Include="Editor\Validation.cs" />

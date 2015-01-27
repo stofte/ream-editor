@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Editor
 {
-    public interface ICompletion
+    public interface IBackgroundCompletion
     {
-        void Initialize(string assemblyPath = null, string schemaNamespace = null);
-        void UpdateFragment(string fragment);
+        Task InitializeAsync(string assemblyPath = null, string schemaNamespace = null);
+        Task UpdateFragmentAsync(string fragment);
         /// <summary>
         /// Suggests completions for the member access expression ("x.")
         /// </summary>
         /// <param name="fragmentIndex">Index of the expression.</param>
         /// <returns></returns>
-        SuggestionList MemberAccessExpressionCompletions(int fragmentIndex);
+        Task<SuggestionList> MemberAccessExpressionCompletionsAsync(int fragmentIndex);
     }
 }

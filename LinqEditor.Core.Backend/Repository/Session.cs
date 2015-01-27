@@ -70,7 +70,12 @@ namespace LinqEditor.Core.Backend.Repository
             _container = new Isolated<Runner>();
             var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
 
-            return initResult;
+            return new InitializeResult
+            {
+                Exception = initResult.Exception, // only member set in runner
+                AssemblyPath = _schemaPath,
+                SchemaNamespace = _schemaNamespace
+            };
         }
 
         public ExecuteResult Execute(string sourceFragment)

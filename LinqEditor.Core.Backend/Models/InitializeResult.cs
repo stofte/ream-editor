@@ -12,6 +12,8 @@ namespace LinqEditor.Core.Backend.Models
     [Serializable]
     public class InitializeResult
     {
-        public Exception Exception;
+        public Exception Exception { get; set; }
+        public string AssemblyPath { get; set; }
+        public string SchemaNamespace { get; set; }
     }
 }

@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.CodeAnalysi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Utility", "LinqEditor.Utility\LinqEditor.Utility.csproj", "{53F0654D-867F-49B8-8443-4C3486FB8309}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Utility.Tests", "LinqEditor.Utility.Test\LinqEditor.Utility.Tests.csproj", "{198F6E16-A422-41D3-BC0D-58843E264BFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Utility.Tests", "LinqEditor.Utility.Tests\LinqEditor.Utility.Tests.csproj", "{198F6E16-A422-41D3-BC0D-58843E264BFE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.CodeAnalysis.Tests", "LinqEditor.Core.CodeAnalysis.Tests\LinqEditor.Core.CodeAnalysis.Tests.csproj", "{E6FE05A0-D542-48FA-974D-ACBD5C063D32}"
 EndProject

@@ -11,9 +11,11 @@ namespace LinqEditor.UI.WinForm.Controls
 {
     public class CodeEditor : UserControl
     {
-        public IBackgroundCompletion CompletionHelper { get; set; }
         ScintillaNET.Scintilla _editor;
 
+        public IBackgroundCompletion CompletionHelper { get; set; }
+        public string SourceCode { get { return _editor.Text; } }
+        
         public CodeEditor()
         {
             InitializeComponent();
@@ -40,11 +42,6 @@ namespace LinqEditor.UI.WinForm.Controls
             ResumeLayout();
 
             _editor.ConfigurationManager.Language = "cs";
-        }
-
-        public string SourceCode()
-        {
-            return _editor.Text;
         }
     }
 }

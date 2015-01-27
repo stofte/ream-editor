@@ -28,7 +28,7 @@ namespace LinqEditor.UI.WinForm
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(WinForm.Main.Create());
+            Application.Run(new WinForm.Main());
         }
     }
 }

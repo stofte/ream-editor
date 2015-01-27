@@ -72,6 +72,9 @@
     <Compile Include="Controls\CodeEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\OutputPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

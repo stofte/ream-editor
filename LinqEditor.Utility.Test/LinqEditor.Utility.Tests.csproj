@@ -6,8 +6,8 @@
     <ProjectGuid>{198F6E16-A422-41D3-BC0D-58843E264BFE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LinqEditor.Utility.Test</RootNamespace>
-    <AssemblyName>LinqEditor.Utility.Test</AssemblyName>
+    <RootNamespace>LinqEditor.Utility.Tests</RootNamespace>
+    <AssemblyName>LinqEditor.Utility.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

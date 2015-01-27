@@ -43,7 +43,7 @@ namespace LinqEditor.Utility.Test
             Repository.Select(x => new { foo = x.Id }).Dump();
             
             var dump = Dumper.FlushDumps();
-            Assert.AreEqual(6, dump.First().Rows.Count);
+            Assert.AreEqual("not the same", dump.First().Rows.Count);
             Assert.AreEqual(1, dump.First().Columns.Count);
         }
 

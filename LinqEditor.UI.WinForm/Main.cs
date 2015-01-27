@@ -5,6 +5,7 @@ using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.Backend.Repository;
 using LinqEditor.Core.CodeAnalysis.Editor;
 using LinqEditor.Core.CodeAnalysis.Models;
+using LinqEditor.UI.WinForm.Controls;
 using ScintillaNET;
 using System;
 using System.CodeDom.Compiler;
@@ -36,7 +37,8 @@ namespace LinqEditor.UI.WinForm
 
         TextBox ConnectionTextBox;
 
-        ScintillaNET.Scintilla Editor;
+        CodeEditor Editor;
+        //ScintillaNET.Scintilla Editor;
         RichTextBox Console;
         IBackgroundSession ConnectionSession;
         IBackgroundCompletion CompletionHelper;
@@ -93,17 +95,8 @@ namespace LinqEditor.UI.WinForm
             ConnectionTextBox.Text = TestConnectionString;
 
             // scintilla
-            Editor = new ScintillaNET.Scintilla();
-            ((System.ComponentModel.ISupportInitialize)(Editor)).BeginInit();
+            Editor = new CodeEditor();
             Editor.Dock = DockStyle.Fill;
-            Editor.ConfigurationManager.Language = "C#";
-            Editor.LineWrapping.VisualFlags = ScintillaNET.LineWrappingVisualFlags.End;
-            Editor.Font = font;
-            Editor.Name = "_scintilla";
-            Editor.TabIndex = 0;
-            Editor.Text = "CodeListItem.Take(10).Dump();";
-            Editor.CharAdded += Editor_CharAdded;
-            ((System.ComponentModel.ISupportInitialize)(Editor)).EndInit();
 
             // toolbar
             Toolbar = new ToolStrip();
@@ -168,8 +161,6 @@ namespace LinqEditor.UI.WinForm
 
             ResumeLayout();
 
-            Editor.ConfigurationManager.Language = "cs";
-
             InitializeContainer();
         }
 
@@ -180,20 +171,12 @@ namespace LinqEditor.UI.WinForm
                 executeButton.PerformClick();
                 return true;
             }
-            else if (keyData == Keys.F6)
-            {
-                var rr = Editor.GetRange(0, 3);
-                var indicator = Editor.Indicators[0];
-                indicator.Color = Color.Red;
-                rr.SetIndicator(indicator.Index);
-                return true;
-            }
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private async Task<ExecuteResult> Execute()
         {
-            return await ConnectionSession.ExecuteAsync(Editor.Text);
+            return await ConnectionSession.ExecuteAsync(Editor.SourceCode());
         }
 
         private void BindResults(IEnumerable<DataTable> tables)
@@ -247,24 +230,6 @@ namespace LinqEditor.UI.WinForm
                 DiagnosticsDataTable.Rows.Add(new[] { item.Category, item.Location, item.Message });
             }
         }
-
-        void Editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
-        {
-            if (e.Ch == '.' && false)
-            {
-                var l = new List<string>();
-                l.Add("AAA");
-                l.Add("BBBBB");
-
-                l.Sort();
-                //Editor.AutoComplete.List = l;
-                //Editor.AutoComplete.SingleLineAccept = false;
-                Editor.AutoComplete.AutoHide = false;
-                Editor.AutoComplete.FillUpCharacters = "";
-                Editor.AutoComplete.Show(l);
-            }
-        }
-
 
         void DiagnosticsDataGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
@@ -344,8 +309,8 @@ namespace LinqEditor.UI.WinForm
 
         async void debugButton_Click(object sender, EventArgs e)
         {
-            await CompletionHelper.UpdateFragmentAsync(Editor.Text);
-            var list = await CompletionHelper.MemberAccessExpressionCompletionsAsync(Editor.Text.Length - 1);
+            await CompletionHelper.UpdateFragmentAsync(Editor.SourceCode());
+            var list = await CompletionHelper.MemberAccessExpressionCompletionsAsync(Editor.SourceCode().Length - 1);
             Console.AppendText("Completions:\n");
             foreach (var elm in list.Suggestions)
             {

@@ -63,9 +63,9 @@ namespace LinqEditor.UI.WinForm.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ExtensionMethod {
+        internal static System.Drawing.Bitmap ExtensionMethod_9571 {
             get {
-                object obj = ResourceManager.GetObject("ExtensionMethod", resourceCulture);
+                object obj = ResourceManager.GetObject("ExtensionMethod_9571", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace LinqEditor.UI.WinForm.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Field {
+        internal static System.Drawing.Bitmap FieldIcon {
             get {
-                object obj = ResourceManager.GetObject("Field", resourceCulture);
+                object obj = ResourceManager.GetObject("FieldIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace LinqEditor.UI.WinForm.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Method {
+        internal static System.Drawing.Bitmap Method_636 {
             get {
-                object obj = ResourceManager.GetObject("Method", resourceCulture);
+                object obj = ResourceManager.GetObject("Method_636", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace LinqEditor.UI.WinForm.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Property {
+        internal static System.Drawing.Bitmap Property_501 {
             get {
-                object obj = ResourceManager.GetObject("Property", resourceCulture);
+                object obj = ResourceManager.GetObject("Property_501", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

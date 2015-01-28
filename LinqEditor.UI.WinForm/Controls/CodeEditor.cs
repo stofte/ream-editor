@@ -48,10 +48,10 @@ namespace LinqEditor.UI.WinForm.Controls
             // https://scintillanet.codeplex.com/discussions/75490
             var imageList = new ImageList();
             // same order as enum order
-            imageList.Images.Add(Resources.Types.Field);
-            imageList.Images.Add(Resources.Types.Property);
-            imageList.Images.Add(Resources.Types.Method);
-            imageList.Images.Add(Resources.Types.ExtensionMethod);
+            imageList.Images.Add(Resources.Types.FieldIcon);
+            imageList.Images.Add(Resources.Types.Property_501);
+            imageList.Images.Add(Resources.Types.Method_636);
+            imageList.Images.Add(Resources.Types.ExtensionMethod_9571);
             
             _editor.AutoComplete.RegisterImages(imageList, System.Drawing.Color.Magenta);
             _editor.AutoComplete.MaxHeight = 10;
@@ -62,7 +62,7 @@ namespace LinqEditor.UI.WinForm.Controls
         async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
         {
             if (e.Ch == '.')
-            {
+            {                
                 await CompletionHelper.UpdateFragmentAsync(_editor.Text);
                 var result = await CompletionHelper.MemberAccessExpressionCompletionsAsync(_editor.CurrentPos);
                 _editor.AutoComplete.FillUpCharacters = "";

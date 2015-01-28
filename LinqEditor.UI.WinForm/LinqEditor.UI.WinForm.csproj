@@ -136,23 +136,20 @@
       <Link>SciLexer64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\resources\console.png">
-      <Link>Icons\console.png</Link>
-    </Content>
     <Content Include="..\resources\play.png">
-      <Link>Icons\play.png</Link>
+      <Link>Resources\ToolStripIcons\play.png</Link>
     </Content>
     <Content Include="..\resources\typeicons\ExtensionMethod_9571.png">
-      <Link>TypeIcons\ExtensionMethod_9571.png</Link>
+      <Link>Resources\TypeIcons\ExtensionMethod_9571.png</Link>
     </Content>
     <Content Include="..\resources\typeicons\FieldIcon.png">
-      <Link>TypeIcons\FieldIcon.png</Link>
+      <Link>Resources\TypeIcons\FieldIcon.png</Link>
     </Content>
     <Content Include="..\resources\typeicons\Method_636.png">
-      <Link>TypeIcons\Method_636.png</Link>
+      <Link>Resources\TypeIcons\Method_636.png</Link>
     </Content>
     <Content Include="..\resources\typeicons\Property_501.png">
-      <Link>TypeIcons\Property_501.png</Link>
+      <Link>Resources\TypeIcons\Property_501.png</Link>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +195,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -69,5 +69,25 @@ namespace LinqEditor.UI.WinForm.Resources {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap QueryResultsNewRow {
+            get {
+                object obj = ResourceManager.GetObject("QueryResultsNewRow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap startwithoutdebugging_6556 {
+            get {
+                object obj = ResourceManager.GetObject("startwithoutdebugging_6556", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

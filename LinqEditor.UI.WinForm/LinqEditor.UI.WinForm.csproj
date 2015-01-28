@@ -139,6 +139,12 @@
     <Content Include="..\resources\play.png">
       <Link>Resources\ToolStripIcons\play.png</Link>
     </Content>
+    <Content Include="..\resources\QueryResultsNewRow.png">
+      <Link>Resources\ToolStripIcons\QueryResultsNewRow.png</Link>
+    </Content>
+    <Content Include="..\resources\startwithoutdebugging_6556.png">
+      <Link>Resources\ToolStripIcons\startwithoutdebugging_6556.png</Link>
+    </Content>
     <Content Include="..\resources\typeicons\ExtensionMethod_9571.png">
       <Link>Resources\TypeIcons\ExtensionMethod_9571.png</Link>
     </Content>

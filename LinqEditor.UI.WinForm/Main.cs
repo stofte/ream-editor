@@ -96,7 +96,7 @@ namespace LinqEditor.UI.WinForm
             // play button
             _executeButton = new ToolStripButton();
             _executeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _executeButton.Image = Resources.Icons.play;
+            _executeButton.Image = Resources.Icons.startwithoutdebugging_6556;
             _executeButton.Click += _executeButton_Click;
             _executeButton.Enabled = false;
             _toolbar.Items.Add(_executeButton);

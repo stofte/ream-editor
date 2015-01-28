@@ -45,6 +45,7 @@ namespace LinqEditor.UI.WinForm.Controls
             Controls.Add(_editor);
             ResumeLayout();
 
+            // https://scintillanet.codeplex.com/discussions/75490
             var imageList = new ImageList();
             // same order as enum order
             imageList.Images.Add(Resources.Types.Field);

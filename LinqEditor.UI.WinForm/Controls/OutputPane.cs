@@ -141,14 +141,14 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             _diagnostics.Rows.Clear();
 
-            var content = errors.Select(x => new
+            var content = (errors ?? new Error[]{}).Select(x => new
             {
                 Category = "Error",
                 Line = x.Location.StartLine,
                 Column = x.Location.StartColumn,
                 Location = string.Format("{0},{1}", x.Location.StartLine, x.Location.StartColumn),
                 Message = x.Message
-            }).Concat(warnings.Select(z => new
+            }).Concat((warnings ?? new Warning[]{}).Select(z => new
             {
                 Category = "Warning",
                 Line = z.Location.StartLine,

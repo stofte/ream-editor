@@ -13,12 +13,10 @@ namespace LinqEditor.UI.WinForm.Controls
     public class CodeEditor : UserControl
     {
         ScintillaNET.Scintilla _editor;
-        IDictionary<SuggestionType, int> _iconMap;
 
         public IBackgroundCompletion CompletionHelper { get; set; }
         public string SourceCode { get { return _editor.Text; } }
 
-        
         public CodeEditor()
         {
             InitializeComponent();
@@ -27,7 +25,7 @@ namespace LinqEditor.UI.WinForm.Controls
         private void InitializeComponent()
         {
             var font = new System.Drawing.Font("Consolas", 10);
-
+            
             _editor = new ScintillaNET.Scintilla();
             var initEditor = _editor as ISupportInitialize;
             initEditor.BeginInit();

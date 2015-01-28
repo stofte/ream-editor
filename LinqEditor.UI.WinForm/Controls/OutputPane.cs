@@ -108,6 +108,14 @@ namespace LinqEditor.UI.WinForm.Controls
                 {
                     _tabControl.SelectedTab = _tabControl.TabPages[1];
                 }
+                if (result.Exception != null)
+                {
+                    _console.AppendText("Exception:\n" + result.Exception.ToString() + "\n");
+                }
+                if (result.InternalException != null)
+                {
+                    _console.AppendText("InternalException:\n" + result.InternalException.ToString() + "\n");
+                }
             }
         }
 

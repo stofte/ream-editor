@@ -22,16 +22,11 @@ namespace LinqEditor.Core.Backend.Repository
         private string _schemaPath;
         private string _schemaNamespace;
         private Guid _sessionId = Guid.NewGuid();
-        private Guid _queryId = Guid.NewGuid();
-
-        //private AppDomain _executionDomain;
 
         private ICSharpCompiler _compiler;
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
         private ISchemaStore _userSettings;
-
-        //private DbEntityProvider _entityProvider;
 
         private Isolated<Runner> _container;
 
@@ -77,12 +72,12 @@ namespace LinqEditor.Core.Backend.Repository
         public ExecuteResult Execute(string sourceFragment)
         {
             string queryNamespace;
-            var querySource = _generator.GenerateQuery(_queryId, out queryNamespace, sourceFragment, _schemaNamespace);
-            var result = _compiler.Compile(querySource, queryNamespace, generateFiles: false, references: _schemaPath);
+            var querySource = _generator.GenerateQuery(Guid.NewGuid(), out queryNamespace, sourceFragment, _schemaNamespace);
+            var result = _compiler.Compile(querySource, queryNamespace, generateFiles: true, references: _schemaPath);
 
             if (result.Success)
             {
-                var containerResult = _container.Value.Execute(result.AssemblyBytes);
+                var containerResult = _container.Value.Execute(result.AssemblyPath);
 
                 return new ExecuteResult
                 {

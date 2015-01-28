@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler\CompilerResults.cs" />
+    <Compile Include="Compiler\CSharpCodeDomCompiler.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Compiler\ICSharpCompiler.cs" />
     <Compile Include="Editor\BackgroundCompletion.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Editor\Validation.cs" />
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Models\CompletionEntry.cs" />
+    <Compile Include="Models\EditContext.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\LocationSpan.cs" />
     <Compile Include="Models\SuggestionEntry.cs" />

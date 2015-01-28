@@ -77,7 +77,6 @@ namespace LinqEditor.Core.Backend.Isolated
             try
             {
                 var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
-
                 var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
                 var instance = Activator.CreateInstance(queryType) as IDynamicQuery;
                 return ExecuteInstance(instance);

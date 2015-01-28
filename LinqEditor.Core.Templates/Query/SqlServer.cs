@@ -44,9 +44,9 @@ namespace LinqEditor.Core.Templates.Query
             #line default
             #line hidden
             this.Write(".Schema.ProgramBase\r\n    {\r\n        protected override void Query() \r\n        {\r\n" +
-                    "#line 1 \"Dynamic\"\r\n");
+                    "");
             
-            #line 18 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
+            #line 17 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SourceCode));
             
             #line default

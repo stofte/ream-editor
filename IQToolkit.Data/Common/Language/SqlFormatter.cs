@@ -846,6 +846,7 @@ namespace IQToolkit.Data.Common
                 this.WriteLine(Indentation.Same);
                 this.Write("FROM ");
                 this.VisitSource(select.From);
+                this.Write(" WITH (NOLOCK) ");
             }
             if (select.Where != null)
             {

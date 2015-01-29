@@ -113,6 +113,7 @@ namespace LinqEditor.UI.WinForm
             _statusBar.ResumeLayout(false);
             _statusBar.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
             InitializeWindsor();
         }
 

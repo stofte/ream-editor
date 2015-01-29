@@ -18,8 +18,8 @@ namespace LinqEditor.UI.WinForm.Controls
         TabPage _consoleTab;
         TabPage _diagnosticsTab;
         
-        List<TabPage> _resultTabs;
         DataTable _diagnostics;
+        List<TabPage> _cachedResultTabs;
 
         public OutputPane()
         {
@@ -53,8 +53,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _console.BackColor = System.Drawing.Color.White;
             _consoleTab.Controls.Add(_console);
 
-            _resultTabs = new List<TabPage>();
-
+            _cachedResultTabs = new List<TabPage>();
 
             SuspendLayout();
             Controls.Add(_tabControl);
@@ -89,16 +88,18 @@ namespace LinqEditor.UI.WinForm.Controls
 
         public void BindOutput(ExecuteResult result)
         {
+            SuspendLayout();
+            _tabControl.Enabled = false;
+            
             if (result.Success)
             {
-                
                 _console.AppendText("Query Text\n");
                 _console.AppendText(result.QueryText);
                 BindResults(result.Tables);
                 BindDiagnostics(new Error[]{}, result.Warnings);
                 if (result.Tables.Count() > 0)
                 {
-                    _tabControl.SelectedTab = _tabControl.TabPages[_tabControl.TabCount-1];
+                    _tabControl.SelectedTab = _tabControl.TabPages[1 + result.Tables.Count()];
                 }
             }
             else
@@ -118,32 +119,53 @@ namespace LinqEditor.UI.WinForm.Controls
                     _console.AppendText("InternalException:\n" + result.InternalException.ToString() + "\n");
                 }
             }
+            _tabControl.Enabled = true;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         private void BindResults(IEnumerable<DataTable> tables)
         {
-            SuspendLayout();
-            foreach (var tab in _resultTabs)
-            {
-                _tabControl.TabPages.Remove(tab);
-            }
-            var newTabs = new List<TabPage>();
+            var prevCount = _tabControl.TabPages.Count - 2; // 2 permanent tabs
+            var index = 0;
+
             foreach (var table in tables)
             {
-                var tab = new TabPage(table.TableName);
-                tab.ClientSizeChanged += TabClientSizeChanged;
-
-                var grid = new DataGridView();
-                grid.ReadOnly = true;
-                grid.AllowUserToAddRows = false;
-                grid.DataBindingComplete += GridDataBindingCompleteAutoSize;
-                grid.DataSource = table;
-                tab.Controls.Add(grid);
-                newTabs.Add(tab);
+                if (index + 1 > prevCount)
+                {
+                    // either make a new tab or reuse previous
+                    TabPage newTab = null;
+                    if (_cachedResultTabs.Count > 0)
+                    {
+                        newTab = _cachedResultTabs[0];
+                        _cachedResultTabs.RemoveAt(0);
+                    }
+                    else
+                    {
+                        newTab = new TabPage();
+                        newTab.ClientSizeChanged += TabClientSizeChanged;
+                        var grid = new DataGridView();
+                        grid.ReadOnly = true;
+                        grid.AllowUserToAddRows = false;
+                        grid.DataBindingComplete += GridDataBindingCompleteAutoSize;
+                        newTab.Controls.Add(grid);
+                    }
+                    newTab.Text = table.TableName;
+                    _tabControl.TabPages.Add(newTab);
+                }
+                var tab = _tabControl.TabPages[2 + index++];
+                var tabGrid = tab.Controls[0] as DataGridView;
+                tabGrid.DataSource = table;
             }
-            _resultTabs = newTabs;
-            _tabControl.TabPages.AddRange(_resultTabs.ToArray());
-            ResumeLayout();
+            for (var i = index; i < prevCount; i++)
+            {
+                _cachedResultTabs.Add(_tabControl.TabPages[2 + i]);
+            }
+            for (var i = index; i < prevCount; i++)
+            {
+                _tabControl.TabPages.Remove(_tabControl.TabPages[2 + i]);
+            }
+            
         }
 
         private void BindDiagnostics(IEnumerable<Error> errors, IEnumerable<Warning> warnings)

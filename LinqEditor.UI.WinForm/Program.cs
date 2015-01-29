@@ -6,29 +6,36 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using LinqEditor.Utility;
+using Castle.Windsor;
+using Castle.Windsor.Installer;
+using Castle.Facilities.TypedFactory;
 
 namespace LinqEditor.UI.WinForm
 {
     static class Program
     {
-        public static string CachePath { get; set; }
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
-            CachePath = Utility.Utility.CachePath();
-
-            if (!Directory.Exists(CachePath))
-            {
-                Directory.CreateDirectory(CachePath);
-            }
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new WinForm.Main());
+
+            var path = Utility.Utility.CachePath();
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            using (var container = new WindsorContainer().Install(FromAssembly.This()))
+            {
+                var mainForm = container.Resolve<MainForm>();
+                Application.Run(mainForm);
+                container.Release(mainForm);
+            }
         }
     }
 }

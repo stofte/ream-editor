@@ -53,6 +53,7 @@
     <Compile Include="Models\LoadAppDomainResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BackgroundSession.cs" />
+    <Compile Include="Repository\EditorScopeAccessor.cs" />
     <Compile Include="Repository\IBackgroundSession.cs" />
     <Compile Include="Repository\ISession.cs" />
     <Compile Include="Repository\Session.cs" />

@@ -17,10 +17,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Castle.Facilities.TypedFactory;
 
 namespace LinqEditor.UI.WinForm
 {
-    public class Main : Form
+    public class MainForm : Form
     {
         public static string TestConnectionString = "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=Opera18500DB";
 
@@ -35,22 +36,22 @@ namespace LinqEditor.UI.WinForm
         OutputPane _outputPane;
 
         IBackgroundSession _connectionSession;
-        IBackgroundCompletion _completionHelper;
-        IWindsorContainer _container;
+        //IWindsorContainer _container;
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
         private void InitializeWindsor()
         {
-            _container = new WindsorContainer();
-            _container.Install(FromAssembly.This());
+            //_container = new WindsorContainer();
+            //_container.AddFacility<TypedFactoryFacility>();
+            //_container.Install(FromAssembly.This());
 
-            _connectionSession = _container.Resolve<IBackgroundSession>(new Arguments(new { connectionString = _connectionTextBox.Text }));
-            _completionHelper = _container.Resolve<IBackgroundCompletion>();
+            //_connectionSession = _container.Resolve<IBackgroundSession>(new Arguments(new { connectionString = _connectionTextBox.Text }));
+            //completionHelper = _container.Resolve<IBackgroundCompletion>();
         }
 
-        public Main()
+        public MainForm()
         {
             _statusBar = new StatusStrip();
             _statusBar.SuspendLayout();
@@ -137,9 +138,7 @@ namespace LinqEditor.UI.WinForm
             _statusBar.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
-            InitializeWindsor();
-
-
+            //InitializeWindsor();
         }
 
         // some custom focus juggling when resizing the splitcontainer when the editor had focus
@@ -175,7 +174,7 @@ namespace LinqEditor.UI.WinForm
 
         private async Task<ExecuteResult> Execute()
         {
-            return await _connectionSession.ExecuteAsync(_editor.SourceCode);
+            return null; // await _connectionSession.ExecuteAsync(_editor.SourceCode);
         }
 
         void _mainContainer_SizeChanged(object sender, EventArgs e)
@@ -186,21 +185,21 @@ namespace LinqEditor.UI.WinForm
 
         void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
-            _container.Release(_connectionSession);
-            _container.Release(_completionHelper);
-            _container.Dispose();
+            //_container.Release(_connectionSession);
+            //_container.Release(_completionHelper);
+            //_container.Dispose();
         }
 
         async void Main_Load(object sender, EventArgs e)
         {
-            var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
+            //var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
             // init the completion helper with schema data
-            await _completionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
+            //await _completionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
             // passes helper to editor control
-            _editor.CompletionHelper = _completionHelper;
+            //_editor.CompletionHelper = _completionHelper;
             _statusLabel.Text = "Editor ready";
             // loads appdomain and initializes connection
-            await _connectionSession.LoadAppDomainAsync();
+            //await _connectionSession.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";
             _executeButton.Enabled = true;
         }

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace LinqEditor.UI.WinForm
 {
@@ -36,6 +37,9 @@ namespace LinqEditor.UI.WinForm
         IBackgroundSession _connectionSession;
         IBackgroundCompletion _completionHelper;
         IWindsorContainer _container;
+
+        Stopwatch _editorFocusTimer;
+        bool _restoreEditorFocusOnSplitterMoved;
 
         private void InitializeWindsor()
         {
@@ -65,7 +69,7 @@ namespace LinqEditor.UI.WinForm
             Load += Main_Load;
             FormClosed += Main_FormClosed;
 
-            
+            _editorFocusTimer = new Stopwatch();
             _mainContainer = new SplitContainer();
             _mainContainer.Location = new Point(0, 0);
             _mainContainer.Orientation = Orientation.Horizontal;
@@ -79,6 +83,9 @@ namespace LinqEditor.UI.WinForm
             _mainContainer.Panel1MinSize = minHeight / 4;
             _mainContainer.Panel2MinSize = minHeight / 3;
             _mainContainer.SizeChanged += _mainContainer_SizeChanged;
+            _mainContainer.GotFocus +=_mainContainer_GotFocus;
+            _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
+            
 
             // status
             _statusBar.Dock = DockStyle.Bottom;
@@ -99,6 +106,7 @@ namespace LinqEditor.UI.WinForm
 
             // scintilla
             _editor = new CodeEditor();
+            _editor.LostFocus += _editor_LostFocus;
             _editor.Dock = DockStyle.Fill;
 
             // output thingy
@@ -130,8 +138,31 @@ namespace LinqEditor.UI.WinForm
             ResumeLayout(false);
             PerformLayout();
             InitializeWindsor();
+
+
         }
-        
+
+        // some custom focus juggling when resizing the splitcontainer when the editor had focus
+        void _mainContainer_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if (_restoreEditorFocusOnSplitterMoved)
+            {
+                _editor.Focus();
+            }
+        }
+
+        void _editor_LostFocus(object sender, EventArgs e)
+        {
+            _editorFocusTimer.Restart();
+            _restoreEditorFocusOnSplitterMoved = false;
+        }
+
+        void _mainContainer_GotFocus(object sender, EventArgs e)
+        {
+            _editorFocusTimer.Stop();
+            _restoreEditorFocusOnSplitterMoved = _editorFocusTimer.ElapsedMilliseconds < 50; // more fudging
+        }
+                
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.F5)

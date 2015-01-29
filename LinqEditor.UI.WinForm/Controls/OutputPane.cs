@@ -175,6 +175,11 @@ namespace LinqEditor.UI.WinForm.Controls
                 _diagnostics.Rows.Add(new[] { item.Category, item.Location, item.Message });
             }
         }
+
+        private void BindRowCount(int rows)
+        {
+            _rowCountLabel.Text = string.Format("{0} rows", rows);
+        }
         
         void TabClientSizeChangedHandler(object sender, EventArgs e)
         {
@@ -188,8 +193,7 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             var tab = sender as TabPage;
             var grid = tab.Controls[0] as DataGridView;
-
-            _rowCountLabel.Text = string.Format("{0} rows", grid.RowCount);
+            BindRowCount(grid.RowCount);
         }
 
         void DiagnosticsListDataBindingCompleteHandler(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -202,11 +206,19 @@ namespace LinqEditor.UI.WinForm.Controls
 
         void GridDataBindingCompleteAutoSizeHandler(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            var view = sender as DataGridView;
-            for (var i = 0; i < view.Columns.Count; i++)
+            var grid = sender as DataGridView;
+            var tab = grid.Parent as TabPage;
+            var tabControl = tab.Parent as TabControl;
+            for (var i = 0; i < grid.Columns.Count; i++)
             {
-                view.Columns[i].AutoSizeMode = i < view.Columns.Count - 1 ?
+                grid.Columns[i].AutoSizeMode = i < grid.Columns.Count - 1 ?
                     DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
+            }
+
+            // if the tab shown doesn't change, no enter event is fired, so check and update here
+            if (tabControl.SelectedTab == tab)
+            {
+                BindRowCount(grid.RowCount);
             }
         }
     }

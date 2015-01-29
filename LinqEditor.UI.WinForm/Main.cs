@@ -48,24 +48,39 @@ namespace LinqEditor.UI.WinForm
 
         public Main()
         {
+            _statusBar = new StatusStrip();
+            _statusBar.SuspendLayout();
+            SuspendLayout();
+            var minHeight = 300;
+            var minWidth = 400;
+
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             Text = "Linq Editor";
             Width = 800;
             Height = 500;
+            MinimumSize = new Size(minWidth, minHeight);
 
             // loads schema etc in async handlers
             Load += Main_Load;
             FormClosed += Main_FormClosed;
+
             
             _mainContainer = new SplitContainer();
+            _mainContainer.Location = new Point(0, 0);
             _mainContainer.Orientation = Orientation.Horizontal;
             _mainContainer.Dock = DockStyle.Fill;
             _mainContainer.TabStop = false;
+            _mainContainer.FixedPanel = FixedPanel.None;
+            // must set this for panel minsizes to work. subtract height for statusbar+toolbar
+            _mainContainer.MinimumSize = new Size(minWidth - 10, minHeight- 80);
+            // fudged values
+            _mainContainer.SplitterDistance = minHeight / 10;
+            _mainContainer.Panel1MinSize = minHeight / 4;
+            _mainContainer.Panel2MinSize = minHeight / 3;
             _mainContainer.SizeChanged += _mainContainer_SizeChanged;
 
             // status
-            _statusBar = new StatusStrip();
             _statusBar.Dock = DockStyle.Bottom;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
             _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
@@ -103,8 +118,7 @@ namespace LinqEditor.UI.WinForm
             _toolbar.Items.Add(_executeButton);
 
             // add controls
-            _statusBar.SuspendLayout();
-            SuspendLayout();
+
             _mainContainer.Panel1.Controls.Add(_editor);
             _mainContainer.Panel1.Controls.Add(_connectionTextBox);
             _mainContainer.Panel2.Controls.Add(_outputPane);
@@ -117,7 +131,7 @@ namespace LinqEditor.UI.WinForm
             PerformLayout();
             InitializeWindsor();
         }
-
+        
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.F5)

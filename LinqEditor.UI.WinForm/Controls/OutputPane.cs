@@ -31,6 +31,12 @@ namespace LinqEditor.UI.WinForm.Controls
             _tabControl = new TabControl();
             _tabControl.Dock = DockStyle.Fill;
             _consoleTab = new TabPage("Console");
+            _diagnostics = new DataTable();
+            _diagnostics.Columns.AddRange(new[]{
+                new DataColumn("Category", typeof(string)),
+                new DataColumn("Location", typeof(string)),
+                new DataColumn("Message", typeof(string))
+            });
             _diagnosticsTab = new TabPage("Errors");
             _diagnosticsTab.ClientSizeChanged += TabClientSizeChanged;
             _diagnosticsList = new DataGridView();
@@ -48,12 +54,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _consoleTab.Controls.Add(_console);
 
             _resultTabs = new List<TabPage>();
-            _diagnostics = new DataTable();
-            _diagnostics.Columns.AddRange(new[]{
-                new DataColumn("Category", typeof(string)),
-                new DataColumn("Location", typeof(string)),
-                new DataColumn("Message", typeof(string))
-            });
+
 
             SuspendLayout();
             Controls.Add(_tabControl);

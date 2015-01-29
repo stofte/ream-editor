@@ -20,6 +20,8 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
         private string _initialSource;
         private string _currentSource;
         private int _sourceOffset;
+        private string _entryNamespace;
+        private string _entryName;
         public static string Marker = "//fragment";
         private IDictionary<string, CompletionEntry> _extensionMethods;
 
@@ -43,11 +45,13 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var semanticModel = GetModel(tree);
             _sourceOffset = _initialSource.IndexOf(Marker);
 
-
-
             // find entry point
-            var methodBody = tree.GetRoot()
-                .DescendantNodes().OfType<MethodDeclarationSyntax>().Last()
+            var nodes = tree.GetRoot().DescendantNodes();
+            // test code has more then one entry
+            var entryMethod = nodes.OfType<MethodDeclarationSyntax>().Last();
+            _entryNamespace = nodes.OfType<NamespaceDeclarationSyntax>().Single().Name.ToString();
+            _entryName = nodes.OfType<MethodDeclarationSyntax>().Last().Identifier.ValueText;
+            var methodBody = entryMethod
                 .DescendantNodes().OfType<StatementSyntax>().First();
 
             // gets static types available at location
@@ -129,27 +133,38 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
         private IEnumerable<SuggestionEntry> GetTypeEntries(TypeInfo typeInfo, ISymbol symbolInfo)
         {
             var t = typeInfo.Type;
-            var staticAccess = symbolInfo.IsStatic || symbolInfo.Kind == SymbolKind.NamedType;
             
-            var methods = t.GetMembers().OfType<IMethodSymbol>()
-                .Where(x => x.CanBeReferencedByName && x.IsStatic == staticAccess)
+            var isStatic = symbolInfo.IsStatic || symbolInfo.Kind == SymbolKind.NamedType;
+            var isContainer = typeInfo.Type.ContainingNamespace.Name == _entryNamespace &&
+                typeInfo.Type.Name == _entryName;
+            
+            // dont include the entry point in completions
+            var methods = isContainer ? new SuggestionEntry[] { } :
+                t.GetMembers().OfType<IMethodSymbol>()
+                .Where(x => x.CanBeReferencedByName && x.IsStatic == isStatic)
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Method, Value = x });
 
             var properties = t.GetMembers().OfType<IPropertySymbol>()
-                .Where(x => x.CanBeReferencedByName && !x.IsIndexer && x.IsStatic == staticAccess)
+                .Where(x => x.CanBeReferencedByName && !x.IsIndexer && 
+                    ((x.IsStatic == isStatic) ||
+                    // if querying the container, we want to include protected properties
+                    (isContainer && x.DeclaredAccessibility == Accessibility.Protected)))
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Property, Value = x });
 
             var fields = t.GetMembers().OfType<IFieldSymbol>()
-                .Where(x => x.CanBeReferencedByName && x.IsStatic && staticAccess)
+                .Where(x => x.CanBeReferencedByName && x.IsStatic && isStatic)
                 .Select(x => x.Name)
                 .Distinct()
                 .Select(x => new SuggestionEntry { Kind = SuggestionType.Field, Value = x });
 
-            var objectEntries = (staticAccess ? new[]
+            var objectEntries = (
+                // no references to object methods on container
+                isContainer ? new SuggestionEntry[] { } :
+                isStatic ? new[]
             {
                 new SuggestionEntry {Value = "Equals", Kind = SuggestionType.Method },
                 new SuggestionEntry {Value = "ReferenceEquals", Kind = SuggestionType.Method }

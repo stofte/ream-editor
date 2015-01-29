@@ -10,6 +10,11 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
 {
     public static class VSCompletionTestData
     {
+        public static Tuple<string, SuggestionType>[] ContainerType = new Tuple<string, SuggestionType>[] 
+        {
+            T.Create("MyProperty", SuggestionType.Property)
+        };
+
         public static Tuple<string, SuggestionType>[] MyStaticClass = new Tuple<string, SuggestionType>[] 
         {
             T.Create("Equals", SuggestionType.Method),

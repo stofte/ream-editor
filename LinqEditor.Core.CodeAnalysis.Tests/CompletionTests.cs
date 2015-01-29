@@ -17,13 +17,6 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
         private static ITemplateService _templateService;
         private ICompletion _completion;
 
-        public struct MyStruct
-        {
-            public static uint Foo = 0xdeadbeef;
-            public int Bar { get; set; }
-            public int Baz() { return 42; }
-        }
-
         [TestFixtureSetUp]
         public void Initialize()
         {
@@ -42,8 +35,10 @@ namespace Generated
         public int Bar { get; set; } 
         public int Baz() { return 42; }
     }
-    public class Proram
+    public abstract class ProgramBase { protected int MyInheritedProperty { get; set; } }
+    public class Program
     {
+        protected int MyProperty { get; set; }
         public void Query() 
         {
 " + Completion.Marker + @"
@@ -130,6 +125,16 @@ namespace Generated
             var s = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
 
             AssertEntries(VSCompletionTestData.GenericIntegerListInstance, s);
+        }
+
+        //[Test]
+        public void Can_Suggest_Protected_Properties_For_MemberAccessExpression_Of_This()
+        {
+            var str = "this.";
+            _completion.UpdateFragment(str);
+            var s = _completion.MemberAccessExpressionCompletions(str.Length - 1).Suggestions.ToArray();
+
+            AssertEntries(VSCompletionTestData.ContainerType, s);
         }
     }
 }

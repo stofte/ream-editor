@@ -17,12 +17,16 @@ namespace LinqEditor.UI.WinForm.Controls
         TabControl _tabControl;
         TabPage _consoleTab;
         TabPage _diagnosticsTab;
+
+        // owned by Main form
+        ToolStripStatusLabel _rowCountLabel;
         
         DataTable _diagnostics;
         List<TabPage> _cachedResultTabs;
 
-        public OutputPane()
+        public OutputPane(ToolStripStatusLabel label)
         {
+            _rowCountLabel = label;
             InitializeComponent();
         }
 
@@ -38,11 +42,11 @@ namespace LinqEditor.UI.WinForm.Controls
                 new DataColumn("Message", typeof(string))
             });
             _diagnosticsTab = new TabPage("Errors");
-            _diagnosticsTab.ClientSizeChanged += TabClientSizeChanged;
+            _diagnosticsTab.ClientSizeChanged += TabClientSizeChangedHandler;
             _diagnosticsList = new DataGridView();
             _diagnosticsList.ReadOnly = true;
             _diagnosticsList.AllowUserToAddRows = false;
-            _diagnosticsList.DataBindingComplete += DiagnosticsListDataBindingComplete;
+            _diagnosticsList.DataBindingComplete += DiagnosticsListDataBindingCompleteHandler;
             _diagnosticsList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             _diagnosticsList.DataSource = _diagnostics;
             _diagnosticsTab.Controls.Add(_diagnosticsList);
@@ -60,31 +64,6 @@ namespace LinqEditor.UI.WinForm.Controls
             ResumeLayout();
         }
 
-        void DiagnosticsListDataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            var view = sender as DataGridView;
-            view.Columns[0].Width = 80;
-            view.Columns[1].Width = 65;
-            view.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-        }
-
-        void TabClientSizeChanged(object sender, EventArgs e)
-        {
-            var tab = sender as TabPage;
-            var grid = tab.Controls[0] as DataGridView;
-            grid.Height = tab.ClientSize.Height;
-            grid.Width = tab.ClientSize.Width;
-        }
-
-        void GridDataBindingCompleteAutoSize(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            var view = sender as DataGridView;
-            for (var i = 0; i < view.Columns.Count; i++)
-            {
-                view.Columns[i].AutoSizeMode = i < view.Columns.Count - 1 ?
-                    DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
-            }
-        }
 
         public void BindOutput(ExecuteResult result)
         {
@@ -120,6 +99,8 @@ namespace LinqEditor.UI.WinForm.Controls
                 }
             }
             _tabControl.Enabled = true;
+            _console.SelectionStart = _console.TextLength;
+            _console.ScrollToCaret();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -143,11 +124,12 @@ namespace LinqEditor.UI.WinForm.Controls
                     else
                     {
                         newTab = new TabPage();
-                        newTab.ClientSizeChanged += TabClientSizeChanged;
+                        newTab.ClientSizeChanged += TabClientSizeChangedHandler;
+                        newTab.Enter += TabEnterHandler;
                         var grid = new DataGridView();
                         grid.ReadOnly = true;
                         grid.AllowUserToAddRows = false;
-                        grid.DataBindingComplete += GridDataBindingCompleteAutoSize;
+                        grid.DataBindingComplete += GridDataBindingCompleteAutoSizeHandler;
                         newTab.Controls.Add(grid);
                     }
                     newTab.Text = table.TableName;
@@ -191,6 +173,40 @@ namespace LinqEditor.UI.WinForm.Controls
             foreach (var item in content)
             {
                 _diagnostics.Rows.Add(new[] { item.Category, item.Location, item.Message });
+            }
+        }
+        
+        void TabClientSizeChangedHandler(object sender, EventArgs e)
+        {
+            var tab = sender as TabPage;
+            var grid = tab.Controls[0] as DataGridView;
+            grid.Height = tab.ClientSize.Height;
+            grid.Width = tab.ClientSize.Width;
+        }
+
+        void TabEnterHandler(object sender, EventArgs e)
+        {
+            var tab = sender as TabPage;
+            var grid = tab.Controls[0] as DataGridView;
+
+            _rowCountLabel.Text = string.Format("{0} rows", grid.RowCount);
+        }
+
+        void DiagnosticsListDataBindingCompleteHandler(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            var view = sender as DataGridView;
+            view.Columns[0].Width = 80;
+            view.Columns[1].Width = 65;
+            view.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
+
+        void GridDataBindingCompleteAutoSizeHandler(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            var view = sender as DataGridView;
+            for (var i = 0; i < view.Columns.Count; i++)
+            {
+                view.Columns[i].AutoSizeMode = i < view.Columns.Count - 1 ?
+                    DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
             }
         }
     }

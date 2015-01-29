@@ -28,6 +28,7 @@ namespace LinqEditor.UI.WinForm
         ToolStripButton _executeButton;
         StatusStrip _statusBar;
         ToolStripStatusLabel _statusLabel;
+        ToolStripStatusLabel _rowCountLabel;
         TextBox _connectionTextBox;
         CodeEditor _editor;
         OutputPane _outputPane;
@@ -69,11 +70,11 @@ namespace LinqEditor.UI.WinForm
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
             _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             _statusLabel = new ToolStripStatusLabel();
-            //_editorStatusBarLabel.Size = new System.Drawing.Size(246, 20);
-            _statusLabel.BorderStyle = Border3DStyle.SunkenOuter;
             _statusLabel.Alignment = ToolStripItemAlignment.Left;
             _statusLabel.Text = "Loading";
-            _statusBar.Items.Add(_statusLabel);
+            _rowCountLabel = new ToolStripStatusLabel();
+            _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
+            _statusBar.Items.AddRange(new[] { _statusLabel, _rowCountLabel });
             
             // connection
             _connectionTextBox = new TextBox();
@@ -86,7 +87,7 @@ namespace LinqEditor.UI.WinForm
             _editor.Dock = DockStyle.Fill;
 
             // output thingy
-            _outputPane = new OutputPane();
+            _outputPane = new OutputPane(_rowCountLabel);
             _outputPane.Dock = DockStyle.Fill;
 
             // toolbar

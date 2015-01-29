@@ -59,6 +59,8 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
         {
+            if (CompletionHelper == null) return;
+
             if (e.Ch == '.')
             {                
                 await CompletionHelper.UpdateFragmentAsync(_editor.Text);

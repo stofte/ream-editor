@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Models
 {
-    public enum SuggestionType
+    public enum AccessibilityModifier
     {
-        Field = 0,
-        Property,
-        Method,
-        ExtensionMethod
+        Public,
+        Private,
+        Protected
     }
 }

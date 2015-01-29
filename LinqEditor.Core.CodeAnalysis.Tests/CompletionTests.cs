@@ -26,8 +26,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Generated
-{
+namespace First.Generated {
     public static class MyStatic { public static int MyValue = 42; }
     public struct MyStruct 
     { 
@@ -35,6 +34,12 @@ namespace Generated
         public int Bar { get; set; } 
         public int Baz() { return 42; }
     }
+}
+
+namespace Another.Generated
+{
+    using First.Generated;
+
     public abstract class ProgramBase { protected int MyInheritedProperty { get; set; } }
     public class Program
     {
@@ -58,7 +63,7 @@ namespace Generated
             _completion.Initialize();
         }
 
-        private void AssertEntries(Tuple<string, SuggestionType>[] vsEntries, SuggestionEntry[] s)
+        private void AssertEntries(Tuple<string, MemberKind>[] vsEntries, SuggestionEntry[] s)
         {
             for (var i = 0; i < vsEntries.Length; i++)
             {

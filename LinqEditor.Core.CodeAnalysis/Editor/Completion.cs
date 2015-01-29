@@ -49,7 +49,7 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var nodes = tree.GetRoot().DescendantNodes();
             // test code has more then one entry
             var entryMethod = nodes.OfType<MethodDeclarationSyntax>().Last();
-            _entryNamespace = nodes.OfType<NamespaceDeclarationSyntax>().Single().Name.ToString();
+            _entryNamespace = nodes.OfType<NamespaceDeclarationSyntax>().Last().Name.ToString();
             _entryName = nodes.OfType<MethodDeclarationSyntax>().Last().Identifier.ValueText;
             var methodBody = entryMethod
                 .DescendantNodes().OfType<StatementSyntax>().First();
@@ -135,8 +135,7 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var t = typeInfo.Type;
             
             var isStatic = symbolInfo.IsStatic || symbolInfo.Kind == SymbolKind.NamedType;
-            var isContainer = typeInfo.Type.ContainingNamespace.Name == _entryNamespace &&
-                typeInfo.Type.Name == _entryName;
+            var isContainer = typeInfo.Type.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) == _entryNamespace;
             
             // dont include the entry point in completions
             var methods = isContainer ? new SuggestionEntry[] { } :
@@ -144,35 +143,35 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
                 .Where(x => x.CanBeReferencedByName && x.IsStatic == isStatic)
                 .Select(x => x.Name)
                 .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.Method, Value = x });
+                .Select(x => new SuggestionEntry { Kind = MemberKind.Method, Value = x });
 
             var properties = t.GetMembers().OfType<IPropertySymbol>()
-                .Where(x => x.CanBeReferencedByName && !x.IsIndexer && 
-                    ((x.IsStatic == isStatic) ||
+                .Where(x => x.CanBeReferencedByName && !x.IsIndexer &&
+                    ((!isContainer && x.IsStatic == isStatic) ||
                     // if querying the container, we want to include protected properties
                     (isContainer && x.DeclaredAccessibility == Accessibility.Protected)))
                 .Select(x => x.Name)
                 .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.Property, Value = x });
+                .Select(x => new SuggestionEntry { Kind = MemberKind.Property, Value = x });
 
             var fields = t.GetMembers().OfType<IFieldSymbol>()
                 .Where(x => x.CanBeReferencedByName && x.IsStatic && isStatic)
                 .Select(x => x.Name)
                 .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.Field, Value = x });
+                .Select(x => new SuggestionEntry { Kind = MemberKind.Field, Value = x });
 
             var objectEntries = (
                 // no references to object methods on container
                 isContainer ? new SuggestionEntry[] { } :
                 isStatic ? new[]
             {
-                new SuggestionEntry {Value = "Equals", Kind = SuggestionType.Method },
-                new SuggestionEntry {Value = "ReferenceEquals", Kind = SuggestionType.Method }
+                new SuggestionEntry {Value = "Equals", Kind = MemberKind.Method },
+                new SuggestionEntry {Value = "ReferenceEquals", Kind = MemberKind.Method }
             } : new[] { 
-                new SuggestionEntry{ Value = "Equals", Kind = SuggestionType.Method },
-                new SuggestionEntry{ Value = "GetHashCode", Kind = SuggestionType.Method },
-                new SuggestionEntry{ Value = "GetType", Kind = SuggestionType.Method },
-                new SuggestionEntry{ Value = "ToString", Kind = SuggestionType.Method },
+                new SuggestionEntry{ Value = "Equals", Kind = MemberKind.Method },
+                new SuggestionEntry{ Value = "GetHashCode", Kind = MemberKind.Method },
+                new SuggestionEntry{ Value = "GetType", Kind = MemberKind.Method },
+                new SuggestionEntry{ Value = "ToString", Kind = MemberKind.Method },
                 // filter out entries that appear in methods
             }).Where(x => methods.All(y => y.Value != x.Value));
 
@@ -191,7 +190,7 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             var possibleExtensions = interfaceNames
                 .SelectMany(x => _extensionMethods.ContainsKey(x) ? _extensionMethods[x].Methods.Select(m => m.Name).Distinct() : new string[] { })
                 .Distinct()
-                .Select(x => new SuggestionEntry { Kind = SuggestionType.ExtensionMethod, Value = x });
+                .Select(x => new SuggestionEntry { Kind = MemberKind.ExtensionMethod, Value = x });
 
             return possibleExtensions;
         }

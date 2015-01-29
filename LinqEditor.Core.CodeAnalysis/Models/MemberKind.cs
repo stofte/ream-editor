@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Models
 {
-    public class SuggestionEntry
+    public enum MemberKind
     {
-        public MemberKind Kind { get; set; }
-        public string Value { get; set; }
+        Field = 0,
+        Property,
+        Method,
+        ExtensionMethod
     }
 }

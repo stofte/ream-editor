@@ -101,12 +101,16 @@
     <Compile Include="Models\EditContext.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\LocationSpan.cs" />
+    <Compile Include="Models\AccessibilityModifier.cs" />
+    <Compile Include="Models\MemberKind.cs" />
+    <Compile Include="Models\TypeInformation.cs" />
     <Compile Include="Models\SuggestionEntry.cs" />
     <Compile Include="Models\SuggestionList.cs" />
-    <Compile Include="Models\SuggestionType.cs" />
+    <Compile Include="Models\TypeMember.cs" />
     <Compile Include="Models\ValidationResults.cs" />
     <Compile Include="Models\Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\ITypeInformationStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

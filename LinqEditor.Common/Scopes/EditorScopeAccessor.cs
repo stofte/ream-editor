@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.Backend.Repository
+namespace LinqEditor.Common.Scopes
 {
     // http://docs.castleproject.org/(S(kwaa14uzdj55gv55dzgf0vui))/Windsor.Implementing%20custom%20scope.ashx
     // http://stackoverflow.com/questions/26096502/argument-bound-lifestyle-in-castle-windsor

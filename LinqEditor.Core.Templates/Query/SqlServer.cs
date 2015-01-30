@@ -29,7 +29,7 @@ namespace LinqEditor.Core.Templates.Query
         public virtual string TransformText()
         {
             this.Write("using System;\r\nusing System.Linq;\r\nusing System.Collections.Generic;\r\nusing LinqE" +
-                    "ditor.Utility.Helpers;\r\n\r\nnamespace ");
+                    "ditor.Common.Helpers;\r\n\r\nnamespace ");
             
             #line 11 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedQueryNamespace));

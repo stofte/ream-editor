@@ -24,7 +24,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.QueryProvider).Assembly), // IQToolkit.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.DbEntityProvider).Assembly), // IQToolkit.Data.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.SqlClient.TSqlLanguage).Assembly), // IQToolkit.Data.SqlClient.dll
-                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Utility.Helpers.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
+                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Common.Helpers.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
             };
         }
 
@@ -64,7 +64,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
         private CompilerResult Compile(string src, string assemblyName, bool generateFiles, MetadataReference[] references)
         {
-            var filename = Utility.Utility.CachePath() + assemblyName;
+            var filename = Common.Utility.CachePath() + assemblyName;
             var compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
             var tree = GetTree(src, filename, generateFiles);
 

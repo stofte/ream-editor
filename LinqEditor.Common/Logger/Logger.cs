@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Utility.Logger
+namespace LinqEditor.Common.Logger
 {
     public class Logger : ILogger
     {

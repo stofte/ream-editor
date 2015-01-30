@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Utility.Tests
+namespace LinqEditor.Common.Tests
 {
     public class TestDatabase : IDisposable
     {

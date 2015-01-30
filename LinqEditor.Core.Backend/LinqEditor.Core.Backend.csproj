@@ -86,9 +86,9 @@
       <Project>{2bea4dec-069d-4c2c-a022-f9696c268e64}</Project>
       <Name>LinqEditor.Core.Schema</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Utility\LinqEditor.Utility.csproj">
+    <ProjectReference Include="..\LinqEditor.Common\LinqEditor.Common.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Utility</Name>
+      <Name>LinqEditor.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

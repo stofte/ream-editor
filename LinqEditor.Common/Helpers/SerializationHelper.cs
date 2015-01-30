@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Utility.Helpers
+namespace LinqEditor.Common.Helpers
 {
     public static class SerializationHelper
     {

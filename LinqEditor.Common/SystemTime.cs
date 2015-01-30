@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Utility
+namespace LinqEditor.Common
 {
     /// <summary>
     /// Fascilitates testing of DateTime usage. 

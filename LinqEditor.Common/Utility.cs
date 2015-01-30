@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace LinqEditor.Utility
+namespace LinqEditor.Common
 {
     public class Utility
     {

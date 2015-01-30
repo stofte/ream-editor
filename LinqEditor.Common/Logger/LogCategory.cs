@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Utility.Logger
+namespace LinqEditor.Common.Logger
 {
     public enum LogCategory
     {

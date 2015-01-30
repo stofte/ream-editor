@@ -7,8 +7,8 @@
     <ProjectGuid>{53F0654D-867F-49B8-8443-4C3486FB8309}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LinqEditor.Utility</RootNamespace>
-    <AssemblyName>LinqEditor.Utility</AssemblyName>
+    <RootNamespace>LinqEditor.Common</RootNamespace>
+    <AssemblyName>LinqEditor.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -52,6 +52,7 @@
     <Compile Include="Logger\LogCategory.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scopes\EditorScopeAccessor.cs" />
     <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="SystemTime.cs" />
     <Compile Include="Test\TestDatabase.cs" />

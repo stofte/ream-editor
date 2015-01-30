@@ -3,9 +3,9 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using System.Collections.Generic;
-using LinqEditor.Utility.Helpers;
+using LinqEditor.Common.Helpers;
 
-namespace LinqEditor.Utility.Tests
+namespace LinqEditor.Common.Tests
 {
     [TestFixture]
     public class DumperTests

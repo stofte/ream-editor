@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using LinqEditor.Utility;
+using LinqEditor.Common;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
 using Castle.Facilities.TypedFactory;
@@ -24,7 +24,7 @@ namespace LinqEditor.UI.WinForm
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var path = Utility.Utility.CachePath();
+            var path = Common.Utility.CachePath();
 
             if (!Directory.Exists(path))
             {

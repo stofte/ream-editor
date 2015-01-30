@@ -133,9 +133,9 @@
       <Project>{800d694f-1037-4d5f-a860-dbd724ddce5e}</Project>
       <Name>LinqEditor.Core.Templates</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Utility\LinqEditor.Utility.csproj">
+    <ProjectReference Include="..\LinqEditor.Common\LinqEditor.Common.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Utility</Name>
+      <Name>LinqEditor.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

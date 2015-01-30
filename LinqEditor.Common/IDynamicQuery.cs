@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Utility
+namespace LinqEditor.Common
 {
     /// <summary>
     /// Dynamic query class implements this interface to make working with it easier.

@@ -25,9 +25,8 @@ namespace LinqEditor.Installers
 
             // install forms
             container.Register(Component.For<MainForm>());
-            container.Register(Component.For<ICodeEditorFactory>().AsFactory());
-            container.Register(Component.For<IOutputPaneFactory>().AsFactory());
-
+            container.Register(Component.For<CodeEditor>());
+            container.Register(Component.For<OutputPane>());
         }
     }
 }

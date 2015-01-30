@@ -51,7 +51,7 @@ namespace LinqEditor.UI.WinForm
             //completionHelper = _container.Resolve<IBackgroundCompletion>();
         }
 
-        public MainForm()
+        public MainForm(OutputPane outputPane, CodeEditor editor)
         {
             _statusBar = new StatusStrip();
             _statusBar.SuspendLayout();
@@ -68,7 +68,6 @@ namespace LinqEditor.UI.WinForm
 
             // loads schema etc in async handlers
             Load += Main_Load;
-            FormClosed += Main_FormClosed;
 
             _editorFocusTimer = new Stopwatch();
             _mainContainer = new SplitContainer();
@@ -87,7 +86,6 @@ namespace LinqEditor.UI.WinForm
             _mainContainer.GotFocus +=_mainContainer_GotFocus;
             _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
             
-
             // status
             _statusBar.Dock = DockStyle.Bottom;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
@@ -106,12 +104,12 @@ namespace LinqEditor.UI.WinForm
             _connectionTextBox.Text = TestConnectionString;
 
             // scintilla
-            _editor = new CodeEditor();
+            _editor = editor;
             _editor.LostFocus += _editor_LostFocus;
             _editor.Dock = DockStyle.Fill;
 
             // output thingy
-            _outputPane = new OutputPane(_rowCountLabel);
+            _outputPane = outputPane; //new OutputPane(); //_rowCountLabel
             _outputPane.Dock = DockStyle.Fill;
 
             // toolbar
@@ -139,6 +137,8 @@ namespace LinqEditor.UI.WinForm
             ResumeLayout(false);
             PerformLayout();
             //InitializeWindsor();
+
+            //FormClosed += delegate { editorFactory.Release(_editor); outputFactory.Release(_outputPane); };
         }
 
         // some custom focus juggling when resizing the splitcontainer when the editor had focus
@@ -181,13 +181,6 @@ namespace LinqEditor.UI.WinForm
         {
             var container = sender as SplitContainer;
             _connectionTextBox.Width = container.ClientSize.Width;
-        }
-
-        void Main_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            //_container.Release(_connectionSession);
-            //_container.Release(_completionHelper);
-            //_container.Dispose();
         }
 
         async void Main_Load(object sender, EventArgs e)

@@ -72,8 +72,6 @@
     <Compile Include="Controls\CodeEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ICodeEditorFactory.cs" />
-    <Compile Include="Controls\IOutputPaneFactory.cs" />
     <Compile Include="Controls\OutputPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

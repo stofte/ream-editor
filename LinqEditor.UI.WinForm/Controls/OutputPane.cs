@@ -24,9 +24,11 @@ namespace LinqEditor.UI.WinForm.Controls
         DataTable _diagnostics;
         List<TabPage> _cachedResultTabs;
 
-        public OutputPane(ToolStripStatusLabel label)
+        public OutputPane(
+            //ToolStripStatusLabel label
+            )
         {
-            _rowCountLabel = label;
+            //_rowCountLabel = label;
             InitializeComponent();
         }
 
@@ -178,7 +180,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
         private void BindRowCount(int rows)
         {
-            _rowCountLabel.Text = string.Format("{0} rows", rows);
+            //_rowCountLabel.Text = string.Format("{0} rows", rows);
         }
         
         void TabClientSizeChangedHandler(object sender, EventArgs e)

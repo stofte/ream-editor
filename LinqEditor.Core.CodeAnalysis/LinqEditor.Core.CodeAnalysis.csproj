@@ -93,6 +93,7 @@
     <Compile Include="Editor\BackgroundCompletion.cs" />
     <Compile Include="Editor\Completion.cs" />
     <Compile Include="Editor\IBackgroundCompletion.cs" />
+    <Compile Include="Editor\IBackgroundCompletionFactory.cs" />
     <Compile Include="Editor\ICompletion.cs" />
     <Compile Include="Editor\IValidation.cs" />
     <Compile Include="Editor\Validation.cs" />

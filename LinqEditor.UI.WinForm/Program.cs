@@ -9,6 +9,7 @@ using LinqEditor.Utility;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
 using Castle.Facilities.TypedFactory;
+using Castle.MicroKernel.Lifestyle;
 
 namespace LinqEditor.UI.WinForm
 {
@@ -32,9 +33,12 @@ namespace LinqEditor.UI.WinForm
 
             using (var container = new WindsorContainer().Install(FromAssembly.This()))
             {
-                var mainForm = container.Resolve<MainForm>();
-                Application.Run(mainForm);
-                container.Release(mainForm);
+                using (var scope = container.BeginScope())
+                {
+                    var mainForm = container.Resolve<MainForm>();
+                    Application.Run(mainForm);
+                    container.Release(mainForm);
+                }
             }
         }
     }

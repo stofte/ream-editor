@@ -36,23 +36,13 @@ namespace LinqEditor.UI.WinForm
         OutputPane _outputPane;
 
         IBackgroundSession _connectionSession;
-        //IWindsorContainer _container;
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        private void InitializeWindsor()
+        public MainForm(IBackgroundSession session, OutputPane outputPane, CodeEditor editor)
         {
-            //_container = new WindsorContainer();
-            //_container.AddFacility<TypedFactoryFacility>();
-            //_container.Install(FromAssembly.This());
-
-            //_connectionSession = _container.Resolve<IBackgroundSession>(new Arguments(new { connectionString = _connectionTextBox.Text }));
-            //completionHelper = _container.Resolve<IBackgroundCompletion>();
-        }
-
-        public MainForm(OutputPane outputPane, CodeEditor editor)
-        {
+            _connectionSession = session;
             _statusBar = new StatusStrip();
             _statusBar.SuspendLayout();
             SuspendLayout();
@@ -109,7 +99,7 @@ namespace LinqEditor.UI.WinForm
             _editor.Dock = DockStyle.Fill;
 
             // output thingy
-            _outputPane = outputPane; //new OutputPane(); //_rowCountLabel
+            _outputPane = outputPane;
             _outputPane.Dock = DockStyle.Fill;
 
             // toolbar
@@ -125,7 +115,6 @@ namespace LinqEditor.UI.WinForm
             _toolbar.Items.Add(_executeButton);
 
             // add controls
-
             _mainContainer.Panel1.Controls.Add(_editor);
             _mainContainer.Panel1.Controls.Add(_connectionTextBox);
             _mainContainer.Panel2.Controls.Add(_outputPane);
@@ -136,9 +125,6 @@ namespace LinqEditor.UI.WinForm
             _statusBar.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
-            //InitializeWindsor();
-
-            //FormClosed += delegate { editorFactory.Release(_editor); outputFactory.Release(_outputPane); };
         }
 
         // some custom focus juggling when resizing the splitcontainer when the editor had focus
@@ -174,7 +160,7 @@ namespace LinqEditor.UI.WinForm
 
         private async Task<ExecuteResult> Execute()
         {
-            return null; // await _connectionSession.ExecuteAsync(_editor.SourceCode);
+            return await _connectionSession.ExecuteAsync(_editor.SourceCode);
         }
 
         void _mainContainer_SizeChanged(object sender, EventArgs e)
@@ -185,14 +171,14 @@ namespace LinqEditor.UI.WinForm
 
         async void Main_Load(object sender, EventArgs e)
         {
-            //var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
+            var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
             // init the completion helper with schema data
             //await _completionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
             // passes helper to editor control
             //_editor.CompletionHelper = _completionHelper;
             _statusLabel.Text = "Editor ready";
             // loads appdomain and initializes connection
-            //await _connectionSession.LoadAppDomainAsync();
+            await _connectionSession.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";
             _executeButton.Enabled = true;
         }

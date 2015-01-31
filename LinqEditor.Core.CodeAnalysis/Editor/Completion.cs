@@ -22,7 +22,6 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
         private int _sourceOffset;
         private string _entryNamespace;
         private string _entryName;
-        public static string Marker = "//fragment";
         private IDictionary<string, CompletionEntry> _extensionMethods;
 
         public Completion(ITemplateService templateService)
@@ -40,10 +39,10 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
             }
 
             var queryNamespace = "";
-            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), out queryNamespace, Marker, schemaNamespace);
+            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), out queryNamespace, SchemaConstants.Marker, schemaNamespace);
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
             var semanticModel = GetModel(tree);
-            _sourceOffset = _initialSource.IndexOf(Marker);
+            _sourceOffset = _initialSource.IndexOf(SchemaConstants.Marker);
 
             // find entry point
             var nodes = tree.GetRoot().DescendantNodes();
@@ -93,7 +92,7 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
 
         public void UpdateFragment(string fragment)
         {
-            _currentSource = _initialSource.Replace(Marker, fragment);
+            _currentSource = _initialSource.Replace(SchemaConstants.Marker, fragment);
         }
 
         public Models.SuggestionList MemberAccessExpressionCompletions(int fragmentIndex)

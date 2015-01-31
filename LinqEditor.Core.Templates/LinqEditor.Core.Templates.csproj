@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Installers\Installer.cs" />
+    <Compile Include="SchemaConstants.cs" />
     <Compile Include="Schema\SqlServer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

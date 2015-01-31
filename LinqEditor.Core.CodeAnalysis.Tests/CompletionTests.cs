@@ -20,7 +20,6 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            var ns = "ns";
             var programSource = @"
 using System;
 using System.Linq;
@@ -52,7 +51,7 @@ namespace Another.Generated
 }
 ";
             var m = new Mock<ITemplateService>();
-            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), out ns, It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
             _templateService = m.Object;
         }
 

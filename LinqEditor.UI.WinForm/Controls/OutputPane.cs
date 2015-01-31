@@ -72,8 +72,8 @@ namespace LinqEditor.UI.WinForm.Controls
             
             if (result.Success)
             {
-                _console.AppendText("Query Text\n");
-                _console.AppendText(result.QueryText);
+                _console.AppendText(string.Format("Query executed in {0} ms\n", result.Duration));
+                _console.AppendText(result.QueryText.Trim() + "\n\n");
                 BindResults(result.Tables);
                 BindDiagnostics(new Error[]{}, result.Warnings);
                 if (result.Tables.Count() > 0)

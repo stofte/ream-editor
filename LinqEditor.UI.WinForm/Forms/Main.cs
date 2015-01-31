@@ -104,7 +104,10 @@ namespace LinqEditor.UI.WinForm.Forms
             // output thingy
             _outputPane = outputPane;
             _outputPane.Dock = DockStyle.Fill;
-            _outputPane.DisplayedRowCountUpdated += delegate(int count) { _rowCountLabel.Text = string.Format("{0} rows", count); };
+            _outputPane.DisplayedRowCountUpdated += delegate(int count) 
+            { 
+                _rowCountLabel.Text = string.Format("{0} rows", count); 
+            };
 
             // toolbar
             _toolbar = new ToolStrip();
@@ -176,14 +179,7 @@ namespace LinqEditor.UI.WinForm.Forms
         async void Main_Load(object sender, EventArgs e)
         {
             var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
-            //_context.AssemblyPath = result.AssemblyPath;
-            //_context.SchemaNamespace = result.SchemaNamespace;
             _context.UpdateContext(result.AssemblyPath, result.SchemaNamespace);
-            // init the completion helper with schema data
-            //await _completionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
-            // passes helper to editor control
-            //_editor.CompletionHelper = _completionHelper;
-            _statusLabel.Text = "Editor ready";
             // loads appdomain and initializes connection
             await _connectionSession.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";

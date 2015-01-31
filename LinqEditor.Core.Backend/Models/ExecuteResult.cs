@@ -12,6 +12,7 @@ namespace LinqEditor.Core.Backend.Models
     [Serializable]
     public class ExecuteResult
     {
+        public long Duration { get; set; }
         public IEnumerable<DataTable> Tables { get; set; }
         public IEnumerable<Warning> Warnings { get; set; }
         public IEnumerable<Error> Errors { get; set; }

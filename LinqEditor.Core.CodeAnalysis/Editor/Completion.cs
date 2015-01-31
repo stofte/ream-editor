@@ -38,8 +38,7 @@ namespace LinqEditor.Core.CodeAnalysis.Editor
                 _references = _references.Concat(new[] { MetadataReference.CreateFromFile(assemblyPath) }).ToArray();
             }
 
-            var queryNamespace = "";
-            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), out queryNamespace, SchemaConstants.Marker, schemaNamespace);
+            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
             var semanticModel = GetModel(tree);
             _sourceOffset = _initialSource.IndexOf(SchemaConstants.Marker);

@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\GuidHelper.cs" />
     <Compile Include="Installer\Installer.cs" />
     <Compile Include="Models\ColumnSchema.cs" />
     <Compile Include="Models\DatabaseSchema.cs" />

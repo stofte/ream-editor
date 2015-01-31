@@ -9,7 +9,7 @@ namespace LinqEditor.Core.Templates
 {
     public class TemplateService : ITemplateService
     {
-        public string GenerateSchema(Guid schemaId, out string schemaNamespace, DatabaseSchema sqlSchema)
+        public string GenerateSchema(Guid schemaId, DatabaseSchema sqlSchema)
         {
             var gen = new Schema.SqlServer()
             {
@@ -17,13 +17,11 @@ namespace LinqEditor.Core.Templates
                 Tables = sqlSchema.Tables
             };
 
-            schemaNamespace = gen.GeneratedSchemaNamespace;
-
             return gen.TransformText();
 
         }
 
-        public string GenerateQuery(Guid queryId, out string assemblyNamespace, string sourceFragment, string schemaNamespace)
+        public string GenerateQuery(Guid queryId, string sourceFragment, string schemaNamespace)
         {
             var gen = new Query.SqlServer()
             {
@@ -31,8 +29,6 @@ namespace LinqEditor.Core.Templates
                 SourceCode = sourceFragment,
                 NamespaceId = queryId
             };
-
-            assemblyNamespace = gen.GeneratedQueryNamespace;
 
             return gen.TransformText();
         }

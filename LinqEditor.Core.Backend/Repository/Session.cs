@@ -12,7 +12,9 @@ using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.CodeAnalysis.Models;
 using LinqEditor.Core.Backend.Settings;
+using LinqEditor.Core.Schema.Helpers;
 using System.IO;
+using System.Diagnostics;
 
 namespace LinqEditor.Core.Backend.Repository
 {
@@ -27,6 +29,7 @@ namespace LinqEditor.Core.Backend.Repository
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
         private ISchemaStore _userSettings;
+        private Stopwatch _watch;
 
         private Isolated<Runner> _container;
 
@@ -36,6 +39,7 @@ namespace LinqEditor.Core.Backend.Repository
             _schemaProvider = schemaProvider;
             _generator = generator;
             _userSettings = userSettings;
+            _watch = new Stopwatch();
         }
 
         public InitializeResult Initialize(string connectionString)
@@ -46,9 +50,8 @@ namespace LinqEditor.Core.Backend.Repository
             if (string.IsNullOrEmpty(_schemaPath))
             {
                 var sqlSchema = _schemaProvider.GetSchema(_connectionString);
-                _schemaNamespace = "";
-                var schemaSource = _generator.GenerateSchema(_sessionId, out _schemaNamespace, sqlSchema);
-                var result = _compiler.Compile(schemaSource, _schemaNamespace, generateFiles: true);
+                var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
+                var result = _compiler.Compile(schemaSource, _sessionId.ToIdentifierWithPrefix("s"), generateFiles: true);
                 _schemaPath = result.AssemblyPath;
 
                 if (result.Success)
@@ -71,20 +74,23 @@ namespace LinqEditor.Core.Backend.Repository
 
         public ExecuteResult Execute(string sourceFragment)
         {
-            string queryNamespace;
-            var querySource = _generator.GenerateQuery(Guid.NewGuid(), out queryNamespace, sourceFragment, _schemaNamespace);
-            var result = _compiler.Compile(querySource, queryNamespace, generateFiles: true, references: _schemaPath);
+            _watch.Restart();
+            var queryId = Guid.NewGuid();
+            var querySource = _generator.GenerateQuery(queryId, sourceFragment, _schemaNamespace);
+            var result = _compiler.Compile(querySource, queryId.ToIdentifierWithPrefix("q"), generateFiles: true, references: _schemaPath);
 
             if (result.Success)
             {
                 var containerResult = _container.Value.Execute(result.AssemblyPath);
+                _watch.Stop();
 
                 return new ExecuteResult
                 {
                     Success = containerResult.Success,
                     QueryText = containerResult.QueryText,
                     Tables = containerResult.Tables,
-                    Warnings = result.Warnings
+                    Warnings = result.Warnings,
+                    Duration = _watch.ElapsedMilliseconds
                 };
             }
 

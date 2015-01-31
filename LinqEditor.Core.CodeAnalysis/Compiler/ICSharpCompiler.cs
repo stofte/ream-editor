@@ -8,7 +8,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 {
     public interface ICSharpCompiler
     {
-        CompilerResult Compile(string src, string assemblyName, bool generateFiles, params string[] references);
-        CompilerResult Compile(string src, string assemblyName, bool generateFiles, byte[] reference);
+        CompilerResult Compile(string src, string assemblyName, string outputFolder = null, params string[] references);
+        CompilerResult Compile(string src, string assemblyName, string outputFolder = null, byte[] reference = null);
     }
 }

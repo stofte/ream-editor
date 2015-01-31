@@ -23,6 +23,7 @@ namespace LinqEditor.Core.Backend.Repository
         private string _connectionString;
         private string _schemaPath;
         private string _schemaNamespace;
+        private string _outputFolder;
         private Guid _sessionId = Guid.NewGuid();
 
         private ICSharpCompiler _compiler;
@@ -40,6 +41,7 @@ namespace LinqEditor.Core.Backend.Repository
             _generator = generator;
             _userSettings = userSettings;
             _watch = new Stopwatch();
+            _outputFolder = Common.Utility.CachePath();
         }
 
         public InitializeResult Initialize(string connectionString)
@@ -51,7 +53,7 @@ namespace LinqEditor.Core.Backend.Repository
             {
                 var sqlSchema = _schemaProvider.GetSchema(_connectionString);
                 var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
-                var result = _compiler.Compile(schemaSource, _sessionId.ToIdentifierWithPrefix("s"), generateFiles: true);
+                var result = _compiler.Compile(schemaSource, _sessionId.ToIdentifierWithPrefix("s"), _outputFolder);
                 _schemaPath = result.AssemblyPath;
 
                 if (result.Success)
@@ -77,7 +79,7 @@ namespace LinqEditor.Core.Backend.Repository
             _watch.Restart();
             var queryId = Guid.NewGuid();
             var querySource = _generator.GenerateQuery(queryId, sourceFragment, _schemaNamespace);
-            var result = _compiler.Compile(querySource, queryId.ToIdentifierWithPrefix("q"), generateFiles: true, references: _schemaPath);
+            var result = _compiler.Compile(querySource, queryId.ToIdentifierWithPrefix("q"), _outputFolder, references: _schemaPath);
 
             if (result.Success)
             {

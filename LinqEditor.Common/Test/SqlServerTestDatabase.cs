@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Common.Tests
 {
-    public class TestDatabase : IDisposable
+    public class SqlServerTestDatabase : IDisposable
     {
         private const string LocalDbMaster = "Data Source=(LocalDB)\\v11.0;Initial Catalog=master;Integrated Security=True";
 
@@ -18,7 +18,7 @@ namespace LinqEditor.Common.Tests
         private readonly string _script;
         public readonly string ConnectionString;
 
-        public TestDatabase(string databaseName, string schema, string script)
+        public SqlServerTestDatabase(string databaseName, string schema, string script)
         {
             _databaseName = databaseName;
             _fileName = Path.GetFullPath(databaseName);

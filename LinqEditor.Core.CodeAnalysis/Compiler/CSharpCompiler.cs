@@ -28,15 +28,28 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             };
         }
 
+
+        public CompilerResult Compile(string src, string assemblyName, string outputFolder = null, byte[] reference = null)
+        {
+            var refs = GetStandardReferences().Concat(reference == null? new MetadataReference[]{ } : new [] { MetadataReference.CreateFromImage(reference) });
+            return Compile(src, assemblyName, outputFolder, refs.ToArray());
+        }
+
+        public CompilerResult Compile(string src, string assemblyName, string outputFolder = null, params string[] otherReferences)
+        {
+            var refs = GetStandardReferences().Concat(otherReferences != null && otherReferences.Length > 0 ? otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
+            return Compile(src, assemblyName, outputFolder, refs.ToArray());
+        }
+
         private string AssemblyFilename()
         {
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             return guid;
         }
 
-        private SyntaxTree GetTree(string source, string filename, bool generateFiles)
+        private SyntaxTree GetTree(string source, string filename)
         {
-            if (generateFiles)
+            if (!string.IsNullOrWhiteSpace(filename))
             {
                 // this works, but VS complains the file doesn't match somehow
                 using (var file = File.CreateText(filename + ".cs"))
@@ -44,29 +57,19 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                     file.Write(source);
                 }
                 return SyntaxFactory.ParseSyntaxTree(source, path: filename + ".cs", options: CSharpParseOptions.Default, encoding: Encoding.Default);
-            } else {
+            }
+            else
+            {
                 return CSharpSyntaxTree.ParseText(source);
             }
         }
 
-        public CompilerResult Compile(string src, string assemblyName, bool generateFiles, byte[] reference)
+        private CompilerResult Compile(string src, string assemblyName, string outputFolder, MetadataReference[] references)
         {
-            var refs = GetStandardReferences().Concat(new[] { MetadataReference.CreateFromImage(reference) });
-            return Compile(src, assemblyName, generateFiles, refs.ToArray());
-        }
-
-        public CompilerResult Compile(string src, string assemblyName, bool generateFiles, params string[] otherReferences)
-        {
-            var refs = GetStandardReferences().Concat(otherReferences.Length > 0 ? otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
-            return Compile(src, assemblyName, generateFiles, refs.ToArray());
-        }
-
-
-        private CompilerResult Compile(string src, string assemblyName, bool generateFiles, MetadataReference[] references)
-        {
-            var filename = generateFiles ? GetAssemblyDirectory() + assemblyName : "foo";
+            var generateFiles = outputFolder != null;
+            var filename = generateFiles ? outputFolder + assemblyName : null;
             var compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
-            var tree = GetTree(src, filename, generateFiles);
+            var tree = GetTree(src, filename);
 
             var compilation = CSharpCompilation.Create(assemblyName)
                 .WithOptions(compilerOptions)
@@ -75,7 +78,8 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
             EmitResult compilationResult = null;
             MemoryStream stream = null;
-            if (generateFiles)
+
+            if (!string.IsNullOrWhiteSpace(outputFolder))
             {
                 using (var dllStream = new FileStream(filename + ".dll", FileMode.OpenOrCreate))
                 using (var pdbStream = new FileStream(filename + ".pdb", FileMode.OpenOrCreate))

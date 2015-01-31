@@ -10,14 +10,6 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
-    public class CSharpCompilerTestClass : CSharpCompiler
-    {
-        protected override string GetAssemblyDirectory()
-        {
-            return Path.GetTempPath();
-        }
-    }
-
     [TestFixture]
     public class CSharpCompilerTests
     {
@@ -34,7 +26,7 @@ namespace Test {
 }
 ";
             var compiler = new CSharpCompiler();
-            var result = compiler.Compile(source, "Test", generateFiles: false);
+            var result = compiler.Compile(source, "Test");
             var assembly = Assembly.Load(result.AssemblyBytes);
             Assert.AreEqual(1, assembly.DefinedTypes.Count());
         }
@@ -51,8 +43,8 @@ namespace Test {
     }
 }
 ";
-            var compiler = new CSharpCompilerTestClass();
-            var result = compiler.Compile(source, "Test", generateFiles: true);
+            var compiler = new CSharpCompiler();
+            var result = compiler.Compile(source, "Test", Path.GetTempPath());
             var filename = Path.GetTempPath() + "Test.dll";
             Assert.IsTrue(File.Exists(filename));
         }
@@ -73,7 +65,7 @@ namespace Test {
 }
 ";
             var compiler = new CSharpCompiler();
-            var result = compiler.Compile(source, "Test", generateFiles: false);
+            var result = compiler.Compile(source, "Test");
             Assert.GreaterOrEqual(result.Errors.Count(), 1);
         }
     }

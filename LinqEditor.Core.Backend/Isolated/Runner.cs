@@ -14,16 +14,16 @@ namespace LinqEditor.Core.Backend.Isolated
 {
     public class Runner : MarshalByRefObject
     {
-        private Assembly _schema;
+        private Assembly _initialAssembly;
         private string _dbType;
         private string _connectionString;
 
-        public LoadAppDomainResult Initialize(byte[] assemblyImage, string connectionString)
+        public LoadAppDomainResult Initialize(byte[] assemblyImage, string connectionString = null)
         {
             return Initialize(assemblyImage, null, connectionString);
         }
 
-        public LoadAppDomainResult Initialize(string assemblyPath, string connectionString)
+        public LoadAppDomainResult Initialize(string assemblyPath, string connectionString = null)
         {
             return Initialize(null, assemblyPath, connectionString);
         }
@@ -35,20 +35,23 @@ namespace LinqEditor.Core.Backend.Isolated
             {
                 if (!string.IsNullOrEmpty(assemblyPath))
                 {
-                    _schema = Assembly.LoadFile(assemblyPath);
+                    _initialAssembly = Assembly.LoadFile(assemblyPath);
                 }
                 else
                 {
-                    _schema = Assembly.Load(assemblyImage);
+                    _initialAssembly = Assembly.Load(assemblyImage);
                 }
 
-                _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _schema.GetName().Name);
-                _connectionString = connectionString;
+                if (connectionString != null)
+                {
+                    _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _initialAssembly.GetName().Name);
+                    _connectionString = connectionString;
 
-                // warm up connection
-                var warmupType = _schema.GetType(string.Format("{0}.Schema.WarmUpConnection", _schema.GetName().Name));
-                var instance = Activator.CreateInstance(warmupType) as IDynamicQuery;
-                var res = ExecuteInstance(instance);
+                    // warm up connection
+                    var warmupType = _initialAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _initialAssembly.GetName().Name));
+                    var instance = Activator.CreateInstance(warmupType) as IDynamicQuery;
+                    var res = ExecuteInstance(instance);
+                }
             }
             catch (Exception e)
             {
@@ -83,7 +86,6 @@ namespace LinqEditor.Core.Backend.Isolated
             }
             catch (Exception e)
             {
-
                 return new ExecuteResult
                 {
                     Exception = e,

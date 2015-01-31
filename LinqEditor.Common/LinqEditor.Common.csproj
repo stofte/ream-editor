@@ -58,7 +58,7 @@
     <Compile Include="Scopes\EditorScopeAccessor.cs" />
     <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="SystemTime.cs" />
-    <Compile Include="Test\TestDatabase.cs" />
+    <Compile Include="Test\SqlServerTestDatabase.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

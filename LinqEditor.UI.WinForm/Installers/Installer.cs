@@ -4,6 +4,7 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor.Installer;
 using LinqEditor.UI.WinForm;
 using LinqEditor.UI.WinForm.Controls;
+using LinqEditor.UI.WinForm.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace LinqEditor.Installers
             container.Install(FromAssembly.Named("LinqEditor.Core.Templates"));
             
             // install forms
-            container.Register(Component.For<MainForm>());
+            container.Register(Component.For<Main>());
             container.Register(Component.For<CodeEditor>());
             container.Register(Component.For<OutputPane>());
         }

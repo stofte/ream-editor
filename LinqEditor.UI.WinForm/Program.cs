@@ -10,6 +10,7 @@ using Castle.Windsor;
 using Castle.Windsor.Installer;
 using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Lifestyle;
+using LinqEditor.UI.WinForm.Forms;
 
 namespace LinqEditor.UI.WinForm
 {
@@ -35,7 +36,7 @@ namespace LinqEditor.UI.WinForm
             {
                 using (var scope = container.BeginScope())
                 {
-                    var mainForm = container.Resolve<MainForm>();
+                    var mainForm = container.Resolve<Main>();
                     Application.Run(mainForm);
                     container.Release(mainForm);
                 }

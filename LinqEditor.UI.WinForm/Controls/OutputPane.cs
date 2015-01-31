@@ -24,11 +24,8 @@ namespace LinqEditor.UI.WinForm.Controls
         DataTable _diagnostics;
         List<TabPage> _cachedResultTabs;
 
-        public OutputPane(
-            //ToolStripStatusLabel label
-            )
+        public OutputPane()
         {
-            //_rowCountLabel = label;
             InitializeComponent();
         }
 
@@ -66,6 +63,7 @@ namespace LinqEditor.UI.WinForm.Controls
             ResumeLayout();
         }
 
+        public event Action<int> DisplayedRowCountUpdated;
 
         public void BindOutput(ExecuteResult result)
         {
@@ -180,6 +178,11 @@ namespace LinqEditor.UI.WinForm.Controls
 
         private void BindRowCount(int rows)
         {
+            if (DisplayedRowCountUpdated != null)
+            {
+                DisplayedRowCountUpdated(rows);
+            }
+            
             //_rowCountLabel.Text = string.Format("{0} rows", rows);
         }
         

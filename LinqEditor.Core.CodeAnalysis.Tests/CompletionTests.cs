@@ -46,7 +46,7 @@ namespace Another.Generated
         protected int MyProperty { get; set; }
         public void Query() 
         {
-" + Completion.Marker + @"
+" + SchemaConstants.Marker + @"
         }
     }
 }

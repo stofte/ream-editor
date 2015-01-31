@@ -20,9 +20,9 @@ using System.Diagnostics;
 using Castle.Facilities.TypedFactory;
 using LinqEditor.Common.Context;
 
-namespace LinqEditor.UI.WinForm
+namespace LinqEditor.UI.WinForm.Forms
 {
-    public class MainForm : Form
+    public class Main : Form
     {
         public static string TestConnectionString = "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=Opera18500DB";
 
@@ -42,7 +42,7 @@ namespace LinqEditor.UI.WinForm
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        public MainForm(IBackgroundSession session, IContext context, OutputPane outputPane, CodeEditor editor)
+        public Main(IBackgroundSession session, IContext context, OutputPane outputPane, CodeEditor editor)
         {
             _connectionSession = session;
             _context = context;
@@ -104,6 +104,7 @@ namespace LinqEditor.UI.WinForm
             // output thingy
             _outputPane = outputPane;
             _outputPane.Dock = DockStyle.Fill;
+            _outputPane.DisplayedRowCountUpdated += delegate(int count) { _rowCountLabel.Text = string.Format("{0} rows", count); };
 
             // toolbar
             _toolbar = new ToolStrip();

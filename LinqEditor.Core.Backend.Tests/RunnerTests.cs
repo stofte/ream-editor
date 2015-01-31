@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Backend.Tests
 {
-    [TestFixture(Category="SqlServerIntegration")]
+    [TestFixture(Category="Database")]
     public class RunnerTests
     {
         [Test]

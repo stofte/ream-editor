@@ -18,11 +18,12 @@ namespace LinqEditor.Installers
         {
             container.AddFacility<TypedFactoryFacility>();
 
-            container.Install(FromAssembly.Named("LinqEditor.Core.CodeAnalysis"));
-            container.Install(FromAssembly.Named("LinqEditor.Core.Templates"));
+            container.Install(FromAssembly.Named("LinqEditor.Common"));
             container.Install(FromAssembly.Named("LinqEditor.Core.Backend"));
+            container.Install(FromAssembly.Named("LinqEditor.Core.CodeAnalysis"));
             container.Install(FromAssembly.Named("LinqEditor.Core.Schema"));
-
+            container.Install(FromAssembly.Named("LinqEditor.Core.Templates"));
+            
             // install forms
             container.Register(Component.For<MainForm>());
             container.Register(Component.For<CodeEditor>());

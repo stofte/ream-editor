@@ -45,9 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Context\Context.cs" />
+    <Compile Include="Context\IContext.cs" />
     <Compile Include="Helpers\Dumper.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="IDynamicQuery.cs" />
+    <Compile Include="Installers\Installer.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\LogCategory.cs" />
     <Compile Include="Logger\Logger.cs" />

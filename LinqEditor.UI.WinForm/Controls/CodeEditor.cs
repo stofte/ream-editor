@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.CodeAnalysis.Editor;
+﻿using LinqEditor.Common.Context;
+using LinqEditor.Core.CodeAnalysis.Editor;
 using LinqEditor.Core.CodeAnalysis.Models;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,20 @@ namespace LinqEditor.UI.WinForm.Controls
     public class CodeEditor : UserControl
     {
         ScintillaNET.Scintilla _editor;
+        IContext _context;
+        IBackgroundCompletion _completionHelper { get; set; }
 
-        public IBackgroundCompletion CompletionHelper { get; set; }
         public string SourceCode { get { return _editor.Text; } }
 
-        public CodeEditor()
+        public CodeEditor(IBackgroundCompletion completion, IContext context)
         {
+            _completionHelper = completion;
+            _context = context;
+            _context.ContextUpdated += async delegate(string path, string schema) 
+            {
+                await _completionHelper.InitializeAsync(path, schema);
+            };
+
             InitializeComponent();
         }
 
@@ -59,12 +68,12 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
         {
-            if (CompletionHelper == null) return;
+            if (_completionHelper == null) return;
 
             if (e.Ch == '.')
             {                
-                await CompletionHelper.UpdateFragmentAsync(_editor.Text);
-                var result = await CompletionHelper.MemberAccessExpressionCompletionsAsync(_editor.CurrentPos);
+                await _completionHelper.UpdateFragmentAsync(_editor.Text);
+                var result = await _completionHelper.MemberAccessExpressionCompletionsAsync(_editor.CurrentPos);
                 _editor.AutoComplete.FillUpCharacters = "";
                 _editor.AutoComplete.List = GetAutoCompleteList(result.Suggestions);
                 _editor.AutoComplete.Show();

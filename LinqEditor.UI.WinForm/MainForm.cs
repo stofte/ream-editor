@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Castle.Facilities.TypedFactory;
+using LinqEditor.Common.Context;
 
 namespace LinqEditor.UI.WinForm
 {
@@ -36,13 +37,15 @@ namespace LinqEditor.UI.WinForm
         OutputPane _outputPane;
 
         IBackgroundSession _connectionSession;
+        IContext _context;
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        public MainForm(IBackgroundSession session, OutputPane outputPane, CodeEditor editor)
+        public MainForm(IBackgroundSession session, IContext context, OutputPane outputPane, CodeEditor editor)
         {
             _connectionSession = session;
+            _context = context;
             _statusBar = new StatusStrip();
             _statusBar.SuspendLayout();
             SuspendLayout();
@@ -172,6 +175,9 @@ namespace LinqEditor.UI.WinForm
         async void Main_Load(object sender, EventArgs e)
         {
             var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
+            //_context.AssemblyPath = result.AssemblyPath;
+            //_context.SchemaNamespace = result.SchemaNamespace;
+            _context.UpdateContext(result.AssemblyPath, result.SchemaNamespace);
             // init the completion helper with schema data
             //await _completionHelper.InitializeAsync(result.AssemblyPath, result.SchemaNamespace);
             // passes helper to editor control

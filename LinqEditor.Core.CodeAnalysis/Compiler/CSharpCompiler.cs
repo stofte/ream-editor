@@ -49,7 +49,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             }
         }
 
-        public CompilerResult Compile(string src, string assemblyName, bool generateFiles, byte[] reference = null)
+        public CompilerResult Compile(string src, string assemblyName, bool generateFiles, byte[] reference)
         {
             var refs = GetStandardReferences().Concat(new[] { MetadataReference.CreateFromImage(reference) });
             return Compile(src, assemblyName, generateFiles, refs.ToArray());
@@ -64,7 +64,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
         private CompilerResult Compile(string src, string assemblyName, bool generateFiles, MetadataReference[] references)
         {
-            var filename = Common.Utility.CachePath() + assemblyName;
+            var filename = generateFiles ? GetAssemblyDirectory() + assemblyName : "foo";
             var compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
             var tree = GetTree(src, filename, generateFiles);
 
@@ -131,6 +131,11 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 AssemblyBytes = compilationResult.Success && !generateFiles ? stream.ToArray() : null,
                 AssemblyPath = generateFiles ? filename + ".dll" : null
             };
+        }
+
+        protected virtual string GetAssemblyDirectory()
+        {
+            return Common.Utility.CachePath();
         }
     }
 }

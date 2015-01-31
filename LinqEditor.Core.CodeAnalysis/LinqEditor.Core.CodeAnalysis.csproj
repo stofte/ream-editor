@@ -112,6 +112,8 @@
     <Compile Include="Models\Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ITypeInformationStore.cs" />
+    <Compile Include="Services\Editor.cs" />
+    <Compile Include="Services\IEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

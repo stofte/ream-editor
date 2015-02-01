@@ -25,8 +25,8 @@ namespace Test {
     }
 }
 ";
-            var compiler = new CSharpCompiler();
-            var result = compiler.Compile(source, "Test");
+
+            var result = CSharpCompiler.CompileToBytes(source, "Test");
             var assembly = Assembly.Load(result.AssemblyBytes);
             Assert.AreEqual(1, assembly.DefinedTypes.Count());
         }
@@ -43,8 +43,8 @@ namespace Test {
     }
 }
 ";
-            var compiler = new CSharpCompiler();
-            var result = compiler.Compile(source, "Test", Path.GetTempPath());
+
+            var result = CSharpCompiler.CompileToFile(source, "Test", Path.GetTempPath());
             var filename = Path.GetTempPath() + "Test.dll";
             Assert.IsTrue(File.Exists(filename));
         }
@@ -64,8 +64,8 @@ namespace Test {
     }
 }
 ";
-            var compiler = new CSharpCompiler();
-            var result = compiler.Compile(source, "Test");
+
+            var result = CSharpCompiler.CompileToBytes(source, "Test");
             Assert.GreaterOrEqual(result.Errors.Count(), 1);
         }
     }

@@ -89,7 +89,6 @@
   <ItemGroup>
     <Compile Include="Compiler\CompilerResults.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
-    <Compile Include="Compiler\ICSharpCompiler.cs" />
     <Compile Include="Editor\BackgroundCompletion.cs" />
     <Compile Include="Editor\Completion.cs" />
     <Compile Include="Editor\IBackgroundCompletion.cs" />

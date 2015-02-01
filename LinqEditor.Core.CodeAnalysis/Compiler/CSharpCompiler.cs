@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Compiler
 {
-    public class CSharpCompiler : ICSharpCompiler
+    public static class CSharpCompiler
     {
         public static MetadataReference[] GetStandardReferences()
         {
@@ -28,38 +28,29 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             };
         }
 
-
-        public CompilerResult Compile(string src, string assemblyName, string outputFolder = null, byte[] reference = null)
+        public static CompilerResult CompileToFile(string src, string assemblyName, string outputFolder, params object[] references)
         {
-            var refs = GetStandardReferences().Concat(reference == null? new MetadataReference[]{ } : new [] { MetadataReference.CreateFromImage(reference) });
-            return Compile(src, assemblyName, outputFolder, refs.ToArray());
-        }
-
-        public CompilerResult Compile(string src, string assemblyName, string outputFolder = null, params string[] otherReferences)
-        {
-            var refs = GetStandardReferences().Concat(otherReferences != null && otherReferences.Length > 0 ? 
-                otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
-            return Compile(src, assemblyName, outputFolder, refs.ToArray());
-        }
-
-        private SyntaxTree GetTree(string source, string filename)
-        {
-            if (!string.IsNullOrWhiteSpace(filename))
+            if (references.Where(x => !(x is string || x is byte[])).Count() > 0)
             {
-                // this works, but VS complains the file doesn't match somehow
-                using (var file = File.CreateText(filename + ".cs"))
-                {
-                    file.Write(source);
-                }
-                return SyntaxFactory.ParseSyntaxTree(source, path: filename + ".cs", options: CSharpParseOptions.Default, encoding: Encoding.Default);
+                throw new ArgumentException("references had invalid types");
             }
-            else
-            {
-                return CSharpSyntaxTree.ParseText(source);
-            }
+            var refs = references.Select(x => x is string ? 
+                MetadataReference.CreateFromFile(x as string) : MetadataReference.CreateFromImage(x as byte[]));
+            return Compile(src, assemblyName, outputFolder, GetStandardReferences().Concat(refs));
         }
 
-        private CompilerResult Compile(string src, string assemblyName, string outputFolder, MetadataReference[] references)
+        public static CompilerResult CompileToBytes(string src, string assemblyName, params object[] references)
+        {
+            if (references.Where(x => !(x is string || x is byte[])).Count() > 0) 
+            {
+                throw new ArgumentException("references had invalid types");
+            }
+            var refs = references.Select(x => x is string ? 
+                MetadataReference.CreateFromFile(x as string) : MetadataReference.CreateFromImage(x as byte[]));
+            return Compile(src, assemblyName, null, GetStandardReferences().Concat(refs));
+        }
+
+        private static CompilerResult Compile(string src, string assemblyName, string outputFolder, IEnumerable<MetadataReference> references)
         {
             var generateFiles = outputFolder != null;
             var filename = generateFiles ? outputFolder + assemblyName : null;
@@ -132,9 +123,21 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             };
         }
 
-        protected virtual string GetAssemblyDirectory()
+        private static SyntaxTree GetTree(string source, string filename)
         {
-            return Common.Utility.CachePath();
+            if (!string.IsNullOrWhiteSpace(filename))
+            {
+                // this works, but VS complains the file doesn't match somehow
+                using (var file = File.CreateText(filename + ".cs"))
+                {
+                    file.Write(source);
+                }
+                return SyntaxFactory.ParseSyntaxTree(source, path: filename + ".cs", options: CSharpParseOptions.Default, encoding: Encoding.Default);
+            }
+            else
+            {
+                return CSharpSyntaxTree.ParseText(source);
+            }
         }
     }
 }

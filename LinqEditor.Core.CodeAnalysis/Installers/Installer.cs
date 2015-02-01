@@ -16,8 +16,6 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<ICSharpCompiler>()
-                                        .ImplementedBy<CSharpCompiler>());
             container.Register(Component.For<IBackgroundCompletionFactory>()
                                         .AsFactory());
             container.Register(Component.For<IBackgroundCompletion>()

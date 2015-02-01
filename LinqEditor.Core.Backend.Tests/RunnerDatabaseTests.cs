@@ -104,15 +104,14 @@ namespace Generated {
             var templateService = new TemplateService();
             _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
-            var compiler = new CSharpCompiler();
-            var schemaResult = compiler.Compile(schemaSource, _schemaId.ToIdentifierWithPrefix("s"), Utility.TempPath());
+            var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix("s"), Utility.TempPath());
             _schemaAssemblyPath = schemaResult.AssemblyPath;
             var querySource1 = templateService.GenerateQuery(_queryId1, "Foo.Dump();", _schemaId.ToIdentifierWithPrefix("s"));
             var querySource2 = templateService.GenerateQuery(_queryId2, "Foo.Dump();", _schemaId.ToIdentifierWithPrefix("s"));
 
-            var fileResult = compiler.Compile(querySource1, _queryId1.ToIdentifierWithPrefix("q"), Utility.TempPath(), _schemaAssemblyPath);
+            var fileResult = CSharpCompiler.CompileToFile(querySource1, _queryId1.ToIdentifierWithPrefix("q"), Utility.TempPath(), _schemaAssemblyPath);
             _queryAssemblyPath = fileResult.AssemblyPath;
-            var bytesResult = compiler.Compile(querySource2, _queryId2.ToIdentifierWithPrefix("q"), null, _schemaAssemblyPath);
+            var bytesResult = CSharpCompiler.CompileToBytes(querySource2, _queryId2.ToIdentifierWithPrefix("q"), _schemaAssemblyPath);
             _queryAssemblyBytes = bytesResult.AssemblyBytes;
         }
 

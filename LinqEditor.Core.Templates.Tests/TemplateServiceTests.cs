@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using LinqEditor.Core.Schema.Helpers;
 using System.IO;
+using LinqEditor.Common;
 
 namespace LinqEditor.Core.Templates.Tests
 {
@@ -16,13 +17,11 @@ namespace LinqEditor.Core.Templates.Tests
         DatabaseSchema _schemaModel;
         Guid _schemaId = Guid.NewGuid();
         string _schemaPath;
-        ICSharpCompiler _compiler;
 
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _schemaPath = Path.GetTempPath() + _schemaId.ToIdentifierWithPrefix("s") + ".dll";
-            _compiler = new CSharpCompiler();
+            _schemaPath = Utility.TempPath() + _schemaId.ToIdentifierWithPrefix("s") + ".dll";
 
             _schemaModel = new DatabaseSchema
             {
@@ -58,7 +57,7 @@ namespace LinqEditor.Core.Templates.Tests
         {
             var templateService = new TemplateService();
             var source = templateService.GenerateSchema(_schemaId, _schemaModel);
-            var result = _compiler.Compile(source, _schemaId.ToIdentifierWithPrefix("s"));
+            var result = CSharpCompiler.CompileToBytes(source, _schemaId.ToIdentifierWithPrefix("s"));
             Assert.AreEqual(0, result.Errors.Count());
         }
 
@@ -68,12 +67,12 @@ namespace LinqEditor.Core.Templates.Tests
             var templateService = new TemplateService();
 
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
-            var schemaResult = _compiler.Compile(schemaSource, _schemaId.ToIdentifierWithPrefix("s"), Path.GetTempPath());
+            var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix("s"), Utility.TempPath());
 
             var queryId = Guid.NewGuid();
             var source = templateService.GenerateQuery(queryId, "table.Count();", _schemaId.ToIdentifierWithPrefix("s"));
 
-            var result = _compiler.Compile(source, _schemaId.ToIdentifierWithPrefix("s"), null, _schemaPath);
+            var result = CSharpCompiler.CompileToBytes(source, _schemaId.ToIdentifierWithPrefix("s"), _schemaPath);
             Assert.AreEqual(0, result.Errors.Count());
         }
 
@@ -83,7 +82,7 @@ namespace LinqEditor.Core.Templates.Tests
             var templateService = new TemplateService();
             var codeId = Guid.NewGuid();
             var source = templateService.GenerateCodeStatements(codeId, "int x = 10;");
-            var result = _compiler.Compile(source, codeId.ToIdentifierWithPrefix("c"));
+            var result = CSharpCompiler.CompileToBytes(source, codeId.ToIdentifierWithPrefix("c"));
             Assert.AreEqual(0, result.Errors.Count());
         }
     }

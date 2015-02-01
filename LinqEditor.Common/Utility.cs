@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace LinqEditor.Common
 
         public static string TempPath()
         {
-            return @"C:\Users\z8zse\Desktop\temp\";
+            return Path.GetTempPath();
         }
     }
 }

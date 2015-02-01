@@ -26,7 +26,6 @@ namespace LinqEditor.Core.Backend.Repository
         private string _outputFolder;
         private Guid _sessionId = Guid.NewGuid();
 
-        private ICSharpCompiler _compiler;
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
         private ISchemaStore _userSettings;
@@ -34,9 +33,8 @@ namespace LinqEditor.Core.Backend.Repository
 
         private Isolated<Runner> _container;
 
-        public Session(ICSharpCompiler compiler, ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings)
+        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings)
         {
-            _compiler = compiler;
             _schemaProvider = schemaProvider;
             _generator = generator;
             _userSettings = userSettings;
@@ -54,7 +52,7 @@ namespace LinqEditor.Core.Backend.Repository
                 _schemaNamespace = _sessionId.ToIdentifierWithPrefix("s");
                 var sqlSchema = _schemaProvider.GetSchema(_connectionString);
                 var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
-                var result = _compiler.Compile(schemaSource, _schemaNamespace, _outputFolder);
+                var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
                 _schemaPath = result.AssemblyPath;
 
                 if (result.Success)
@@ -80,11 +78,11 @@ namespace LinqEditor.Core.Backend.Repository
             _watch.Restart();
             var queryId = Guid.NewGuid();
             var querySource = _generator.GenerateQuery(queryId, sourceFragment, _schemaNamespace);
-            var result = _compiler.Compile(querySource, queryId.ToIdentifierWithPrefix("q"), _outputFolder, references: _schemaPath);
+            var result = CSharpCompiler.CompileToBytes(querySource, queryId.ToIdentifierWithPrefix("q"), _schemaPath);
 
             if (result.Success)
             {
-                var containerResult = _container.Value.Execute(result.AssemblyPath);
+                var containerResult = _container.Value.Execute(result.AssemblyBytes);
                 _watch.Stop();
 
                 return new ExecuteResult

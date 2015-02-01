@@ -1,5 +1,5 @@
 ﻿
-namespace LinqEditor.Common.Logger
+namespace LinqEditor.Core.Logger
 {
     public enum LogCategory
     {

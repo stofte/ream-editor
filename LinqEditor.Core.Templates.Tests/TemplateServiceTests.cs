@@ -1,4 +1,4 @@
-﻿using LinqEditor.Common;
+﻿using LinqEditor.Core;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Schema.Helpers;
 using LinqEditor.Core.Schema.Models;

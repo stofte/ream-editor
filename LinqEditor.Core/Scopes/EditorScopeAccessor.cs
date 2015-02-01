@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace LinqEditor.Common.Scopes
+namespace LinqEditor.Core.Scopes
 {
     // http://docs.castleproject.org/(S(kwaa14uzdj55gv55dzgf0vui))/Windsor.Implementing%20custom%20scope.ashx
     // http://stackoverflow.com/questions/26096502/argument-bound-lifestyle-in-castle-windsor

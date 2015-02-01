@@ -1,5 +1,5 @@
 ﻿using IQToolkit.Data;
-using LinqEditor.Common.Generated;
+using LinqEditor.Core.Generated;
 using LinqEditor.Core.Backend.Models;
 using System;
 using System.IO;

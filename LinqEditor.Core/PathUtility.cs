@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace LinqEditor.Common
+namespace LinqEditor.Core
 {
     public class PathUtility
     {

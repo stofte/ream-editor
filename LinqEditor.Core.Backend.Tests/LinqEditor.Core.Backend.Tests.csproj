@@ -59,9 +59,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LinqEditor.Common\LinqEditor.Common.csproj">
+    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Common</Name>
+      <Name>LinqEditor.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\LinqEditor.Core.Backend\LinqEditor.Core.Backend.csproj">
       <Project>{9d6c745c-4e54-48c0-8d46-cae2bb29be29}</Project>

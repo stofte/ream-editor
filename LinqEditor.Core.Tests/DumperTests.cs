@@ -1,10 +1,10 @@
-﻿using LinqEditor.Common.Generated;
+﻿using LinqEditor.Core.Generated;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LinqEditor.Common.Tests
+namespace LinqEditor.Core.Tests
 {
     [TestFixture]
     public class DumperTests

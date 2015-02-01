@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LinqEditor.Common.Tests")]
+[assembly: AssemblyTitle("LinqEditor.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LinqEditor.Common.Tests")]
+[assembly: AssemblyProduct("LinqEditor.Core")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d7a5322e-1e31-455d-bc2a-c5418a1006bc")]
+[assembly: Guid("4e1490e2-fe6c-4c36-87bb-44aea1542c31")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -1,5 +1,5 @@
-﻿using LinqEditor.Common;
-using LinqEditor.Common.Helpers;
+﻿using LinqEditor.Core;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Schema.Models;
 using System.Configuration;
 using System.IO;
@@ -20,7 +20,7 @@ namespace LinqEditor.Core.Backend.Settings
         private void SynchronizeCacheData()
         {
             // delete unknown files and dictionary entries
-            var baseDir = Common.PathUtility.CachePath;
+            var baseDir = Core.PathUtility.CachePath;
             var cached = GeneratedSchemaFile;
             var hashes = SchemaHashes;
             var knownHashes = new SerializableStringDictionary();

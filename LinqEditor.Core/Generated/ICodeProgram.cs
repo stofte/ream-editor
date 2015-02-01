@@ -1,5 +1,5 @@
 ﻿
-namespace LinqEditor.Common.Generated
+namespace LinqEditor.Core.Generated
 {
     public interface ICodeProgram
     {

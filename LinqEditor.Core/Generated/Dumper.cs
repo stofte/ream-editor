@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace LinqEditor.Common.Generated
+namespace LinqEditor.Core.Generated
 {
     /// <summary>
     /// Dumper is used in the generated code for showing results in the UI. 

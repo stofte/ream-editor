@@ -28,8 +28,8 @@ namespace LinqEditor.Core.Templates.Code
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System;\r\nusing System.Text;\r\nusing LinqEditor.Common.Generated;\r\n\r\nnamespac" +
-                    "e ");
+            this.Write("using System;\r\nusing System.Text;\r\nusing LinqEditor.Core.Generated;\r\n\r\nnamespace " +
+                    "");
             
             #line 10 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedNamespace));

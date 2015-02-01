@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LinqEditor.Common.Helpers
+namespace LinqEditor.Core.Helpers
 {
     public static class SerializationHelper
     {

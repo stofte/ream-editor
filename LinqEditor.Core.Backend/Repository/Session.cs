@@ -32,7 +32,7 @@ namespace LinqEditor.Core.Backend.Repository
             _generator = generator;
             _userSettings = userSettings;
             _watch = new Stopwatch();
-            _outputFolder = Common.PathUtility.CachePath;
+            _outputFolder = Core.PathUtility.CachePath;
         }
 
         public InitializeResult Initialize(string connectionString)

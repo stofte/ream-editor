@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LinqEditor.Common.Context
+namespace LinqEditor.Core.Context
 {
     public interface IContext
     {

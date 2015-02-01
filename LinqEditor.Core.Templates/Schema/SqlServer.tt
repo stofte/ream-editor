@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using IQToolkit;
 using IQToolkit.Data;
 using IQToolkit.Data.Mapping;
-using LinqEditor.Common.Generated;
+using LinqEditor.Core.Generated;
 
 namespace <#=GeneratedSchemaNamespace#>.Schema 
 {

@@ -1,7 +1,7 @@
 ﻿using Castle.MicroKernel.Lifestyle;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
-using LinqEditor.Common;
+using LinqEditor.Core;
 using LinqEditor.UI.WinForm.Forms;
 using System;
 using System.IO;

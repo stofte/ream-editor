@@ -1,9 +1,9 @@
 ﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
-using LinqEditor.Common.Context;
+using LinqEditor.Core.Context;
 
-namespace LinqEditor.Common.Installers
+namespace LinqEditor.Core.Installers
 {
     public class Installer : IWindsorInstaller
     {

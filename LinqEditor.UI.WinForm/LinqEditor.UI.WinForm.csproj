@@ -179,9 +179,9 @@
       <Project>{a9a7b56d-772c-4475-ace4-2b4b495794dd}</Project>
       <Name>LinqEditor.Core.CodeAnalysis</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Common\LinqEditor.Common.csproj">
+    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Common</Name>
+      <Name>LinqEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

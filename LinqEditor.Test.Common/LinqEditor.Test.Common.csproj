@@ -53,9 +53,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LinqEditor.Common\LinqEditor.Common.csproj">
+    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Common</Name>
+      <Name>LinqEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

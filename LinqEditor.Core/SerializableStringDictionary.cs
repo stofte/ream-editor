@@ -4,7 +4,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace LinqEditor.Common
+namespace LinqEditor.Core
 {
     public class SerializableStringDictionary : StringDictionary, IXmlSerializable
     {

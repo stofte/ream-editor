@@ -7,8 +7,8 @@
     <ProjectGuid>{53F0654D-867F-49B8-8443-4C3486FB8309}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LinqEditor.Common</RootNamespace>
-    <AssemblyName>LinqEditor.Common</AssemblyName>
+    <RootNamespace>LinqEditor.Core</RootNamespace>
+    <AssemblyName>LinqEditor.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

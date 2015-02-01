@@ -1,4 +1,4 @@
-﻿using LinqEditor.Common.Context;
+﻿using LinqEditor.Core.Context;
 using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.Backend.Repository;
 using LinqEditor.UI.WinForm.Controls;

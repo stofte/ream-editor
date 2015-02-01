@@ -6,8 +6,8 @@
     <ProjectGuid>{198F6E16-A422-41D3-BC0D-58843E264BFE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LinqEditor.Common.Tests</RootNamespace>
-    <AssemblyName>LinqEditor.Common.Tests</AssemblyName>
+    <RootNamespace>LinqEditor.Core.Tests</RootNamespace>
+    <AssemblyName>LinqEditor.Core.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -55,9 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LinqEditor.Common\LinqEditor.Common.csproj">
+    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Common</Name>
+      <Name>LinqEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

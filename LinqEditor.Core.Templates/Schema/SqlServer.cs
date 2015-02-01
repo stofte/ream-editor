@@ -30,7 +30,7 @@ namespace LinqEditor.Core.Templates.Schema
         {
             this.Write("using System;\r\nusing System.IO;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing Sy" +
                     "stem.Collections.Generic;\r\nusing IQToolkit;\r\nusing IQToolkit.Data;\r\nusing IQTool" +
-                    "kit.Data.Mapping;\r\nusing LinqEditor.Common.Generated;\r\n\r\nnamespace ");
+                    "kit.Data.Mapping;\r\nusing LinqEditor.Core.Generated;\r\n\r\nnamespace ");
             
             #line 16 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Schema\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedSchemaNamespace));

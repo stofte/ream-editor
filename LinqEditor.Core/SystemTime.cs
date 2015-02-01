@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LinqEditor.Common
+namespace LinqEditor.Core
 {
     /// <summary>
     /// Fascilitates testing of DateTime usage. 

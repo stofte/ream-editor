@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace LinqEditor.Common.Logger
+namespace LinqEditor.Core.Logger
 {
     public class Logger : ILogger
     {

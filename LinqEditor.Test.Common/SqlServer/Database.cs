@@ -1,4 +1,4 @@
-﻿using LinqEditor.Common;
+﻿using LinqEditor.Core;
 using System;
 using System.Data.SqlClient;
 using System.IO;

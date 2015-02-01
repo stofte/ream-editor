@@ -28,10 +28,10 @@ namespace LinqEditor.Core.Templates.Code
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System;\r\nusing System.Text;\r\nusing LinqEditor.Core.Generated;\r\n\r\nnamespace " +
-                    "");
+            this.Write("using System;\r\nusing System.Text;\r\nusing System.Linq;\r\nusing System.Collections.G" +
+                    "eneric;\r\nusing LinqEditor.Core.Generated;\r\n\r\nnamespace ");
             
-            #line 10 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
+            #line 12 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedNamespace));
             
             #line default
@@ -62,7 +62,7 @@ namespace LinqEditor.Core.Templates.Code
         {
 ");
             
-            #line 34 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
+            #line 36 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SourceCode));
             
             #line default

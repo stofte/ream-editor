@@ -11,8 +11,6 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
         public byte[] AssemblyBytes { get; set; }
         public string AssemblyPath { get; set; }
         public IEnumerable<Error>  Errors { get; set; }
-        //public Diagnostic[] Warnings { get; set; }
-
         public IEnumerable<Warning> Warnings { get; set; }
     }
 }

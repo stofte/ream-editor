@@ -5,6 +5,8 @@
 <#@ import namespace="System.Collections.Generic" #>
 using System;
 using System.Text;
+using System.Linq;
+using System.Collections.Generic;
 using LinqEditor.Core.Generated;
 
 namespace <#= GeneratedNamespace#> 

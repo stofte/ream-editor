@@ -92,7 +92,6 @@
     <Compile Include="Editor\BackgroundCompletion.cs" />
     <Compile Include="Editor\Completion.cs" />
     <Compile Include="Editor\IBackgroundCompletion.cs" />
-    <Compile Include="Editor\IBackgroundCompletionFactory.cs" />
     <Compile Include="Editor\ICompletion.cs" />
     <Compile Include="Editor\IValidation.cs" />
     <Compile Include="Editor\Validation.cs" />
@@ -111,6 +110,7 @@
     <Compile Include="Models\Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ITypeInformationStore.cs" />
+    <Compile Include="Repositories\TypeInformationStore.cs" />
     <Compile Include="Services\Editor.cs" />
     <Compile Include="Services\IEditor.cs" />
   </ItemGroup>

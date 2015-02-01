@@ -5,4 +5,4 @@ install:
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release linq-editor.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe /exclude:Database ./LinqEditor.Core.Tests/bin/Release/LinqEditor.Core.Tests.dll ./LinqEditor.Core.Backend.Tests/bin/Release/LinqEditor.Core.Backend.Tests.dll ./LinqEditor.Core.CodeAnalysis.Tests/bin/Release/LinqEditor.Core.CodeAnalysis.Tests.dll ./LinqEditor.Core.Templates.Tests/bin/Release/LinqEditor.Core.Templates.Tests.dll
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./LinqEditor.Core.Tests/bin/Release/LinqEditor.Core.Tests.dll ./LinqEditor.Core.Backend.Tests/bin/Release/LinqEditor.Core.Backend.Tests.dll ./LinqEditor.Core.CodeAnalysis.Tests/bin/Release/LinqEditor.Core.CodeAnalysis.Tests.dll ./LinqEditor.Core.Templates.Tests/bin/Release/LinqEditor.Core.Templates.Tests.dll /exclude:Database

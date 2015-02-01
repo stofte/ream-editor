@@ -136,6 +136,8 @@ namespace LinqEditor.Core.Generated
 
         private static DataColumn[] MapColumns(TypeMap map)
         {
+            // need to handle nullable specially
+            // http://stackoverflow.com/questions/6251431/dataset-does-not-support-system-nullable
             return map.Columns.OrderBy(x => x.Index).Select(y => new DataColumn(y.Name, Nullable.GetUnderlyingType(y.Type) ?? y.Type)).ToArray();
         }
 

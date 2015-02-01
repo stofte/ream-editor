@@ -3,6 +3,7 @@ using LinqEditor.Core.CodeAnalysis.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -127,7 +128,9 @@ namespace LinqEditor.UI.WinForm.Controls
                         var grid = new DataGridView();
                         grid.ReadOnly = true;
                         grid.AllowUserToAddRows = false;
+                        grid.DefaultCellStyle.NullValue = "null";
                         grid.DataBindingComplete += GridDataBindingCompleteAutoSizeHandler;
+                        grid.CellFormatting += GridCellFormatting;
                         newTab.Controls.Add(grid);
                     }
                     newTab.Text = table.TableName;
@@ -146,6 +149,15 @@ namespace LinqEditor.UI.WinForm.Controls
                 _tabControl.TabPages.Remove(_tabControl.TabPages[2 + i]);
             }
             
+        }
+
+        void GridCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.Value != null && e.Value == DBNull.Value)
+            {
+                e.CellStyle.Font = new Font(e.CellStyle.Font, FontStyle.Italic);
+                e.CellStyle.ForeColor = Color.Silver;
+            }
         }
 
         private void BindDiagnostics(IEnumerable<Error> errors, IEnumerable<Warning> warnings)

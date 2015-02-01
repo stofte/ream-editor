@@ -23,6 +23,15 @@ namespace LinqEditor.Core.Backend.Tests
             Assert.IsNull(initResult.Error);
         }
 
+        [Test]
+        public void Can_Execute_Dynamic_Assembly()
+        {
+
+        }
+
+        #region configuration
+
+
         SqlServerTestDatabase _database;
         string _initialAssemblyPath;
 
@@ -52,6 +61,20 @@ namespace Initial {
 }
 ";
 
+        string _dynamicSource = @"
+using System; 
+using Initial;
+
+namespace Generated {
+    public class Program {
+        public int Query() {
+            var query = new SlowQuery();
+            
+        }
+    }
+}
+";
+
         [TestFixtureSetUp]
         public void Initialize()
         {
@@ -76,5 +99,7 @@ namespace Initial {
                 File.Delete(_initialAssemblyPath);
             }
         }
+
+        #endregion
     }
 }

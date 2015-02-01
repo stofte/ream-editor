@@ -30,15 +30,14 @@ namespace LinqEditor.Core.Templates.Schema
         {
             this.Write("using System;\r\nusing System.IO;\r\nusing System.Linq;\r\nusing System.Data;\r\nusing Sy" +
                     "stem.Collections.Generic;\r\nusing IQToolkit;\r\nusing IQToolkit.Data;\r\nusing IQTool" +
-                    "kit.Data.Mapping;\r\nusing LinqEditor.Common;\r\nusing LinqEditor.Common.Helpers;\r\n\r" +
-                    "\nnamespace ");
+                    "kit.Data.Mapping;\r\nusing LinqEditor.Common.Generated;\r\n\r\nnamespace ");
             
-            #line 17 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Schema\SqlServer.tt"
+            #line 16 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Schema\SqlServer.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedSchemaNamespace));
             
             #line default
             #line hidden
-            this.Write(".Schema {\r\n\r\n");
+            this.Write(".Schema \r\n{\r\n\r\n");
             
             #line 19 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Schema\SqlServer.tt"
 
@@ -221,8 +220,8 @@ foreach(var table in Tables) {
             
             #line default
             #line hidden
-            this.Write("\r\n    }\r\n\r\n    public abstract class ProgramBase : IDynamicQuery\r\n    {\r\n        " +
-                    "private Database _db;\r\n\r\n");
+            this.Write("\r\n    }\r\n\r\n    public abstract class ProgramBase : IDatabaseProgram\r\n    {\r\n     " +
+                    "   private Database _db;\r\n\r\n");
             
             #line 90 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Schema\SqlServer.tt"
  foreach(var table in Tables) { 

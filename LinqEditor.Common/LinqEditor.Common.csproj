@@ -47,9 +47,10 @@
   <ItemGroup>
     <Compile Include="Context\Context.cs" />
     <Compile Include="Context\IContext.cs" />
-    <Compile Include="Helpers\Dumper.cs" />
+    <Compile Include="Generated\Dumper.cs" />
+    <Compile Include="Generated\ICodeProgram.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
-    <Compile Include="IDynamicQuery.cs" />
+    <Compile Include="Generated\IDatabaseProgram.cs" />
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\LogCategory.cs" />

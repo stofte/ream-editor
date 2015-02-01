@@ -32,5 +32,16 @@ namespace LinqEditor.Core.Templates
 
             return gen.TransformText();
         }
+
+        public string GenerateCodeStatements(Guid codeId, string sourceFragment)
+        {
+            var gen = new Code.Statements()
+            {
+                SourceCode = sourceFragment,
+                NamespaceId = codeId
+            };
+
+            return gen.TransformText();
+        }
     }
 }

@@ -20,5 +20,8 @@ namespace LinqEditor.Core.Backend.Models
         public Exception InternalException { get; set; }
         public bool Success { get; set; }
         public string QueryText { get; set; }
+
+        public ProgramType Kind { get; set; }
+        public string CodeOutput { get; set; }
     }
 }

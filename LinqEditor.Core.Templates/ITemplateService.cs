@@ -11,5 +11,6 @@ namespace LinqEditor.Core.Templates
     {
         string GenerateSchema(Guid schemaId, DatabaseSchema sqlSchema);
         string GenerateQuery(Guid queryId, string sourceFragment, string schemaAssemblyNamespace);
+        string GenerateCodeStatements(Guid codeId, string sourceFragment);
     }
 }

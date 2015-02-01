@@ -11,10 +11,10 @@ using System.Collections.Generic;
 using IQToolkit;
 using IQToolkit.Data;
 using IQToolkit.Data.Mapping;
-using LinqEditor.Common;
-using LinqEditor.Common.Helpers;
+using LinqEditor.Common.Generated;
 
-namespace <#=GeneratedSchemaNamespace#>.Schema {
+namespace <#=GeneratedSchemaNamespace#>.Schema 
+{
 
 <#
 foreach(var table in Tables) {
@@ -83,7 +83,7 @@ foreach(var table in Tables) {
 
     }
 
-    public abstract class ProgramBase : IDynamicQuery
+    public abstract class ProgramBase : IDatabaseProgram
     {
         private Database _db;
 

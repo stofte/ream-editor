@@ -6,10 +6,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using LinqEditor.Common.Helpers;
+using LinqEditor.Common.Generated;
 
-namespace <#=GeneratedQueryNamespace#> {
-
+namespace <#=GeneratedQueryNamespace#> 
+{
     public class Program : <#=GeneratedSchemaNamespace#>.Schema.ProgramBase
     {
         protected override void Query() 
@@ -17,5 +17,4 @@ namespace <#=GeneratedQueryNamespace#> {
 <#=SourceCode#>
         }
     }
-
 }

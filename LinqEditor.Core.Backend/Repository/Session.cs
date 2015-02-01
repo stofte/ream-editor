@@ -51,9 +51,10 @@ namespace LinqEditor.Core.Backend.Repository
             _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
             if (string.IsNullOrEmpty(_schemaPath))
             {
+                _schemaNamespace = _sessionId.ToIdentifierWithPrefix("s");
                 var sqlSchema = _schemaProvider.GetSchema(_connectionString);
                 var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
-                var result = _compiler.Compile(schemaSource, _sessionId.ToIdentifierWithPrefix("s"), _outputFolder);
+                var result = _compiler.Compile(schemaSource, _schemaNamespace, _outputFolder);
                 _schemaPath = result.AssemblyPath;
 
                 if (result.Success)

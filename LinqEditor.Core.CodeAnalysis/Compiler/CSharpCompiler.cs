@@ -24,7 +24,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.QueryProvider).Assembly), // IQToolkit.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.DbEntityProvider).Assembly), // IQToolkit.Data.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.SqlClient.TSqlLanguage).Assembly), // IQToolkit.Data.SqlClient.dll
-                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Common.Helpers.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
+                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Common.Generated.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
             };
         }
 

@@ -36,6 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Code\Statements.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Statements.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
     <None Include="Schema\SqlServer.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
@@ -50,6 +54,14 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\Statements.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Statements.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Code\Statements.partial.cs">
+      <DependentUpon>Statements.tt</DependentUpon>
+    </Compile>
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="SchemaConstants.cs" />
     <Compile Include="Schema\SqlServer.cs">

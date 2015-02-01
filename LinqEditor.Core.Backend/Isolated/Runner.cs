@@ -9,12 +9,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using LinqEditor.Common.Generated;
 
 namespace LinqEditor.Core.Backend.Isolated
 {
     public class Runner : MarshalByRefObject
     {
         private Assembly _initialAssembly;
+        private ProgramType _runnerType;
         private string _dbType;
         private string _connectionString;
 
@@ -42,6 +44,8 @@ namespace LinqEditor.Core.Backend.Isolated
                     _initialAssembly = Assembly.Load(assemblyImage);
                 }
 
+                _runnerType = connectionString != null ? ProgramType.Database : ProgramType.Code;
+
                 if (connectionString != null)
                 {
                     _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _initialAssembly.GetName().Name);
@@ -49,8 +53,8 @@ namespace LinqEditor.Core.Backend.Isolated
 
                     // warm up connection
                     var warmupType = _initialAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _initialAssembly.GetName().Name));
-                    var instance = Activator.CreateInstance(warmupType) as IDynamicQuery;
-                    var res = ExecuteInstance(instance);
+                    var instance = Activator.CreateInstance(warmupType) as IDatabaseProgram;
+                    var res = ExecuteDatabase(instance);
                 }
             }
             catch (Exception e)
@@ -81,8 +85,16 @@ namespace LinqEditor.Core.Backend.Isolated
             {
                 var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
                 var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
-                var instance = Activator.CreateInstance(queryType) as IDynamicQuery;
-                return ExecuteInstance(instance);
+
+                //if (_runnerType == ProgramType.Database)
+                //{
+                    var instance = Activator.CreateInstance(queryType) as IDatabaseProgram;
+                    return ExecuteDatabase(instance);
+                //}
+                //else if (_runnerType == ProgramType.Code)
+                //{
+                //    var instance = Activator.CreateInstance(queryType) as ICodeProgram;
+                //}
             }
             catch (Exception e)
             {
@@ -94,13 +106,8 @@ namespace LinqEditor.Core.Backend.Isolated
             }
         }
 
-        // http://blogs.microsoft.co.il/sasha/2008/07/19/appdomains-and-remoting-life-time-service/
-        public override object InitializeLifetimeService()
-        {   
-            return null;
-        }
 
-        private ExecuteResult ExecuteInstance(IDynamicQuery instance)
+        private ExecuteResult ExecuteDatabase(IDatabaseProgram instance)
         {
             var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", _connectionString, _dbType);
             provider.Log = new StringWriter();
@@ -114,6 +121,20 @@ namespace LinqEditor.Core.Backend.Isolated
                 Success = true,
                 QueryText = provider.Log.ToString()
             };
+        }
+
+        private ExecuteResult ExecuteCode(ICodeProgram instance)
+        {
+            return new ExecuteResult
+            {
+                
+            };
+        }
+
+        // http://blogs.microsoft.co.il/sasha/2008/07/19/appdomains-and-remoting-life-time-service/
+        public override object InitializeLifetimeService()
+        {
+            return null;
         }
     }
 }

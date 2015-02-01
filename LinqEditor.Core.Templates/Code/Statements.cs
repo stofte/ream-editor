@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace LinqEditor.Core.Templates.Query
+namespace LinqEditor.Core.Templates.Code
 {
     using System.Linq;
     using System.Text;
@@ -18,9 +18,9 @@ namespace LinqEditor.Core.Templates.Query
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
+    #line 1 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "11.0.0.0")]
-    public partial class SqlServer : SqlServerBase
+    public partial class Statements : StatementsBase
     {
 #line hidden
         /// <summary>
@@ -28,25 +28,41 @@ namespace LinqEditor.Core.Templates.Query
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System;\r\nusing System.Linq;\r\nusing System.Collections.Generic;\r\nusing LinqE" +
-                    "ditor.Common.Generated;\r\n\r\nnamespace ");
+            this.Write("using System;\r\nusing System.Text;\r\nusing LinqEditor.Common.Generated;\r\n\r\nnamespac" +
+                    "e ");
             
-            #line 11 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedQueryNamespace));
-            
-            #line default
-            #line hidden
-            this.Write(" \r\n{\r\n    public class Program : ");
-            
-            #line 13 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedSchemaNamespace));
+            #line 10 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GeneratedNamespace));
             
             #line default
             #line hidden
-            this.Write(".Schema.ProgramBase\r\n    {\r\n        protected override void Query() \r\n        {\r\n" +
-                    "");
+            this.Write(@" 
+{
+    public class Program : ICodeProgram
+    {
+        StringBuilder sb = new StringBuilder();
+
+        protected void Write(object obj) 
+        {
+            sb.Append(obj.ToString());
+        }
+
+        protected void WriteLine(object obj) 
+        {
+            sb.AppendLine(obj.ToString());
+        }
+
+        public string Execute() 
+        {
+            UserCode();
+            return sb.ToString();
+        }
+
+        private void UserCode() 
+        {
+");
             
-            #line 17 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Query\SqlServer.tt"
+            #line 34 "C:\Users\z8zse\Documents\GitHub\linq-editor\LinqEditor.Core.Templates\Code\Statements.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SourceCode));
             
             #line default
@@ -63,7 +79,7 @@ namespace LinqEditor.Core.Templates.Query
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "11.0.0.0")]
-    public class SqlServerBase
+    public class StatementsBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

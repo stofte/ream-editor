@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using System.Collections.Generic;
-using LinqEditor.Common.Helpers;
+using LinqEditor.Common.Generated;
 
 namespace LinqEditor.Common.Tests
 {

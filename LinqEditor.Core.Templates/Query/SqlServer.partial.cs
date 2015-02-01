@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Schema.Models;
+using LinqEditor.Core.Schema.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace LinqEditor.Core.Templates.Query
         // todo duplicated from schema
         public string GeneratedQueryNamespace
         {
-            get { return "q" + NamespaceId.ToString().Replace("-", ""); }
+            get { return NamespaceId.ToIdentifierWithPrefix("q"); }
         }
     }
 }

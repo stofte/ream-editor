@@ -13,7 +13,7 @@ namespace LinqEditor.Installers
         {
             container.AddFacility<TypedFactoryFacility>();
 
-            container.Install(FromAssembly.Named("LinqEditor.Common"));
+            container.Install(FromAssembly.Named("LinqEditor.Core"));
             container.Install(FromAssembly.Named("LinqEditor.Core.Backend"));
             container.Install(FromAssembly.Named("LinqEditor.Core.CodeAnalysis"));
             container.Install(FromAssembly.Named("LinqEditor.Core.Schema"));

@@ -51,7 +51,7 @@ insert into
         varbinarycol,
         varbinarymaxcol,
 
-        -- timestampcol is auto filled
+        -- timestamp/rowversion is auto filled
         uniqueidentifiercol
     ) 
     values(

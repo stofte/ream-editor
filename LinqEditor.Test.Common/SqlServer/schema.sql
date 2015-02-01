@@ -43,6 +43,6 @@ create table TypeTestTable (
     --xmlcol xml
 
     -- Other Data Types
-    timestampcol timestamp,
+    rowversioncol rowversion,
     uniqueidentifiercol uniqueidentifier
 );

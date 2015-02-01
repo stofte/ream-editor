@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Schema.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -58,15 +59,35 @@ namespace LinqEditor.Core.Schema.Services
 
         private string SqlTypeToDotNetType(string type, string nullable)
         {
-            var isNullable = nullable == "YES";
+            var nullableSuffix = nullable == "YES" ? "?" : string.Empty;
             switch (type)
             {
+                case "date":
+                case "smalldatetime":
+                case "datetime":
+                case "datetime2":
+                    return "DateTime" + nullableSuffix;
+                case "datetimeoffset":
+                    return "DateTimeOffset" + nullableSuffix;
+                case "time":
+                    return "TimeSpan" + nullableSuffix;
                 case "int":
-                    return isNullable ? "int?" : "int";
-                case "nvarchar":
+                    return "int" + nullableSuffix;
+                case "real":
+                case "float":
+                    return "double" + nullableSuffix;
+                case "timestamp":
+                case "rowversion":
+                case "binary":
+                case "varbinary":
+                    return "byte[]";
+                case "uniqueidentifier":
+                    return "Guid" + nullableSuffix;
                 case "text":
                 default:
                     return "string";
+                //default:
+                //    throw new ArgumentException("Unsupported type");
             }
         }
     }

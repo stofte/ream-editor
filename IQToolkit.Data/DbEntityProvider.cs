@@ -330,26 +330,34 @@ namespace IQToolkit.Data
                 }
                 type = TypeHelper.GetNonNullableType(type);
                 Type vtype = value.GetType();
-                if (type != vtype)
+                try
                 {
-                    if (type.IsEnum)
+                    if (type != vtype)
                     {
-                        if (vtype == typeof(string))
+                        if (type.IsEnum)
                         {
-                            return Enum.Parse(type, (string)value);
-                        }
-                        else
-                        {
-                            Type utype = Enum.GetUnderlyingType(type);
-                            if (utype != vtype)
+                            if (vtype == typeof(string))
                             {
-                                value = System.Convert.ChangeType(value, utype);
+                                return Enum.Parse(type, (string)value);
                             }
-                            return Enum.ToObject(type, value);
+                            else
+                            {
+                                Type utype = Enum.GetUnderlyingType(type);
+                                if (utype != vtype)
+                                {
+                                    value = System.Convert.ChangeType(value, utype);
+                                }
+                                return Enum.ToObject(type, value);
+                            }
                         }
+                        return System.Convert.ChangeType(value, type);
                     }
-                    return System.Convert.ChangeType(value, type);
                 }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                
                 return value;
             }
 

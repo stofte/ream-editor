@@ -93,7 +93,6 @@ namespace LinqEditor.Core.Backend.Isolated
             try
             {
                 var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
-                System.Threading.Thread.Sleep(2000);
                 var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
 
                 if (_runnerType == ProgramType.Database)

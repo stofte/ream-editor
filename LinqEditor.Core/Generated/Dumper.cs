@@ -9,9 +9,8 @@ using System.Runtime.CompilerServices;
 namespace LinqEditor.Core.Generated
 {
     /// <summary>
-    /// Dumper is used in the generated code for showing results in the UI. 
-    /// SQL column data is injected by the generated code before invocation.
-    /// Each instance is in a seperate AppDomain.
+    /// Dumper is used in the generated code for dumping ienumerables
+    /// and other values to datatables, that are then shown in the ui.
     /// </summary>
     public static class Dumper
     {
@@ -137,7 +136,7 @@ namespace LinqEditor.Core.Generated
 
         private static DataColumn[] MapColumns(TypeMap map)
         {
-            return map.Columns.OrderBy(x => x.Index).Select(y => new DataColumn(y.Name, y.Type)).ToArray();
+            return map.Columns.OrderBy(x => x.Index).Select(y => new DataColumn(y.Name, Nullable.GetUnderlyingType(y.Type) ?? y.Type)).ToArray();
         }
 
         private static object[] MapRow(TypeMap map, object obj)
@@ -148,11 +147,11 @@ namespace LinqEditor.Core.Generated
             {
                 if (col.Kind == ColumnType.Field)
                 {
-                    rowValues[col.Index] = objType.GetField(col.Name).GetValue(obj);
+                    rowValues[col.Index] = objType.GetField(col.Name).GetValue(obj) ?? DBNull.Value;
                 }
                 else
                 {
-                    rowValues[col.Index] = objType.GetProperty(col.Name).GetValue(obj, null);
+                    rowValues[col.Index] = objType.GetProperty(col.Name).GetValue(obj, null) ?? DBNull.Value;
                 }
             }
             return rowValues;

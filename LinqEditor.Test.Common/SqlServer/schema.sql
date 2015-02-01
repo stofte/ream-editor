@@ -8,10 +8,10 @@ create table TypeTestTable (
     -- Exact Numerics
     bigintcol bigint,
     bitcol bit,
-    decimalcol decimal,
+    decimalcol decimal(19, 1),
     intcol int,
     moneycol money,
-    numericcol numeric,
+    numericcol numeric(19, 1),
     smallintcol smallint,
     smallmoneycol smallmoney,
     tinyintcol tinyint,
@@ -26,17 +26,22 @@ create table TypeTestTable (
     smalldatetimecol smalldatetime,
     timecol time,
     -- Character Strings
-    charcol char,
+    charcol char(6),
+    varcharcol varchar(6),
+    varcharmaxcol varchar(max),
     textcol text,
-    varcharcol varchar,
     -- Unicode Character Strings
-    ncharcol nchar,
+    ncharcol nchar(3),
+    nvarcharcol nvarchar(3),
     ntextcol ntext,
-    nvarcharcol nvarchar,
-    -- Binary Strings
-    binarycol binary,
-    imagecol image,
-    varbinarycol varbinary,
+    
+    -- skipping image/xml types for now
+    binarycol binary(8),
+    varbinarycol varbinary(8),
+    varbinarymaxcol varbinary(max),
+    --imagecol image,
+    --xmlcol xml
+
     -- Other Data Types
     timestampcol timestamp,
     uniqueidentifiercol uniqueidentifier

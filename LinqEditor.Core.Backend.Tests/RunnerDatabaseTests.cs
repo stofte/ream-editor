@@ -79,7 +79,7 @@ namespace LinqEditor.Core.Backend.Tests
         }
 
         [Test]
-        public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows()
+        public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only()
         {
             var container = new Isolated<Runner>();
             var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);

@@ -155,7 +155,6 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             if (e.Value != null && e.Value == DBNull.Value)
             {
-                e.CellStyle.Font = new Font(e.CellStyle.Font, FontStyle.Italic);
                 e.CellStyle.ForeColor = Color.Silver;
             }
         }

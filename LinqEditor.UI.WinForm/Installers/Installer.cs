@@ -2,14 +2,8 @@
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor.Installer;
-using LinqEditor.UI.WinForm;
 using LinqEditor.UI.WinForm.Controls;
 using LinqEditor.UI.WinForm.Forms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LinqEditor.Installers
 {

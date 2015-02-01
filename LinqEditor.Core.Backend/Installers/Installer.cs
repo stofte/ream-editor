@@ -1,14 +1,8 @@
-﻿using Castle.Windsor.Installer;
+﻿using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LinqEditor.Core.Backend.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Castle.Facilities.TypedFactory;
 
 namespace LinqEditor.Core.Backend.Installers
 {

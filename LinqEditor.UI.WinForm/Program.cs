@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using LinqEditor.Common;
+﻿using Castle.MicroKernel.Lifestyle;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
-using Castle.Facilities.TypedFactory;
-using Castle.MicroKernel.Lifestyle;
+using LinqEditor.Common;
 using LinqEditor.UI.WinForm.Forms;
+using System;
+using System.IO;
+using System.Windows.Forms;
 
 namespace LinqEditor.UI.WinForm
 {
@@ -25,7 +20,7 @@ namespace LinqEditor.UI.WinForm
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var path = Common.Utility.CachePath();
+            var path = PathUtility.CachePath;
 
             if (!Directory.Exists(path))
             {

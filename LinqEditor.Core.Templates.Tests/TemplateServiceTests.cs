@@ -1,13 +1,12 @@
-﻿using LinqEditor.Common.Tests;
+﻿using LinqEditor.Common;
 using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.Schema.Helpers;
 using LinqEditor.Core.Schema.Models;
 using NUnit.Framework;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using LinqEditor.Core.Schema.Helpers;
 using System.IO;
-using LinqEditor.Common;
+using System.Linq;
 
 namespace LinqEditor.Core.Templates.Tests
 {
@@ -21,7 +20,7 @@ namespace LinqEditor.Core.Templates.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _schemaPath = Utility.TempPath() + _schemaId.ToIdentifierWithPrefix("s") + ".dll";
+            _schemaPath = PathUtility.TempPath + _schemaId.ToIdentifierWithPrefix("s") + ".dll";
 
             _schemaModel = new DatabaseSchema
             {
@@ -67,7 +66,7 @@ namespace LinqEditor.Core.Templates.Tests
             var templateService = new TemplateService();
 
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
-            var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix("s"), Utility.TempPath());
+            var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix("s"), PathUtility.TempPath);
 
             var queryId = Guid.NewGuid();
             var source = templateService.GenerateQuery(queryId, "table.Count();", _schemaId.ToIdentifierWithPrefix("s"));

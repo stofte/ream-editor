@@ -1,12 +1,9 @@
 ﻿using LinqEditor.Common.Context;
 using LinqEditor.Core.CodeAnalysis.Editor;
 using LinqEditor.Core.CodeAnalysis.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LinqEditor.UI.WinForm.Controls

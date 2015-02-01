@@ -2,11 +2,6 @@
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LinqEditor.Common.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LinqEditor.Common.Installers
 {

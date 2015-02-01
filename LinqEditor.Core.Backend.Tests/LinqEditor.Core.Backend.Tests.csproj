@@ -79,6 +79,10 @@
       <Project>{800d694f-1037-4d5f-a860-dbd724ddce5e}</Project>
       <Name>LinqEditor.Core.Templates</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Test.Common\LinqEditor.Test.Common.csproj">
+      <Project>{9ec90760-15fe-40ed-aaa4-fa63a79cd050}</Project>
+      <Name>LinqEditor.Test.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LinqEditor.Core.Schema.Helpers;
+﻿using LinqEditor.Core.Schema.Helpers;
+using System;
 
 namespace LinqEditor.Core.Templates.Code
 {

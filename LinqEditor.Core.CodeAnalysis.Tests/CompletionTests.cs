@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using NUnit.Framework;
-using NUnit.Framework.Constraints;
+﻿using LinqEditor.Core.CodeAnalysis.Editor;
+using LinqEditor.Core.CodeAnalysis.Models;
 using LinqEditor.Core.Templates;
 using Moq;
-using LinqEditor.Core.CodeAnalysis.Editor;
-using LinqEditor.Core.CodeAnalysis.Models;
-using T = System.Tuple;
+using NUnit.Framework;
+using System;
+using System.Linq;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {

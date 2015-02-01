@@ -1,24 +1,12 @@
-﻿using Castle.MicroKernel;
-using Castle.Windsor;
-using Castle.Windsor.Installer;
+﻿using LinqEditor.Common.Context;
 using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.Backend.Repository;
-using LinqEditor.Core.CodeAnalysis.Editor;
-using LinqEditor.Core.CodeAnalysis.Models;
 using LinqEditor.UI.WinForm.Controls;
-using ScintillaNET;
 using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Data;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Diagnostics;
-using Castle.Facilities.TypedFactory;
-using LinqEditor.Common.Context;
 
 namespace LinqEditor.UI.WinForm.Forms
 {

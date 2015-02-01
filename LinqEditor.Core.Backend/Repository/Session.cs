@@ -1,20 +1,13 @@
-﻿using LinqEditor.Core.Templates;
-using LinqEditor.Core.Backend.Isolated;
-using LinqEditor.Core.Schema.Models;
-using LinqEditor.Core.Schema.Services;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LinqEditor.Core.CodeAnalysis.Compiler;
+﻿using LinqEditor.Core.Backend.Isolated;
 using LinqEditor.Core.Backend.Models;
-using LinqEditor.Core.CodeAnalysis.Models;
 using LinqEditor.Core.Backend.Settings;
+using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Schema.Helpers;
-using System.IO;
+using LinqEditor.Core.Schema.Services;
+using LinqEditor.Core.Templates;
+using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace LinqEditor.Core.Backend.Repository
 {
@@ -39,7 +32,7 @@ namespace LinqEditor.Core.Backend.Repository
             _generator = generator;
             _userSettings = userSettings;
             _watch = new Stopwatch();
-            _outputFolder = Common.Utility.CachePath();
+            _outputFolder = Common.PathUtility.CachePath;
         }
 
         public InitializeResult Initialize(string connectionString)

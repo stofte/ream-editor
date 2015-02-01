@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using LinqEditor.Common.Generated;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
+using System;
 using System.Collections.Generic;
-using LinqEditor.Common.Generated;
+using System.Linq;
 
 namespace LinqEditor.Common.Tests
 {

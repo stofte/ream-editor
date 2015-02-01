@@ -24,7 +24,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.QueryProvider).Assembly), // IQToolkit.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.DbEntityProvider).Assembly), // IQToolkit.Data.dll
                 MetadataReference.CreateFromAssembly(typeof(IQToolkit.Data.SqlClient.TSqlLanguage).Assembly), // IQToolkit.Data.SqlClient.dll
-                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Common.Generated.Dumper).Assembly) // LinqEditor.Core.CodeAnalysis.dll
+                MetadataReference.CreateFromAssembly(typeof(LinqEditor.Common.Generated.Dumper).Assembly) // LinqEditor.Common.dll
             };
         }
 
@@ -37,14 +37,9 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 
         public CompilerResult Compile(string src, string assemblyName, string outputFolder = null, params string[] otherReferences)
         {
-            var refs = GetStandardReferences().Concat(otherReferences != null && otherReferences.Length > 0 ? otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
+            var refs = GetStandardReferences().Concat(otherReferences != null && otherReferences.Length > 0 ? 
+                otherReferences.Select(x => MetadataReference.CreateFromFile(x) as MetadataReference) : new MetadataReference[] { });
             return Compile(src, assemblyName, outputFolder, refs.ToArray());
-        }
-
-        private string AssemblyFilename()
-        {
-            var guid = Guid.NewGuid().ToString().Replace("-", "");
-            return guid;
         }
 
         private SyntaxTree GetTree(string source, string filename)

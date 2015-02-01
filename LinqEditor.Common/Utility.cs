@@ -16,5 +16,10 @@ namespace LinqEditor.Common
             var paths = doc.Descendants(XName.Get("probing", "urn:schemas-microsoft-com:asm.v1"));
             return AppDomain.CurrentDomain.BaseDirectory + paths.First().Attribute("privatePath").Value + "\\";
         }
+
+        public static string TempPath()
+        {
+            return @"C:\Users\z8zse\Desktop\temp\";
+        }
     }
 }

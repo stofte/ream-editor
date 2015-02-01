@@ -32,6 +32,20 @@ namespace LinqEditor.Core.Backend.Isolated
 
         private LoadAppDomainResult Initialize(byte[] assemblyImage, string assemblyPath, string connectionString)
         {
+            // i dont get how the runtime actually loads assemblies, so for now, we just grab
+            // the resolve failed event, and return the passed assembly straight. this avoid
+            // having to use the probe-path configuration setup, and lets us persist assemblies
+            // where ever
+
+            AppDomain.CurrentDomain.AssemblyResolve += delegate(object sender, ResolveEventArgs args)
+            {
+                if (args.RequestingAssembly != null)
+                {
+                    return _initialAssembly;
+                }
+                return null;
+            };
+
             Exception exn = null;
             try
             {
@@ -44,9 +58,10 @@ namespace LinqEditor.Core.Backend.Isolated
                     _initialAssembly = Assembly.Load(assemblyImage);
                 }
 
+                // code context depends on initial connection string
                 _runnerType = connectionString != null ? ProgramType.Database : ProgramType.Code;
 
-                if (connectionString != null)
+                if (_runnerType == ProgramType.Database)
                 {
                     _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _initialAssembly.GetName().Name);
                     _connectionString = connectionString;
@@ -84,17 +99,19 @@ namespace LinqEditor.Core.Backend.Isolated
             try
             {
                 var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
+                System.Threading.Thread.Sleep(2000);
                 var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
 
-                //if (_runnerType == ProgramType.Database)
-                //{
+                if (_runnerType == ProgramType.Database)
+                {
                     var instance = Activator.CreateInstance(queryType) as IDatabaseProgram;
                     return ExecuteDatabase(instance);
-                //}
-                //else if (_runnerType == ProgramType.Code)
-                //{
-                //    var instance = Activator.CreateInstance(queryType) as ICodeProgram;
-                //}
+                }
+                else // _runnerType == ProgramType.Code
+                {
+                    var instance = Activator.CreateInstance(queryType) as ICodeProgram;
+                    return ExecuteCode(instance);
+                }
             }
             catch (Exception e)
             {
@@ -105,7 +122,6 @@ namespace LinqEditor.Core.Backend.Isolated
                 };
             }
         }
-
 
         private ExecuteResult ExecuteDatabase(IDatabaseProgram instance)
         {
@@ -125,9 +141,10 @@ namespace LinqEditor.Core.Backend.Isolated
 
         private ExecuteResult ExecuteCode(ICodeProgram instance)
         {
+            var output = instance.Execute();
             return new ExecuteResult
             {
-                
+                CodeOutput = output
             };
         }
 

@@ -14,8 +14,8 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
             container.Register(Component.For<IBackgroundCompletion>()
                                         .ImplementedBy<BackgroundCompletion>()
                                         .LifestyleScoped());
-            container.Register(Component.For<ITypeInformationStore>()
-                            .ImplementedBy<TypeInformationStore>()
+            container.Register(Component.For<ISemanticStore>()
+                            .ImplementedBy<SemanticStore>()
                             .LifestyleScoped());
             
         }

@@ -10,16 +10,26 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Repositories
 {
-    public class TypeInformationStore : ITypeInformationStore
+    /// <summary>
+    /// Abstracts most roslyn internals, and exposes them via custom dtos.
+    /// The class has three phases, during initialize the type space is 
+    /// searched for extensionmethods. During editor usage, the latest
+    /// model is injected, with optional edit index, which updates state.
+    /// The class can then be queryed for relevant context infomation.
+    /// </summary>
+    public class SemanticStore : ISemanticStore
     {
         private IDictionary<string, IList<TypeMember>> _extensionMethods;
+
         private string _entryNamespace;
         private string _entryName;
+        private SemanticModel _model;
 
-        public void InitializeModel(SemanticModel model, SyntaxTree tree)
+        public void Initialize(SemanticModel model)
         {
+            _model = model;
             // find entry point
-            var nodes = tree.GetRoot().DescendantNodes();
+            var nodes = _model.SyntaxTree.GetRoot().DescendantNodes();
             // test code has more then one entry
             var entryMethod = nodes.OfType<MethodDeclarationSyntax>().Last();
             _entryNamespace = nodes.OfType<NamespaceDeclarationSyntax>().Last().Name.ToString();
@@ -28,7 +38,7 @@ namespace LinqEditor.Core.CodeAnalysis.Repositories
                 .DescendantNodes().OfType<StatementSyntax>().First();
 
             // gets static types available at location
-            var availableTypes = model
+            var availableTypes = _model
                 .LookupSymbols(methodBody.Span.Start)
                 .OfType<INamedTypeSymbol>()
                 .Where(x => x.CanBeReferencedByName && x.IsStatic && !x.IsAbstract &&
@@ -67,7 +77,14 @@ namespace LinqEditor.Core.CodeAnalysis.Repositories
             _extensionMethods = dict;
         }
 
-        public TypeInformation GetInformation(TypeInfo typeInfo, SymbolInfo symbolInfo)
+        public void Update(SemanticModel model) 
+        {
+            _model = model;
+        }
+
+        public void UpdateWithEdit(SemanticModel model, int updateIndex) {}
+
+        public TypeInformation GetInformation()
         {
             throw new NotImplementedException();
         }

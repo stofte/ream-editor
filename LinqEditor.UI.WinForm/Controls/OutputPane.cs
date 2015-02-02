@@ -127,7 +127,12 @@ namespace LinqEditor.UI.WinForm.Controls
                         newTab.Enter += TabEnterHandler;
                         var grid = new DataGridView();
                         grid.ReadOnly = true;
+                        grid.AllowDrop = false;
                         grid.AllowUserToAddRows = false;
+                        grid.AllowUserToDeleteRows = false;
+                        grid.AllowUserToOrderColumns = true;
+                        grid.AllowUserToResizeColumns = true;
+                        grid.AllowUserToResizeRows = false; // less dragging action going on
                         grid.DefaultCellStyle.NullValue = "null";
                         grid.DataBindingComplete += GridDataBindingCompleteAutoSizeHandler;
                         grid.CellFormatting += GridCellFormatting;
@@ -223,10 +228,31 @@ namespace LinqEditor.UI.WinForm.Controls
             var grid = sender as DataGridView;
             var tab = grid.Parent as TabPage;
             var tabControl = tab.Parent as TabControl;
+            var gridWidth = grid.Width;
+
             for (var i = 0; i < grid.Columns.Count; i++)
             {
-                grid.Columns[i].AutoSizeMode = i < grid.Columns.Count - 1 ?
-                    DataGridViewAutoSizeColumnMode.AllCells : DataGridViewAutoSizeColumnMode.Fill;
+                var mode = DataGridViewAutoSizeColumnMode.AllCells; 
+                if (i == grid.Columns.Count - 1) {
+                    var previousColWidth = 0;
+                    for (var j = 0; j < grid.Columns.Count - 1; j++ ) 
+                    {
+                        previousColWidth += grid.Columns[j].Width;
+                    }
+                    // assume the last cell needs on average the same as the rest.
+                    if (previousColWidth + (previousColWidth / (grid.Columns.Count - 1)) < gridWidth)
+                    {
+                        mode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                }
+                grid.Columns[i].AutoSizeMode = mode;
+            }
+
+            for (var i = 0; i < grid.Columns.Count; i++)
+            {
+                var width = grid.Columns[i].Width;
+                grid.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                grid.Columns[i].Width = width;
             }
 
             // if the tab shown doesn't change, no enter event is fired, so check and update here

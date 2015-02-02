@@ -2,6 +2,9 @@
 
 namespace LinqEditor.Core.CodeAnalysis.Models
 {
+    /// <summary>
+    /// Contains type information for available types
+    /// </summary>
     public class TypeInformation
     {
         public bool IsStatic { get; set; }

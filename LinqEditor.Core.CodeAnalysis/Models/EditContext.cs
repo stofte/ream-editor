@@ -9,7 +9,7 @@ namespace LinqEditor.Core.CodeAnalysis.Models
         /// <summary>
         /// Accessing an objects members.
         /// </summary>
-        MemberAccessExpression,
+        MemberCompletion,
         /// <summary>
         /// Could not infer type
         /// </summary>

@@ -5,6 +5,7 @@ namespace LinqEditor.Core.CodeAnalysis.Repositories
 {
     public interface ITypeInformationStore
     {
-        TypeInformation GetInformation(TypeInfo typeInfo);
+        void InitializeModel(SemanticModel model, SyntaxTree tree);
+        TypeInformation GetInformation(TypeInfo typeInfo, SymbolInfo symbolInfo);
     }
 }

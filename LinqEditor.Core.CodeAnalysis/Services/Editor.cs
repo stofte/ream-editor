@@ -1,8 +1,12 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.CodeAnalysis.Models;
+using LinqEditor.Core.Context;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Templates;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,19 +17,23 @@ namespace LinqEditor.Core.CodeAnalysis.Services
     {
         private MetadataReference[] _references;
         private ITemplateService _templateService;
+        private IContext _context;
         private string _initialSource;
         private string _currentSource;
         private int _sourceOffset;
-        private string _entryNamespace;
-        private string _entryName;
 
-        public Editor(ITemplateService templateService)
+        private TypeInfo _memberAccessType;
+        private SymbolInfo _memberAccessSymbol;
+
+        public Editor(ITemplateService templateService, IContext context)
         {
             _templateService = templateService;
             _references = CSharpCompiler.GetStandardReferences();
+            _context = context;
+            _context.ContextUpdated += Initialize;
         }
 
-        public void Initialize(string assemblyPath = null, string schemaNamespace = null)
+        void Initialize(string assemblyPath, string schemaNamespace)
         {
             // update references
             if (!string.IsNullOrEmpty(assemblyPath))
@@ -37,21 +45,34 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
             var semanticModel = GetModel(tree);
             _sourceOffset = _initialSource.IndexOf(SchemaConstants.Marker);
-
-            // find entry point
-            var nodes = tree.GetRoot().DescendantNodes();
-            // test code has more then one entry
-            var entryMethod = nodes.OfType<MethodDeclarationSyntax>().Last();
-            _entryNamespace = nodes.OfType<NamespaceDeclarationSyntax>().Last().Name.ToString();
-            _entryName = nodes.OfType<MethodDeclarationSyntax>().Last().Identifier.ValueText;
         }
 
-        public Models.EditContext UpdateSource(string sourceFragment, int updateIndex)
+        public EditContext UpdateSource(string sourceFragment, int updateIndex)
         {
-            throw new NotImplementedException();
+            if (sourceFragment[updateIndex] == '.')
+            {
+                // check if context is really member access
+                _currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
+                
+                var tree = CSharpSyntaxTree.ParseText(_currentSource);
+                var semanticModel = GetModel(tree);
+                var dotTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
+                var syntaxNode = tree.GetRoot().DescendantNodes(dotTextSpan).Last();
+                var ctx = syntaxNode is MemberAccessExpressionSyntax ? EditContext.MemberCompletion : EditContext.Unknown;
+
+                if (ctx == EditContext.MemberCompletion)
+                {
+                    var node = syntaxNode as MemberAccessExpressionSyntax;
+                    _memberAccessType = semanticModel.GetTypeInfo(node.Expression);
+                    _memberAccessSymbol = semanticModel.GetSymbolInfo(node.Expression);
+                }
+
+                return ctx;
+            }
+            return EditContext.Unknown;
         }
 
-        public IEnumerable<Models.SuggestionEntry> MemberCompletions()
+        public IEnumerable<SuggestionEntry> MemberCompletions()
         {
             throw new NotImplementedException();
         }
@@ -59,7 +80,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         private SemanticModel GetModel(SyntaxTree tree)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            var comp = CSharpCompilation.Create("d" + Guid.NewGuid().ToString().Replace("-", ""))
+            var comp = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("d"))
                 .AddReferences(_references)
                 .WithOptions(compilerOptions)
                 .AddSyntaxTrees(tree);

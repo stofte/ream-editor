@@ -1,4 +1,6 @@
-﻿using LinqEditor.Core.Templates;
+﻿using LinqEditor.Core.CodeAnalysis.Models;
+using LinqEditor.Core.Context;
+using LinqEditor.Core.Templates;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -9,6 +11,7 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
     public class EditorTests
     {
         private ITemplateService _templateService;
+        private IContext _context; 
 
         [TestFixtureSetUp]
         public void Initialize()
@@ -46,13 +49,25 @@ namespace Another.Generated
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
             _templateService = m.Object;
+            _context = new Context.Context();
         }
 
-        [Test]
-        public void Can_Initialize_Editor()
+        [TestCase("var x = new List<int>(); x.", Description="list")]
+        [TestCase("var x = new List<int>(); x.Select(x => x.", Description="lambda argument")]
+        [TestCase("int.", Description = "type alias")]
+        [TestCase("MyStatic.", Description = "static class")]
+        [TestCase("var s = new MyStruct { Bar = 22 }; s.", Description = "instance struct")]
+        [TestCase("MyStruct.", Description = "static struct")]
+        [TestCase("this.", Description="this")]
+        public void Editor_Returns_MemberCompletion_Context_For_Update(string src)
         {
-            var editor = new Services.Editor(_templateService);
-            editor.Initialize();
+            
+            var editor = new Services.Editor(_templateService, _context);
+            _context.UpdateContext("", ""); // fire bogus event
+            var ctx = editor.UpdateSource(src, src.Length - 1);
+            Assert.AreEqual(EditContext.MemberCompletion, ctx);
         }
+
+
     }
 }

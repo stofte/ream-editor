@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.CodeAnalysis.Models;
+﻿using LinqEditor.Core.CodeAnalysis.Helpers;
+using LinqEditor.Core.CodeAnalysis.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -86,37 +87,8 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             return new CompilerResult
             {
                 Success = compilationResult.Success,
-                Errors = compilationResult.Diagnostics.Where(e => e.Severity == DiagnosticSeverity.Error).Select(x =>
-                {
-                    var loc = x.Location.GetMappedLineSpan().Span;
-                    return new Error
-                    {
-                        // errors are for display purposes, so offsetting one
-                        Location = new LocationSpan
-                        {
-                            StartLine = loc.Start.Line+1,
-                            StartColumn = loc.Start.Character+1,
-                            EndLine = loc.End.Line+1,
-                            EndColumn = loc.End.Character+1
-                        },
-                        Message = x.GetMessage()
-                    };
-                }),
-                Warnings = compilationResult.Diagnostics.Where(w => w.Severity == DiagnosticSeverity.Warning).Select(x =>
-                {
-                    var loc = x.Location.GetMappedLineSpan().Span;
-                    return new Warning
-                    {
-                        Location = new LocationSpan
-                        {
-                            StartLine = loc.Start.Line+1,
-                            StartColumn = loc.Start.Character+1,
-                            EndLine = loc.End.Line+1,
-                            EndColumn = loc.End.Character+1
-                        },
-                        Message = x.GetMessage()
-                    };
-                }),
+                Errors = CodeAnalysisHelper.GetErrors(compilationResult.Diagnostics),
+                Warnings = CodeAnalysisHelper.GetWarnings(compilationResult.Diagnostics),
                 AssemblyBytes = compilationResult.Success && !generateFiles ? stream.ToArray() : null,
                 AssemblyPath = generateFiles ? filename + ".dll" : null
             };

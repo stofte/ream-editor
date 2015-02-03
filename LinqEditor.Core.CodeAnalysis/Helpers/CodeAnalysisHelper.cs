@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,45 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 {
     public static class CodeAnalysisHelper
     {
+        public static IEnumerable<Warning> GetWarnings(ImmutableArray<Diagnostic> diagnostics)
+        {
+            return diagnostics.Where(w => w.Severity == DiagnosticSeverity.Warning).Select(x =>
+            {
+                var loc = x.Location.GetMappedLineSpan().Span;
+                return new Warning
+                {
+                    Location = new LocationSpan
+                    {
+                        StartLine = loc.Start.Line + 1,
+                        StartColumn = loc.Start.Character + 1,
+                        EndLine = loc.End.Line + 1,
+                        EndColumn = loc.End.Character + 1
+                    },
+                    Message = x.GetMessage()
+                };
+            });
+        }
+
+        public static IEnumerable<Error> GetErrors(ImmutableArray<Diagnostic> diagnostics)
+        {
+            return diagnostics.Where(e => e.Severity == DiagnosticSeverity.Error).Select(x =>
+            {
+                var loc = x.Location.GetMappedLineSpan().Span;
+                return new Error
+                {
+                    // errors are for display purposes, so offsetting one
+                    Location = new LocationSpan
+                    {
+                        StartLine = loc.Start.Line + 1,
+                        StartColumn = loc.Start.Character + 1,
+                        EndLine = loc.End.Line + 1,
+                        EndColumn = loc.End.Character + 1
+                    },
+                    Message = x.GetMessage()
+                };
+            });
+        }
+
         public static IEnumerable<TypeMember> GetTypeExtensionMethods(TypeInfo typeInfo, ExtensionMethodCollection extensionMethods)
         {
             // fqn of interfaces the type implements

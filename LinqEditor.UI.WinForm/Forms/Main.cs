@@ -25,15 +25,13 @@ namespace LinqEditor.UI.WinForm.Forms
         OutputPane _outputPane;
 
         IBackgroundSession _connectionSession;
-        IContext _context;
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        public Main(IBackgroundSession session, IContext context, OutputPane outputPane, CodeEditor editor)
+        public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor)
         {
             _connectionSession = session;
-            _context = context;
             _statusBar = new StatusStrip();
             _statusBar.SuspendLayout();
             SuspendLayout();
@@ -167,7 +165,6 @@ namespace LinqEditor.UI.WinForm.Forms
         async void Main_Load(object sender, EventArgs e)
         {
             var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
-            _context.UpdateContext(result.AssemblyPath, result.SchemaNamespace);
             // loads appdomain and initializes connection
             await _connectionSession.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";

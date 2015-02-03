@@ -134,6 +134,7 @@ namespace LinqEditor.UI.WinForm.Controls
                         grid.AllowUserToResizeColumns = true;
                         grid.AllowUserToResizeRows = false; // less dragging action going on
                         grid.DefaultCellStyle.NullValue = "null";
+                        
                         grid.DataBindingComplete += GridDataBindingCompleteAutoSizeHandler;
                         grid.CellFormatting += GridCellFormatting;
                         newTab.Controls.Add(grid);
@@ -161,7 +162,11 @@ namespace LinqEditor.UI.WinForm.Controls
             if (e.Value != null && e.Value == DBNull.Value)
             {
                 e.CellStyle.ForeColor = Color.Silver;
+
             }
+            e.CellStyle.SelectionBackColor = ControlPaint.LightLight(ControlPaint.LightLight(ControlPaint.LightLight(SystemColors.Highlight))); // jeez
+            e.CellStyle.SelectionForeColor = SystemColors.ControlText;
+            e.CellStyle.Font = new System.Drawing.Font("Verdana", 8);
         }
 
         private void BindDiagnostics(IEnumerable<Error> errors, IEnumerable<Warning> warnings)

@@ -2,6 +2,7 @@
 using LinqEditor.Core.Backend.Models;
 using LinqEditor.Core.Backend.Settings;
 using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.Context;
 using LinqEditor.Core.Schema.Helpers;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;
@@ -22,15 +23,17 @@ namespace LinqEditor.Core.Backend.Repository
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
         private ISchemaStore _userSettings;
+        private IContext _context;
         private Stopwatch _watch;
 
         private Isolated<Runner> _container;
 
-        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings)
+        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context)
         {
             _schemaProvider = schemaProvider;
             _generator = generator;
             _userSettings = userSettings;
+            _context = context;
             _watch = new Stopwatch();
             _outputFolder = Core.PathUtility.CachePath;
         }
@@ -58,6 +61,8 @@ namespace LinqEditor.Core.Backend.Repository
                 // todo: probably want to store namespace in settings also
                 _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
             }
+
+            _context.UpdateContext(_schemaPath, _schemaNamespace);
 
             return new InitializeResult
             {

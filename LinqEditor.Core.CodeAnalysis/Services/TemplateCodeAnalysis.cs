@@ -82,14 +82,17 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 var tree = CSharpSyntaxTree.ParseText(_currentSource);
                 var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
                 var dotTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
-                var syntaxNode = tree.GetRoot().DescendantNodes(dotTextSpan).Last();
+
+                var syntaxNode = tree.GetRoot()
+                    .DescendantNodes(dotTextSpan)
+                    .OfType<MemberAccessExpressionSyntax>()
+                    .LastOrDefault();
                 
-                if (syntaxNode is MemberAccessExpressionSyntax)
+                if (syntaxNode != null)
                 {
-                    var node = syntaxNode as MemberAccessExpressionSyntax;
-                    if (node == null || node.Expression == null) goto exit;
-                    var typeInfo = semanticModel.GetTypeInfo(node.Expression);
-                    var symInfo = semanticModel.GetSymbolInfo(node.Expression);
+                    if (syntaxNode == null || syntaxNode.Expression == null) goto exit;
+                    var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Expression);
+                    var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Expression);
                     if (symInfo.Symbol == null) goto exit;
                     // should be ok to work with symbols
                     ctx = UserContext.MemberCompletion;

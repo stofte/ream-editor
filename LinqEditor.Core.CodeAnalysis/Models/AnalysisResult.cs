@@ -8,7 +8,7 @@ namespace LinqEditor.Core.CodeAnalysis.Models
 {
     public class AnalysisResult
     {
-        public IEnumerable<SuggestionEntry> MemberCompletions { get; set; }
-        public EditContext Context { get; set; }
+        public IEnumerable<CompletionEntry> MemberCompletions { get; set; }
+        public UserContext Context { get; set; }
     }
 }

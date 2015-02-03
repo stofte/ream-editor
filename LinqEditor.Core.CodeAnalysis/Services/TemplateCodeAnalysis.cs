@@ -68,8 +68,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
         public AnalysisResult Analyze(string sourceFragment, int updateIndex)
         {
-            var ctx = EditContext.Unknown;
-            IEnumerable<SuggestionEntry> suggestions = new List<SuggestionEntry>();
+            var ctx = UserContext.Unknown;
+            IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
 
             if (sourceFragment[updateIndex] == '.')
             {
@@ -80,9 +80,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 var semanticModel = GetModel(tree);
                 var dotTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
                 var syntaxNode = tree.GetRoot().DescendantNodes(dotTextSpan).Last();
-                ctx = syntaxNode is MemberAccessExpressionSyntax ? EditContext.MemberCompletion : EditContext.Unknown;
+                ctx = syntaxNode is MemberAccessExpressionSyntax ? UserContext.MemberCompletion : UserContext.Unknown;
 
-                if (ctx == EditContext.MemberCompletion)
+                if (ctx == UserContext.MemberCompletion)
                 {
                     var node = syntaxNode as MemberAccessExpressionSyntax;
                     var typeInfo = semanticModel.GetTypeInfo(node.Expression);
@@ -93,9 +93,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     // possibly use DeclaringSyntaxReferences.Count() == 0
                     var anyPrivate = typeInformation.Members.Where(x => x.Accessibility == AccessibilityModifier.Private).Count();
                     var isStatic = symInfo.Symbol.IsStatic || symInfo.Symbol.Kind == SymbolKind.NamedType;
-
-                    var debugExt = string.Join("|", extensions.Distinct(new TypeMember()).Select(x => x.Name).OrderBy(x => x));
-                    var debugMem = string.Join("|", typeInformation.Members.Distinct(new TypeMember()).Select(x => x.Name + ":" + x.Kind).OrderBy(x => x));
                     suggestions = MapSuggestions(typeInformation, extensions, isStatic);
                 }
             }
@@ -127,13 +124,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         /// <param name="extensionMethods">The extension methods.</param>
         /// <param name="staticAccess">if set to <c>true</c>, access is static (if false, access is instance).</param>
         /// <returns></returns>
-        private IEnumerable<SuggestionEntry> MapSuggestions(TypeInformation fullInfo, IEnumerable<TypeMember> extensionMethods, bool staticAccess)
+        private IEnumerable<CompletionEntry> MapSuggestions(TypeInformation fullInfo, IEnumerable<TypeMember> extensionMethods, bool staticAccess)
         {
             var l = fullInfo.Members
                 .Concat(extensionMethods)
                 .Where(x => x.IsStatic == staticAccess || x.Kind == MemberKind.ExtensionMethod)
                 .Distinct(new FilterByNameAndKind())
-                .Select(x => new SuggestionEntry { Kind = x.Kind, Value = x.Name });
+                .Select(x => new CompletionEntry { Kind = x.Kind, Value = x.Name });
             return l;
         }
     }

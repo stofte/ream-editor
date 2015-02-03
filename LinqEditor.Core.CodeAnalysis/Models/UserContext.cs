@@ -2,9 +2,9 @@
 namespace LinqEditor.Core.CodeAnalysis.Models
 {
     /// <summary>
-    /// Denotes the type of edit
+    /// Denotes the context for a user update
     /// </summary>
-    public enum EditContext
+    public enum UserContext
     {
         /// <summary>
         /// Accessing an objects members.

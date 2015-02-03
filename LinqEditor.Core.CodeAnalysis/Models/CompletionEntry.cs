@@ -5,8 +5,7 @@ namespace LinqEditor.Core.CodeAnalysis.Models
 {
     public class CompletionEntry
     {
-        public IList<IMethodSymbol> Methods { get; set; }
-        public string TypeName { get; set; }
-        public ITypeSymbol Symbol { get; set; }
+        public MemberKind Kind { get; set; }
+        public string Value { get; set; }
     }
 }

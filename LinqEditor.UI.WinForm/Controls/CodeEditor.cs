@@ -63,7 +63,7 @@ namespace LinqEditor.UI.WinForm.Controls
             if (e.Ch == '.')
             {
                 var result = await _codeAnalyzer.AnalyzeAsync(_editor.Text, _editor.CurrentPos-1);
-                if (result.Context == EditContext.MemberCompletion)
+                if (result.Context == UserContext.MemberCompletion)
                 {
                     _editor.AutoComplete.FillUpCharacters = "";
                     _editor.AutoComplete.List = GetAutoCompleteList(result.MemberCompletions);
@@ -72,7 +72,7 @@ namespace LinqEditor.UI.WinForm.Controls
             }
         }
 
-        private List<string> GetAutoCompleteList(IEnumerable<SuggestionEntry> suggestions)
+        private List<string> GetAutoCompleteList(IEnumerable<CompletionEntry> suggestions)
         {
             return suggestions.Select(x => string.Format("{0}?{1}", x.Value, (int)x.Kind)).ToList();
         }

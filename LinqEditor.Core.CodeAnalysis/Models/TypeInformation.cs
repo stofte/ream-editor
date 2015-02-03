@@ -3,7 +3,7 @@
 namespace LinqEditor.Core.CodeAnalysis.Models
 {
     /// <summary>
-    /// Contains type information for available types
+    /// Contains all type information for the type
     /// </summary>
     public class TypeInformation
     {

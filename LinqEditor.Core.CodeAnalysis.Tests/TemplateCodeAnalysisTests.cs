@@ -55,17 +55,17 @@ namespace Another.Generated
         }
 
         // "." is last char
-        [TestCase("var x = new List<int>(); x.", EditContext.MemberCompletion, Description = "generic integer list")]
-        [TestCase("var x = new List<int>(); x.Select(x => x.", EditContext.MemberCompletion, Description = "lambda argument")]
-        [TestCase("int.", EditContext.MemberCompletion, Description = "type alias")]
-        [TestCase("MyStatic.", EditContext.MemberCompletion, Description = "static class")]
-        [TestCase("var s = new MyStruct { Bar = 22 }; s.", EditContext.MemberCompletion, Description = "instance struct")]
-        [TestCase("MyStruct.", EditContext.MemberCompletion, Description = "static struct")]
-        [TestCase("this.", EditContext.MemberCompletion, Description = "this")]
+        [TestCase("var x = new List<int>(); x.", UserContext.MemberCompletion, Description = "generic integer list")]
+        [TestCase("var x = new List<int>(); x.Select(x => x.", UserContext.MemberCompletion, Description = "lambda argument")]
+        [TestCase("int.", UserContext.MemberCompletion, Description = "type alias")]
+        [TestCase("MyStatic.", UserContext.MemberCompletion, Description = "static class")]
+        [TestCase("var s = new MyStruct { Bar = 22 }; s.", UserContext.MemberCompletion, Description = "instance struct")]
+        [TestCase("MyStruct.", UserContext.MemberCompletion, Description = "static struct")]
+        [TestCase("this.", UserContext.MemberCompletion, Description = "this")]
         // not member completions
-        [TestCase("var x = new List<int>();", EditContext.Unknown, Description = "statement terminator")]
-        [TestCase("3423", EditContext.Unknown, Description = "illegal token?")]
-        public void TemplateCodeAnalysis_Returns_Correct_Context_For_Analyse(string src, EditContext editContex)
+        [TestCase("var x = new List<int>();", UserContext.Unknown, Description = "statement terminator")]
+        [TestCase("3423", UserContext.Unknown, Description = "illegal token?")]
+        public void TemplateCodeAnalysis_Returns_Correct_Context_For_Analyse(string src, UserContext editContex)
         {
             
             var editor = new TemplateCodeAnalysis(_templateService, _context);

@@ -10,5 +10,7 @@ namespace LinqEditor.Core.CodeAnalysis.Models
     {
         public IEnumerable<CompletionEntry> MemberCompletions { get; set; }
         public UserContext Context { get; set; }
+        public IEnumerable<Warning> Warnings { get; set; }
+        public IEnumerable<Error> Errors { get; set; }
     }
 }

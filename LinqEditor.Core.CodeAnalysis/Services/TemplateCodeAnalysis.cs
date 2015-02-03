@@ -24,7 +24,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         private string _currentSource;
         private int _sourceOffset;
         ExtensionMethodCollection _extensionMethods;
-
+        
         /// <summary>
         /// Filters by VS semantics (name and kind)
         /// </summary>
@@ -53,7 +53,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
             _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
-            var semanticModel = GetModel(tree);
+            IEnumerable<Warning> warnings = new List<Warning>();
+            IEnumerable<Error> errors = new List<Error>();
+            var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
             _extensionMethods = CodeAnalysisHelper.GetExtensionMethods(semanticModel);
             _sourceOffset = _initialSource.IndexOf(SchemaConstants.Marker);
             _initialized = true;
@@ -70,41 +72,48 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         {
             var ctx = UserContext.Unknown;
             IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
+            IEnumerable<Warning> warnings = new List<Warning>();
+            IEnumerable<Error> errors = new List<Error>();
 
             if (sourceFragment[updateIndex] == '.')
             {
                 // check if context is really member access
                 _currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
-                
                 var tree = CSharpSyntaxTree.ParseText(_currentSource);
-                var semanticModel = GetModel(tree);
+                var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
                 var dotTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
                 var syntaxNode = tree.GetRoot().DescendantNodes(dotTextSpan).Last();
-                ctx = syntaxNode is MemberAccessExpressionSyntax ? UserContext.MemberCompletion : UserContext.Unknown;
-
-                if (ctx == UserContext.MemberCompletion)
+                
+                if (syntaxNode is MemberAccessExpressionSyntax)
                 {
                     var node = syntaxNode as MemberAccessExpressionSyntax;
+                    if (node == null || node.Expression == null) goto exit;
                     var typeInfo = semanticModel.GetTypeInfo(node.Expression);
                     var symInfo = semanticModel.GetSymbolInfo(node.Expression);
+                    if (symInfo.Symbol == null) goto exit;
+                    // should be ok to work with symbols
+                    ctx = UserContext.MemberCompletion;
                     // get all applicable extensions
                     var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo, _extensionMethods);
                     var typeInformation = CodeAnalysisHelper.GetTypeInformation(typeInfo, symInfo.Symbol);
                     // possibly use DeclaringSyntaxReferences.Count() == 0
                     var anyPrivate = typeInformation.Members.Where(x => x.Accessibility == AccessibilityModifier.Private).Count();
                     var isStatic = symInfo.Symbol.IsStatic || symInfo.Symbol.Kind == SymbolKind.NamedType;
+
                     suggestions = MapSuggestions(typeInformation, extensions, isStatic);
                 }
             }
-
+            exit:
             return new AnalysisResult
             {
                 Context = ctx,
-                MemberCompletions = suggestions.OrderBy(x => x.Value).ThenBy(x => x.Kind)
+                MemberCompletions = suggestions.OrderBy(x => x.Value).ThenBy(x => x.Kind),
+                Errors = errors,
+                Warnings = warnings
             };
         }
         
-        private SemanticModel GetModel(SyntaxTree tree)
+        private SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var comp = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("d"))
@@ -113,6 +122,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 .AddSyntaxTrees(tree);
 
             var diag = comp.GetDiagnostics();
+            warnings = CodeAnalysisHelper.GetWarnings(diag);
+            errors = CodeAnalysisHelper.GetErrors(diag);
             return comp.GetSemanticModel(tree);
         }
 

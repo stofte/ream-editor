@@ -98,11 +98,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="CompletionTests.cs" />
     <Compile Include="CSharpCompilerTests.cs" />
-    <Compile Include="EditorTests.cs" />
+    <Compile Include="TemplateCodeAnalysisTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeInformationStoreTests.cs" />
     <Compile Include="VSCompletionTestData.cs" />
   </ItemGroup>
   <ItemGroup>

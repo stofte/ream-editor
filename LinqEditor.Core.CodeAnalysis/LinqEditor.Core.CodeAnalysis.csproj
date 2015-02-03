@@ -89,16 +89,13 @@
   <ItemGroup>
     <Compile Include="Compiler\CompilerResults.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
-    <Compile Include="Editor\BackgroundCompletion.cs" />
-    <Compile Include="Editor\Completion.cs" />
-    <Compile Include="Editor\IBackgroundCompletion.cs" />
-    <Compile Include="Editor\ICompletion.cs" />
-    <Compile Include="Editor\IValidation.cs" />
-    <Compile Include="Editor\Validation.cs" />
+    <Compile Include="Helpers\CodeAnalysisHelper.cs" />
     <Compile Include="Installers\Installer.cs" />
+    <Compile Include="Models\AnalysisResult.cs" />
     <Compile Include="Models\CompletionEntry.cs" />
     <Compile Include="Models\EditContext.cs" />
     <Compile Include="Models\Error.cs" />
+    <Compile Include="Models\ExtensionMethodCollection.cs" />
     <Compile Include="Models\LocationSpan.cs" />
     <Compile Include="Models\AccessibilityModifier.cs" />
     <Compile Include="Models\MemberKind.cs" />
@@ -109,10 +106,14 @@
     <Compile Include="Models\ValidationResults.cs" />
     <Compile Include="Models\Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\ISemanticStore.cs" />
-    <Compile Include="Repositories\SemanticStore.cs" />
-    <Compile Include="Services\Editor.cs" />
-    <Compile Include="Services\IEditor.cs" />
+    <Compile Include="Services\AsyncTemplateCodeAnalysis.cs" />
+    <Compile Include="Services\IAsyncTemplateCodeAnalysis.cs" />
+    <Compile Include="Services\ITemplateCodeAnalysis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Services\TemplateCodeAnalysis.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

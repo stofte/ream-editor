@@ -1,0 +1,139 @@
+﻿using LinqEditor.Core.CodeAnalysis.Models;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LinqEditor.Core.CodeAnalysis.Helpers
+{
+    public static class CodeAnalysisHelper
+    {
+        public static IEnumerable<TypeMember> GetTypeExtensionMethods(TypeInfo typeInfo, ExtensionMethodCollection extensionMethods)
+        {
+            // fqn of interfaces the type implements
+            var interfaceNames = typeInfo.Type.AllInterfaces.Select(x =>
+                x.ConstructedFrom != null && x.ConstructedFrom != x ?
+                x.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) :
+                x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+            // extensionmethods matching interfaces
+            var possibleExtensions = interfaceNames
+                .SelectMany(x => extensionMethods.ContainsKey(x) ? extensionMethods[x] : new List<TypeMember>());
+
+            return possibleExtensions;
+        }
+
+        public static TypeInformation GetTypeInformation(TypeInfo typeInfo, ISymbol symbolInfo)
+        {
+            var t = typeInfo.Type;
+
+            Func<Accessibility, AccessibilityModifier> mapAccess = (mod) =>
+                mod == Accessibility.Public ? AccessibilityModifier.Public :
+                mod == Accessibility.Protected ? AccessibilityModifier.Protected :
+                AccessibilityModifier.Private;
+            
+            var methods = t.GetMembers().OfType<IMethodSymbol>()
+                .Where(x => x.CanBeReferencedByName)
+                .Select(x => new TypeMember
+                {
+                    IsStatic = x.IsStatic,
+                    Accessibility = mapAccess(x.DeclaredAccessibility),
+                    Kind = MemberKind.Method,
+                    Name = x.Name
+                });
+
+            var properties = t.GetMembers().OfType<IPropertySymbol>()
+                .Where(x => x.CanBeReferencedByName && !x.IsIndexer)
+                .Select(x => new TypeMember
+                {
+                    IsStatic = x.IsStatic,
+                    Accessibility = mapAccess(x.DeclaredAccessibility),
+                    Kind = MemberKind.Property,
+                    Name = x.Name
+                });
+
+            var fields = t.GetMembers().OfType<IFieldSymbol>()
+                .Where(x => x.CanBeReferencedByName)
+                .Select(x => new TypeMember
+                {
+                    IsStatic = x.IsStatic,
+                    Accessibility = mapAccess(x.DeclaredAccessibility),
+                    Kind = MemberKind.Field,
+                    Name = x.Name
+                });
+
+            var objectEntries = new[] {
+                new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
+                new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "ReferenceEquals" },
+
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "GetHashCode" },
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "GetType" },
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "ToString" }
+            };
+
+            return new TypeInformation
+            {
+                IsStatic = t.IsStatic,
+                Name = t.Name,
+                Namespace = t.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                Members = methods.Concat(properties).Concat(fields).Concat(objectEntries)
+            };
+        }
+
+
+        /// <summary>
+        /// Gets the extension methods available inside the scope of the last method.
+        /// </summary>
+        public static ExtensionMethodCollection GetExtensionMethods(SemanticModel model)
+        {
+            // find entry point
+            var nodes = model.SyntaxTree.GetRoot().DescendantNodes();
+            // test code has more then one entry
+            var entryMethod = nodes.OfType<MethodDeclarationSyntax>().Last();
+            var methodBody = entryMethod
+                .DescendantNodes().OfType<StatementSyntax>().First();
+
+            // gets static types available at location
+            var availableTypes = model
+                .LookupSymbols(methodBody.Span.Start)
+                .OfType<INamedTypeSymbol>()
+                .Where(x => x.CanBeReferencedByName && x.IsStatic && !x.IsAbstract);
+
+            // lookup extension methods on available types
+            var availableExtensionMethods = new List<IMethodSymbol>();
+            foreach (var type in availableTypes)
+            {
+                var methods = type.GetMembers().OfType<IMethodSymbol>();
+                var extensions = methods.Where(m => m.IsExtensionMethod && m.CanBeReferencedByName);
+                availableExtensionMethods.AddRange(extensions);
+            }
+
+            var dict = new ExtensionMethodCollection();
+            foreach (var m in availableExtensionMethods)
+            {
+                var t = m.Parameters.First().Type;
+                var key = t.OriginalDefinition != null && t.OriginalDefinition != t ?
+                    t.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) :
+                    t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                if (!dict.ContainsKey(key))
+                {
+                    dict.Add(key, new List<TypeMember>());
+                }
+                dict[key].Add(new TypeMember
+                {
+                    Accessibility = AccessibilityModifier.Public,
+                    IsStatic = true,
+                    Kind = MemberKind.ExtensionMethod,
+                    Name = m.Name
+                });
+            }
+
+            return dict;
+        }
+    }
+}

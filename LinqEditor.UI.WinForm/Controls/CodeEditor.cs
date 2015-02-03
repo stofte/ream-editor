@@ -1,30 +1,23 @@
 ﻿using LinqEditor.Core.Context;
-using LinqEditor.Core.CodeAnalysis.Editor;
 using LinqEditor.Core.CodeAnalysis.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using LinqEditor.Core.CodeAnalysis.Services;
 
 namespace LinqEditor.UI.WinForm.Controls
 {
     public class CodeEditor : UserControl
     {
         ScintillaNET.Scintilla _editor;
-        IContext _context;
-        IBackgroundCompletion _completionHelper { get; set; }
+        IAsyncTemplateCodeAnalysis _codeAnalyzer;
 
         public string SourceCode { get { return _editor.Text; } }
 
-        public CodeEditor(IBackgroundCompletion completion, IContext context)
+        public CodeEditor(IAsyncTemplateCodeAnalysis codeAnalyzer)
         {
-            _completionHelper = completion;
-            _context = context;
-            _context.ContextUpdated += async delegate(string path, string schema) 
-            {
-                await _completionHelper.InitializeAsync(path, schema);
-            };
-
+            _codeAnalyzer = codeAnalyzer;
             InitializeComponent();
         }
 
@@ -65,15 +58,17 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
         {
-            if (_completionHelper == null) return;
+            if (!_codeAnalyzer.IsReady) return;
 
             if (e.Ch == '.')
-            {                
-                await _completionHelper.UpdateFragmentAsync(_editor.Text);
-                var result = await _completionHelper.MemberAccessExpressionCompletionsAsync(_editor.CurrentPos);
-                _editor.AutoComplete.FillUpCharacters = "";
-                _editor.AutoComplete.List = GetAutoCompleteList(result.Suggestions);
-                _editor.AutoComplete.Show();
+            {
+                var result = await _codeAnalyzer.AnalyzeAsync(_editor.Text, _editor.CurrentPos-1);
+                if (result.Context == EditContext.MemberCompletion)
+                {
+                    _editor.AutoComplete.FillUpCharacters = "";
+                    _editor.AutoComplete.List = GetAutoCompleteList(result.MemberCompletions);
+                    _editor.AutoComplete.Show();
+                }
             }
         }
 

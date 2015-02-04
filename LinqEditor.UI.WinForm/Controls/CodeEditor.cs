@@ -23,15 +23,18 @@ namespace LinqEditor.UI.WinForm.Controls
 
         private void InitializeComponent()
         {
-            var font = new System.Drawing.Font("Consolas", 10);
-            
+            var editorFont = new System.Drawing.Font("Consolas", 10);
+
             _editor = new ScintillaNET.Scintilla();
             var initEditor = _editor as ISupportInitialize;
             initEditor.BeginInit();
             _editor.Dock = DockStyle.Fill;
             _editor.ConfigurationManager.Language = "C#";
+            _editor.Margins[1].Width = 0; // not sure what this is
+            _editor.MatchBraces = true;
             _editor.LineWrapping.VisualFlags = ScintillaNET.LineWrappingVisualFlags.End;
-            _editor.Font = font;
+            _editor.Caret.Width = 2;
+            _editor.Font = editorFont;
             _editor.Name = "_scintilla";
             _editor.TabIndex = 0;
             _editor.Text = "CodeListItem.Take(10).Dump();";

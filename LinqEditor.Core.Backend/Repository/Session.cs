@@ -103,7 +103,6 @@ namespace LinqEditor.Core.Backend.Repository
 
         public LoadAppDomainResult LoadAppDomain()
         {
-            
             // loads schema in new appdomain
             _container = new Isolated<Runner>();
             var initResult = _container.Value.Initialize(_schemaPath, _connectionString);

@@ -1,6 +1,6 @@
 ﻿using LinqEditor.Core;
 using LinqEditor.Core.Helpers;
-using LinqEditor.Core.Schema.Models;
+using LinqEditor.Core.Models.Database;
 using System.Configuration;
 using System.IO;
 

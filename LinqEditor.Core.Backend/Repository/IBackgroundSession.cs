@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Backend.Models;
+﻿using LinqEditor.Core.Models.Editor;
 using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Backend.Repository

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LinqEditor.Core.Schema.Models
+namespace LinqEditor.Core.Models.Database
 {
     [Serializable]
     public class ColumnSchema

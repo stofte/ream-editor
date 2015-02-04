@@ -95,12 +95,11 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LinqEditor.Core.Schema\LinqEditor.Core.Schema.csproj">
-      <Project>{2bea4dec-069d-4c2c-a022-f9696c268e64}</Project>
-      <Name>LinqEditor.Core.Schema</Name>
+    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
+      <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
+      <Name>LinqEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

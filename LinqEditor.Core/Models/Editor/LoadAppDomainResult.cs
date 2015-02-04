@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LinqEditor.Core.Backend.Models
+namespace LinqEditor.Core.Models.Editor
 {
     [Serializable]
     public class LoadAppDomainResult

@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Schema.Helpers;
+﻿using LinqEditor.Core.Helpers;
 using System;
 
 namespace LinqEditor.Core.Templates.Code

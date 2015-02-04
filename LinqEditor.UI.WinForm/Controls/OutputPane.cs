@@ -1,5 +1,5 @@
-﻿using LinqEditor.Core.Backend.Models;
-using LinqEditor.Core.CodeAnalysis.Models;
+﻿using LinqEditor.Core.Models.Editor;
+using LinqEditor.Core.Models.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -201,8 +201,6 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 DisplayedRowCountUpdated(rows);
             }
-            
-            //_rowCountLabel.Text = string.Format("{0} rows", rows);
         }
         
         void TabClientSizeChangedHandler(object sender, EventArgs e)
@@ -237,20 +235,20 @@ namespace LinqEditor.UI.WinForm.Controls
 
             for (var i = 0; i < grid.Columns.Count; i++)
             {
-                var mode = DataGridViewAutoSizeColumnMode.AllCells; 
-                if (i == grid.Columns.Count - 1) {
-                    var previousColWidth = 0;
-                    for (var j = 0; j < grid.Columns.Count - 1; j++ ) 
-                    {
-                        previousColWidth += grid.Columns[j].Width;
-                    }
-                    // assume the last cell needs on average the same as the rest.
-                    if (previousColWidth + (previousColWidth / (grid.Columns.Count - 1)) < gridWidth)
-                    {
-                        mode = DataGridViewAutoSizeColumnMode.Fill;
-                    }
-                }
-                grid.Columns[i].AutoSizeMode = mode;
+                //var mode = DataGridViewAutoSizeColumnMode.AllCells; 
+                //if (i == grid.Columns.Count - 1) {
+                //    var previousColWidth = 0;
+                //    for (var j = 0; j < grid.Columns.Count - 1; j++ ) 
+                //    {
+                //        previousColWidth += grid.Columns[j].Width;
+                //    }
+                //    // assume the last cell needs on average the same as the rest.
+                //    if (previousColWidth + (previousColWidth / (grid.Columns.Count - 1)) < gridWidth)
+                //    {
+                //        mode = DataGridViewAutoSizeColumnMode.Fill;
+                //    }
+                //}
+                grid.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             }
 
             for (var i = 0; i < grid.Columns.Count; i++)

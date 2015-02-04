@@ -1,5 +1,5 @@
-﻿using LinqEditor.Core.Schema.Helpers;
-using LinqEditor.Core.Schema.Models;
+﻿using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Database;
 using System;
 using System.Collections.Generic;
 

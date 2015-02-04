@@ -1,6 +1,6 @@
 ﻿using IQToolkit.Data;
 using LinqEditor.Core.Generated;
-using LinqEditor.Core.Backend.Models;
+using LinqEditor.Core.Models.Editor;
 using System;
 using System.IO;
 using System.Reflection;

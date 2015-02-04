@@ -1,9 +1,9 @@
 ﻿using LinqEditor.Core.Backend.Isolated;
-using LinqEditor.Core.Backend.Models;
+using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Backend.Settings;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Context;
-using LinqEditor.Core.Schema.Helpers;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;
 using System;

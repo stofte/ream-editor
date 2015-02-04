@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Schema.Models;
+﻿using LinqEditor.Core.Models.Database;
 using System;
 
 namespace LinqEditor.Core.Templates

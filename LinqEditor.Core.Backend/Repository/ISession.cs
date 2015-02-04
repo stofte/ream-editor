@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Backend.Models;
+﻿using LinqEditor.Core.Models.Editor;
 
 namespace LinqEditor.Core.Backend.Repository
 {

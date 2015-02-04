@@ -1,8 +1,8 @@
 ﻿using LinqEditor.Core;
 using LinqEditor.Core.Backend.Isolated;
 using LinqEditor.Core.CodeAnalysis.Compiler;
-using LinqEditor.Core.Schema.Helpers;
-using LinqEditor.Core.Schema.Models;
+using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;
 using LinqEditor.Test.Common.SqlServer;

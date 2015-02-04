@@ -1,9 +1,9 @@
-﻿using LinqEditor.Core.CodeAnalysis.Models;
+﻿using LinqEditor.Core.Models.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace LinqEditor.Core.Backend.Models
+namespace LinqEditor.Core.Models.Editor
 {
     // todo: split into code<->backend and ui<->backend parts
     [Serializable]

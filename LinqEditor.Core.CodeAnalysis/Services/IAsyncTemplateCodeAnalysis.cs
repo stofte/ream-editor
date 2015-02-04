@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.CodeAnalysis.Models;
+﻿using LinqEditor.Core.Models.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;

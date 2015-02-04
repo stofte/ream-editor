@@ -1,7 +1,8 @@
 ﻿using LinqEditor.Core;
 using LinqEditor.Core.CodeAnalysis.Compiler;
-using LinqEditor.Core.Schema.Helpers;
-using LinqEditor.Core.Schema.Models;
+using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Editor;
+using LinqEditor.Core.Models.Database;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

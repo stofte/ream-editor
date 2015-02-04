@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.CodeAnalysis.Models
+namespace LinqEditor.Core.Models.Analysis
 {
     public class AnalysisResult
     {

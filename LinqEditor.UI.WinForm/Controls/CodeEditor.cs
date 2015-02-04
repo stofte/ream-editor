@@ -1,5 +1,5 @@
 ﻿using LinqEditor.Core.Context;
-using LinqEditor.Core.CodeAnalysis.Models;
+using LinqEditor.Core.Models.Analysis;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;

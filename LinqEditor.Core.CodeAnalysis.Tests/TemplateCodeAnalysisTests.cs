@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.CodeAnalysis.Models;
+﻿using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Context;
 using LinqEditor.Core.Templates;

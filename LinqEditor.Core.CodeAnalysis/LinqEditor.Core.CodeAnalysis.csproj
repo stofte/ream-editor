@@ -91,17 +91,6 @@
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Helpers\CodeAnalysisHelper.cs" />
     <Compile Include="Installers\Installer.cs" />
-    <Compile Include="Models\AnalysisResult.cs" />
-    <Compile Include="Models\CompletionEntry.cs" />
-    <Compile Include="Models\UserContext.cs" />
-    <Compile Include="Models\Error.cs" />
-    <Compile Include="Models\ExtensionMethodCollection.cs" />
-    <Compile Include="Models\LocationSpan.cs" />
-    <Compile Include="Models\AccessibilityModifier.cs" />
-    <Compile Include="Models\MemberKind.cs" />
-    <Compile Include="Models\TypeInformation.cs" />
-    <Compile Include="Models\TypeMember.cs" />
-    <Compile Include="Models\Warning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AsyncTemplateCodeAnalysis.cs" />
     <Compile Include="Services\IAsyncTemplateCodeAnalysis.cs" />

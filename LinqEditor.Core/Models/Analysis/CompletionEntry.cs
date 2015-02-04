@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 
-namespace LinqEditor.Core.CodeAnalysis.Models
+namespace LinqEditor.Core.Models.Analysis
 {
     public class CompletionEntry
     {

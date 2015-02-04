@@ -1,6 +1,6 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Helpers;
-using LinqEditor.Core.CodeAnalysis.Models;
+using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Context;
 using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Templates;

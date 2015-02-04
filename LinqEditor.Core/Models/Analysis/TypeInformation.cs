@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LinqEditor.Core.CodeAnalysis.Models
+namespace LinqEditor.Core.Models.Analysis
 {
     /// <summary>
     /// Contains all type information for the type

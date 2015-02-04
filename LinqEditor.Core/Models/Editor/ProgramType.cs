@@ -1,5 +1,5 @@
 ﻿
-namespace LinqEditor.Core.Backend.Models
+namespace LinqEditor.Core.Models.Editor
 {
     public enum ProgramType
     {

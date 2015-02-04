@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Schema.Models;
+﻿using LinqEditor.Core.Models.Database;
 
 namespace LinqEditor.Core.Backend.Settings
 {

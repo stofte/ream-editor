@@ -1,5 +1,5 @@
 ﻿
-namespace LinqEditor.Core.CodeAnalysis.Models
+namespace LinqEditor.Core.Models.Analysis
 {
     /// <summary>
     /// Denotes the context for a user update

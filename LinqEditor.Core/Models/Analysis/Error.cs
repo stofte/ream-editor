@@ -1,7 +1,7 @@
 ﻿
-namespace LinqEditor.Core.CodeAnalysis.Models
+namespace LinqEditor.Core.Models.Analysis
 {
-    public class Warning
+    public class Error
     {
         public string Message { get; set; }
         public LocationSpan Location { get; set; }

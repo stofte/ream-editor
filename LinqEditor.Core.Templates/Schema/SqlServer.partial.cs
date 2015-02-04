@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Schema.Models;
+﻿using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Database;
 using System;
 using System.Collections.Generic;
 
@@ -11,7 +12,7 @@ namespace LinqEditor.Core.Templates.Schema
 
         public string GeneratedSchemaNamespace
         {
-            get { return "s" + NamespaceId.ToString().Replace("-", ""); }
+            get { return NamespaceId.ToIdentifierWithPrefix("s"); }
         }
     }
 }

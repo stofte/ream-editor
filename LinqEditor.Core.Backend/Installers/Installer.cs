@@ -13,8 +13,6 @@ namespace LinqEditor.Core.Backend.Installers
             container.Register(Component.For<IBackgroundSession>()
                                         .ImplementedBy<Repository.BackgroundSession>()
                                         .LifestyleScoped());
-            container.Register(Component.For<Settings.ISchemaStore>()
-                                        .ImplementedBy<Settings.SchemaStore>());
         }
     }
 }

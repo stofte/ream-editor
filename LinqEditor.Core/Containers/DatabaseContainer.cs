@@ -60,7 +60,7 @@ namespace LinqEditor.Core.Containers
                     var instance = Activator.CreateInstance(warmupType) as IDatabaseProgram;
                     var res = ExecuteInstance(instance);
                 }
-                base.Initialize();
+                base.InitializeAppDomain();
             }
             catch (Exception e)
             {
@@ -75,22 +75,11 @@ namespace LinqEditor.Core.Containers
 
         private ExecuteResult Execute(byte[] assembly, string path)
         {
-            try
-            {
-                var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
-                var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
+            var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
+            var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));
 
-                var instance = Activator.CreateInstance(queryType) as IDatabaseProgram;
-                return ExecuteInstance(instance);
-            }
-            catch (Exception e)
-            {
-                return new ExecuteResult
-                {
-                    Exception = e,
-                    Success = false
-                };
-            }
+            var instance = Activator.CreateInstance(queryType) as IDatabaseProgram;
+            return ExecuteInstance(instance);
         }
 
         private ExecuteResult ExecuteInstance(IDatabaseProgram instance)

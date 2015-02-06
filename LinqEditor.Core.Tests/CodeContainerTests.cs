@@ -1,6 +1,7 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Templates;
+using LinqEditor.Core.Containers;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -19,8 +20,10 @@ namespace LinqEditor.Core.Tests
         public void Initialize()
         {
             var templateService = new TemplateService();
-            var result1 = CSharpCompiler.CompileToFile(_source1, _id1.ToIdentifierWithPrefix("d"), PathUtility.TempPath);
-            var result2 = CSharpCompiler.CompileToBytes(_source1, _id1.ToIdentifierWithPrefix("d"));
+            _id1 = Guid.NewGuid();
+            _source1 = templateService.GenerateCodeStatements(_id1, "Write(\"foobar\");");
+            var result1 = CSharpCompiler.CompileToFile(_source1, _id1.ToIdentifierWithPrefix(SchemaConstants.CodePrefix), PathUtility.TempPath);
+            var result2 = CSharpCompiler.CompileToBytes(_source1, _id1.ToIdentifierWithPrefix(SchemaConstants.CodePrefix));
             _path1 = result1.AssemblyPath;
             _bytes1 = result2.AssemblyBytes;
         }
@@ -30,8 +33,18 @@ namespace LinqEditor.Core.Tests
         {
             if (File.Exists(_path1))
             {
-
+                File.Delete(_path1);
             }
+        }
+
+        [Test]
+        public void Can_Execute_Simple_Statements_With_Write()
+        {
+            var container = new Isolated<CodeContainer>();
+            container.Value.Initialize();
+            var result = container.Value.Execute(_path1);
+            container.Dispose();
+            Assert.AreEqual("foobar", result.CodeOutput);
         }
     }
 }

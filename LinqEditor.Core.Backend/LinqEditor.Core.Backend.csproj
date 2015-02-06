@@ -46,15 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Installers\Installer.cs" />
-    <Compile Include="Isolated\Runner.cs" />
-    <Compile Include="Isolated\Isolated.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\BackgroundSession.cs" />
     <Compile Include="Repository\IBackgroundSession.cs" />
     <Compile Include="Repository\ISession.cs" />
     <Compile Include="Repository\Session.cs" />
-    <Compile Include="Settings\ISchemaStore.cs" />
-    <Compile Include="Settings\SchemaStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

@@ -10,7 +10,7 @@ namespace LinqEditor.Core.Templates.Code
 
         public string GeneratedNamespace
         {
-            get { return NamespaceId.ToIdentifierWithPrefix("c"); }
+            get { return NamespaceId.ToIdentifierWithPrefix(SchemaConstants.CodePrefix); }
         }
     }
 }

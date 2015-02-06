@@ -120,6 +120,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scopes\EditorScopeAccessor.cs" />
     <Compile Include="SerializableStringDictionary.cs" />
+    <Compile Include="Settings\ISchemaStore.cs" />
+    <Compile Include="Settings\SchemaStore.cs" />
     <Compile Include="SystemTime.cs" />
     <Compile Include="PathUtility.cs" />
   </ItemGroup>

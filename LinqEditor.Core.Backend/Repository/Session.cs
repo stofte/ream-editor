@@ -1,5 +1,5 @@
 ﻿using LinqEditor.Core.Models.Editor;
-using LinqEditor.Core.Backend.Settings;
+using LinqEditor.Core.Settings;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Context;
 using LinqEditor.Core.Helpers;
@@ -44,7 +44,7 @@ namespace LinqEditor.Core.Backend.Repository
             _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
             if (string.IsNullOrEmpty(_schemaPath))
             {
-                _schemaNamespace = _sessionId.ToIdentifierWithPrefix("s");
+                _schemaNamespace = _sessionId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
                 var sqlSchema = _schemaProvider.GetSchema(_connectionString);
                 var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
                 var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
@@ -75,7 +75,7 @@ namespace LinqEditor.Core.Backend.Repository
             _watch.Restart();
             var queryId = Guid.NewGuid();
             var querySource = _generator.GenerateQuery(queryId, sourceFragment, _schemaNamespace);
-            var result = CSharpCompiler.CompileToBytes(querySource, queryId.ToIdentifierWithPrefix("q"), _schemaPath);
+            var result = CSharpCompiler.CompileToBytes(querySource, queryId.ToIdentifierWithPrefix(SchemaConstants.QueryPrefix), _schemaPath);
 
             if (result.Success)
             {

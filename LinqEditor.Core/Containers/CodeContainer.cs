@@ -13,7 +13,7 @@ namespace LinqEditor.Core.Containers
     {
         public LoadAppDomainResult Initialize()
         {
-            base.Initialize();
+            base.InitializeAppDomain();
             return new LoadAppDomainResult();
         }
 

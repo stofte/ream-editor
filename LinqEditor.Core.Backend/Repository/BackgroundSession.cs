@@ -1,5 +1,5 @@
 ﻿using LinqEditor.Core.Models.Editor;
-using LinqEditor.Core.Backend.Settings;
+using LinqEditor.Core.Settings;
 using LinqEditor.Core.Context;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;

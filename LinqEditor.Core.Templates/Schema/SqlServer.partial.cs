@@ -12,7 +12,7 @@ namespace LinqEditor.Core.Templates.Schema
 
         public string GeneratedSchemaNamespace
         {
-            get { return NamespaceId.ToIdentifierWithPrefix("s"); }
+            get { return NamespaceId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix); }
         }
     }
 }

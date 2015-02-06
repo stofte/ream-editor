@@ -15,7 +15,7 @@ namespace LinqEditor.Core.Templates.Query
         // todo duplicated from schema
         public string GeneratedQueryNamespace
         {
-            get { return NamespaceId.ToIdentifierWithPrefix("q"); }
+            get { return NamespaceId.ToIdentifierWithPrefix(SchemaConstants.QueryPrefix); }
         }
     }
 }

@@ -119,7 +119,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         private SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-            var comp = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("d"))
+            var comp = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix(SchemaConstants.QueryPrefix))
                 .AddReferences(_references)
                 .WithOptions(compilerOptions)
                 .AddSyntaxTrees(tree);

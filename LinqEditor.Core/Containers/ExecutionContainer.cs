@@ -17,7 +17,7 @@ namespace LinqEditor.Core.Containers
         protected Assembly _baseAssembly;
         protected ProgramType _runnerType;
 
-        protected void Initialize()
+        protected void InitializeAppDomain()
         {
             // i dont get how the runtime actually loads assemblies, so for now, we just grab
             // the resolve failed event, and return the passed assembly straight. this avoid

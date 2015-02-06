@@ -9,6 +9,8 @@ namespace LinqEditor.Core.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<Settings.ISchemaStore>()
+                                        .ImplementedBy<Settings.SchemaStore>());
             container.Register(Component.For<IContext>()
                                         .ImplementedBy<Context.Context>()
                                         .LifestyleScoped());

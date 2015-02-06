@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace LinqEditor.Core.Backend.Isolated
+namespace LinqEditor.Core.Containers
 {
     // http://www.superstarcoders.com/blogs/posts/executing-code-in-a-separate-application-domain-using-c-sharp.aspx
-
     public sealed class Isolated<T> : IDisposable where T : MarshalByRefObject
     {
         private AppDomain _domain;

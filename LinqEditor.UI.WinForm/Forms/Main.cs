@@ -12,7 +12,7 @@ namespace LinqEditor.UI.WinForm.Forms
 {
     public class Main : Form
     {
-        public static string TestConnectionString = "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=Opera18500DB";
+        public static string TestConnectionString = "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=Opera56100DB";
 
         ToolStrip _toolbar;
         SplitContainer _mainContainer;

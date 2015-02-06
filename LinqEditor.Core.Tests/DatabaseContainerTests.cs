@@ -1,26 +1,23 @@
-﻿using LinqEditor.Core;
-using LinqEditor.Core.Backend.Isolated;
-using LinqEditor.Core.CodeAnalysis.Compiler;
-using LinqEditor.Core.Helpers;
-using LinqEditor.Core.Models.Database;
+﻿using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;
-using LinqEditor.Test.Common.SqlServer;
+using LinqEditor.Core.Helpers;
 using NUnit.Framework;
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using LinqEditor.Core.CodeAnalysis.Compiler;
+using System.IO;
+using LinqEditor.Core.Containers;
 
-namespace LinqEditor.Core.Backend.Tests
+namespace LinqEditor.Core.Tests
 {
-    /// <summary>
-    /// Tests integration of components
-    /// </summary>
-    [TestFixture(Category="Database")]
-    public class RunnerDatabaseTests
+    [TestFixture(Category = "Database")]
+    public class DatabaseContainerTests
     {
-        
-        Database _database;
+        LinqEditor.Test.Common.SqlServer.Database _database;
         string _schemaAssemblyPath;
         string _query1AssemblyPath;
         byte[] _query2AssemblyBytes;
@@ -34,7 +31,7 @@ namespace LinqEditor.Core.Backend.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new Database("UnitTest");
+            _database = new LinqEditor.Test.Common.SqlServer.Database("UnitTest");
             var schemaProvider = new SqlSchemaProvider();
             var templateService = new TemplateService();
             _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);
@@ -77,7 +74,7 @@ namespace LinqEditor.Core.Backend.Tests
         [Test]
         public void Can_Load_Initial_Schema_Assembly()
         {
-            var container = new Isolated<Runner>();
+            var container = new Isolated<DatabaseContainer>();
             var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             container.Dispose();
             Assert.IsNull(initResult.Error);
@@ -86,7 +83,7 @@ namespace LinqEditor.Core.Backend.Tests
         [Test]
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only_Using_Byte_Assembly()
         {
-            var container = new Isolated<Runner>();
+            var container = new Isolated<DatabaseContainer>();
             var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             var executeResult = container.Value.Execute(_query2AssemblyBytes);
 
@@ -100,7 +97,7 @@ namespace LinqEditor.Core.Backend.Tests
         [Test]
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only_Using_File_Assembly()
         {
-            var container = new Isolated<Runner>();
+            var container = new Isolated<DatabaseContainer>();
             var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             var executeResult = container.Value.Execute(_query1AssemblyPath);
 
@@ -114,7 +111,7 @@ namespace LinqEditor.Core.Backend.Tests
         [Test]
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_All_DataTypes()
         {
-            var container = new Isolated<Runner>();
+            var container = new Isolated<DatabaseContainer>();
             var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             var executeResult = container.Value.Execute(_query3AssemblyBytes);
 

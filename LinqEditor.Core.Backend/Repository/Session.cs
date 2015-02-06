@@ -1,5 +1,4 @@
-﻿using LinqEditor.Core.Backend.Isolated;
-using LinqEditor.Core.Models.Editor;
+﻿using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Backend.Settings;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Context;
@@ -26,7 +25,7 @@ namespace LinqEditor.Core.Backend.Repository
         private IContext _context;
         private Stopwatch _watch;
 
-        private Isolated<Runner> _container;
+        private Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer> _container;
 
         public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context)
         {
@@ -104,7 +103,7 @@ namespace LinqEditor.Core.Backend.Repository
         public LoadAppDomainResult LoadAppDomain()
         {
             // loads schema in new appdomain
-            _container = new Isolated<Runner>();
+            _container = new Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer>();
             var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
 
             return new LoadAppDomainResult

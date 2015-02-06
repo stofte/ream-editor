@@ -23,8 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Tests", "Li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.CodeAnalysis.Tests", "LinqEditor.Core.CodeAnalysis.Tests\LinqEditor.Core.CodeAnalysis.Tests.csproj", "{E6FE05A0-D542-48FA-974D-ACBD5C063D32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Backend.Tests", "LinqEditor.Core.Backend.Tests\LinqEditor.Core.Backend.Tests.csproj", "{8D444C75-E721-43DA-B328-60DA8031D8D7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Templates.Tests", "LinqEditor.Core.Templates.Tests\LinqEditor.Core.Templates.Tests.csproj", "{E8194448-28D6-46AD-B3A3-ECBB2F231562}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Test.Common", "LinqEditor.Test.Common\LinqEditor.Test.Common.csproj", "{9EC90760-15FE-40ED-AAA4-FA63A79CD050}"
@@ -79,10 +77,6 @@ Global
 		{E6FE05A0-D542-48FA-974D-ACBD5C063D32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6FE05A0-D542-48FA-974D-ACBD5C063D32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6FE05A0-D542-48FA-974D-ACBD5C063D32}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D444C75-E721-43DA-B328-60DA8031D8D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D444C75-E721-43DA-B328-60DA8031D8D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D444C75-E721-43DA-B328-60DA8031D8D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D444C75-E721-43DA-B328-60DA8031D8D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E8194448-28D6-46AD-B3A3-ECBB2F231562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E8194448-28D6-46AD-B3A3-ECBB2F231562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8194448-28D6-46AD-B3A3-ECBB2F231562}.Release|Any CPU.ActiveCfg = Release|Any CPU

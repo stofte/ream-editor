@@ -87,6 +87,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Containers\CodeContainer.cs" />
+    <Compile Include="Containers\DatabaseContainer.cs" />
+    <Compile Include="Containers\ExecutionContainer.cs" />
+    <Compile Include="Containers\Isolated.cs" />
     <Compile Include="Context\Context.cs" />
     <Compile Include="Context\IContext.cs" />
     <Compile Include="Generated\Dumper.cs" />

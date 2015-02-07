@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqEditor.Core.Models.Editor;
+using System;
 
 namespace LinqEditor.Core.Containers
 {

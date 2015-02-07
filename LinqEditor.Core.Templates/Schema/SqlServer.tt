@@ -87,6 +87,8 @@ foreach(var table in Tables) {
     {
         private Database _db;
 
+        public string ConnectionString { get { return @"<#=ConnectionString#>"; } }
+
 <# foreach(var table in Tables) { #>
         protected IEntityTable<<#=table.Name#>> <#=table.Name#>;
 <# } #>

@@ -90,6 +90,8 @@
     <Compile Include="Containers\CodeContainer.cs" />
     <Compile Include="Containers\DatabaseContainer.cs" />
     <Compile Include="Containers\ExecutionContainer.cs" />
+    <Compile Include="Containers\ICodeContainer.cs" />
+    <Compile Include="Containers\IDatabaseContainer.cs" />
     <Compile Include="Containers\Isolated.cs" />
     <Compile Include="Context\Context.cs" />
     <Compile Include="Context\IContext.cs" />
@@ -118,7 +120,7 @@
     <Compile Include="Models\Editor\LoadAppDomainResult.cs" />
     <Compile Include="Models\Editor\ProgramType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scopes\EditorScopeAccessor.cs" />
+    <Compile Include="Scopes\ContainerScopeAccessor.cs" />
     <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="Settings\ISchemaStore.cs" />
     <Compile Include="Settings\SchemaStore.cs" />

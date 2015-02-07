@@ -7,19 +7,19 @@ using System.Reflection;
 
 namespace LinqEditor.Core.Containers
 {
-    public class DatabaseContainer : ExecutionContainer
+    public class DatabaseContainer : ExecutionContainer, IDatabaseContainer
     {
         private string _dbType;
         private string _connectionString;
 
-        public LoadAppDomainResult Initialize(byte[] assembly, string connectionString)
+        public LoadAppDomainResult Initialize(byte[] assembly)
         {
-            return Initialize(assembly, null, connectionString);
+            return Initialize(assembly, null);
         }
 
-        public LoadAppDomainResult Initialize(string assemblyPath, string connectionString)
+        public LoadAppDomainResult Initialize(string assemblyPath)
         {
-            return Initialize(null, assemblyPath, connectionString);
+            return Initialize(null, assemblyPath);
         }
 
         public ExecuteResult Execute(byte[] assembly)
@@ -32,7 +32,7 @@ namespace LinqEditor.Core.Containers
             return Execute(null, path);
         }
 
-        private LoadAppDomainResult Initialize(byte[] assemblyImage, string assemblyPath, string connectionString)
+        private LoadAppDomainResult Initialize(byte[] assemblyImage, string assemblyPath)
         {
             // probably want to make this try/catch build dependent?
             Exception exn = null;
@@ -47,19 +47,14 @@ namespace LinqEditor.Core.Containers
                     _baseAssembly = Assembly.Load(assemblyImage);
                 }
 
-                // code context depends on initial connection string
-                _runnerType = connectionString != null ? ProgramType.Database : ProgramType.Code;
-
-                if (_runnerType == ProgramType.Database)
-                {
-                    _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _baseAssembly.GetName().Name);
-                    _connectionString = connectionString;
-
-                    // warm up connection
-                    var warmupType = _baseAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _baseAssembly.GetName().Name));
-                    var instance = Activator.CreateInstance(warmupType) as IDatabaseProgram;
-                    var res = ExecuteInstance(instance);
-                }
+                _runnerType = ProgramType.Database;
+                _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _baseAssembly.GetName().Name);
+                // warm up connection
+                var warmupType = _baseAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _baseAssembly.GetName().Name));
+                var instance = Activator.CreateInstance(warmupType) as IDatabaseProgram;
+                _connectionString = instance.ConnectionString;
+                var res = ExecuteInstance(instance);
+               
                 base.InitializeAppDomain();
             }
             catch (Exception e)

@@ -53,6 +53,7 @@ namespace LinqEditor.Core.Schema.Services
 
             return new DatabaseSchema
             {
+                ConnectionString = connectionString,
                 Tables = tables
             };
         }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Containers
 {
-    public class CodeContainer : ExecutionContainer
+    public class CodeContainer : ExecutionContainer, ICodeContainer
     {
         public LoadAppDomainResult Initialize()
         {

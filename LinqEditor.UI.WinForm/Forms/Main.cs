@@ -23,6 +23,7 @@ namespace LinqEditor.UI.WinForm.Forms
         TextBox _connectionTextBox;
         CodeEditor _editor;
         OutputPane _outputPane;
+        ComboBox _contextSelector;
 
         IBackgroundSession _connectionSession;
 
@@ -106,10 +107,17 @@ namespace LinqEditor.UI.WinForm.Forms
             _executeButton.Click += _executeButton_Click;
             _executeButton.Enabled = false;
             _toolbar.Items.Add(_executeButton);
+            
+            // select context
+            _contextSelector = new ComboBox();
+            _contextSelector.Dock = DockStyle.Top;
+            _contextSelector.Items.AddRange(new object[] { TestConnectionString, "Code" });
+            _contextSelector.SelectedIndex = 0;
+            _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
             // add controls
             _mainContainer.Panel1.Controls.Add(_editor);
-            _mainContainer.Panel1.Controls.Add(_connectionTextBox);
+            _mainContainer.Panel1.Controls.Add(_contextSelector); // _connectionTextBox
             _mainContainer.Panel2.Controls.Add(_outputPane);
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);

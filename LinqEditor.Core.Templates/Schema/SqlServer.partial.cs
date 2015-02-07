@@ -9,6 +9,7 @@ namespace LinqEditor.Core.Templates.Schema
     {
         public Guid NamespaceId { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }
+        public string ConnectionString { get; set; }
 
         public string GeneratedSchemaNamespace
         {

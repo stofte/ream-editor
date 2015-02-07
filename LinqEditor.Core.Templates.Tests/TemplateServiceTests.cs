@@ -25,6 +25,7 @@ namespace LinqEditor.Core.Templates.Tests
 
             _schemaModel = new DatabaseSchema
             {
+                ConnectionString = "bogus-connection-string",
                 Tables = new List<TableSchema>
                 {
                     new TableSchema 

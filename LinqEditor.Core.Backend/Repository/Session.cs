@@ -104,7 +104,7 @@ namespace LinqEditor.Core.Backend.Repository
         {
             // loads schema in new appdomain
             _container = new Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer>();
-            var initResult = _container.Value.Initialize(_schemaPath, _connectionString);
+            var initResult = _container.Value.Initialize(_schemaPath);
 
             return new LoadAppDomainResult
             {

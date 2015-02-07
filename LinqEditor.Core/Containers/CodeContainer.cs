@@ -9,8 +9,18 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Containers
 {
-    public class CodeContainer : ExecutionContainer, ICodeContainer
+    public class CodeContainer : ExecutionContainer, IContainer
     {
+        public LoadAppDomainResult Initialize(byte[] assembly)
+        {
+            throw new NotImplementedException("Cannot initialize CodeContainer with assembly");
+        }
+
+        public LoadAppDomainResult Initialize(string assemblyPath)
+        {
+            throw new NotImplementedException("Cannot initialize CodeContainer with assembly");
+        }
+
         public LoadAppDomainResult Initialize()
         {
             base.InitializeAppDomain();
@@ -50,5 +60,7 @@ namespace LinqEditor.Core.Containers
                 };
             }
         }
+
+
     }
 }

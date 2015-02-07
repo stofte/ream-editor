@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace LinqEditor.Core.Containers
 {
-    public class DatabaseContainer : ExecutionContainer, IDatabaseContainer
+    public class DatabaseContainer : ExecutionContainer, IContainer
     {
         private string _dbType;
         private string _connectionString;
@@ -20,6 +20,11 @@ namespace LinqEditor.Core.Containers
         public LoadAppDomainResult Initialize(string assemblyPath)
         {
             return Initialize(null, assemblyPath);
+        }
+
+        public LoadAppDomainResult Initialize()
+        {
+            throw new NotImplementedException("Cannot initialize DatabaseContainer without schema");
         }
 
         public ExecuteResult Execute(byte[] assembly)

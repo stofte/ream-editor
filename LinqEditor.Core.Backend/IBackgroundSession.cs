@@ -6,6 +6,7 @@ namespace LinqEditor.Core.Backend
     public interface IBackgroundSession
     {
         Task<InitializeResult> InitializeAsync(string connectionString);
+        Task<InitializeResult> InitializeAsync();
         Task<ExecuteResult> ExecuteAsync(string sourceFragment);
         Task<LoadAppDomainResult> LoadAppDomainAsync();
     }

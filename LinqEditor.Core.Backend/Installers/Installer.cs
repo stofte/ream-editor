@@ -10,6 +10,8 @@ namespace LinqEditor.Core.Backend.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<IBackgroundSessionFactory>()
+                                        .AsFactory());
             container.Register(Component.For<IBackgroundSession>()
                                         .ImplementedBy<BackgroundSession>()
                                         .LifestyleScoped());

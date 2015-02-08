@@ -21,6 +21,11 @@ namespace LinqEditor.Core.Backend
             return await Task.Run(() => Initialize(connectionString));
         }
 
+        public async Task<InitializeResult> InitializeAsync()
+        {
+            return await Task.Run(() => Initialize());
+        }
+
         public async Task<ExecuteResult> ExecuteAsync(string sourceFragment)
         {
             return await Task.Run(() => Execute(sourceFragment));

@@ -164,9 +164,15 @@ namespace LinqEditor.Core.Backend
 
         public void Dispose()
         {
-            _container.Dispose();
+            if (_codeContainer != null && _codeContainerFactory != null)
+            {
+                _codeContainerFactory.Release(_codeContainer);
+            }
+
+            if (_databaseContainer != null && _databaseContainerFactory != null)
+            {
+                _databaseContainerFactory.Release(_databaseContainer);
+            }
         }
-
-
     }
 }

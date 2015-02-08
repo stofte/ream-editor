@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("LinqEditor.Core.Backend.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("KMD A/S")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("LinqEditor.Core.Backend.Tests")]
-[assembly: AssemblyCopyright("Copyright © KMD A/S 2015")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

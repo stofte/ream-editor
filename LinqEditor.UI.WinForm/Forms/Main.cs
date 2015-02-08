@@ -1,6 +1,6 @@
 ﻿using LinqEditor.Core.Context;
 using LinqEditor.Core.Models.Editor;
-using LinqEditor.Core.Backend.Repository;
+using LinqEditor.Core.Backend;
 using LinqEditor.UI.WinForm.Controls;
 using System;
 using System.Diagnostics;

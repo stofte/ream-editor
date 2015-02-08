@@ -1,7 +1,7 @@
 ﻿using LinqEditor.Core.Models.Editor;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.Backend.Repository
+namespace LinqEditor.Core.Backend
 {
     public interface IBackgroundSession
     {

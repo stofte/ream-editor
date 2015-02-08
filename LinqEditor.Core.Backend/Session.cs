@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using LinqEditor.Core.Containers;
 
-namespace LinqEditor.Core.Backend.Repository
+namespace LinqEditor.Core.Backend
 {
     public class Session : ISession, IDisposable
     {
@@ -19,6 +19,11 @@ namespace LinqEditor.Core.Backend.Repository
         private string _schemaNamespace;
         private string _outputFolder;
         private Guid _sessionId = Guid.NewGuid();
+
+        // session is one-time bind only
+        private bool _codeSession;
+        private bool _initialized = false;
+        private bool _loadedAppDomain = false;
 
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
@@ -30,6 +35,8 @@ namespace LinqEditor.Core.Backend.Repository
         private IContainerMapper _containerMapper;
 
         private Isolated<DatabaseContainer> _container;
+        private IIsolatedCodeContainer _codeContainer;
+        private IIsolatedDatabaseContainer _databaseContainer;
 
         public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper)
         {
@@ -44,8 +51,25 @@ namespace LinqEditor.Core.Backend.Repository
             _containerMapper = containerMapper;
         }
 
+        /// <summary>
+        /// Initializes the session as a code session.
+        /// </summary>
+        public InitializeResult Initialize()
+        {
+            if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
+            _codeSession = true;
+            _initialized = true;
+            return new InitializeResult();
+        }
+
+        /// <summary>
+        /// Initializes the session as a database session, with the supplied connection string
+        /// </summary>
         public InitializeResult Initialize(string connectionString)
         {
+            if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
+            _codeSession = false;
+            _initialized = true;
             _connectionString = connectionString;
             // check cache
             _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
@@ -80,13 +104,18 @@ namespace LinqEditor.Core.Backend.Repository
         public ExecuteResult Execute(string sourceFragment)
         {
             _watch.Restart();
-            var queryId = Guid.NewGuid();
-            var querySource = _generator.GenerateQuery(queryId, sourceFragment, _schemaNamespace);
-            var result = CSharpCompiler.CompileToBytes(querySource, queryId.ToIdentifierWithPrefix(SchemaConstants.QueryPrefix), _schemaPath);
+            var programId = Guid.NewGuid();
+            var programSource = _codeSession ? _generator.GenerateCodeStatements(programId, sourceFragment) :
+                                               _generator.GenerateQuery(programId, sourceFragment, _schemaNamespace);
+            var references = _codeSession ? new string[] { } : new string[] { _schemaPath };
+            var prefix = _codeSession ? SchemaConstants.CodePrefix : SchemaConstants.QueryPrefix;
+            var result = CSharpCompiler.CompileToBytes(programSource, programId.ToIdentifierWithPrefix(prefix), references);
 
             if (result.Success)
             {
-                var containerResult = _container.Value.Execute(result.AssemblyBytes);
+                var containerResult = _codeSession ? _codeContainer.Value.Execute(result.AssemblyBytes) :
+                    _databaseContainer.Value.Execute(result.AssemblyBytes);
+
                 _watch.Stop();
 
                 return new ExecuteResult
@@ -109,13 +138,27 @@ namespace LinqEditor.Core.Backend.Repository
 
         public LoadAppDomainResult LoadAppDomain()
         {
+            if (_loadedAppDomain) throw new InvalidOperationException("Cannot load AppDomain more then once");
+            Exception exn = null;
             // loads schema in new appdomain
-            _container = new Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer>(Guid.NewGuid());
-            var initResult = _container.Value.Initialize(_schemaPath);
+            if (_codeSession)
+            {
+                _codeContainer = _codeContainerFactory.Create(_containerMapper.CodeContainer);
+                var res = _codeContainer.Value.Initialize();
+                exn = res.Error;
+            }
+            else
+            {
+                _databaseContainer = _databaseContainerFactory.Create(_containerMapper.MapConnectionString(_connectionString));
+                var res = _databaseContainer.Value.Initialize(_schemaPath);
+                exn = res.Error;
+            }
+
+            _loadedAppDomain = true;
 
             return new LoadAppDomainResult
             {
-                Error = initResult.Error, // only member set in runner
+                Error = exn, // only member set in runner
             };
         }
 
@@ -123,5 +166,7 @@ namespace LinqEditor.Core.Backend.Repository
         {
             _container.Dispose();
         }
+
+
     }
 }

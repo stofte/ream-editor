@@ -6,7 +6,7 @@ using LinqEditor.Core.Templates;
 using System.Threading.Tasks;
 using LinqEditor.Core.Containers;
 
-namespace LinqEditor.Core.Backend.Repository
+namespace LinqEditor.Core.Backend
 {
     // ok to use Task.Run when "just" offloading from UI thread
     // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true

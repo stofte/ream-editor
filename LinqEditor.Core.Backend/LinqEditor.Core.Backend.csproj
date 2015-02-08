@@ -47,10 +47,11 @@
   <ItemGroup>
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\BackgroundSession.cs" />
-    <Compile Include="Repository\IBackgroundSession.cs" />
-    <Compile Include="Repository\ISession.cs" />
-    <Compile Include="Repository\Session.cs" />
+    <Compile Include="BackgroundSession.cs" />
+    <Compile Include="IBackgroundSession.cs" />
+    <Compile Include="IBackgroundSessionFactory.cs" />
+    <Compile Include="ISession.cs" />
+    <Compile Include="Session.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

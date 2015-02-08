@@ -2,7 +2,7 @@
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
-using LinqEditor.Core.Backend.Repository;
+using LinqEditor.Core.Backend;
 
 namespace LinqEditor.Core.Backend.Installers
 {
@@ -11,7 +11,7 @@ namespace LinqEditor.Core.Backend.Installers
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(Component.For<IBackgroundSession>()
-                                        .ImplementedBy<Repository.BackgroundSession>()
+                                        .ImplementedBy<BackgroundSession>()
                                         .LifestyleScoped());
         }
     }

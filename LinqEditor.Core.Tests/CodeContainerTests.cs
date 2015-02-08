@@ -40,7 +40,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Can_Execute_Simple_Statements_With_Write()
         {
-            var container = new Isolated<CodeContainer>();
+            var container = new Isolated<CodeContainer>(Guid.NewGuid());
             container.Value.Initialize();
             var result = container.Value.Execute(_path1);
             container.Dispose();

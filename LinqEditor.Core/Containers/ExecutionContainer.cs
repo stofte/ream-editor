@@ -38,5 +38,10 @@ namespace LinqEditor.Core.Containers
         {
             return null;
         }
+
+        protected async Task<ExecuteResult> AsyncLauncher(Func<ExecuteResult> func)
+        {
+            return await Task.Run(func);
+        }
     }
 }

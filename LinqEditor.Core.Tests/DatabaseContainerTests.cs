@@ -74,7 +74,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Can_Load_Initial_Schema_Assembly()
         {
-            var container = new Isolated<DatabaseContainer>();
+            var container = new Isolated<DatabaseContainer>(Guid.NewGuid());
             var initResult = container.Value.Initialize(_schemaAssemblyPath);
             container.Dispose();
             Assert.IsNull(initResult.Error);
@@ -83,7 +83,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only_Using_Byte_Assembly()
         {
-            var container = new Isolated<DatabaseContainer>();
+            var container = new Isolated<DatabaseContainer>(Guid.NewGuid());
             var initResult = container.Value.Initialize(_schemaAssemblyPath);
             var executeResult = container.Value.Execute(_query2AssemblyBytes);
 
@@ -97,7 +97,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only_Using_File_Assembly()
         {
-            var container = new Isolated<DatabaseContainer>();
+            var container = new Isolated<DatabaseContainer>(Guid.NewGuid());
             var initResult = container.Value.Initialize(_schemaAssemblyPath);
             var executeResult = container.Value.Execute(_query1AssemblyPath);
 
@@ -111,7 +111,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_All_DataTypes()
         {
-            var container = new Isolated<DatabaseContainer>();
+            var container = new Isolated<DatabaseContainer>(Guid.NewGuid());
             var initResult = container.Value.Initialize(_schemaAssemblyPath);
             var executeResult = container.Value.Execute(_query3AssemblyBytes);
 

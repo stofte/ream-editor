@@ -104,6 +104,7 @@
     <EmbeddedResource Include="Resources\Icons.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Icons.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Types.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -135,6 +136,9 @@
     <Content Include="..\lib\SciLexer64.dll">
       <Link>SciLexer64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\resources\DatabaseOptions_12882.png">
+      <Link>Resources\ToolStripIcons\DatabaseOptions_12882.png</Link>
     </Content>
     <Content Include="..\resources\play.png">
       <Link>Resources\ToolStripIcons\play.png</Link>

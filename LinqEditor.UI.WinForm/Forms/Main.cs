@@ -17,6 +17,7 @@ namespace LinqEditor.UI.WinForm.Forms
         ToolStrip _toolbar;
         SplitContainer _mainContainer;
         ToolStripButton _executeButton;
+        ToolStripButton _databaseButton;
         StatusStrip _statusBar;
         ToolStripStatusLabel _statusLabel;
         ToolStripStatusLabel _rowCountLabel;
@@ -106,6 +107,10 @@ namespace LinqEditor.UI.WinForm.Forms
             _executeButton.Image = Resources.Icons.startwithoutdebugging_6556;
             _executeButton.Click += _executeButton_Click;
             _executeButton.Enabled = false;
+            _databaseButton = new ToolStripButton();
+            _databaseButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            _databaseButton.Image = Resources.Icons.DatabaseOptions_12882;
+            _databaseButton.Click += _databaseButton_Click;
             _toolbar.Items.Add(_executeButton);
             
             // select context
@@ -126,6 +131,11 @@ namespace LinqEditor.UI.WinForm.Forms
             _statusBar.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
+        }
+
+        void _databaseButton_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         // some custom focus juggling when resizing the splitcontainer when the editor had focus

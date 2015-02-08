@@ -8,6 +8,7 @@ using LinqEditor.Core.Templates;
 using System;
 using System.Diagnostics;
 using System.IO;
+using LinqEditor.Core.Containers;
 
 namespace LinqEditor.Core.Backend.Repository
 {
@@ -24,10 +25,13 @@ namespace LinqEditor.Core.Backend.Repository
         private ISchemaStore _userSettings;
         private IContext _context;
         private Stopwatch _watch;
+        private IIsolatedCodeContainerFactory _codeContainerFactory;
+        private IIsolatedDatabaseContainerFactory _databaseContainerFactory;
+        private IContainerMapper _containerMapper;
 
-        private Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer> _container;
+        private Isolated<DatabaseContainer> _container;
 
-        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context)
+        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper)
         {
             _schemaProvider = schemaProvider;
             _generator = generator;
@@ -35,6 +39,9 @@ namespace LinqEditor.Core.Backend.Repository
             _context = context;
             _watch = new Stopwatch();
             _outputFolder = Core.PathUtility.CachePath;
+            _codeContainerFactory = codeContainerFactory;
+            _databaseContainerFactory = databaseContainerFactory;
+            _containerMapper = containerMapper;
         }
 
         public InitializeResult Initialize(string connectionString)
@@ -103,7 +110,7 @@ namespace LinqEditor.Core.Backend.Repository
         public LoadAppDomainResult LoadAppDomain()
         {
             // loads schema in new appdomain
-            _container = new Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer>();
+            _container = new Core.Containers.Isolated<LinqEditor.Core.Containers.DatabaseContainer>(Guid.NewGuid());
             var initResult = _container.Value.Initialize(_schemaPath);
 
             return new LoadAppDomainResult

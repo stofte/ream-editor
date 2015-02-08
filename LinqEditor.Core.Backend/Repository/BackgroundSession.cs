@@ -4,6 +4,7 @@ using LinqEditor.Core.Context;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;
 using System.Threading.Tasks;
+using LinqEditor.Core.Containers;
 
 namespace LinqEditor.Core.Backend.Repository
 {
@@ -11,8 +12,9 @@ namespace LinqEditor.Core.Backend.Repository
     // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true
     public class BackgroundSession : Session, IBackgroundSession
     {
-        public BackgroundSession(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context) :
-            base(schemaProvider, generator, userSettings, context) { }
+        public BackgroundSession(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, 
+            IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper) :
+            base(schemaProvider, generator, userSettings, context, codeContainerFactory, databaseContainerFactory, containerMapper) { }
 
         public async Task<InitializeResult> InitializeAsync(string connectionString)
         {

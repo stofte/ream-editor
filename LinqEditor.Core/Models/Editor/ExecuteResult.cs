@@ -9,6 +9,15 @@ namespace LinqEditor.Core.Models.Editor
     [Serializable]
     public class ExecuteResult
     {
+        public ExecuteResult()
+        {
+            Tables = new List<DataTable>();
+            Warnings = new List<Warning>();
+            Errors = new List<Error>();
+            CodeOutput = string.Empty;
+            QueryText = string.Empty;
+        }
+
         public long Duration { get; set; }
         public IEnumerable<DataTable> Tables { get; set; }
         public IEnumerable<Warning> Warnings { get; set; }

@@ -71,14 +71,19 @@ namespace LinqEditor.UI.WinForm.Controls
             
             if (result.Success)
             {
-                _console.AppendText(string.Format("Query executed in {0} ms\n", result.Duration));
-                _console.AppendText(result.QueryText.Trim() + "\n\n");
-                BindResults(result.Tables);
-                BindDiagnostics(new Error[]{}, result.Warnings);
-                if (result.Tables.Count() > 0)
+                var isCode = !string.IsNullOrWhiteSpace(result.CodeOutput);
+                _console.AppendText(string.Format("{1} executed in {0} ms\n", result.Duration, isCode ? "Code" : "Query"));
+                _console.AppendText((isCode ? result.CodeOutput.Trim() : result.QueryText.Trim())+"\n\n");
+                if (result.Tables != null)
                 {
-                    _tabControl.SelectedTab = _tabControl.TabPages[1 + result.Tables.Count()];
+                    BindResults(result.Tables);
+                    if (result.Tables.Count() > 0)
+                    {
+                        _tabControl.SelectedTab = _tabControl.TabPages[1 + result.Tables.Count()];
+                    }
                 }
+                
+                BindDiagnostics(new Error[]{}, result.Warnings);
             }
             else
             {

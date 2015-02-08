@@ -50,6 +50,7 @@ namespace Another.Generated
 ";
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(programSource);
             _templateService = m.Object;
             _context = new Context.Context();
         }

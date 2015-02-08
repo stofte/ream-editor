@@ -27,16 +27,23 @@ namespace LinqEditor.UI.WinForm.Forms
         ComboBox _contextSelector;
 
         IBackgroundSession _connectionSession;
+        IBackgroundSessionFactory _backgroundSessionFactory;
+
+        Form _connectionManager;
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor)
+        public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor, IBackgroundSessionFactory sessionFactory, ConnectionManager connectionManager)
         {
+            _backgroundSessionFactory = sessionFactory;
             _connectionSession = session;
+            _connectionManager = connectionManager;
             _statusBar = new StatusStrip();
+
             _statusBar.SuspendLayout();
             SuspendLayout();
+            
             var minHeight = 300;
             var minWidth = 400;
 
@@ -111,12 +118,12 @@ namespace LinqEditor.UI.WinForm.Forms
             _databaseButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             _databaseButton.Image = Resources.Icons.DatabaseOptions_12882;
             _databaseButton.Click += _databaseButton_Click;
-            _toolbar.Items.Add(_executeButton);
+            _toolbar.Items.AddRange(new [] { _executeButton, _databaseButton });
             
             // select context
             _contextSelector = new ComboBox();
             _contextSelector.Dock = DockStyle.Top;
-            _contextSelector.Items.AddRange(new object[] { TestConnectionString, "Code" });
+            _contextSelector.Items.AddRange(new object[] { "Code" });
             _contextSelector.SelectedIndex = 0;
             _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
@@ -135,7 +142,7 @@ namespace LinqEditor.UI.WinForm.Forms
 
         void _databaseButton_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            _connectionManager.ShowDialog();
         }
 
         // some custom focus juggling when resizing the splitcontainer when the editor had focus
@@ -182,9 +189,22 @@ namespace LinqEditor.UI.WinForm.Forms
 
         async void Main_Load(object sender, EventArgs e)
         {
-            var result = await _connectionSession.InitializeAsync(_connectionTextBox.Text);
+            // get selected context
+            IBackgroundSession session = _backgroundSessionFactory.Create();
+            InitializeResult result = null;
+            var ctx = _contextSelector.SelectedItem as string;
+
+            if (ctx == "Code")
+            {
+                result = await session.InitializeAsync();
+            }
+            else
+            {
+                result = await session.InitializeAsync(ctx);
+            }
+
             // loads appdomain and initializes connection
-            await _connectionSession.LoadAppDomainAsync();
+            await session.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";
             _executeButton.Enabled = true;
         }

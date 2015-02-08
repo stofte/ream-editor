@@ -49,9 +49,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             if (!string.IsNullOrEmpty(assemblyPath))
             {
                 _references = _references.Concat(new[] { MetadataReference.CreateFromFile(assemblyPath) }).ToArray();
+                _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
             }
-
-            _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
+            else
+            {
+                _currentSource = _initialSource = _templateService.GenerateCodeStatements(Guid.NewGuid(), SchemaConstants.Marker);
+            }
+            
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
             IEnumerable<Warning> warnings = new List<Warning>();
             IEnumerable<Error> errors = new List<Error>();
@@ -62,7 +66,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         }
 
         public bool IsReady { get { return _initialized; } }
-
+        
         public AnalysisResult Analyze(string sourceFragment)
         {
             throw new NotImplementedException();

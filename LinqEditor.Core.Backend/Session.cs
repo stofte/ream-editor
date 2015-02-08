@@ -59,6 +59,7 @@ namespace LinqEditor.Core.Backend
             if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
             _codeSession = true;
             _initialized = true;
+            _context.UpdateContext(null, null);
             return new InitializeResult();
         }
 
@@ -124,7 +125,8 @@ namespace LinqEditor.Core.Backend
                     QueryText = containerResult.QueryText,
                     Tables = containerResult.Tables,
                     Warnings = result.Warnings,
-                    Duration = _watch.ElapsedMilliseconds
+                    Duration = _watch.ElapsedMilliseconds,
+                    CodeOutput = containerResult.CodeOutput
                 };
             }
 

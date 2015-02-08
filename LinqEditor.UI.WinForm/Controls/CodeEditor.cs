@@ -37,7 +37,6 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.Font = editorFont;
             _editor.Name = "_scintilla";
             _editor.TabIndex = 0;
-            _editor.Text = "CodeListItem.Take(10).Dump();";
             _editor.CharAdded += _editor_CharAdded;
             initEditor.EndInit();
 

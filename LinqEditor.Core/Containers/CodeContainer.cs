@@ -48,7 +48,8 @@ namespace LinqEditor.Core.Containers
                 var output = instance.Execute();
                 return new ExecuteResult
                 {
-                    CodeOutput = output
+                    CodeOutput = output,
+                    Success = true
                 };
             }
             catch (Exception e)

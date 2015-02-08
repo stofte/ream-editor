@@ -4,6 +4,7 @@ using LinqEditor.Core.Templates;
 using LinqEditor.Core.Containers;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.IO;
 
 namespace LinqEditor.Core.Tests
@@ -45,6 +46,18 @@ namespace LinqEditor.Core.Tests
             var result = container.Value.Execute(_path1);
             container.Dispose();
             Assert.AreEqual("foobar", result.CodeOutput);
+        }
+
+        [Test]
+        public void Results_With_No_Tables_Has_Empty_Collection()
+        {
+            var container = new Isolated<CodeContainer>(Guid.NewGuid());
+            container.Value.Initialize();
+            var result = container.Value.Execute(_path1);
+            container.Dispose();
+
+            Assert.IsNotNull(result.Tables);
+            Assert.AreEqual(0, result.Tables.Count());
         }
     }
 }

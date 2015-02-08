@@ -1,6 +1,7 @@
 ﻿using LinqEditor.Core;
 using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Models.Database;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 
@@ -100,6 +101,23 @@ namespace LinqEditor.Core.Settings
             }
         }
 
+        /// <summary>
+        /// Maps from connection strings to names
+        /// </summary>
+        [UserScopedSetting]
+        [DefaultSettingValue("")]
+        public SerializableStringDictionary ConnectionNames
+        {
+            get
+            {
+                return (SerializableStringDictionary)this["ConnectionNames"];
+            }
+            set
+            {
+                this["ConnectionNames"] = (SerializableStringDictionary)value;
+            }
+        }
+
         public string GetCachedAssembly(string connectionString)
         {
             if (SchemaHashes.ContainsKey(connectionString))
@@ -114,6 +132,12 @@ namespace LinqEditor.Core.Settings
             var hash = SerializationHelper.Hash(schema);
             GeneratedSchemaFile[hash] = assemblyPath;
             SchemaHashes[connectionString] = hash;
+            Save();
+        }
+
+        public void AddConnectionString(string connectionString, string name)
+        {
+            ConnectionNames[connectionString] = name;
             Save();
         }
     }

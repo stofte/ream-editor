@@ -23,6 +23,11 @@ namespace LinqEditor.Core
             get { return Path.GetTempPath(); }
         }
 
+        public static string ApplicationDirectory
+        {
+            get { return AppDomain.CurrentDomain.BaseDirectory; }
+        }
+
         public static string CurrentPath
         {
             get { return Environment.CurrentDirectory + @"\"; }

@@ -59,6 +59,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ApplicationSettingsTests.cs" />
     <Compile Include="CodeContainerTests.cs" />
     <Compile Include="WindsorContainerDatabaseTests.cs" />
     <Compile Include="WindsorContainerTests.cs" />

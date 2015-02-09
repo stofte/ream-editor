@@ -8,6 +8,11 @@ namespace LinqEditor.Core
 {
     public class SerializableStringDictionary : StringDictionary, IXmlSerializable
     {
+        public SerializableStringDictionary() 
+        {
+            
+        }
+
         public XmlSchema GetSchema()
         {
             return null;

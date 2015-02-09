@@ -16,6 +16,7 @@ namespace LinqEditor.Core.Settings
         public SchemaStore()
         {
             SynchronizeCacheData();
+            
         }
 
         private void SynchronizeCacheData()
@@ -138,6 +139,12 @@ namespace LinqEditor.Core.Settings
         public void AddConnectionString(string connectionString, string name)
         {
             ConnectionNames[connectionString] = name;
+            Save();
+        }
+
+        public void DeleteConnectionString(string connectionString)
+        {
+            ConnectionNames.Remove(connectionString);
             Save();
         }
     }

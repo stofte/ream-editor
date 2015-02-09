@@ -8,6 +8,7 @@ namespace LinqEditor.Core.Settings
         string GetCachedAssembly(string connectionString);
         void PersistSchema(string connectionString, DatabaseSchema schema, string assemblyPath);
         void AddConnectionString(string connectionString, string name);
+        void DeleteConnectionString(string connectionString);
         SerializableStringDictionary ConnectionNames { get; }
     }
 }

@@ -28,7 +28,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Adding_Connection_Persists_Settings()
         {
-            var app = new ApplicationSettings();
+            var app = new ConnectionStore();
             app.AddConnection(new Connection { ConnectionString = "foo" });
 
             Assert.IsTrue(File.Exists(path));

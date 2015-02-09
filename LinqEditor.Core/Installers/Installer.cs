@@ -14,6 +14,10 @@ namespace LinqEditor.Core.Installers
         {
             container.Register(Component.For<Settings.ISchemaStore>()
                                         .ImplementedBy<Settings.SchemaStore>());
+            container.Register(Component.For<Settings.IConnectionStore>()
+                                        .ImplementedBy<Settings.ConnectionStore>()
+                                        .LifestyleSingleton());
+
             container.Register(Component.For<IContext>()
                                         .ImplementedBy<Context.Context>()
                                         .LifestyleScoped());

@@ -14,49 +14,28 @@ namespace LinqEditor.Core.Settings
     [Serializable]
     public class ApplicationSettings
     {
-        private string _path = PathUtility.ApplicationDirectory + FileName;
-
-        [JsonProperty]
-        private IList<Connection> Connections; // ignore naming for json rendering
-
+        protected string _path = PathUtility.ApplicationDirectory + FileName;
+        protected ApplicationSettings _storedInstance;
         public static string FileName = "settings.json";
         
-        public ApplicationSettings()
+        protected T Read<T>()
         {
-            ApplicationSettings settings = null;
             if (File.Exists(_path))
             {
                 var fileData = File.ReadAllText(_path);
                 try
                 {
-                    settings = JsonConvert.DeserializeObject<ApplicationSettings>(fileData);
+                    return JsonConvert.DeserializeObject<T>(fileData);
                 }
                 catch { }
             }
-
-            if (settings == null)
-            {
-                Connections = new List<Connection>();
-            }
-            else
-            {
-                Connections = settings.Connections;
-            }
+            return default(T);
         }
-
-        private void Save()
+        
+        protected void Save()
         {
             var str = JsonConvert.SerializeObject(this);
             File.WriteAllText(_path, str);
-        }
-
-        public void AddConnection(Connection conn)
-        {
-            if (!Connections.Contains(conn, new Connection()))
-            {
-                Connections.Add(conn);
-                Save();
-            }
         }
     }
 }

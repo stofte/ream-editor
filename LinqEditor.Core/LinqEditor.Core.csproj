@@ -128,6 +128,7 @@
     <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="Settings\ApplicationSettings.cs" />
     <Compile Include="Settings\Connection.cs" />
+    <Compile Include="Settings\ConnectionStore.cs" />
     <Compile Include="Settings\ISchemaStore.cs" />
     <Compile Include="Settings\SchemaStore.cs" />
     <Compile Include="SystemTime.cs" />

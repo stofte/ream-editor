@@ -29,6 +29,7 @@ namespace LinqEditor.UI.WinForm.Forms
         IBackgroundSession _connectionSession;
         IBackgroundSessionFactory _backgroundSessionFactory;
         IConnectionStore _connectionStore;
+        ISettingsStore _settingsStore;
 
         Form _connectionManager;
 
@@ -36,12 +37,13 @@ namespace LinqEditor.UI.WinForm.Forms
         bool _restoreEditorFocusOnSplitterMoved;
 
         public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor, IBackgroundSessionFactory sessionFactory, 
-            IConnectionStore connectionStore, ConnectionManager connectionManager)
+            IConnectionStore connectionStore, ISettingsStore settingsStore, ConnectionManager connectionManager)
         {
             _backgroundSessionFactory = sessionFactory;
             _connectionSession = session;
             _connectionManager = connectionManager;
             _connectionStore = connectionStore;
+            _settingsStore = settingsStore;
             _statusBar = new StatusStrip();
 
             _statusBar.SuspendLayout();
@@ -122,6 +124,10 @@ namespace LinqEditor.UI.WinForm.Forms
             //_contextSelector.Items.AddRange(new object[] { "Code" });
             //_contextSelector.SelectedIndex = 0;
             _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+            _contextSelector.SelectedIndexChanged += delegate 
+            {
+ 
+            };
             BindConnections();
 
             // event handlers
@@ -198,22 +204,18 @@ namespace LinqEditor.UI.WinForm.Forms
 
         async void Main_Load(object sender, EventArgs e)
         {
-            return;
-
-            // get selected context
+            // restore last used context
+            var id = _settingsStore.LastConnectionUsed;
+            foreach (Connection conn in _contextSelector.Items)
+            {
+                if (conn.Id == id)
+                {
+                    _contextSelector.SelectedItem = conn;
+                    break;
+                }
+            }
             IBackgroundSession session = _backgroundSessionFactory.Create();
-            InitializeResult result = null;
-            var ctx = _contextSelector.SelectedItem as string;
-
-            if (ctx == "Code")
-            {
-                result = await session.InitializeAsync();
-            }
-            else
-            {
-                result = await session.InitializeAsync(ctx);
-            }
-
+            var result = await session.InitializeAsync(id);
             // loads appdomain and initializes connection
             await session.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";

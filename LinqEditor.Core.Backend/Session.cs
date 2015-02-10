@@ -8,6 +8,7 @@ using LinqEditor.Core.Templates;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using LinqEditor.Core.Containers;
 
 namespace LinqEditor.Core.Backend
@@ -33,12 +34,14 @@ namespace LinqEditor.Core.Backend
         private IIsolatedCodeContainerFactory _codeContainerFactory;
         private IIsolatedDatabaseContainerFactory _databaseContainerFactory;
         private IContainerMapper _containerMapper;
+        private IConnectionStore _connectionStore;
 
-        private Isolated<DatabaseContainer> _container;
         private IIsolatedCodeContainer _codeContainer;
         private IIsolatedDatabaseContainer _databaseContainer;
 
-        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper)
+        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, 
+            IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, 
+            IContainerMapper containerMapper, IConnectionStore connectionStore)
         {
             _schemaProvider = schemaProvider;
             _generator = generator;
@@ -49,6 +52,16 @@ namespace LinqEditor.Core.Backend
             _codeContainerFactory = codeContainerFactory;
             _databaseContainerFactory = databaseContainerFactory;
             _containerMapper = containerMapper;
+            _connectionStore = connectionStore;
+        }
+
+        public InitializeResult Initialize(Guid connectionId)
+        {
+            if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
+            _codeSession = connectionId == Guid.Empty;
+            _initialized = true;
+
+            return _codeSession ? InitCode() : InitDatabase(connectionId);
         }
 
         /// <summary>
@@ -72,6 +85,47 @@ namespace LinqEditor.Core.Backend
             _codeSession = false;
             _initialized = true;
             _connectionString = connectionString;
+            // check cache
+            _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
+            if (string.IsNullOrEmpty(_schemaPath))
+            {
+                _schemaNamespace = _sessionId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
+                var sqlSchema = _schemaProvider.GetSchema(_connectionString);
+                var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
+                var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
+                _schemaPath = result.AssemblyPath;
+
+                if (result.Success)
+                {
+                    _userSettings.PersistSchema(_connectionString, sqlSchema, _schemaPath);
+                }
+            }
+            else
+            {
+                // todo: probably want to store namespace in settings also
+                _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
+            }
+
+            _context.UpdateContext(_schemaPath, _schemaNamespace);
+
+            return new InitializeResult
+            {
+                AssemblyPath = _schemaPath,
+                SchemaNamespace = _schemaNamespace
+            };
+        }
+
+        private InitializeResult InitCode()
+        {
+            _context.UpdateContext(null, null);
+            return new InitializeResult();
+        }
+
+        private InitializeResult InitDatabase(Guid id)
+        {
+            _connectionString = _connectionStore.Connections.Where(x => x.Id == id).Select(x => x.ConnectionString).SingleOrDefault();
+            if (_connectionString == null) throw new ArgumentException("unknown connection id");
+
             // check cache
             _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
             if (string.IsNullOrEmpty(_schemaPath))

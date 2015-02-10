@@ -5,6 +5,7 @@ using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Templates;
 using System.Threading.Tasks;
 using LinqEditor.Core.Containers;
+using System;
 
 namespace LinqEditor.Core.Backend
 {
@@ -13,8 +14,9 @@ namespace LinqEditor.Core.Backend
     public class BackgroundSession : Session, IBackgroundSession
     {
         public BackgroundSession(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, 
-            IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper) :
-            base(schemaProvider, generator, userSettings, context, codeContainerFactory, databaseContainerFactory, containerMapper) { }
+            IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper,
+            IConnectionStore connectionStore) :
+            base(schemaProvider, generator, userSettings, context, codeContainerFactory, databaseContainerFactory, containerMapper, connectionStore) { }
 
         public async Task<InitializeResult> InitializeAsync(string connectionString)
         {
@@ -24,6 +26,11 @@ namespace LinqEditor.Core.Backend
         public async Task<InitializeResult> InitializeAsync()
         {
             return await Task.Run(() => Initialize());
+        }
+
+        public async Task<InitializeResult> InitializeAsync(Guid id)
+        {
+            return await Task.Run(() => Initialize(id));
         }
 
         public async Task<ExecuteResult> ExecuteAsync(string sourceFragment)

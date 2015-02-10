@@ -14,8 +14,6 @@ namespace LinqEditor.Core.Settings
     [Serializable]
     public abstract class ApplicationSettings
     {
-        //public static string FileName = "settings.json";
-        //protected static string path = (PathUtility.ApplicationDirectory + FileName);
         protected ApplicationSettings _storedInstance;
         
         protected static T Read<T>()
@@ -36,7 +34,7 @@ namespace LinqEditor.Core.Settings
         protected void Save()
         {
             var path = FileName(GetType());
-            var str = JsonConvert.SerializeObject(this);
+            var str = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(path, str);
         }
 

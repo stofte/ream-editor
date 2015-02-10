@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Models.Editor;
+using System;
 
 namespace LinqEditor.Core.Backend
 {
@@ -6,6 +7,7 @@ namespace LinqEditor.Core.Backend
     {
         InitializeResult Initialize(string connectionString);
         InitializeResult Initialize();
+        InitializeResult Initialize(Guid connectionId);
         LoadAppDomainResult LoadAppDomain();
         ExecuteResult Execute(string sourceFragment);
     }

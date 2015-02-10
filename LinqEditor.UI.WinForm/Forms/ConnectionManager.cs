@@ -24,16 +24,6 @@ namespace LinqEditor.UI.WinForm.Forms
             InitializeComponent();
         }
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == Keys.Escape)
-            {
-                Close();
-                return true;
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
-
         private void InitializeComponent()
         {
             var width = 380;
@@ -92,6 +82,12 @@ namespace LinqEditor.UI.WinForm.Forms
             editConnStr.Multiline = true;
             editConnStr.WordWrap = true;
             editConnStr.Font = font;
+            editConnStr.ScrollBars = ScrollBars.Vertical;
+            editConnStr.KeyDown += delegate(object sender, KeyEventArgs args)
+            {
+                if (args.Control && args.KeyCode == Keys.A)
+                    editConnStr.SelectAll();
+            };
             deleteBtn.Text = "Delete";
             deleteBtn.Enabled = false;
             saveBtn.Text = "Save";
@@ -125,7 +121,13 @@ namespace LinqEditor.UI.WinForm.Forms
             addConnStr.Multiline = true;
             addConnStr.WordWrap = true;
             addConnStr.Height = 75;
+            addConnStr.ScrollBars = ScrollBars.Vertical;
             addConnStr.Font = font;
+            addConnStr.KeyDown += delegate(object sender, KeyEventArgs args) 
+            {
+                if (args.Control && args.KeyCode == Keys.A)
+                    addConnStr.SelectAll();
+            };
             addButton.Text = "Add";
             addButton.Enabled = false;
 
@@ -204,6 +206,7 @@ namespace LinqEditor.UI.WinForm.Forms
             closeButton.Text = "Close";
             closeButton.Location = new Point(width - 95, lastOffset + 15);
             closeButton.Click += delegate { Hide(); };
+            CancelButton = closeButton;
 
             layoutEdit.ClientSizeChanged += delegate
             {

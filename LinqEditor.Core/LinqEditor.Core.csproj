@@ -131,6 +131,7 @@
     <Compile Include="Settings\ConnectionStore.cs" />
     <Compile Include="Settings\ISchemaStore.cs" />
     <Compile Include="Settings\SchemaStore.cs" />
+    <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="SystemTime.cs" />
     <Compile Include="PathUtility.cs" />
   </ItemGroup>

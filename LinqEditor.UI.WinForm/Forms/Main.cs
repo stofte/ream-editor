@@ -7,12 +7,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LinqEditor.Core.Settings;
 
 namespace LinqEditor.UI.WinForm.Forms
 {
     public class Main : Form
     {
-        public static string TestConnectionString = "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=Opera56100DB";
+        public static string TestConnectionString = @"Data Source=.\sqlexpress;Integrated Security=True;Initial Catalog=Opera56100DB";
 
         ToolStrip _toolbar;
         SplitContainer _mainContainer;
@@ -21,24 +22,26 @@ namespace LinqEditor.UI.WinForm.Forms
         StatusStrip _statusBar;
         ToolStripStatusLabel _statusLabel;
         ToolStripStatusLabel _rowCountLabel;
-        TextBox _connectionTextBox;
         CodeEditor _editor;
         OutputPane _outputPane;
         ComboBox _contextSelector;
 
         IBackgroundSession _connectionSession;
         IBackgroundSessionFactory _backgroundSessionFactory;
+        IConnectionStore _connectionStore;
 
         Form _connectionManager;
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor, IBackgroundSessionFactory sessionFactory, ConnectionManager connectionManager)
+        public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor, IBackgroundSessionFactory sessionFactory, 
+            IConnectionStore connectionStore, ConnectionManager connectionManager)
         {
             _backgroundSessionFactory = sessionFactory;
             _connectionSession = session;
             _connectionManager = connectionManager;
+            _connectionStore = connectionStore;
             _statusBar = new StatusStrip();
 
             _statusBar.SuspendLayout();
@@ -70,7 +73,6 @@ namespace LinqEditor.UI.WinForm.Forms
             _mainContainer.SplitterDistance = minHeight / 10;
             _mainContainer.Panel1MinSize = minHeight / 4;
             _mainContainer.Panel2MinSize = minHeight / 3;
-            _mainContainer.SizeChanged += _mainContainer_SizeChanged;
             _mainContainer.GotFocus +=_mainContainer_GotFocus;
             _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
             
@@ -85,12 +87,6 @@ namespace LinqEditor.UI.WinForm.Forms
             _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
             _statusBar.Items.AddRange(new[] { _statusLabel, _rowCountLabel });
             
-            // connection
-            _connectionTextBox = new TextBox();
-            _connectionTextBox.Dock = DockStyle.Top;
-            _connectionTextBox.ReadOnly = true;
-            _connectionTextBox.Text = TestConnectionString;
-
             // scintilla
             _editor = editor;
             _editor.LostFocus += _editor_LostFocus;
@@ -123,13 +119,21 @@ namespace LinqEditor.UI.WinForm.Forms
             // select context
             _contextSelector = new ComboBox();
             _contextSelector.Dock = DockStyle.Top;
-            _contextSelector.Items.AddRange(new object[] { "Code" });
-            _contextSelector.SelectedIndex = 0;
+            //_contextSelector.Items.AddRange(new object[] { "Code" });
+            //_contextSelector.SelectedIndex = 0;
             _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+            BindConnections();
 
-            // add controls
+            // event handlers
+            _connectionStore.ConnectionsUpdated += delegate
+            {
+                BindConnections();
+            };
+            
+            
+            // add controls and resume
             _mainContainer.Panel1.Controls.Add(_editor);
-            _mainContainer.Panel1.Controls.Add(_contextSelector); // _connectionTextBox
+            _mainContainer.Panel1.Controls.Add(_contextSelector);
             _mainContainer.Panel2.Controls.Add(_outputPane);
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);
@@ -138,6 +142,17 @@ namespace LinqEditor.UI.WinForm.Forms
             _statusBar.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
+        }
+
+        void BindConnections()
+        {
+            var selected = _contextSelector.SelectedItem;
+            _contextSelector.Items.Clear();
+            _contextSelector.Items.Add(new Connection { Id = Guid.Empty, DisplayName = "", ConnectionString = "Code" });
+            foreach (var conn in _connectionStore.Connections)
+            {
+                _contextSelector.Items.Add(conn);
+            }
         }
 
         void _databaseButton_Click(object sender, EventArgs e)
@@ -181,14 +196,10 @@ namespace LinqEditor.UI.WinForm.Forms
             return await _connectionSession.ExecuteAsync(_editor.SourceCode);
         }
 
-        void _mainContainer_SizeChanged(object sender, EventArgs e)
-        {
-            var container = sender as SplitContainer;
-            _connectionTextBox.Width = container.ClientSize.Width;
-        }
-
         async void Main_Load(object sender, EventArgs e)
         {
+            return;
+
             // get selected context
             IBackgroundSession session = _backgroundSessionFactory.Create();
             InitializeResult result = null;

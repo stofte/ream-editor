@@ -14,7 +14,7 @@ namespace LinqEditor.Core.Tests
     [TestFixture]
     public class ApplicationSettingsTests
     {
-        string path = PathUtility.ApplicationDirectory + ApplicationSettings.FileName;
+        string connStorePath = ConnectionStore.FileName(typeof(ConnectionStore));
 
         [TestFixtureSetUp]
         [TestFixtureTearDown]
@@ -22,9 +22,9 @@ namespace LinqEditor.Core.Tests
         public void InitializeAndCleanup()
         {
             // delete any previous test file, before and after all and any tests
-            if (File.Exists(path))
+            if (File.Exists(connStorePath))
             {
-                File.Delete(path);
+                File.Delete(connStorePath);
             }
         }
 
@@ -33,7 +33,7 @@ namespace LinqEditor.Core.Tests
         {
             var app = ConnectionStore.Instance;
             app.Add(new Connection { Id = Guid.NewGuid(), ConnectionString = "foo", CachedSchemaFileName = "bar" });
-            Assert.IsTrue(File.Exists(path));
+            Assert.IsTrue(File.Exists(connStorePath));
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace LinqEditor.Core.Tests
             app.Add(new Connection { Id = deleteGuid, ConnectionString = "qux", CachedSchemaFileName = "baz" });
             app.Delete(app.Connections.Where(x => x.Id == deleteGuid).Single()); // delete the instance with deleteGuid 
 
-            var fileData = File.ReadAllText(path);
+            var fileData = File.ReadAllText(connStorePath);
             var instance = JsonConvert.DeserializeObject<ConnectionStore>(fileData);
             // reflect value out
             var reflectedValue = instance.GetType().GetField("_connections", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(instance) as IList<Connection>;

@@ -13,6 +13,7 @@ namespace LinqEditor.Core.Settings
         void Update(Connection conn);
         void Delete(Connection conn);
         IEnumerable<Connection> Connections { get; }
+        event Action ConnectionsUpdated;
     }
 
     public class ConnectionStore : ApplicationSettings, IConnectionStore
@@ -30,6 +31,8 @@ namespace LinqEditor.Core.Settings
             }
         }
 
+        public event Action ConnectionsUpdated;
+
         [JsonProperty]
         private IList<Connection> _connections; // ignore naming for json rendering
 
@@ -40,6 +43,11 @@ namespace LinqEditor.Core.Settings
             {
                 _connections.Add(conn);
                 Save();
+
+                if (ConnectionsUpdated != null)
+                {
+                    ConnectionsUpdated();
+                }
             }
         }
 
@@ -54,6 +62,10 @@ namespace LinqEditor.Core.Settings
                     c.DisplayName = conn.DisplayName;
                     c.ConnectionString = conn.ConnectionString;
                     Save();
+                    if (ConnectionsUpdated != null)
+                    {
+                        ConnectionsUpdated();
+                    }
                     break;
                 }
             }
@@ -63,6 +75,10 @@ namespace LinqEditor.Core.Settings
         {
             _connections = _connections.Where(x => x.Id != conn.Id).ToList();
             Save();
+            if (ConnectionsUpdated != null)
+            {
+                ConnectionsUpdated();
+            }
         }
 
         [JsonIgnore]

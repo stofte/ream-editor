@@ -49,16 +49,6 @@ namespace LinqEditor.UI.WinForm.Forms
             var addType = new ComboBox();
             var addButton = new Button();
 
-            Action bindConnections = () =>
-            {
-                editSelector.Items.Clear();
-                foreach (var conn in _connectionStore.Connections)
-                {
-                    editSelector.Items.Add(conn);
-                }
-                editSelector.Enabled = editSelector.Items.Count > 0;
-            };
-
             layoutEdit.SuspendLayout();
             layoutAdd.SuspendLayout();
             SuspendLayout();
@@ -72,18 +62,18 @@ namespace LinqEditor.UI.WinForm.Forms
             Padding = new System.Windows.Forms.Padding() { All = 10 };
             Text = "Connection manager";
 
-
+            layoutEdit.BackColor = Color.Transparent;
+            layoutEdit.FlowDirection = FlowDirection.LeftToRight;
+            layoutEdit.Location = new Point(15, 35);
+            layoutEdit.Height = 165;
             editRuler.AutoSize = false;
             editRuler.Height = 2;
             editRuler.Text = "";
             editRuler.BorderStyle = BorderStyle.Fixed3D;
             editRuler.Location = new Point(0, 20);
-            
             editHeader.Text = "Existing connections";
             editHeader.Width = 105;
             editHeader.Location = new Point(20, 14);
-
-            
             editType.Enabled = false;
             editType.Width = width / 4;
             editTitle.Enabled = false;
@@ -92,29 +82,70 @@ namespace LinqEditor.UI.WinForm.Forms
             editConnStr.Multiline = true;
             editConnStr.WordWrap = true;
             editConnStr.Font = font;
-
             deleteBtn.Text = "Delete";
             deleteBtn.Enabled = false;
-            deleteBtn.Click += delegate 
-            {
-                var obj = editSelector.SelectedItem as Connection;
-                _schemaStore.DeleteConnectionString(obj.ConnectionString);
-                editConnStr.Text = "";
-                editConnStr.Enabled = false;
-                editType.Text = "";
-                editType.Enabled = false;
-                editTitle.Text = "";
-                editTitle.Enabled = false;
-                deleteBtn.Enabled = false;
-                saveBtn.Enabled = false;
-                bindConnections();
-            };
-            
             saveBtn.Text = "Save";
             saveBtn.Enabled = false;
-
             editSelector.Dock = DockStyle.Top;
             editSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            /////////////////////////////////////////////////////////////
+
+            var addOffset = 220;
+
+            layoutAdd.BackColor = Color.Transparent;
+            layoutAdd.FlowDirection = FlowDirection.LeftToRight;
+            layoutAdd.Location = new Point(15, addOffset + 15);
+            layoutAdd.Height = 160;
+
+            addRuler.AutoSize = false;
+            addRuler.Height = 2;
+            addRuler.Text = "";
+            addRuler.BorderStyle = BorderStyle.Fixed3D;
+            addRuler.Location = new Point(0, addOffset);
+            addHeader.Text = "Add connection";
+            addHeader.Width = 85;
+            addHeader.Location = new Point(20, addOffset - 7);
+            addType.Width = width / 4;
+            addType.DropDownStyle = ComboBoxStyle.DropDownList;
+            addType.Items.Add("SQL Server");
+            addType.SelectedItem = addType.Items[0];
+            addType.Enabled = false;
+            addDescription.Text = "Enter a connection string and an optional display title";
+            addConnStr.Multiline = true;
+            addConnStr.WordWrap = true;
+            addConnStr.Height = 75;
+            addConnStr.Font = font;
+            addButton.Text = "Add";
+            addButton.Enabled = false;
+
+            ///////////////////////////////////////////////////////////////
+
+            Action bindConnections = () =>
+            {
+                editSelector.Items.Clear();
+                foreach (var conn in _connectionStore.Connections)
+                {
+                    editSelector.Items.Add(conn);
+                }
+                editSelector.Enabled = editSelector.Items.Count > 0;
+            };
+
+            addButton.Click += delegate
+            {
+                _connectionStore.Add(new Connection { Id = Guid.NewGuid(), ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
+
+                addConnStr.Text = string.Empty;
+                addTitle.Text = string.Empty;
+                addButton.Enabled = false;
+                bindConnections();
+            };
+
+            addConnStr.TextChanged += delegate
+            {
+                addButton.Enabled = addConnStr.Text.Length > 0;
+            };
+
             editSelector.SelectedValueChanged += delegate(object sender, EventArgs args)
             {
                 var list = sender as ComboBox;
@@ -128,67 +159,30 @@ namespace LinqEditor.UI.WinForm.Forms
                     editType.Text = "SQL Server";
                     saveBtn.Enabled = true;
                     deleteBtn.Enabled = true;
-                } 
+                }
             };
 
-            layoutEdit.BackColor = Color.Transparent;
-            layoutEdit.FlowDirection = FlowDirection.LeftToRight;
-            layoutEdit.Location = new Point(15, 35);
-            layoutEdit.Height = 165;
-
-            /////////////////////////////////////////////////////////////
-
-            var addOffset = 220;
-
-            addRuler.AutoSize = false;
-            addRuler.Height = 2;
-            addRuler.Text = "";
-            addRuler.BorderStyle = BorderStyle.Fixed3D;
-            addRuler.Location = new Point(0, addOffset);
-            
-            addHeader.Text = "Add connection";
-            addHeader.Width = 85;
-            addHeader.Location = new Point(20, addOffset - 7);
-
-            
-            addType.Width = width / 4;
-            addType.DropDownStyle = ComboBoxStyle.DropDownList;
-            addType.Items.Add("SQL Server");
-            addType.SelectedItem = addType.Items[0];
-            addType.Enabled = false;
-
-            layoutAdd.BackColor = Color.Transparent;
-            layoutAdd.FlowDirection = FlowDirection.LeftToRight;
-            layoutAdd.Location = new Point(15, addOffset + 15);
-            layoutAdd.Height = 160;
-
-            
-            addDescription.Text = "Enter a connection string and an optional display title";
-
-            addConnStr.Multiline = true;
-            addConnStr.WordWrap = true;
-            addConnStr.Height = 75;
-            addConnStr.Font = font;
-
-            addButton.Text = "Add";
-            addButton.Enabled = false;
-            addButton.Click += delegate
+            deleteBtn.Click += delegate
             {
-                _schemaStore.AddConnectionString(addConnStr.Text, addTitle.Text);
-                addConnStr.Text = string.Empty;
-                addTitle.Text = string.Empty;
-                addButton.Enabled = false;
+                var obj = editSelector.SelectedItem as Connection;
+                _connectionStore.Delete(obj);
+
+                editConnStr.Text = "";
+                editConnStr.Enabled = false;
+                editType.Text = "";
+                editType.Enabled = false;
+                editTitle.Text = "";
+                editTitle.Enabled = false;
+                deleteBtn.Enabled = false;
+                saveBtn.Enabled = false;
+
                 bindConnections();
             };
 
-            addConnStr.TextChanged += delegate 
-            {
-                addButton.Enabled = addConnStr.Text.Length > 0;
-            };
-
-            ///////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
 
             var lastOffset = 405;
+
             var lastRuler = new Label();
             lastRuler.AutoSize = false;
             lastRuler.Height = 2;
@@ -208,8 +202,7 @@ namespace LinqEditor.UI.WinForm.Forms
                 editConnStr.Width = layoutEdit.ClientSize.Width - 15;
                 editTitle.Width = layoutEdit.ClientSize.Width - 15;
             };
-            layoutEdit.Width = 200;
-
+            
             layoutAdd.ClientSizeChanged += delegate
             {
                 addDescription.Width = layoutAdd.ClientSize.Width - 15;

@@ -14,15 +14,15 @@ namespace LinqEditor.Core.Settings
     [Serializable]
     public class ApplicationSettings
     {
-        protected string _path = PathUtility.ApplicationDirectory + FileName;
-        protected ApplicationSettings _storedInstance;
         public static string FileName = "settings.json";
+        protected static string path = (PathUtility.ApplicationDirectory + FileName);
+        protected ApplicationSettings _storedInstance;
         
-        protected T Read<T>()
+        protected static T Read<T>()
         {
-            if (File.Exists(_path))
+            if (File.Exists(path))
             {
-                var fileData = File.ReadAllText(_path);
+                var fileData = File.ReadAllText(path);
                 try
                 {
                     return JsonConvert.DeserializeObject<T>(fileData);
@@ -35,7 +35,7 @@ namespace LinqEditor.Core.Settings
         protected void Save()
         {
             var str = JsonConvert.SerializeObject(this);
-            File.WriteAllText(_path, str);
+            File.WriteAllText(path, str);
         }
     }
 }

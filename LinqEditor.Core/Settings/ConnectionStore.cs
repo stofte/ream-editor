@@ -17,16 +17,16 @@ namespace LinqEditor.Core.Settings
 
     public class ConnectionStore : ApplicationSettings, IConnectionStore
     {
-        public ConnectionStore() : base()
+        public static ConnectionStore Instance
         {
-            var instance = Read<ConnectionStore>();
-            if (instance != null)
+            get 
             {
-                _connections = instance._connections;
-            }
-            else
-            {
-                _connections = new List<Connection>();
+                ConnectionStore connStore = Read<ConnectionStore>();
+                if (connStore == null)
+                {
+                    connStore = new ConnectionStore() { _connections = new List<Connection>() };
+                }
+                return connStore;
             }
         }
 
@@ -35,7 +35,8 @@ namespace LinqEditor.Core.Settings
 
         public void Add(Connection conn)
         {
-            if (!_connections.Contains(conn, new Connection()))
+            if (conn.Id == Guid.Empty) throw new ArgumentException("connection must have id");
+            if (_connections.Where(x => x.Id == conn.Id).Count() == 0)
             {
                 _connections.Add(conn);
                 Save();
@@ -44,12 +45,21 @@ namespace LinqEditor.Core.Settings
 
         public void Update(Connection conn)
         {
-
+            foreach (var c in _connections)
+            {
+                if (c.Id == conn.Id)
+                {
+                    c.CachedSchemaFileName = conn.CachedSchemaFileName;
+                    c.CachedSchemaNamespace = conn.CachedSchemaNamespace;
+                    c.DisplayName = conn.DisplayName;
+                    c.ConnectionString = conn.ConnectionString;
+                }
+            }
         }
 
-        public void Update(Connection conn)
+        public void Delete(Connection conn)
         {
-
+            _connections = _connections.Where(x => x.Id != conn.Id).ToList();
         }
 
         [JsonIgnore]

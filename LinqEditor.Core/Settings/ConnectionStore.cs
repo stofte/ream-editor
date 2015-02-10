@@ -53,6 +53,8 @@ namespace LinqEditor.Core.Settings
                     c.CachedSchemaNamespace = conn.CachedSchemaNamespace;
                     c.DisplayName = conn.DisplayName;
                     c.ConnectionString = conn.ConnectionString;
+                    Save();
+                    break;
                 }
             }
         }
@@ -60,6 +62,7 @@ namespace LinqEditor.Core.Settings
         public void Delete(Connection conn)
         {
             _connections = _connections.Where(x => x.Id != conn.Id).ToList();
+            Save();
         }
 
         [JsonIgnore]

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Settings
 {
-    public class SettingsStore : ApplicationSettings
+    public class SettingsStore : ApplicationSettings, ISettingsStore
     {
         private int _mainX;
         private int _mainY;

@@ -15,6 +15,7 @@ namespace LinqEditor.Core.Tests
     public class ApplicationSettingsTests
     {
         string connStorePath = ConnectionStore.FileName(typeof(ConnectionStore));
+        string settingsPath = SettingsStore.FileName(typeof(SettingsStore));
 
         [TestFixtureSetUp]
         [TestFixtureTearDown]
@@ -25,6 +26,10 @@ namespace LinqEditor.Core.Tests
             if (File.Exists(connStorePath))
             {
                 File.Delete(connStorePath);
+            }
+            if (File.Exists(settingsPath))
+            {
+                File.Delete(settingsPath);
             }
         }
 
@@ -50,7 +55,7 @@ namespace LinqEditor.Core.Tests
             var app = ConnectionStore.Instance;
             Assert.IsNotNull(app.Connections);
         }
-
+        
         [Test]
         public void Generated_Settings_File_Contains_Mapped_Values()
         {

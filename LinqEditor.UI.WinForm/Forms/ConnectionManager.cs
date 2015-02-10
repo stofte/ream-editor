@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Settings;
+using LinqEditor.UI.WinForm.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +35,7 @@ namespace LinqEditor.UI.WinForm.Forms
             var editSelector = new ComboBox();
             var editRuler = new Label();
             var editHeader = new Label();
-            var editConnStr = new TextBox();
+            var editConnStr = new TextBox2();
             var editTitle = new TextBox();
             var editType = new TextBox();
             var deleteBtn = new Button();
@@ -44,7 +45,7 @@ namespace LinqEditor.UI.WinForm.Forms
             var addRuler = new Label();
             var addHeader = new Label();
             var addDescription = new Label();
-            var addConnStr = new TextBox();
+            var addConnStr = new TextBox2();
             var addTitle = new TextBox();
             var addType = new ComboBox();
             var addButton = new Button();
@@ -83,11 +84,6 @@ namespace LinqEditor.UI.WinForm.Forms
             editConnStr.WordWrap = true;
             editConnStr.Font = font;
             editConnStr.ScrollBars = ScrollBars.Vertical;
-            editConnStr.KeyDown += delegate(object sender, KeyEventArgs args)
-            {
-                if (args.Control && args.KeyCode == Keys.A)
-                    editConnStr.SelectAll();
-            };
             deleteBtn.Text = "Delete";
             deleteBtn.Enabled = false;
             saveBtn.Text = "Save";
@@ -121,13 +117,8 @@ namespace LinqEditor.UI.WinForm.Forms
             addConnStr.Multiline = true;
             addConnStr.WordWrap = true;
             addConnStr.Height = 75;
-            addConnStr.ScrollBars = ScrollBars.Vertical;
             addConnStr.Font = font;
-            addConnStr.KeyDown += delegate(object sender, KeyEventArgs args) 
-            {
-                if (args.Control && args.KeyCode == Keys.A)
-                    addConnStr.SelectAll();
-            };
+            addConnStr.ScrollBars = ScrollBars.Vertical;
             addButton.Text = "Add";
             addButton.Enabled = false;
 
@@ -135,22 +126,79 @@ namespace LinqEditor.UI.WinForm.Forms
 
             Action bindConnections = () =>
             {
+                var current = editSelector.SelectedItem as Connection;
                 editSelector.Items.Clear();
                 foreach (var conn in _connectionStore.Connections)
                 {
                     editSelector.Items.Add(conn);
                 }
                 editSelector.Enabled = editSelector.Items.Count > 0;
+
+                if (current != null)
+                {
+                    foreach (Connection conn in editSelector.Items)
+                    {
+                        if (current.Id == conn.Id)
+                        {
+                            editSelector.SelectedItem = conn;
+                            break;
+                        }
+                    }
+                }
+                else if (editSelector.Items.Count > 0)
+                {
+                    // if we had no previous, we just pick the first item
+                    editSelector.SelectedIndex = 0;
+                }
             };
 
+            Action clearEdit = () =>
+            {
+                editConnStr.Text = "";
+                editConnStr.Enabled = false;
+                editType.Text = "";
+                editType.Enabled = false;
+                editTitle.Text = "";
+                editTitle.Enabled = false;
+                deleteBtn.Enabled = false;
+                saveBtn.Enabled = false;
+            };
+
+            deleteBtn.Click += delegate
+            {
+                var obj = editSelector.SelectedItem as Connection;
+                _connectionStore.Delete(obj);
+                clearEdit();
+                editSelector.SelectedItem = null;
+                bindConnections();
+            };
+
+            saveBtn.Click += delegate
+            {
+                var conn = editSelector.SelectedItem as Connection;
+                conn.ConnectionString = editConnStr.Text;
+                conn.DisplayName = editTitle.Text;
+                clearEdit();
+                _connectionStore.Update(conn);
+                bindConnections();
+            };
+            
             addButton.Click += delegate
             {
-                _connectionStore.Add(new Connection { Id = Guid.NewGuid(), ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
-
+                var id =  Guid.NewGuid();
+                _connectionStore.Add(new Connection { Id = id, ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
                 addConnStr.Text = string.Empty;
                 addTitle.Text = string.Empty;
                 addButton.Enabled = false;
                 bindConnections();
+                foreach (Connection obj in editSelector.Items)
+                {
+                    if (obj.Id == id)
+                    {
+                        editSelector.SelectedItem = obj;
+                        break;
+                    }
+                }
             };
 
             addConnStr.TextChanged += delegate
@@ -172,23 +220,6 @@ namespace LinqEditor.UI.WinForm.Forms
                     saveBtn.Enabled = true;
                     deleteBtn.Enabled = true;
                 }
-            };
-
-            deleteBtn.Click += delegate
-            {
-                var obj = editSelector.SelectedItem as Connection;
-                _connectionStore.Delete(obj);
-
-                editConnStr.Text = "";
-                editConnStr.Enabled = false;
-                editType.Text = "";
-                editType.Enabled = false;
-                editTitle.Text = "";
-                editTitle.Enabled = false;
-                deleteBtn.Enabled = false;
-                saveBtn.Enabled = false;
-
-                bindConnections();
             };
 
             ////////////////////////////////////////////////////////////////////
@@ -231,6 +262,19 @@ namespace LinqEditor.UI.WinForm.Forms
                 layoutEdit.Width = ClientSize.Width - 20;
             };
 
+            // resets the form when shown
+            VisibleChanged += delegate
+            {
+                if (Visible)
+                {
+                    addConnStr.Text = string.Empty;
+                    addTitle.Text = string.Empty;
+                    clearEdit();
+                    editSelector.SelectedItem = null;
+                    bindConnections();
+                }
+            };
+
             layoutEdit.Controls.AddRange(new Control[] { editSelector, editConnStr, editTitle, editType, deleteBtn, saveBtn });
             layoutAdd.Controls.AddRange(new Control[] { addDescription, addConnStr, addTitle, addType, addButton });
             Controls.AddRange(new Control[] { editHeader, editRuler, layoutEdit, addHeader, addRuler, layoutAdd, lastRuler, closeButton });
@@ -241,9 +285,6 @@ namespace LinqEditor.UI.WinForm.Forms
             layoutEdit.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
-
-            bindConnections();
         }
-
     }
 }

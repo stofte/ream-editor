@@ -75,6 +75,9 @@
     <Compile Include="Controls\OutputPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\TextBox2.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\ConnectionManager.cs">
       <SubType>Form</SubType>
     </Compile>

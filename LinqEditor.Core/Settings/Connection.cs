@@ -17,7 +17,11 @@ namespace LinqEditor.Core.Settings
 
         public override string ToString()
         {
-            return DisplayName;
+            if (!string.IsNullOrWhiteSpace(DisplayName))
+            {
+                return string.Format("{0} ({1})", DisplayName, ConnectionString);
+            }
+            return ConnectionString;
         }
     }
 }

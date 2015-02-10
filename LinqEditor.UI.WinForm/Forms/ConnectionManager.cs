@@ -24,6 +24,16 @@ namespace LinqEditor.UI.WinForm.Forms
             InitializeComponent();
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+            {
+                Close();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         private void InitializeComponent()
         {
             var width = 380;
@@ -194,7 +204,6 @@ namespace LinqEditor.UI.WinForm.Forms
             closeButton.Text = "Close";
             closeButton.Location = new Point(width - 95, lastOffset + 15);
             closeButton.Click += delegate { Hide(); };
-            AcceptButton = closeButton;
 
             layoutEdit.ClientSizeChanged += delegate
             {

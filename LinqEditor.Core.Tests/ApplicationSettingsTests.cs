@@ -45,6 +45,13 @@ namespace LinqEditor.Core.Tests
         }
 
         [Test]
+        public void Connections_Is_Never_Null()
+        {
+            var app = ConnectionStore.Instance;
+            Assert.IsNotNull(app.Connections);
+        }
+
+        [Test]
         public void Generated_Settings_File_Contains_Mapped_Values()
         {
             var app = ConnectionStore.Instance;

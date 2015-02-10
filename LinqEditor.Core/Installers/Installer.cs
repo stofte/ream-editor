@@ -16,6 +16,7 @@ namespace LinqEditor.Core.Installers
                                         .ImplementedBy<Settings.SchemaStore>());
             container.Register(Component.For<Settings.IConnectionStore>()
                                         .ImplementedBy<Settings.ConnectionStore>()
+                                        .UsingFactoryMethod(() => Settings.ConnectionStore.Instance)
                                         .LifestyleSingleton());
 
             container.Register(Component.For<IContext>()

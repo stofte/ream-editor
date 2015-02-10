@@ -14,5 +14,10 @@ namespace LinqEditor.Core.Settings
         public string DisplayName { get; set; }
         public string CachedSchemaFileName { get; set; }
         public string CachedSchemaNamespace { get; set; }
+
+        public override string ToString()
+        {
+            return DisplayName;
+        }
     }
 }

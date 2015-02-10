@@ -14,28 +14,13 @@ namespace LinqEditor.UI.WinForm.Forms
 {
     public class ConnectionManager : Form
     {
-        class BasicComboBoxItem
-        {
-            public string Name { get; set; }
-            public string ConnectionString { get; set; }
-
-            public override string ToString()
-            {
-                return string.Format("{0} {1}", Name, ConnectionString);
-            }
-        }
-
-        // http://stackoverflow.com/questions/11873378/adding-placeholder-text-to-textbox
-        private const int EM_SETCUEBANNER = 0x1501;
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)]string lParam);
-        
         ISchemaStore _schemaStore;
+        IConnectionStore _connectionStore;
 
-        public ConnectionManager(ISchemaStore schemaStore)
+        public ConnectionManager(ISchemaStore schemaStore, IConnectionStore connectionStore)
         {
             _schemaStore = schemaStore;
+            _connectionStore = connectionStore;
             InitializeComponent();
         }
 
@@ -67,9 +52,9 @@ namespace LinqEditor.UI.WinForm.Forms
             Action bindConnections = () =>
             {
                 editSelector.Items.Clear();
-                foreach (string connStr in _schemaStore.ConnectionNames.Keys)
+                foreach (var conn in _connectionStore.Connections)
                 {
-                    editSelector.Items.Add(new BasicComboBoxItem { Name = _schemaStore.ConnectionNames[connStr], ConnectionString = connStr });
+                    editSelector.Items.Add(conn);
                 }
                 editSelector.Enabled = editSelector.Items.Count > 0;
             };
@@ -112,7 +97,7 @@ namespace LinqEditor.UI.WinForm.Forms
             deleteBtn.Enabled = false;
             deleteBtn.Click += delegate 
             {
-                var obj = editSelector.SelectedItem as BasicComboBoxItem;
+                var obj = editSelector.SelectedItem as Connection;
                 _schemaStore.DeleteConnectionString(obj.ConnectionString);
                 editConnStr.Text = "";
                 editConnStr.Enabled = false;
@@ -133,12 +118,12 @@ namespace LinqEditor.UI.WinForm.Forms
             editSelector.SelectedValueChanged += delegate(object sender, EventArgs args)
             {
                 var list = sender as ComboBox;
-                var selected = list.SelectedItem as BasicComboBoxItem;
+                var selected = list.SelectedItem as Connection;
                 if (selected != null)
                 {
                     editConnStr.Text = selected.ConnectionString;
                     editConnStr.Enabled = true;
-                    editTitle.Text = selected.Name;
+                    editTitle.Text = selected.DisplayName;
                     editTitle.Enabled = true;
                     editType.Text = "SQL Server";
                     saveBtn.Enabled = true;

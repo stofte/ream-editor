@@ -9,6 +9,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 {
     public interface IAsyncTemplateCodeAnalysis
     {
+        Task InitializeAsync(string assemblyPath);
         bool IsReady { get; }
         Task<AnalysisResult> AnalyzeAsync(string sourceFragment, int updateIndex);
     }

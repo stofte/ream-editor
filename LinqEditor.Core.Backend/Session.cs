@@ -13,6 +13,9 @@ using LinqEditor.Core.Containers;
 
 namespace LinqEditor.Core.Backend
 {
+    /// <summary>
+    /// well designed class with single responsibility of doing everything
+    /// </summary>
     public class Session : ISession, IDisposable
     {
         private string _connectionString;

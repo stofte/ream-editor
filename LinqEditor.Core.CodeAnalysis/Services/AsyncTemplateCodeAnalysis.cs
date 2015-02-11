@@ -14,6 +14,11 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         public AsyncTemplateCodeAnalysis(ITemplateService templateService, IContext context) 
             : base(templateService, context) { }
 
+        public async Task InitializeAsync(string assemblyPath)
+        {
+            await Task.Run(() => Initialize(assemblyPath));
+        }
+
         public async Task<AnalysisResult> AnalyzeAsync(string sourceFragment, int updateIndex)
         {
             return await Task.Run(() => Analyze(sourceFragment, updateIndex));

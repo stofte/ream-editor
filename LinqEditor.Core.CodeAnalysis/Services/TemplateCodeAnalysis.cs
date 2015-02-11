@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace LinqEditor.Core.CodeAnalysis.Services
 {
@@ -43,7 +44,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _context.ContextUpdated += Initialize;
         }
 
-        void Initialize(string assemblyPath, string schemaNamespace)
+        public void Initialize(string assemblyPath)
+        {
+            // todo: dont depend on filename ...
+            Initialize(assemblyPath, Path.GetFileNameWithoutExtension(assemblyPath));
+        }
+
+        private void Initialize(string assemblyPath, string schemaNamespace)
         {
             // update references
             if (!string.IsNullOrEmpty(assemblyPath))

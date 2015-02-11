@@ -35,6 +35,11 @@ namespace LinqEditor.Core.Backend.Tests
                                         .ImplementedBy<Context.Context>()
                                         .LifestyleScoped());
 
+            container.Register(Component.For<Settings.IConnectionStore>()
+                                        .ImplementedBy<Settings.ConnectionStore>()
+                                        .UsingFactoryMethod(() => Settings.ConnectionStore.Instance)
+                                        .LifestyleSingleton());
+
             container.Register(Component.For<IContainerMapper>()
                                         .ImplementedBy<ContainerMapper>()
                                         .LifestyleSingleton());

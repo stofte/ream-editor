@@ -8,6 +8,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
     /// </summary>
     public interface ITemplateCodeAnalysis
     {
+        void Initialize(string assemblyPath);
         /// <summary>
         /// Analyses the specified source fragment.
         /// </summary>

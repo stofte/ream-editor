@@ -127,11 +127,13 @@ namespace LinqEditor.UI.WinForm.Forms
             {
                 if (!_enableContextSelector) return;
                 _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
-                _executeButton.Enabled = false;
                 var selected = _contextSelector.SelectedItem as Connection;
+                if (selected == null) return;
+                _executeButton.Enabled = false;
                 await BindSession(selected.Id);
                 _executeButton.Enabled = true;
                 _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+                _settingsStore.LastConnectionUsed = selected.Id;
             };
             BindConnections();
 

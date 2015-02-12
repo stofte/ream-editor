@@ -264,7 +264,8 @@ namespace LinqEditor.UI.WinForm.Controls
             }
 
             // if the tab shown doesn't change, no enter event is fired, so check and update here
-            if (tabControl.SelectedTab == tab)
+            // also check that we werent moved out of the ui
+            if (tabControl != null && tabControl.SelectedTab == tab)
             {
                 BindRowCount(grid.RowCount);
             }

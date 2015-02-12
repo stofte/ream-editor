@@ -18,7 +18,7 @@ namespace LinqEditor.Core.Backend
     /// <summary>
     /// well designed class with single responsibility of doing everything
     /// </summary>
-    public class Session : ISession, IDisposable
+    public class Session : ISession
     {
         // session is one-time bind only
         private bool _codeSession;
@@ -122,20 +122,7 @@ namespace LinqEditor.Core.Backend
                 Error = exn, // only member set in runner
             };
         }
-
-        public void Dispose()
-        {
-            if (_codeContainer != null && _codeContainerFactory != null)
-            {
-                _codeContainerFactory.Release(_codeContainer);
-            }
-
-            if (_databaseContainer != null && _databaseContainerFactory != null)
-            {
-                _databaseContainerFactory.Release(_databaseContainer);
-            }
-        }
-
+        
         // expose code analysis
         public AnalysisResult Analyze(string sourceFragment, int updateIndex)
         {

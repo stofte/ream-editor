@@ -58,12 +58,16 @@ namespace LinqEditor.Core.Settings
             {
                 if (c.Id == conn.Id)
                 {
+                    // these are changed by the user. since the event is a hack mainly for the ui, we dont fire
+                    // the event if the changes was by code, since we risk firing event handlers in the ui.
+                    var uiEvent = c.DisplayName != conn.DisplayName || c.ConnectionString != conn.ConnectionString;
+
                     c.CachedSchemaFileName = conn.CachedSchemaFileName;
                     c.CachedSchemaNamespace = conn.CachedSchemaNamespace;
                     c.DisplayName = conn.DisplayName;
                     c.ConnectionString = conn.ConnectionString;
                     Save();
-                    if (ConnectionsUpdated != null)
+                    if (ConnectionsUpdated != null && uiEvent)
                     {
                         ConnectionsUpdated();
                     }

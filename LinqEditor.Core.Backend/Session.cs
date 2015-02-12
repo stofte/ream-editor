@@ -20,12 +20,6 @@ namespace LinqEditor.Core.Backend
     /// </summary>
     public class Session : ISession, IDisposable
     {
-        private string _connectionString;
-        private string _schemaPath;
-        private string _schemaNamespace;
-        private string _outputFolder;
-        private Guid _sessionId = Guid.NewGuid();
-
         // session is one-time bind only
         private bool _codeSession;
         private bool _initialized = false;
@@ -33,8 +27,7 @@ namespace LinqEditor.Core.Backend
 
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
-        //private ISchemaStore _userSettings;
-        //private IContext _context;
+
         private Stopwatch _watch;
         private IIsolatedCodeContainerFactory _codeContainerFactory;
         private IIsolatedDatabaseContainerFactory _databaseContainerFactory;
@@ -52,9 +45,7 @@ namespace LinqEditor.Core.Backend
         {
             _schemaProvider = schemaProvider;
             _generator = generator;
-            //_userSettings = userSettings;
             _watch = new Stopwatch();
-            _outputFolder = Core.PathUtility.CachePath;
             _codeContainerFactory = codeContainerFactory;
             _databaseContainerFactory = databaseContainerFactory;
             _containerMapper = containerMapper;
@@ -75,8 +66,8 @@ namespace LinqEditor.Core.Backend
             _watch.Restart();
             var programId = Guid.NewGuid();
             var programSource = _codeSession ? _generator.GenerateCodeStatements(programId, sourceFragment) :
-                                               _generator.GenerateQuery(programId, sourceFragment, _schemaNamespace);
-            var references = _codeSession ? new string[] { } : new string[] { _schemaPath };
+                                               _generator.GenerateQuery(programId, sourceFragment, _connection.CachedSchemaNamespace );
+            var references = _codeSession ? new string[] { } : new string[] { _connection.CachedSchemaFileName };
             var prefix = _codeSession ? SchemaConstants.CodePrefix : SchemaConstants.QueryPrefix;
             var result = CSharpCompiler.CompileToBytes(programSource, programId.ToIdentifierWithPrefix(prefix), references);
 
@@ -119,8 +110,8 @@ namespace LinqEditor.Core.Backend
             }
             else
             {
-                _databaseContainer = _databaseContainerFactory.Create(_containerMapper.MapConnectionString(_connectionString));
-                var res = _databaseContainer.Value.Initialize(_schemaPath);
+                _databaseContainer = _databaseContainerFactory.Create(_containerMapper.MapConnectionString(_connection.ConnectionString));
+                var res = _databaseContainer.Value.Initialize(_connection.CachedSchemaFileName);
                 exn = res.Error;
             }
 
@@ -167,7 +158,6 @@ namespace LinqEditor.Core.Backend
         private InitializeResult InitCode()
         {
             _codeAnalysis.Initialize();
-            //_context.UpdateContext(null, null);
             return new InitializeResult();
         }
 
@@ -179,33 +169,26 @@ namespace LinqEditor.Core.Backend
             // check cache
             if (string.IsNullOrEmpty(_connection.CachedSchemaFileName))
             {
-                _schemaNamespace = _sessionId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
-                var sqlSchema = _schemaProvider.GetSchema(_connectionString);
-                var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
-                var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
-                _schemaPath = result.AssemblyPath;
-
+                var schemaId = Guid.NewGuid();
+                var schemaNamespace = schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
+                var sqlSchema = _schemaProvider.GetSchema(_connection.ConnectionString);
+                var schemaSource = _generator.GenerateSchema(schemaId, sqlSchema);
+                var result = CSharpCompiler.CompileToFile(schemaSource, schemaNamespace, Core.PathUtility.CachePath);
+                
                 if (result.Success)
                 {
                     _connection.CachedSchemaFileName = result.AssemblyPath;
-                    _connection.CachedSchemaNamespace = _schemaNamespace;
+                    _connection.CachedSchemaNamespace = schemaNamespace;
                     _connectionStore.Update(_connection);
                 }
             }
-            else
-            {
-                _schemaPath = _connection.CachedSchemaFileName;
-                // todo: probably want to store namespace in settings also
-                _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
 
-            }
-
-            _codeAnalysis.Initialize(_schemaPath);
+            _codeAnalysis.Initialize(_connection.CachedSchemaFileName);
 
             return new InitializeResult
             {
-                AssemblyPath = _schemaPath,
-                SchemaNamespace = _schemaNamespace
+                AssemblyPath = _connection.CachedSchemaFileName,
+                SchemaNamespace = _connection.CachedSchemaNamespace
             };
         }
 

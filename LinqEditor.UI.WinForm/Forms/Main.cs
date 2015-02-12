@@ -30,6 +30,7 @@ namespace LinqEditor.UI.WinForm.Forms
         IBackgroundSessionFactory _backgroundSessionFactory;
         IConnectionStore _connectionStore;
         ISettingsStore _settingsStore;
+        bool _enableContextSelector = false;
 
         Form _connectionManager;
 
@@ -121,15 +122,21 @@ namespace LinqEditor.UI.WinForm.Forms
             _contextSelector = new ComboBox();
             _contextSelector.Dock = DockStyle.Top;
             _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
-            _contextSelector.SelectedIndexChanged += delegate 
+            _contextSelector.SelectedIndexChanged += async delegate 
             {
- 
+                if (!_enableContextSelector) return;
+                _executeButton.Enabled = false;
+                var selected = _contextSelector.SelectedItem as Connection;
+                await BindSession(selected.Id);
+                _executeButton.Enabled = true;
             };
             BindConnections();
 
             _connectionStore.ConnectionsUpdated += delegate
             {
+                _enableContextSelector = false;
                 BindConnections();
+                _enableContextSelector = true;
             };
             
             // add controls and resume
@@ -147,13 +154,38 @@ namespace LinqEditor.UI.WinForm.Forms
 
         void BindConnections()
         {
-            var selected = _contextSelector.SelectedItem;
+            var selected = _contextSelector.SelectedItem as Connection;
             _contextSelector.Items.Clear();
             _contextSelector.Items.Add(new Connection { Id = Guid.Empty, DisplayName = "", ConnectionString = "Code" });
             foreach (var conn in _connectionStore.Connections)
             {
                 _contextSelector.Items.Add(conn);
             }
+            if (selected != null)
+            {
+                // see if the previous context still exists
+                foreach (Connection conn in _contextSelector.Items)
+                {
+                    if (conn.Id == selected.Id)
+                    {
+                        _contextSelector.SelectedItem = conn;
+                    }
+                }
+            }
+        }
+
+        async Task BindSession(Guid id)
+        {
+            if (_session != null)
+            {
+                _backgroundSessionFactory.Release(_session);
+            }
+            var sessionId = Guid.NewGuid();
+            _session = _backgroundSessionFactory.Create(sessionId);
+            _editor.Session(sessionId);
+            var result = await _session.InitializeAsync(id);
+            // loads appdomain and initializes connection
+            await _session.LoadAppDomainAsync();
         }
 
         void _databaseButton_Click(object sender, EventArgs e)
@@ -181,7 +213,7 @@ namespace LinqEditor.UI.WinForm.Forms
             _editorFocusTimer.Stop();
             _restoreEditorFocusOnSplitterMoved = _editorFocusTimer.ElapsedMilliseconds < 50; // more fudging
         }
-                
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.F5)
@@ -209,14 +241,10 @@ namespace LinqEditor.UI.WinForm.Forms
                     break;
                 }
             }
-            var sessionId = Guid.NewGuid();
-            _session = _backgroundSessionFactory.Create(sessionId);
-            _editor.Session(sessionId); // need something better
-            var result = await _session.InitializeAsync(id);
-            // loads appdomain and initializes connection
-            await _session.LoadAppDomainAsync();
+            await BindSession(id);
             _statusLabel.Text = "Query ready";
             _executeButton.Enabled = true;
+            _enableContextSelector = true;
         }
 
         async void _executeButton_Click(object sender, EventArgs e)

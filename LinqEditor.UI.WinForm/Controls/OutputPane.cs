@@ -16,10 +16,6 @@ namespace LinqEditor.UI.WinForm.Controls
         TabControl _tabControl;
         TabPage _consoleTab;
         TabPage _diagnosticsTab;
-
-        // owned by Main form
-        ToolStripStatusLabel _rowCountLabel;
-        
         DataTable _diagnostics;
         List<TabPage> _cachedResultTabs;
 
@@ -240,19 +236,6 @@ namespace LinqEditor.UI.WinForm.Controls
 
             for (var i = 0; i < grid.Columns.Count; i++)
             {
-                //var mode = DataGridViewAutoSizeColumnMode.AllCells; 
-                //if (i == grid.Columns.Count - 1) {
-                //    var previousColWidth = 0;
-                //    for (var j = 0; j < grid.Columns.Count - 1; j++ ) 
-                //    {
-                //        previousColWidth += grid.Columns[j].Width;
-                //    }
-                //    // assume the last cell needs on average the same as the rest.
-                //    if (previousColWidth + (previousColWidth / (grid.Columns.Count - 1)) < gridWidth)
-                //    {
-                //        mode = DataGridViewAutoSizeColumnMode.Fill;
-                //    }
-                //}
                 grid.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             }
 

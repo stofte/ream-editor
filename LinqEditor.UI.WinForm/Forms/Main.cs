@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LinqEditor.Core.Settings;
+using LinqEditor.UI.WinForm.Resources;
 
 namespace LinqEditor.UI.WinForm.Forms
 {
@@ -54,7 +55,7 @@ namespace LinqEditor.UI.WinForm.Forms
 
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
-            Text = "Linq Editor";
+            Text = ApplicationStrings.APPLICATION_TITLE;
             Width = 800;
             Height = 500;
             MinimumSize = new Size(minWidth, minHeight);
@@ -84,7 +85,7 @@ namespace LinqEditor.UI.WinForm.Forms
             _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             _statusLabel = new ToolStripStatusLabel();
             _statusLabel.Alignment = ToolStripItemAlignment.Left;
-            _statusLabel.Text = "Loading";
+            _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
             _rowCountLabel = new ToolStripStatusLabel();
             _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
             _statusBar.Items.AddRange(new[] { _statusLabel, _rowCountLabel });
@@ -125,10 +126,12 @@ namespace LinqEditor.UI.WinForm.Forms
             _contextSelector.SelectedIndexChanged += async delegate 
             {
                 if (!_enableContextSelector) return;
+                _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
                 _executeButton.Enabled = false;
                 var selected = _contextSelector.SelectedItem as Connection;
                 await BindSession(selected.Id);
                 _executeButton.Enabled = true;
+                _statusLabel.Text = ApplicationStrings.EDITOR_READY;
             };
             BindConnections();
 
@@ -223,12 +226,7 @@ namespace LinqEditor.UI.WinForm.Forms
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
-
-        private async Task<ExecuteResult> Execute()
-        {
-            return await _session.ExecuteAsync(_editor.SourceCode);
-        }
-
+        
         async void Main_Load(object sender, EventArgs e)
         {
             // restore last used context
@@ -242,18 +240,20 @@ namespace LinqEditor.UI.WinForm.Forms
                 }
             }
             await BindSession(id);
-            _statusLabel.Text = "Query ready";
+            _statusLabel.Text = ApplicationStrings.EDITOR_READY;
             _executeButton.Enabled = true;
             _enableContextSelector = true;
         }
 
         async void _executeButton_Click(object sender, EventArgs e)
         {
+            _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
             var btn = sender as ToolStripButton;
             btn.Enabled = false;
-            var result = await Execute();
+            var result = await _session.ExecuteAsync(_editor.SourceCode);
             _outputPane.BindOutput(result);
             btn.Enabled = true;
+            _statusLabel.Text = ApplicationStrings.EDITOR_READY;
         }
     }
 }

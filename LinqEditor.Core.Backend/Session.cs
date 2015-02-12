@@ -10,6 +10,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using LinqEditor.Core.Containers;
+using LinqEditor.Core.CodeAnalysis.Services;
+using LinqEditor.Core.Models.Analysis;
 
 namespace LinqEditor.Core.Backend
 {
@@ -31,31 +33,33 @@ namespace LinqEditor.Core.Backend
 
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
-        private ISchemaStore _userSettings;
-        private IContext _context;
+        //private ISchemaStore _userSettings;
+        //private IContext _context;
         private Stopwatch _watch;
         private IIsolatedCodeContainerFactory _codeContainerFactory;
         private IIsolatedDatabaseContainerFactory _databaseContainerFactory;
         private IContainerMapper _containerMapper;
         private IConnectionStore _connectionStore;
+        private ITemplateCodeAnalysis _codeAnalysis;
+        private Connection _connection;
 
         private IIsolatedCodeContainer _codeContainer;
         private IIsolatedDatabaseContainer _databaseContainer;
 
-        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator, ISchemaStore userSettings, IContext context, 
-            IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, 
-            IContainerMapper containerMapper, IConnectionStore connectionStore)
+        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator,// ISchemaStore userSettings,
+            IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory,
+            IContainerMapper containerMapper, IConnectionStore connectionStore, ITemplateCodeAnalysis codeAnalysis)
         {
             _schemaProvider = schemaProvider;
             _generator = generator;
-            _userSettings = userSettings;
-            _context = context;
+            //_userSettings = userSettings;
             _watch = new Stopwatch();
             _outputFolder = Core.PathUtility.CachePath;
             _codeContainerFactory = codeContainerFactory;
             _databaseContainerFactory = databaseContainerFactory;
             _containerMapper = containerMapper;
             _connectionStore = connectionStore;
+            _codeAnalysis = codeAnalysis;
         }
 
         public InitializeResult Initialize(Guid connectionId)
@@ -63,100 +67,7 @@ namespace LinqEditor.Core.Backend
             if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
             _codeSession = connectionId == Guid.Empty;
             _initialized = true;
-
             return _codeSession ? InitCode() : InitDatabase(connectionId);
-        }
-
-        /// <summary>
-        /// Initializes the session as a code session.
-        /// </summary>
-        public InitializeResult Initialize()
-        {
-            if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
-            _codeSession = true;
-            _initialized = true;
-            _context.UpdateContext(null, null);
-            return new InitializeResult();
-        }
-
-        /// <summary>
-        /// Initializes the session as a database session, with the supplied connection string
-        /// </summary>
-        public InitializeResult Initialize(string connectionString)
-        {
-            if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
-            _codeSession = false;
-            _initialized = true;
-            _connectionString = connectionString;
-            // check cache
-            _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
-            if (string.IsNullOrEmpty(_schemaPath))
-            {
-                _schemaNamespace = _sessionId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
-                var sqlSchema = _schemaProvider.GetSchema(_connectionString);
-                var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
-                var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
-                _schemaPath = result.AssemblyPath;
-
-                if (result.Success)
-                {
-                    _userSettings.PersistSchema(_connectionString, sqlSchema, _schemaPath);
-                }
-            }
-            else
-            {
-                // todo: probably want to store namespace in settings also
-                _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
-            }
-
-            _context.UpdateContext(_schemaPath, _schemaNamespace);
-
-            return new InitializeResult
-            {
-                AssemblyPath = _schemaPath,
-                SchemaNamespace = _schemaNamespace
-            };
-        }
-
-        private InitializeResult InitCode()
-        {
-            _context.UpdateContext(null, null);
-            return new InitializeResult();
-        }
-
-        private InitializeResult InitDatabase(Guid id)
-        {
-            _connectionString = _connectionStore.Connections.Where(x => x.Id == id).Select(x => x.ConnectionString).SingleOrDefault();
-            if (_connectionString == null) throw new ArgumentException("unknown connection id");
-
-            // check cache
-            _schemaPath = _userSettings.GetCachedAssembly(_connectionString);
-            if (string.IsNullOrEmpty(_schemaPath))
-            {
-                _schemaNamespace = _sessionId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
-                var sqlSchema = _schemaProvider.GetSchema(_connectionString);
-                var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
-                var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
-                _schemaPath = result.AssemblyPath;
-
-                if (result.Success)
-                {
-                    _userSettings.PersistSchema(_connectionString, sqlSchema, _schemaPath);
-                }
-            }
-            else
-            {
-                // todo: probably want to store namespace in settings also
-                _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
-            }
-
-            _context.UpdateContext(_schemaPath, _schemaNamespace);
-
-            return new InitializeResult
-            {
-                AssemblyPath = _schemaPath,
-                SchemaNamespace = _schemaNamespace
-            };
         }
 
         public ExecuteResult Execute(string sourceFragment)
@@ -233,5 +144,70 @@ namespace LinqEditor.Core.Backend
                 _databaseContainerFactory.Release(_databaseContainer);
             }
         }
+
+        // expose code analysis
+        public AnalysisResult Analyze(string sourceFragment, int updateIndex)
+        {
+            if (!_codeAnalysis.IsReady)
+            {
+                return new AnalysisResult { Context = UserContext.Unknown };
+            }
+            return _codeAnalysis.Analyze(sourceFragment, updateIndex);
+        }
+
+        public AnalysisResult Analyze(string sourceFragment)
+        {
+            if (!_codeAnalysis.IsReady)
+            {
+                return new AnalysisResult { Context = UserContext.Unknown };
+            }
+            return _codeAnalysis.Analyze(sourceFragment);
+        }
+
+        private InitializeResult InitCode()
+        {
+            _codeAnalysis.Initialize();
+            //_context.UpdateContext(null, null);
+            return new InitializeResult();
+        }
+
+        private InitializeResult InitDatabase(Guid id)
+        {
+            _connection = _connectionStore.Connections.Where(x => x.Id == id).Single();
+            if (_connection == null) throw new ArgumentException("unknown connection id");
+
+            // check cache
+            if (string.IsNullOrEmpty(_connection.CachedSchemaFileName))
+            {
+                _schemaNamespace = _sessionId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
+                var sqlSchema = _schemaProvider.GetSchema(_connectionString);
+                var schemaSource = _generator.GenerateSchema(_sessionId, sqlSchema);
+                var result = CSharpCompiler.CompileToFile(schemaSource, _schemaNamespace, _outputFolder);
+                _schemaPath = result.AssemblyPath;
+
+                if (result.Success)
+                {
+                    _connection.CachedSchemaFileName = result.AssemblyPath;
+                    _connection.CachedSchemaNamespace = _schemaNamespace;
+                    _connectionStore.Update(_connection);
+                }
+            }
+            else
+            {
+                _schemaPath = _connection.CachedSchemaFileName;
+                // todo: probably want to store namespace in settings also
+                _schemaNamespace = Path.GetFileNameWithoutExtension(_schemaPath);
+
+            }
+
+            _codeAnalysis.Initialize(_schemaPath);
+
+            return new InitializeResult
+            {
+                AssemblyPath = _schemaPath,
+                SchemaNamespace = _schemaNamespace
+            };
+        }
+
     }
 }

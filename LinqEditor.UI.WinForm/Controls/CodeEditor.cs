@@ -5,20 +5,33 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using LinqEditor.Core.CodeAnalysis.Services;
+using LinqEditor.Core.Backend;
+using System;
 
 namespace LinqEditor.UI.WinForm.Controls
 {
     public class CodeEditor : UserControl
     {
         ScintillaNET.Scintilla _editor;
-        IAsyncTemplateCodeAnalysis _codeAnalyzer;
+        IBackgroundSession _session;
+        IBackgroundSessionFactory _sessionFactory;
 
         public string SourceCode { get { return _editor.Text; } }
 
-        public CodeEditor(IAsyncTemplateCodeAnalysis codeAnalyzer)
+        public CodeEditor(IBackgroundSessionFactory sessionFactory)
         {
-            _codeAnalyzer = codeAnalyzer;
+            _sessionFactory = sessionFactory;
             InitializeComponent();
+        }
+
+        public void Session(Guid id)
+        {
+            if (_session != null)
+            {
+                _sessionFactory.Release(_session);
+            }
+
+            _session = _sessionFactory.Create(id);
         }
 
         private void InitializeComponent()
@@ -60,11 +73,11 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
         {
-            if (!_codeAnalyzer.IsReady) return;
+            if (_session == null) return;
 
             if (e.Ch == '.')
             {
-                var result = await _codeAnalyzer.AnalyzeAsync(_editor.Text, _editor.CurrentPos-1);
+                var result = await _session.AnalyzeAsync(_editor.Text, _editor.CurrentPos - 1);
                 if (result.Context == UserContext.MemberCompletion)
                 {
                     _editor.AutoComplete.FillUpCharacters = "";

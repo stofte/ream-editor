@@ -8,7 +8,7 @@ namespace LinqEditor.Core.Backend
 {
     public interface IBackgroundSessionFactory
     {
-        IBackgroundSession Create();
+        IBackgroundSession Create(Guid id);
         void Release(IBackgroundSession session);
     }
 }

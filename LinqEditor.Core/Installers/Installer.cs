@@ -15,6 +15,7 @@ namespace LinqEditor.Core.Installers
             container.Register(Component.For<Settings.ISchemaStore>()
                                         .ImplementedBy<Settings.SchemaStore>());
 
+            // these classes touch files, so single instance only
             container.Register(Component.For<Settings.IConnectionStore>()
                                         .ImplementedBy<Settings.ConnectionStore>()
                                         .UsingFactoryMethod(() => Settings.ConnectionStore.Instance)
@@ -24,14 +25,9 @@ namespace LinqEditor.Core.Installers
                                         .ImplementedBy<Settings.ISettingsStore>()
                                         .UsingFactoryMethod(() => Settings.SettingsStore.Instance)
                                         .LifestyleSingleton());
-
-            container.Register(Component.For<IContext>()
-                                        .ImplementedBy<Context.Context>()
-                                        .LifestyleScoped());
-
+            
             container.Register(Component.For<IContainerMapper>()
-                                        .ImplementedBy<ContainerMapper>()
-                                        .LifestyleSingleton());
+                                        .ImplementedBy<ContainerMapper>());
 
             container.Register(Component.For<IIsolatedCodeContainerFactory>()
                                         .AsFactory());
@@ -39,10 +35,10 @@ namespace LinqEditor.Core.Installers
                                         .AsFactory());
             container.Register(Component.For<IIsolatedDatabaseContainer>()
                                         .ImplementedBy<IsolatedDatabaseContainer>()
-                                        .LifestyleScoped<ContainerScopeAccessor>());
+                                        .LifestyleScoped<IdScopeAccessor>());
             container.Register(Component.For<IIsolatedCodeContainer>()
                                         .ImplementedBy<IsolatedCodeContainer>()
-                                        .LifestyleScoped<ContainerScopeAccessor>());
+                                        .LifestyleScoped<IdScopeAccessor>());
         }
     }
 }

@@ -22,7 +22,7 @@ namespace LinqEditor.Core.Tests
 
             container.Register(Component.For<IIsolatedCodeContainer>()
                 .ImplementedBy<IsolatedCodeContainer>()
-                .LifestyleScoped<ContainerScopeAccessor>());
+                .LifestyleScoped<IdScopeAccessor>());
 
             var codeContainerFactory = container.Resolve<IIsolatedCodeContainerFactory>();
             var id = Guid.NewGuid();
@@ -40,7 +40,7 @@ namespace LinqEditor.Core.Tests
             container.Register(Component.For<IIsolatedDatabaseContainerFactory>().AsFactory());
             container.Register(Component.For<IIsolatedDatabaseContainer>()
                 .ImplementedBy<IsolatedDatabaseContainer>()
-                .LifestyleScoped<ContainerScopeAccessor>());
+                .LifestyleScoped<IdScopeAccessor>());
 
             var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
             var dbId1 = Guid.NewGuid();

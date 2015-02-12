@@ -18,6 +18,7 @@ namespace LinqEditor.Core.Settings
 
     public class ConnectionStore : ApplicationSettings, IConnectionStore
     {
+        // use a factory property, so we dont mess up our constructor with file reading logic
         public static ConnectionStore Instance
         {
             get 

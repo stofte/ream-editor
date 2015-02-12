@@ -35,19 +35,19 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             public int GetHashCode(TypeMember obj) { return (obj.Name + obj.Kind.ToString()).GetHashCode(); }
         }
 
-        public TemplateCodeAnalysis(ITemplateService templateService, IContext context)
+        public TemplateCodeAnalysis(ITemplateService templateService)
         {
             _initialized = false;
             _templateService = templateService;
             _references = CSharpCompiler.GetStandardReferences();
-            _context = context;
-            _context.ContextUpdated += Initialize;
+            //_context = context;
+            //_context.ContextUpdated += Initialize;
         }
 
-        public void Initialize(string assemblyPath)
+        public void Initialize(string assemblyPath = null)
         {
             // todo: dont depend on filename ...
-            Initialize(assemblyPath, Path.GetFileNameWithoutExtension(assemblyPath));
+            Initialize(assemblyPath, assemblyPath != null ? Path.GetFileNameWithoutExtension(assemblyPath) : string.Empty);
         }
 
         private void Initialize(string assemblyPath, string schemaNamespace)

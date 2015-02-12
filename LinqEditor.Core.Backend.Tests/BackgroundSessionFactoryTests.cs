@@ -14,6 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 using LinqEditor.Core.Templates;
 using Moq;
+using LinqEditor.Core.CodeAnalysis.Services;
+using Castle.Windsor.Installer;
+using LinqEditor.Core.Settings;
 
 namespace LinqEditor.Core.Backend.Tests
 {
@@ -26,51 +29,24 @@ namespace LinqEditor.Core.Backend.Tests
             var container = new WindsorContainer();
             container.AddFacility<TypedFactoryFacility>();
 
-            var mockedSchemaStore = new Mock<Settings.ISchemaStore>();
+            container.Install(FromAssembly.Containing<IConnectionStore>()); // core
+            container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
+            container.Install(FromAssembly.Containing<IBackgroundSessionFactory>()); // core.backend
+            container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
+            container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
             
-            container.Register(Component.For<Settings.ISchemaStore>()
-                                        .Instance(mockedSchemaStore.Object));
-
-            container.Register(Component.For<IContext>()
-                                        .ImplementedBy<Context.Context>()
-                                        .LifestyleScoped());
-
-            container.Register(Component.For<Settings.IConnectionStore>()
-                                        .ImplementedBy<Settings.ConnectionStore>()
-                                        .UsingFactoryMethod(() => Settings.ConnectionStore.Instance)
-                                        .LifestyleSingleton());
-
-            container.Register(Component.For<IContainerMapper>()
-                                        .ImplementedBy<ContainerMapper>()
-                                        .LifestyleSingleton());
-
-            container.Register(Component.For<IIsolatedCodeContainerFactory>()
-                                        .AsFactory());
-            container.Register(Component.For<IIsolatedDatabaseContainerFactory>()
-                                        .AsFactory());
-            container.Register(Component.For<IIsolatedDatabaseContainer>()
-                                        .ImplementedBy<IsolatedDatabaseContainer>()
-                                        .LifestyleScoped<ContainerScopeAccessor>());
-            container.Register(Component.For<IIsolatedCodeContainer>()
-                                        .ImplementedBy<IsolatedCodeContainer>()
-                                        .LifestyleScoped<ContainerScopeAccessor>());
-            
-            container.Register(Component.For<ISqlSchemaProvider>().ImplementedBy<SqlSchemaProvider>());
-            container.Register(Component.For<ITemplateService>().ImplementedBy<TemplateService>());
-            container.Register(Component.For<IBackgroundSessionFactory>()
-                            .AsFactory());
-            container.Register(Component.For<IBackgroundSession>()
-                                        .ImplementedBy<BackgroundSession>()
-                                        .LifestyleScoped());
-
             var factory = container.Resolve<IBackgroundSessionFactory>();
 
-            // session is scope dependent
-            using (var scope = container.BeginScope())
-            {
-                var session = factory.Create();
-                factory.Release(session);
-            }
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+            var session1 = factory.Create(id1);
+            var session2 = factory.Create(id1);
+            var session3 = factory.Create(id2);
+
+            Assert.IsNotNull(session1);
+            Assert.AreSame(session1, session2);
+            Assert.AreNotSame(session1, session3);
+            Assert.AreNotSame(session2, session3);
         }
     }
 }

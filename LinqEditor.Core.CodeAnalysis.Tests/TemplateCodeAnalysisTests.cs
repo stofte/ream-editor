@@ -69,8 +69,9 @@ namespace Another.Generated
         public void TemplateCodeAnalysis_Returns_Correct_Context_For_Analyze(string src, int offset, UserContext editContex)
         {
             
-            var editor = new TemplateCodeAnalysis(_templateService, _context);
-            _context.UpdateContext("", ""); // fire bogus event to init class
+            var editor = new TemplateCodeAnalysis(_templateService);
+            editor.Initialize();
+            //_context.UpdateContext("", ""); // fire bogus event to init class
             var result = editor.Analyze(src, src.Length - offset);
             Assert.AreEqual(editContex, result.Context);
         }
@@ -85,9 +86,10 @@ namespace Another.Generated
         [TestCase("var x = new List<int>();x.Where(y => new { y.})", "IntegerValueInstance", 3, Description = "int instance 2, add closing paren")]
         public void TemplateCodeAnalysis_Returns_Member_Access_Completions(string src, string vsEntriesKey, int offset)
         {
-            var editor = new TemplateCodeAnalysis(_templateService, _context);
+            var editor = new TemplateCodeAnalysis(_templateService);
+            editor.Initialize();
             var vsEntries = VSCompletionTestData.Data[vsEntriesKey];
-            _context.UpdateContext("", ""); // fire bogus event to init class
+            //_context.UpdateContext("", ""); // fire bogus event to init class
             var result = editor.Analyze(src, src.Length - offset);
             var suggesitons = result.MemberCompletions.ToArray();
 

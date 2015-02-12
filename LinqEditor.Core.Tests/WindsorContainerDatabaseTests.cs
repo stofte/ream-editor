@@ -58,7 +58,7 @@ namespace LinqEditor.Core.Tests
             container.Register(Component.For<IIsolatedDatabaseContainerFactory>().AsFactory());
             container.Register(Component.For<IIsolatedDatabaseContainer>()
                 .ImplementedBy<IsolatedDatabaseContainer>()
-                .LifestyleScoped<ContainerScopeAccessor>());
+                .LifestyleScoped<IdScopeAccessor>());
 
             var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
             var dbId = Guid.NewGuid();

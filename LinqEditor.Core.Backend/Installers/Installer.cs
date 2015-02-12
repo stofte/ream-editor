@@ -3,6 +3,7 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LinqEditor.Core.Backend;
+using LinqEditor.Core.Scopes;
 
 namespace LinqEditor.Core.Backend.Installers
 {
@@ -14,7 +15,7 @@ namespace LinqEditor.Core.Backend.Installers
                                         .AsFactory());
             container.Register(Component.For<IBackgroundSession>()
                                         .ImplementedBy<BackgroundSession>()
-                                        .LifestyleScoped());
+                                        .LifestyleScoped<IdScopeAccessor>());
         }
     }
 }

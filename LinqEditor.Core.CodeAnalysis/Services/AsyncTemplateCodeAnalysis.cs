@@ -11,8 +11,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 {
     public class AsyncTemplateCodeAnalysis : TemplateCodeAnalysis, IAsyncTemplateCodeAnalysis
     {
-        public AsyncTemplateCodeAnalysis(ITemplateService templateService, IContext context) 
-            : base(templateService, context) { }
+        public AsyncTemplateCodeAnalysis(ITemplateService templateService) 
+            : base(templateService) { }
 
         public async Task InitializeAsync(string assemblyPath)
         {

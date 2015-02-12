@@ -15,12 +15,10 @@ namespace LinqEditor.UI.WinForm.Forms
 {
     public class ConnectionManager : Form
     {
-        ISchemaStore _schemaStore;
         IConnectionStore _connectionStore;
 
-        public ConnectionManager(ISchemaStore schemaStore, IConnectionStore connectionStore)
+        public ConnectionManager(IConnectionStore connectionStore)
         {
-            _schemaStore = schemaStore;
             _connectionStore = connectionStore;
             InitializeComponent();
         }

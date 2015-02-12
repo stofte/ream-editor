@@ -10,9 +10,10 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<ITemplateCodeAnalysis>()
+                                        .ImplementedBy<TemplateCodeAnalysis>());
             container.Register(Component.For<IAsyncTemplateCodeAnalysis>()
-                                        .ImplementedBy<AsyncTemplateCodeAnalysis>()
-                                        .LifestyleScoped());
+                                        .ImplementedBy<AsyncTemplateCodeAnalysis>());
         }
     }
 }

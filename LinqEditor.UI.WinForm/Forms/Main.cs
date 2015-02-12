@@ -26,7 +26,7 @@ namespace LinqEditor.UI.WinForm.Forms
         OutputPane _outputPane;
         ComboBox _contextSelector;
 
-        IBackgroundSession _connectionSession;
+        IBackgroundSession _session;
         IBackgroundSessionFactory _backgroundSessionFactory;
         IConnectionStore _connectionStore;
         ISettingsStore _settingsStore;
@@ -36,11 +36,10 @@ namespace LinqEditor.UI.WinForm.Forms
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
 
-        public Main(IBackgroundSession session, OutputPane outputPane, CodeEditor editor, IBackgroundSessionFactory sessionFactory, 
-            IConnectionStore connectionStore, ISettingsStore settingsStore, ConnectionManager connectionManager)
+        public Main(IBackgroundSessionFactory sessionFactory, IConnectionStore connectionStore, ISettingsStore settingsStore, 
+            OutputPane outputPane, CodeEditor editor, ConnectionManager connectionManager)
         {
             _backgroundSessionFactory = sessionFactory;
-            _connectionSession = session;
             _connectionManager = connectionManager;
             _connectionStore = connectionStore;
             _settingsStore = settingsStore;
@@ -121,8 +120,6 @@ namespace LinqEditor.UI.WinForm.Forms
             // select context
             _contextSelector = new ComboBox();
             _contextSelector.Dock = DockStyle.Top;
-            //_contextSelector.Items.AddRange(new object[] { "Code" });
-            //_contextSelector.SelectedIndex = 0;
             _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
             _contextSelector.SelectedIndexChanged += delegate 
             {
@@ -130,12 +127,10 @@ namespace LinqEditor.UI.WinForm.Forms
             };
             BindConnections();
 
-            // event handlers
             _connectionStore.ConnectionsUpdated += delegate
             {
                 BindConnections();
             };
-            
             
             // add controls and resume
             _mainContainer.Panel1.Controls.Add(_editor);
@@ -199,7 +194,7 @@ namespace LinqEditor.UI.WinForm.Forms
 
         private async Task<ExecuteResult> Execute()
         {
-            return await _connectionSession.ExecuteAsync(_editor.SourceCode);
+            return await _session.ExecuteAsync(_editor.SourceCode);
         }
 
         async void Main_Load(object sender, EventArgs e)
@@ -214,10 +209,12 @@ namespace LinqEditor.UI.WinForm.Forms
                     break;
                 }
             }
-            IBackgroundSession session = _backgroundSessionFactory.Create();
-            var result = await session.InitializeAsync(id);
+            var sessionId = Guid.NewGuid();
+            _session = _backgroundSessionFactory.Create(sessionId);
+            _editor.Session(sessionId); // need something better
+            var result = await _session.InitializeAsync(id);
             // loads appdomain and initializes connection
-            await session.LoadAppDomainAsync();
+            await _session.LoadAppDomainAsync();
             _statusLabel.Text = "Query ready";
             _executeButton.Enabled = true;
         }

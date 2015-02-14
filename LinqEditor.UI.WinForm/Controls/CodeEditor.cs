@@ -38,6 +38,12 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             var editorFont = new System.Drawing.Font("Consolas", 10);
 
+            // set editor focus on tab changes
+            VisibleChanged += delegate 
+            {
+                if (Visible) _editor.Focus();
+            };
+
             _editor = new ScintillaNET.Scintilla();
             var initEditor = _editor as ISupportInitialize;
             initEditor.BeginInit();

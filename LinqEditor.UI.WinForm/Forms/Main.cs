@@ -42,9 +42,12 @@ namespace LinqEditor.UI.WinForm.Forms
             createLabel.Text = "empty";
             _createTab.ImageIndex = 0;
             var lastSelected = 0;
-            _tabControl.Deselected += delegate(object sender, TabControlEventArgs e)
+            var lastFocus = false;
+
+            _tabControl.Deselecting += delegate(object sender, TabControlCancelEventArgs e)
             {
                 lastSelected = e.TabPageIndex;
+                lastFocus = e.TabPage.Focused;
             };
 
             _tabControl.Selecting += delegate(object sender, TabControlCancelEventArgs e)
@@ -66,42 +69,14 @@ namespace LinqEditor.UI.WinForm.Forms
                         newTab.Controls.Add(newForm);
                         _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
                         _tabControl.SelectedIndex = _tabControl.TabPages.Count - 2;
+
                         //_tabControl.SelectedTab = newTab;
                     }
+                    if (lastFocus) _tabControl.SelectedTab.Focus();
                 }
                 _tabControl.CtrlTabSwitching = false;
             };
-
-            //_tabControl.SelectedIndexChanged += delegate(object sender, EventArgs args)
-            //{
-            //    //if (_tabControl.SelectedTab == _createTab)
-            //    //{
-            //    //    //if (!_tabControl.CtrlTabSwitching)
-            //    //    //{
-            //    //        // proper mouse click on new tab
-            //    //        var newForm = Program.Container.Resolve<MainPanel>();
-            //    //        newForm.Dock = DockStyle.Fill;
-            //    //        var newTab = new TabPage();
-            //    //        newTab.Text = string.Format("Query {0}", _tabCounter++);
-            //    //        newTab.Controls.Add(newForm);
-            //    //        _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
-            //    //        _tabControl.SelectedTab = newTab;
-            //    //    //}
-            //    //    //else
-            //    //    //{
-            //    //    //    // tabbing through panes with ctrl-tab, so skip the new tab
-            //    //    //    var idx = _tabControl.CtrlTabSwitchingShift ? _tabControl.TabPages.Count - 2 : 0;
-            //    //    //    _tabControl.SelectedIndex = idx;
-            //    //    //    _tabControl.TabPages[idx].Refresh();
-            //    //    //    //_tabControl.SelectedTab = _tabControl.TabPages[idx];
-            //    //    //}
-            //    //}
-            //    Debug.Assert(_tabControl.SelectedTab != _createTab);
-            //    //_tabControl.Refresh();
-            //    //_tabControl.CtrlTabSwitching = false;
-            //    //_tabControl.CtrlTabSwitchingShift = false;
-            //};
-            
+                        
             var defaultForm = Program.Container.Resolve<MainPanel>();
 
             var defaultTab = new TabPage();
@@ -130,21 +105,6 @@ namespace LinqEditor.UI.WinForm.Forms
             SuspendLayout();
             Controls.Add(_tabControl);
             ResumeLayout();
-        }
-
-        private void TabControl1_Selecting(Object sender, TabControlCancelEventArgs e)
-        {
-
-            System.Text.StringBuilder messageBoxCS = new System.Text.StringBuilder();
-            messageBoxCS.AppendFormat("{0} = {1}", "TabPage", e.TabPage);
-            messageBoxCS.AppendLine();
-            messageBoxCS.AppendFormat("{0} = {1}", "TabPageIndex", e.TabPageIndex);
-            messageBoxCS.AppendLine();
-            messageBoxCS.AppendFormat("{0} = {1}", "Action", e.Action);
-            messageBoxCS.AppendLine();
-            messageBoxCS.AppendFormat("{0} = {1}", "Cancel", e.Cancel);
-            messageBoxCS.AppendLine();
-            MessageBox.Show(messageBoxCS.ToString(), "Selecting Event");
         }
     }
 }

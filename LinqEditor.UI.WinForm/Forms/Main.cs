@@ -63,7 +63,7 @@ namespace LinqEditor.UI.WinForm.Forms
                         var newForm = Program.Container.Resolve<MainPanel>();
                         newForm.Dock = DockStyle.Fill;
                         var newTab = new TabPage();
-                        newTab.Text = string.Format("Query {0}", _tabCounter++);
+                        newTab.Text = string.Format(" Query {0}  ", _tabCounter++);
                         
                         newTab.Controls.Add(newForm);
                         _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);

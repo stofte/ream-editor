@@ -122,7 +122,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _closeButton = new ToolStripButton();
             _closeButton.Alignment = ToolStripItemAlignment.Right;
             _closeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _closeButton.Image = Resources.Icons.action_Cancel_16xLG;
+            _closeButton.Image = Resources.Icons.Offline_16xLG;
             _toolbar.Items.AddRange(new[] { _executeButton, _databaseButton, _closeButton });
 
             _closeButton.Click += delegate

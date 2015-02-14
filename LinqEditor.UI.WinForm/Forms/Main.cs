@@ -68,8 +68,11 @@ namespace LinqEditor.UI.WinForm.Forms
                         newTab.Controls.Add(newForm);
                         _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
                         _tabControl.SelectedIndex = _tabControl.TabPages.Count - 2;
-                        newTab.Width += 30;
-                        //_tabControl.SelectedTab = newTab;
+                        newForm.RemoveTab += delegate
+                        {
+                            _tabControl.TabPages.Remove(newTab);
+                            Program.Container.Release(newForm);
+                        };
                     }
                 }
                 _tabControl.CtrlTabSwitching = false;

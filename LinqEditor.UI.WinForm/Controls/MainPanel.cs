@@ -128,6 +128,16 @@ namespace LinqEditor.UI.WinForm.Controls
             _closeButton.Click += delegate
             {
                 if (RemoveTab != null) RemoveTab();
+                return;
+                var page = Parent as TabPage;
+                if (page != null)
+                {
+                    var pageParent = page.Parent as TabControl;
+                    if (pageParent != null)
+                    {
+                        pageParent.TabPages.Remove(page);
+                    }
+                }
             };
 
             //_toolbar.Items.Add(dropButton);

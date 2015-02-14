@@ -42,12 +42,10 @@ namespace LinqEditor.UI.WinForm.Forms
             createLabel.Text = "empty";
             _createTab.ImageIndex = 0;
             var lastSelected = 0;
-            var lastFocus = false;
 
             _tabControl.Deselecting += delegate(object sender, TabControlCancelEventArgs e)
             {
                 lastSelected = e.TabPageIndex;
-                lastFocus = e.TabPage.Focused;
             };
 
             _tabControl.Selecting += delegate(object sender, TabControlCancelEventArgs e)
@@ -66,34 +64,21 @@ namespace LinqEditor.UI.WinForm.Forms
                         newForm.Dock = DockStyle.Fill;
                         var newTab = new TabPage();
                         newTab.Text = string.Format("Query {0}", _tabCounter++);
+                        
                         newTab.Controls.Add(newForm);
                         _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
                         _tabControl.SelectedIndex = _tabControl.TabPages.Count - 2;
-
+                        newTab.Width += 30;
                         //_tabControl.SelectedTab = newTab;
                     }
-                    if (lastFocus) _tabControl.SelectedTab.Focus();
                 }
                 _tabControl.CtrlTabSwitching = false;
             };
-                        
-            var defaultForm = Program.Container.Resolve<MainPanel>();
 
-            var defaultTab = new TabPage();
-            defaultTab.Text = "Query 1";
-            defaultTab.Controls.Add(defaultForm);
-            _tabControl.Controls.AddRange(new TabPage[] { defaultTab, _createTab });
-
-            defaultTab.ClientSizeChanged += delegate
-            {
-                defaultForm.Size = defaultTab.ClientSize;
-            };
-
-            _tabControl.ClientSizeChanged += delegate
-            {
-                defaultTab.Size = _tabControl.ClientSize;
-            };
-
+            // dummy tab we add, then remove to get the initial tab created in the selecting event
+            var triggerTab = new TabPage(); 
+            _tabControl.Controls.AddRange(new TabPage[] { triggerTab, _createTab });
+            
             ClientSizeChanged += delegate
             {
                 _tabControl.Size = ClientSize;
@@ -101,6 +86,11 @@ namespace LinqEditor.UI.WinForm.Forms
 
             Width = 800;
             Height = 500;
+
+            Load += delegate
+            {
+                _tabControl.TabPages.Remove(triggerTab);
+            };
 
             SuspendLayout();
             Controls.Add(_tabControl);

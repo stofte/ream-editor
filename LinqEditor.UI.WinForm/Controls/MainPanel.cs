@@ -19,6 +19,7 @@ namespace LinqEditor.UI.WinForm.Controls
         SplitContainer _mainContainer;
         ToolStripButton _executeButton;
         ToolStripButton _databaseButton;
+        ToolStripButton _closeButton;
         StatusStrip _statusBar;
         ToolStripStatusLabel _statusLabel;
         ToolStripStatusLabel _rowCountLabel;
@@ -36,6 +37,8 @@ namespace LinqEditor.UI.WinForm.Controls
 
         Stopwatch _editorFocusTimer;
         bool _restoreEditorFocusOnSplitterMoved;
+
+        public event Action RemoveTab;
 
         public MainPanel(IBackgroundSessionFactory sessionFactory, IConnectionStore connectionStore, ISettingsStore settingsStore,
             OutputPane outputPane, CodeEditor editor, ConnectionManager connectionManager)
@@ -99,6 +102,13 @@ namespace LinqEditor.UI.WinForm.Controls
             _toolbar = new ToolStrip();
             _toolbar.Dock = DockStyle.Top;
 
+            var dropButton = new ToolStripDropDownButton();
+            var dropDown = new ToolStripDropDown();
+            var t1 = new ToolStripMenuItem();
+            t1.Text = "foo";
+            dropDown.Items.AddRange(new ToolStripItem[] { t1 });
+            dropButton.DropDown = dropDown;
+
             // play button
             _executeButton = new ToolStripButton();
             _executeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
@@ -109,7 +119,18 @@ namespace LinqEditor.UI.WinForm.Controls
             _databaseButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             _databaseButton.Image = Resources.Icons.DatabaseOptions_12882;
             _databaseButton.Click += _databaseButton_Click;
-            _toolbar.Items.AddRange(new[] { _executeButton, _databaseButton });
+            _closeButton = new ToolStripButton();
+            _closeButton.Alignment = ToolStripItemAlignment.Right;
+            _closeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            _closeButton.Image = Resources.Icons.action_Cancel_16xLG;
+            _toolbar.Items.AddRange(new[] { _executeButton, _databaseButton, _closeButton });
+
+            _closeButton.Click += delegate
+            {
+                if (RemoveTab != null) RemoveTab();
+            };
+
+            //_toolbar.Items.Add(dropButton);
 
             // select context
             _contextSelector = new ComboBox();

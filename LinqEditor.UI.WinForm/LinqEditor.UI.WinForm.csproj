@@ -152,8 +152,14 @@
     <Content Include="..\resources\action_add_16xMD.png">
       <Link>Resources\ToolStripIcons\action_add_16xMD.png</Link>
     </Content>
+    <Content Include="..\resources\action_Cancel_16xLG.png">
+      <Link>Resources\ToolStripIcons\action_Cancel_16xLG.png</Link>
+    </Content>
     <Content Include="..\resources\DatabaseOptions_12882.png">
       <Link>Resources\ToolStripIcons\DatabaseOptions_12882.png</Link>
+    </Content>
+    <Content Include="..\resources\Offline_16xLG.png">
+      <Link>Resources\ToolStripIcons\Offline_16xLG.png</Link>
     </Content>
     <Content Include="..\resources\play.png">
       <Link>Resources\ToolStripIcons\play.png</Link>

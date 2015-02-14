@@ -114,7 +114,8 @@ namespace LinqEditor.Core.Backend
             }
             else
             {
-                _databaseContainer = _databaseContainerFactory.Create(_containerMapper.MapConnectionString(_connection.ConnectionString));
+                var id = _containerMapper.MapConnectionString(_connection.ConnectionString);
+                _databaseContainer = _databaseContainerFactory.Create(id);
                 var res = _databaseContainer.Value.Initialize(_connection.CachedSchemaFileName);
                 exn = res.Error;
             }

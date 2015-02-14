@@ -15,10 +15,10 @@ namespace LinqEditor.Core.Backend
     // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true
     public class BackgroundSession : Session, IBackgroundSession
     {
-        public BackgroundSession(ISqlSchemaProvider schemaProvider, ITemplateService generator, 
+        public BackgroundSession(Guid id, ISqlSchemaProvider schemaProvider, ITemplateService generator, 
             IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, IContainerMapper containerMapper,
             IConnectionStore connectionStore, ITemplateCodeAnalysis codeAnalysis) :
-            base(schemaProvider, generator, codeContainerFactory, databaseContainerFactory, containerMapper, connectionStore, codeAnalysis) { }
+            base(id, schemaProvider, generator, codeContainerFactory, databaseContainerFactory, containerMapper, connectionStore, codeAnalysis) { }
 
         //public async Task<InitializeResult> InitializeAsync(string connectionString)
         //{

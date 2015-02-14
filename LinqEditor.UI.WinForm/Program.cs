@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace LinqEditor.UI.WinForm
 {
-    static class Program
+    class Program
     {
         /// <summary>
         /// The main entry point for the application.
@@ -27,15 +27,17 @@ namespace LinqEditor.UI.WinForm
                 Directory.CreateDirectory(path);
             }
 
-            using (var container = new WindsorContainer().Install(FromAssembly.This()))
-            {
-                using (var scope = container.BeginScope())
-                {
-                    var mainForm = container.Resolve<Main>();
-                    Application.Run(mainForm);
-                    container.Release(mainForm);
-                }
-            }
+            _container = new WindsorContainer().Install(FromAssembly.This());
+            var mainForm = _container.Resolve<Main>();
+            Application.Run(mainForm);
+            _container.Release(mainForm);
+        }
+
+        static IWindsorContainer _container;
+
+        public static IWindsorContainer Container
+        {
+            get { return _container; }
         }
     }
 }

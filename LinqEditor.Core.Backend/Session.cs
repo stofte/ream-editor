@@ -24,6 +24,7 @@ namespace LinqEditor.Core.Backend
         private bool _codeSession;
         private bool _initialized = false;
         private bool _loadedAppDomain = false;
+        private Guid _id;
 
         private ISqlSchemaProvider _schemaProvider;
         private ITemplateService _generator;
@@ -39,10 +40,13 @@ namespace LinqEditor.Core.Backend
         private IIsolatedCodeContainer _codeContainer;
         private IIsolatedDatabaseContainer _databaseContainer;
 
-        public Session(ISqlSchemaProvider schemaProvider, ITemplateService generator,// ISchemaStore userSettings,
+        public Guid Id { get { return _id; } }
+
+        public Session(Guid contextId, ISqlSchemaProvider schemaProvider, ITemplateService generator,// ISchemaStore userSettings,
             IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory,
             IContainerMapper containerMapper, IConnectionStore connectionStore, ITemplateCodeAnalysis codeAnalysis)
         {
+            _id = contextId; // id passd to the factory
             _schemaProvider = schemaProvider;
             _generator = generator;
             _watch = new Stopwatch();

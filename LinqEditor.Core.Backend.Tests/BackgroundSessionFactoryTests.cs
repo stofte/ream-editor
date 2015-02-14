@@ -43,7 +43,9 @@ namespace LinqEditor.Core.Backend.Tests
             var session2 = factory.Create(id1);
             var session3 = factory.Create(id2);
 
+
             Assert.IsNotNull(session1);
+            Assert.AreEqual(session1.Id, id1);
             Assert.AreSame(session1, session2);
             Assert.AreNotSame(session1, session3);
             Assert.AreNotSame(session2, session3);

@@ -10,6 +10,8 @@ using LinqEditor.Core.Templates;
 using LinqEditor.Core.Helpers;
 using NUnit.Framework;
 using System;
+using Castle.Windsor.Installer;
+using LinqEditor.Core.Settings;
 
 namespace LinqEditor.Core.Tests
 {
@@ -55,14 +57,28 @@ namespace LinqEditor.Core.Tests
             var container = new WindsorContainer();
             container.AddFacility<TypedFactoryFacility>();
 
-            container.Register(Component.For<IIsolatedDatabaseContainerFactory>().AsFactory());
-            container.Register(Component.For<IIsolatedDatabaseContainer>()
-                .ImplementedBy<IsolatedDatabaseContainer>()
-                .LifestyleScoped<IdScopeAccessor>());
+            container.Install(FromAssembly.Containing<IConnectionStore>()); // core
 
             var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
-            var dbId = Guid.NewGuid();
-            var instance = containerFactory.Create(dbId);
+            var dbId1 = Guid.NewGuid();
+            var dbId2 = Guid.NewGuid();
+            var instance1 = containerFactory.Create(dbId1);
+            var instance2 = containerFactory.Create(dbId2);
+            Assert.AreNotSame(instance1, instance2);
+        }
+
+        [Test]
+        public void Can_Load_The_Same_DatabaseContainer_Instance()
+        {
+            var container = new WindsorContainer();
+            container.AddFacility<TypedFactoryFacility>();
+            container.Install(FromAssembly.Containing<IConnectionStore>()); // core
+
+            var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
+            var dbId1 = Guid.NewGuid();
+            var instance1 = containerFactory.Create(dbId1);
+            var instance2 = containerFactory.Create(dbId1);
+            Assert.AreSame(instance1, instance2);
         }
     }
 }

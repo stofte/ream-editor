@@ -20,10 +20,16 @@ namespace LinqEditor.Installers
             container.Install(FromAssembly.Named("LinqEditor.Core.Templates"));
             
             // install forms
-            container.Register(Component.For<Main>());
-            container.Register(Component.For<ConnectionManager>());
-            container.Register(Component.For<CodeEditor>());
-            container.Register(Component.For<OutputPane>());
+            container.Register(Component.For<Main>()
+                                        .LifestyleTransient());
+            container.Register(Component.For<MainPanel>()
+                                        .LifestyleTransient());
+            container.Register(Component.For<ConnectionManager>()
+                                        .LifestyleTransient());
+            container.Register(Component.For<CodeEditor>()
+                                        .LifestyleTransient());
+            container.Register(Component.For<OutputPane>()
+                                        .LifestyleTransient());
         }
     }
 }

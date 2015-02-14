@@ -14,248 +14,137 @@ namespace LinqEditor.UI.WinForm.Forms
 {
     public class Main : Form
     {
-        public static string TestConnectionString = @"Data Source=.\sqlexpress;Integrated Security=True;Initial Catalog=Opera56100DB";
+        public const int MinHeight = 290;
+        public const int MinWidth = 400;
+        int _tabCounter = 1;
 
-        ToolStrip _toolbar;
-        SplitContainer _mainContainer;
-        ToolStripButton _executeButton;
-        ToolStripButton _databaseButton;
-        StatusStrip _statusBar;
-        ToolStripStatusLabel _statusLabel;
-        ToolStripStatusLabel _rowCountLabel;
-        CodeEditor _editor;
-        OutputPane _outputPane;
-        ComboBox _contextSelector;
+        TabControl2 _tabControl;
+        TabPage _createTab;
 
-        IBackgroundSession _session;
-        IBackgroundSessionFactory _backgroundSessionFactory;
-        IConnectionStore _connectionStore;
-        ISettingsStore _settingsStore;
-        bool _enableContextSelector = false;
-
-        Form _connectionManager;
-
-        Stopwatch _editorFocusTimer;
-        bool _restoreEditorFocusOnSplitterMoved;
-
-        public Main(IBackgroundSessionFactory sessionFactory, IConnectionStore connectionStore, ISettingsStore settingsStore, 
-            OutputPane outputPane, CodeEditor editor, ConnectionManager connectionManager)
+        public Main()
         {
-            _backgroundSessionFactory = sessionFactory;
-            _connectionManager = connectionManager;
-            _connectionStore = connectionStore;
-            _settingsStore = settingsStore;
-            _statusBar = new StatusStrip();
+            InitializeControl();
+        }
 
-            _statusBar.SuspendLayout();
-            SuspendLayout();
-            
-            var minHeight = 300;
-            var minWidth = 400;
-
+        void InitializeControl()
+        {
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             Text = ApplicationStrings.APPLICATION_TITLE;
-            Width = 800;
-            Height = 500;
-            MinimumSize = new Size(minWidth, minHeight);
+            MinimumSize = new Size(MinWidth, MinHeight);
 
-            // loads schema etc in async handlers
-            Load += Main_Load;
-
-            _editorFocusTimer = new Stopwatch();
-            _mainContainer = new SplitContainer();
-            _mainContainer.Location = new Point(0, 0);
-            _mainContainer.Orientation = Orientation.Horizontal;
-            _mainContainer.Dock = DockStyle.Fill;
-            _mainContainer.TabStop = false;
-            _mainContainer.FixedPanel = FixedPanel.None;
-            // must set this for panel minsizes to work. subtract height for statusbar+toolbar
-            _mainContainer.MinimumSize = new Size(minWidth - 10, minHeight- 80);
-            // fudged values
-            _mainContainer.SplitterDistance = minHeight / 10;
-            _mainContainer.Panel1MinSize = minHeight / 4;
-            _mainContainer.Panel2MinSize = minHeight / 3;
-            _mainContainer.GotFocus +=_mainContainer_GotFocus;
-            _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
-            
-            // status
-            _statusBar.Dock = DockStyle.Bottom;
-            _statusBar.GripStyle = ToolStripGripStyle.Hidden;
-            _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            _statusLabel = new ToolStripStatusLabel();
-            _statusLabel.Alignment = ToolStripItemAlignment.Left;
-            _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
-            _rowCountLabel = new ToolStripStatusLabel();
-            _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
-            _statusBar.Items.AddRange(new[] { _statusLabel, _rowCountLabel });
-            
-            // scintilla
-            _editor = editor;
-            _editor.LostFocus += _editor_LostFocus;
-            _editor.Dock = DockStyle.Fill;
-
-            // output thingy
-            _outputPane = outputPane;
-            _outputPane.Dock = DockStyle.Fill;
-            _outputPane.DisplayedRowCountUpdated += delegate(int count) 
-            { 
-                _rowCountLabel.Text = string.Format("{0} rows", count); 
+            _tabControl = new TabControl2();
+            var x = Resources.Icons.action_add_16xMD;
+            _tabControl.ImageList = new ImageList();
+            _tabControl.ImageList.Images.Add(x);
+            _createTab = new TabPage();
+            var createLabel = new Label();
+            createLabel.Text = "empty";
+            _createTab.ImageIndex = 0;
+            var lastSelected = 0;
+            _tabControl.Deselected += delegate(object sender, TabControlEventArgs e)
+            {
+                lastSelected = e.TabPageIndex;
             };
 
-            // toolbar
-            _toolbar = new ToolStrip();
-            _toolbar.Dock = DockStyle.Top;
-            
-            // play button
-            _executeButton = new ToolStripButton();
-            _executeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _executeButton.Image = Resources.Icons.startwithoutdebugging_6556;
-            _executeButton.Click += _executeButton_Click;
-            _executeButton.Enabled = false;
-            _databaseButton = new ToolStripButton();
-            _databaseButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _databaseButton.Image = Resources.Icons.DatabaseOptions_12882;
-            _databaseButton.Click += _databaseButton_Click;
-            _toolbar.Items.AddRange(new [] { _executeButton, _databaseButton });
-            
-            // select context
-            _contextSelector = new ComboBox();
-            _contextSelector.Dock = DockStyle.Top;
-            _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
-            _contextSelector.SelectedIndexChanged += async delegate 
+            _tabControl.Selecting += delegate(object sender, TabControlCancelEventArgs e)
             {
-                if (!_enableContextSelector) return;
-                _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
-                var selected = _contextSelector.SelectedItem as Connection;
-                if (selected == null) return;
-                _executeButton.Enabled = false;
-                await BindSession(selected.Id);
-                _executeButton.Enabled = true;
-                _statusLabel.Text = ApplicationStrings.EDITOR_READY;
-                _settingsStore.LastConnectionUsed = selected.Id;
-            };
-            BindConnections();
-
-            _connectionStore.ConnectionsUpdated += delegate
-            {
-                _enableContextSelector = false;
-                BindConnections();
-                _enableContextSelector = true;
-            };
-            
-            // add controls and resume
-            _mainContainer.Panel1.Controls.Add(_editor);
-            _mainContainer.Panel1.Controls.Add(_contextSelector);
-            _mainContainer.Panel2.Controls.Add(_outputPane);
-            Controls.Add(_mainContainer);
-            Controls.Add(_toolbar);
-            Controls.Add(_statusBar);
-            _statusBar.ResumeLayout(false);
-            _statusBar.PerformLayout();
-            ResumeLayout(false);
-            PerformLayout();
-        }
-
-        void BindConnections()
-        {
-            var selected = _contextSelector.SelectedItem as Connection;
-            _contextSelector.Items.Clear();
-            _contextSelector.Items.Add(new Connection { Id = Guid.Empty, DisplayName = "", ConnectionString = "Code" });
-            foreach (var conn in _connectionStore.Connections)
-            {
-                _contextSelector.Items.Add(conn);
-            }
-            if (selected != null)
-            {
-                // see if the previous context still exists
-                foreach (Connection conn in _contextSelector.Items)
+                if (e.TabPage == _createTab)
                 {
-                    if (conn.Id == selected.Id)
+                    //e.Cancel = true;
+
+                    if (_tabControl.CtrlTabSwitching)
                     {
-                        _contextSelector.SelectedItem = conn;
+                        _tabControl.SelectedIndex = lastSelected == 0 ? _tabControl.TabPages.Count - 2 : 0;
+                    }
+                    else
+                    {
+                        var newForm = Program.Container.Resolve<MainPanel>();
+                        newForm.Dock = DockStyle.Fill;
+                        var newTab = new TabPage();
+                        newTab.Text = string.Format("Query {0}", _tabCounter++);
+                        newTab.Controls.Add(newForm);
+                        _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
+                        _tabControl.SelectedIndex = _tabControl.TabPages.Count - 2;
+                        //_tabControl.SelectedTab = newTab;
                     }
                 }
-            }
-        }
+                _tabControl.CtrlTabSwitching = false;
+            };
 
-        async Task BindSession(Guid id)
-        {
-            if (_session != null)
+            //_tabControl.SelectedIndexChanged += delegate(object sender, EventArgs args)
+            //{
+            //    //if (_tabControl.SelectedTab == _createTab)
+            //    //{
+            //    //    //if (!_tabControl.CtrlTabSwitching)
+            //    //    //{
+            //    //        // proper mouse click on new tab
+            //    //        var newForm = Program.Container.Resolve<MainPanel>();
+            //    //        newForm.Dock = DockStyle.Fill;
+            //    //        var newTab = new TabPage();
+            //    //        newTab.Text = string.Format("Query {0}", _tabCounter++);
+            //    //        newTab.Controls.Add(newForm);
+            //    //        _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
+            //    //        _tabControl.SelectedTab = newTab;
+            //    //    //}
+            //    //    //else
+            //    //    //{
+            //    //    //    // tabbing through panes with ctrl-tab, so skip the new tab
+            //    //    //    var idx = _tabControl.CtrlTabSwitchingShift ? _tabControl.TabPages.Count - 2 : 0;
+            //    //    //    _tabControl.SelectedIndex = idx;
+            //    //    //    _tabControl.TabPages[idx].Refresh();
+            //    //    //    //_tabControl.SelectedTab = _tabControl.TabPages[idx];
+            //    //    //}
+            //    //}
+            //    Debug.Assert(_tabControl.SelectedTab != _createTab);
+            //    //_tabControl.Refresh();
+            //    //_tabControl.CtrlTabSwitching = false;
+            //    //_tabControl.CtrlTabSwitchingShift = false;
+            //};
+            
+            var defaultForm = Program.Container.Resolve<MainPanel>();
+
+            var defaultTab = new TabPage();
+            defaultTab.Text = "Query 1";
+            defaultTab.Controls.Add(defaultForm);
+            _tabControl.Controls.AddRange(new TabPage[] { defaultTab, _createTab });
+
+            defaultTab.ClientSizeChanged += delegate
             {
-                _backgroundSessionFactory.Release(_session);
-            }
-            var sessionId = Guid.NewGuid();
-            _session = _backgroundSessionFactory.Create(sessionId);
-            _editor.Session(sessionId);
-            var result = await _session.InitializeAsync(id);
-            // loads appdomain and initializes connection
-            await _session.LoadAppDomainAsync();
-        }
+                defaultForm.Size = defaultTab.ClientSize;
+            };
 
-        void _databaseButton_Click(object sender, EventArgs e)
-        {
-            _connectionManager.ShowDialog();
-        }
-
-        // some custom focus juggling when resizing the splitcontainer when the editor had focus
-        void _mainContainer_SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            if (_restoreEditorFocusOnSplitterMoved)
+            _tabControl.ClientSizeChanged += delegate
             {
-                _editor.Focus();
-            }
-        }
+                defaultTab.Size = _tabControl.ClientSize;
+            };
 
-        void _editor_LostFocus(object sender, EventArgs e)
-        {
-            _editorFocusTimer.Restart();
-            _restoreEditorFocusOnSplitterMoved = false;
-        }
-
-        void _mainContainer_GotFocus(object sender, EventArgs e)
-        {
-            _editorFocusTimer.Stop();
-            _restoreEditorFocusOnSplitterMoved = _editorFocusTimer.ElapsedMilliseconds < 50; // more fudging
-        }
-
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == Keys.F5)
+            ClientSizeChanged += delegate
             {
-                _executeButton.PerformClick();
-                return true;
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
-        
-        async void Main_Load(object sender, EventArgs e)
-        {
-            // restore last used context
-            var id = _settingsStore.LastConnectionUsed;
-            foreach (Connection conn in _contextSelector.Items)
-            {
-                if (conn.Id == id)
-                {
-                    _contextSelector.SelectedItem = conn;
-                    break;
-                }
-            }
-            await BindSession(id);
-            _statusLabel.Text = ApplicationStrings.EDITOR_READY;
-            _executeButton.Enabled = true;
-            _enableContextSelector = true;
+                _tabControl.Size = ClientSize;
+            };
+
+            Width = 800;
+            Height = 500;
+
+            SuspendLayout();
+            Controls.Add(_tabControl);
+            ResumeLayout();
         }
 
-        async void _executeButton_Click(object sender, EventArgs e)
+        private void TabControl1_Selecting(Object sender, TabControlCancelEventArgs e)
         {
-            _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
-            var btn = sender as ToolStripButton;
-            btn.Enabled = false;
-            var result = await _session.ExecuteAsync(_editor.SourceCode);
-            _outputPane.BindOutput(result);
-            btn.Enabled = true;
-            _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+
+            System.Text.StringBuilder messageBoxCS = new System.Text.StringBuilder();
+            messageBoxCS.AppendFormat("{0} = {1}", "TabPage", e.TabPage);
+            messageBoxCS.AppendLine();
+            messageBoxCS.AppendFormat("{0} = {1}", "TabPageIndex", e.TabPageIndex);
+            messageBoxCS.AppendLine();
+            messageBoxCS.AppendFormat("{0} = {1}", "Action", e.Action);
+            messageBoxCS.AppendLine();
+            messageBoxCS.AppendFormat("{0} = {1}", "Cancel", e.Cancel);
+            messageBoxCS.AppendLine();
+            MessageBox.Show(messageBoxCS.ToString(), "Selecting Event");
         }
     }
 }

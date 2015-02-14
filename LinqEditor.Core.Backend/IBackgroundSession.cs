@@ -14,5 +14,6 @@ namespace LinqEditor.Core.Backend
         Task<LoadAppDomainResult> LoadAppDomainAsync();
         Task<AnalysisResult> AnalyzeAsync(string sourceFragment, int updateIndex);
         Task<AnalysisResult> AnalyzeAsync(string sourceFragment);
+        Guid Id { get; }
     }
 }

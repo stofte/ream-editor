@@ -9,6 +9,15 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
     [TestFixture]
     public class CSharpCompilerTests
     {
+        [TestFixtureTearDown]
+        public void Cleanup()
+        {
+            if (File.Exists(Path.GetTempPath() + "Test.dll"))
+            {
+                File.Delete(Path.GetTempPath() + "Test.dll");
+            }
+        }
+
         [Test]
         public void Can_Compile_CSharp_Library()
         {

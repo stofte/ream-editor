@@ -73,5 +73,6 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual("foo", reflectedValue[0].ConnectionString);
             Assert.AreEqual("bar", reflectedValue[0].CachedSchemaFileName);
         }
+
     }
 }

@@ -34,6 +34,7 @@ namespace LinqEditor.UI.WinForm.Controls
         ISettingsStore _settingsStore;
         bool _enableContextSelector = false;
         long _sessionLoadMs = 0;
+        System.Threading.CancellationTokenSource _tokenSource;
 
         Form _connectionManager;
 
@@ -161,6 +162,14 @@ namespace LinqEditor.UI.WinForm.Controls
                 if (btn != null)
                 {
                     _stopButton.Enabled = !btn.Enabled;
+                }
+            };
+
+            _stopButton.Click += delegate
+            {
+                if (_tokenSource != null)
+                {
+                    _tokenSource.Cancel();
                 }
             };
 
@@ -315,19 +324,32 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void _executeButton_Click(object sender, EventArgs e)
         {
+            _tokenSource = new System.Threading.CancellationTokenSource();
             _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
             _statusTimer.Enabled = true;
             _statusLabel.Image = Icons.spinner;
             _timeLabel.Text = string.Empty;
             var btn = sender as ToolStripButton;
             btn.Enabled = false;
-            var result = await _session.ExecuteAsync(_editor.SourceCode);
+            var result = await _session.ExecuteAsync(_editor.SourceCode, _tokenSource.Token);
             _outputPane.BindOutput(result);
-            btn.Enabled = true;
+
+            // if we cancelled out, we need to reinit the app domain
+            if (result.Cancelled)
+            {
+                _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
+                var reInitResult = await _session.ReinitializeAsync();
+                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_CANCELLED_AFTER, result.DurationMs + reInitResult.DurationMs);
+            }
+            else
+            {
+                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_COMPLETED_IN, result.DurationMs);
+            }
+
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
-            _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_COMPLETED_IN, result.DurationMs);
             _statusTimer.Enabled = false;
             _statusLabel.Image = Icons.ok_grey;
+            btn.Enabled = true;
         }
     }
 }

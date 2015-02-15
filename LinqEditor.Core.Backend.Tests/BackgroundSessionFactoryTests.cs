@@ -87,10 +87,10 @@ namespace LinqEditor.Core.Backend.Tests
             cts.CancelAfter(1000);
             Assert.AreNotSame(cts.Token, CancellationToken.None);
             var result = await session.ExecuteAsync(src1, cts.Token);
-            Assert.AreEqual("Cancelled", result.CodeOutput);
+            Assert.IsTrue(result.Cancelled);
            
             // assert we didn't run the full duration
-            Assert.GreaterOrEqual(ms, watch.ElapsedMilliseconds);
+            Assert.Greater(ms, watch.ElapsedMilliseconds);
            
             // reinitialize session and try another execute
             await session.ReinitializeAsync();

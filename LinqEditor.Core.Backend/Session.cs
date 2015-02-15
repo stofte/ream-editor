@@ -134,9 +134,8 @@ namespace LinqEditor.Core.Backend
                     {
                         Success = false,
                         Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
-                        QueryText = "Cancelled",
+                        Cancelled = true,
                         DurationMs = _watch.ElapsedMilliseconds,
-                        CodeOutput = "Cancelled"
                     };
                 }
 

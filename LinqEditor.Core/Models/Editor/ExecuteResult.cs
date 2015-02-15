@@ -25,6 +25,7 @@ namespace LinqEditor.Core.Models.Editor
         public Exception Exception { get; set; }
         public Exception InternalException { get; set; }
         public bool Success { get; set; }
+        public bool Cancelled { get; set; }
         public string QueryText { get; set; }
 
         public ProgramType Kind { get; set; }

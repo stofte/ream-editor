@@ -8,8 +8,6 @@ namespace LinqEditor.Core.Backend
 {
     public interface IBackgroundSession
     {
-        //Task<InitializeResult> InitializeAsync(string connectionString);
-        //Task<InitializeResult> InitializeAsync();
         Task<InitializeResult> InitializeAsync(Guid id);
         Task<InitializeResult> ReinitializeAsync();
         Task<ExecuteResult> ExecuteAsync(string sourceFragment);

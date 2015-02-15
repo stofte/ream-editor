@@ -2,20 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Settings
 {
-    public interface IConnectionStore
-    {
-        void Add(Connection conn);
-        void Update(Connection conn);
-        void Delete(Connection conn);
-        IEnumerable<Connection> Connections { get; }
-        event Action ConnectionsUpdated;
-    }
-
     public class ConnectionStore : ApplicationSettings, IConnectionStore
     {
         [JsonIgnore]

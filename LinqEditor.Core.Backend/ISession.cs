@@ -7,8 +7,6 @@ namespace LinqEditor.Core.Backend
 {
     public interface ISession
     {
-        //InitializeResult Initialize(string connectionString);
-        //InitializeResult Initialize();
         InitializeResult Initialize(Guid connectionId);
         InitializeResult Reinitialize();
         LoadAppDomainResult LoadAppDomain();

@@ -1,5 +1,4 @@
-﻿using Castle.Facilities.TypedFactory;
-using Castle.MicroKernel.Registration;
+﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LinqEditor.Core.CodeAnalysis.Services;

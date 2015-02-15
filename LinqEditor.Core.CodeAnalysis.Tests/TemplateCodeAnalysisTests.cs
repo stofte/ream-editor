@@ -1,5 +1,5 @@
-﻿using LinqEditor.Core.Models.Analysis;
-using LinqEditor.Core.CodeAnalysis.Services;
+﻿using LinqEditor.Core.CodeAnalysis.Services;
+using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Templates;
 using Moq;
 using NUnit.Framework;

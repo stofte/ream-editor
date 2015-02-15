@@ -1,5 +1,4 @@
 ﻿using LinqEditor.Core.Models.Editor;
-using System.Threading;
 
 namespace LinqEditor.Core.Containers
 {

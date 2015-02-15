@@ -2,7 +2,6 @@
 using Castle.Windsor;
 using Castle.Windsor.Installer;
 using LinqEditor.Core.CodeAnalysis.Services;
-using LinqEditor.Core.Containers;
 using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Settings;

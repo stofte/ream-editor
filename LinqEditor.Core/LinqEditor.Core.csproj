@@ -94,7 +94,13 @@
     <Compile Include="Containers\DatabaseContainer.cs" />
     <Compile Include="Containers\ExecutionContainer.cs" />
     <Compile Include="Containers\IContainer.cs" />
+    <Compile Include="Containers\IIsolatedCodeContainer.cs" />
+    <Compile Include="Containers\IIsolatedCodeContainerFactory.cs" />
+    <Compile Include="Containers\IIsolatedDatabaseContainer.cs" />
+    <Compile Include="Containers\IIsolatedDatabaseContainerFactory.cs" />
     <Compile Include="Containers\Isolated.cs" />
+    <Compile Include="Containers\IsolatedCodeContainer.cs" />
+    <Compile Include="Containers\IsolatedDatabaseContainer.cs" />
     <Compile Include="Generated\Dumper.cs" />
     <Compile Include="Generated\ICodeProgram.cs" />
     <Compile Include="Helpers\DebugLogger.cs" />
@@ -126,9 +132,8 @@
     <Compile Include="Settings\ApplicationSettings.cs" />
     <Compile Include="Settings\Connection.cs" />
     <Compile Include="Settings\ConnectionStore.cs" />
-    <Compile Include="Settings\ISchemaStore.cs" />
+    <Compile Include="Settings\IConnectionStore.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />
-    <Compile Include="Settings\SchemaStore.cs" />
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="SystemTime.cs" />
     <Compile Include="PathUtility.cs" />

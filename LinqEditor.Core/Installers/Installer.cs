@@ -1,9 +1,8 @@
-﻿using Castle.MicroKernel.Registration;
-using Castle.Facilities.TypedFactory;
+﻿using Castle.Facilities.TypedFactory;
+using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LinqEditor.Core.Containers;
-using LinqEditor.Core.Scopes;
 
 namespace LinqEditor.Core.Installers
 {
@@ -11,9 +10,6 @@ namespace LinqEditor.Core.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<Settings.ISchemaStore>()
-                                        .ImplementedBy<Settings.SchemaStore>());
-
             // these classes touch files, so single instance only
             container.Register(Component.For<Settings.IConnectionStore>()
                                         .ImplementedBy<Settings.ConnectionStore>()
@@ -25,9 +21,6 @@ namespace LinqEditor.Core.Installers
                                         .UsingFactoryMethod(() => Settings.SettingsStore.Instance)
                                         .LifestyleSingleton());
             
-            //container.Register(Component.For<IContainerMapper>()
-            //                            .ImplementedBy<ContainerMapper>());
-
             container.Register(Component.For<IIsolatedCodeContainerFactory>()
                                         .AsFactory());
             container.Register(Component.For<IIsolatedDatabaseContainerFactory>()
@@ -35,11 +28,9 @@ namespace LinqEditor.Core.Installers
             container.Register(Component.For<IIsolatedDatabaseContainer>()
                                         .ImplementedBy<IsolatedDatabaseContainer>()
                                         .LifestyleTransient());
-                                        //.LifestyleScoped<IdScopeAccessor>());
             container.Register(Component.For<IIsolatedCodeContainer>()
                                         .ImplementedBy<IsolatedCodeContainer>()
                                         .LifestyleTransient());
-                                        //.LifestyleScoped<IdScopeAccessor>());
         }
     }
 }

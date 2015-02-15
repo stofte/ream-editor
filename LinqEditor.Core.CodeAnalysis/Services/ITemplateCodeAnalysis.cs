@@ -1,5 +1,4 @@
 ﻿using LinqEditor.Core.Models.Analysis;
-using System.Collections.Generic;
 
 namespace LinqEditor.Core.CodeAnalysis.Services
 {

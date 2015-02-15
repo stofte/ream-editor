@@ -4,7 +4,6 @@ using LinqEditor.Core.Models.Editor;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 
 namespace LinqEditor.Core.Containers
 {

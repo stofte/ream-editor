@@ -1,13 +1,13 @@
-﻿using LinqEditor.Core.Models.Editor;
-using LinqEditor.Core.Settings;
-using LinqEditor.Core.Schema.Services;
-using LinqEditor.Core.Templates;
-using System.Threading.Tasks;
+﻿using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Containers;
-using System;
-using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Models.Analysis;
+using LinqEditor.Core.Models.Editor;
+using LinqEditor.Core.Schema.Services;
+using LinqEditor.Core.Settings;
+using LinqEditor.Core.Templates;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Backend
 {

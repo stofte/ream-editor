@@ -1,5 +1,4 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Helpers;
-using LinqEditor.Core.Models.Analysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;

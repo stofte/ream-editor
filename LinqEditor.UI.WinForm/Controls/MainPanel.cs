@@ -1,12 +1,10 @@
 ﻿using LinqEditor.Core.Backend;
-using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Settings;
 using LinqEditor.UI.WinForm.Forms;
 using LinqEditor.UI.WinForm.Resources;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -143,6 +141,15 @@ namespace LinqEditor.UI.WinForm.Controls
             _closeButton.Click += delegate
             {
                 if (RemoveTab != null) RemoveTab();
+            };
+
+            _executeButton.EnabledChanged += delegate(object sender, EventArgs args)
+            {
+                var btn = sender as ToolStripButton;
+                if (btn != null)
+                {
+                    _stopButton.Enabled = !btn.Enabled;
+                }
             };
 
             //_toolbar.Items.Add(dropButton);

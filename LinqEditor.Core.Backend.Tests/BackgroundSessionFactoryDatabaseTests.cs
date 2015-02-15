@@ -1,21 +1,19 @@
-﻿using LinqEditor.Core.Models.Database;
+﻿using Castle.Facilities.TypedFactory;
+using Castle.MicroKernel.Registration;
+using Castle.Windsor;
+using Castle.Windsor.Installer;
+using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Database;
+using LinqEditor.Core.Schema.Services;
+using LinqEditor.Core.Settings;
+using LinqEditor.Core.Templates;
+using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using LinqEditor.Core.Templates;
-using LinqEditor.Core.CodeAnalysis.Compiler;
-using LinqEditor.Core.Schema.Services;
-using Castle.Windsor;
-using Castle.Facilities.TypedFactory;
-using Castle.Windsor.Installer;
-using LinqEditor.Core.Settings;
-using LinqEditor.Core.CodeAnalysis.Services;
-using Moq;
-using Castle.MicroKernel.Registration;
 
 namespace LinqEditor.Core.Backend.Tests
 {

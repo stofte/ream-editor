@@ -32,55 +32,9 @@ namespace LinqEditor.Core.Containers
         {
             return ExecuteInternal(assembly, null);
         }
-
-        public ExecuteResult Execute(byte[] assembly, CancellationToken ct)
-        {
-            if (ct != CancellationToken.None)
-            {
-                if (!ct.CanBeCanceled)
-                {
-                    throw new Exception("foo");
-                }
-
-                var timer = new System.Timers.Timer(100);
-                timer.Elapsed += delegate
-                {
-                    if (ct.IsCancellationRequested)
-                    {
-                        ct.ThrowIfCancellationRequested();
-                    }
-                };
-                timer.AutoReset = true;
-                timer.Enabled = true;
-            }
-            return ExecuteInternal(assembly, null);
-        }
-
+        
         public ExecuteResult Execute(string path)
         {
-            return ExecuteInternal(null, path);
-        }
-
-        public ExecuteResult Execute(string path, CancellationToken ct)
-        {
-            if (ct != CancellationToken.None)
-            {
-                if (!ct.CanBeCanceled)
-                {
-                    throw new Exception("foo");
-                }
-
-                var timer = new System.Timers.Timer(100);
-                timer.Elapsed += delegate
-                {
-                    if (ct.IsCancellationRequested)
-                    {
-                        ct.ThrowIfCancellationRequested();
-                    }
-                    
-                };
-                timer.Enabled = true;
-            }
             return ExecuteInternal(null, path);
         }
 

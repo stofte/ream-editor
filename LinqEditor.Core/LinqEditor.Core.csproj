@@ -97,6 +97,7 @@
     <Compile Include="Containers\Isolated.cs" />
     <Compile Include="Generated\Dumper.cs" />
     <Compile Include="Generated\ICodeProgram.cs" />
+    <Compile Include="Helpers\DebugLogger.cs" />
     <Compile Include="Helpers\GuidHelper.cs" />
     <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Generated\IDatabaseProgram.cs" />

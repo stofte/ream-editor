@@ -29,5 +29,11 @@ namespace LinqEditor.Core.Models.Editor
 
         public ProgramType Kind { get; set; }
         public string CodeOutput { get; set; }
+
+        public override string ToString()
+        {
+            var str = string.Format("success:{0}, codeoutput:{1}", Success, CodeOutput);
+            return str;
+        }
     }
 }

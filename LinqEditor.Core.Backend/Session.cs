@@ -61,8 +61,9 @@ namespace LinqEditor.Core.Backend
         public InitializeResult Initialize(Guid connectionId)
         {
             if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
-            _codeSession = connectionId == _connectionStore.CodeConnection.Id;
+            _codeSession = connectionId == ConnectionStore.CodeId;
             _initialized = true;
+            DebugLogger.Log("connectionId " + connectionId);
             return _codeSession ? InitCode() : InitDatabase(connectionId);
         }
 
@@ -70,7 +71,7 @@ namespace LinqEditor.Core.Backend
         {
             if (!_canReinitialize) throw new InvalidOperationException("Cannot reinitialize unless execute was cancelled");
             _canReinitialize = false;
-
+            DebugLogger.Log("_codeSession " + _codeSession);
             _loadedAppDomain = false;
             LoadAppDomain();
 
@@ -100,11 +101,13 @@ namespace LinqEditor.Core.Backend
                     _canReinitialize = true;
                     if (_codeSession)
                     {
+                        DebugLogger.Log("ct.Register disposing code " + _codeContainer.Id);
                         _codeContainer.Dispose();
                         _codeContainerFactory.Release(_codeContainer);
                     }
                     else
                     {
+                        DebugLogger.Log("ct.Register disposing db " + _databaseContainer.Id);
                         _databaseContainer.Dispose();
                         _databaseContainerFactory.Release(_databaseContainer);
                     }
@@ -114,17 +117,15 @@ namespace LinqEditor.Core.Backend
 
                 try
                 {
-                    // if the src differs, the bytes must differ
-                    if (_prevHash != 0 && _prevSrc != null && _prevSrc != sourceFragment)
-                    {
-                        Debug.Assert(_prevHash != result.AssemblyBytes.GetHashCode());
-                    }
+                    DebugLogger.Log("AssemblyBytes.GetHashCode " + result.AssemblyBytes.GetHashCode());
 
                     _prevHash = result.AssemblyBytes.GetHashCode();
                     _prevSrc = sourceFragment;
 
                     containerResult = _codeSession ? _codeContainer.Value.Execute(result.AssemblyBytes) :
                     _databaseContainer.Value.Execute(result.AssemblyBytes);
+
+                    DebugLogger.Log("containerResult.CodeOutput " + containerResult.CodeOutput);
                 }
                 catch (AppDomainUnloadedException)
                 {
@@ -170,12 +171,14 @@ namespace LinqEditor.Core.Backend
                 _codeContainer = _codeContainerFactory.Create();
                 var res = _codeContainer.Value.Initialize();
                 exn = res.Error;
+                DebugLogger.Log("created code " + _codeContainer.Id);
             }
             else
             {
                 _databaseContainer = _databaseContainerFactory.Create();
                 var res = _databaseContainer.Value.Initialize(_connection.CachedSchemaFileName);
                 exn = res.Error;
+                DebugLogger.Log("created db " + _databaseContainer.Id);
             }
 
             _loadedAppDomain = true;

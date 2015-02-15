@@ -3,6 +3,7 @@ using Castle.Windsor;
 using Castle.Windsor.Installer;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Containers;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Settings;
 using LinqEditor.Core.Templates;
@@ -52,15 +53,15 @@ namespace LinqEditor.Core.Backend.Tests
         [Test]
         public async void Can_Create_And_Cancel_Background_Code_Session()
         {
+            DebugLogger.Log("Can_Create_And_Cancel_Background_Code_Session");
             // todo: this test fails randomly 
             var factory = _container.Resolve<IBackgroundSessionFactory>();
-            var mapper = _container.Resolve<IConnectionStore>();
             var id = Guid.NewGuid();
             var ms = 5 * 60 * 1000;
             var src1 = string.Format("System.Threading.Thread.Sleep({0});", ms);
             var src2 = "Write(\"foo\");";
             var session = factory.Create(id);
-            await session.InitializeAsync(mapper.CodeConnection.Id);
+            await session.InitializeAsync(ConnectionStore.CodeId);
 
             var watch = new Stopwatch();
             
@@ -77,7 +78,7 @@ namespace LinqEditor.Core.Backend.Tests
            
             // reinitialize session and try another execute
             await session.ReinitializeAsync();
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
             var result2 = await session.ExecuteAsync(src2);
             Assert.AreEqual("foo", result2.CodeOutput);
         }

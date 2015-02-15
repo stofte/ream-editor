@@ -14,7 +14,6 @@ namespace LinqEditor.Core.Settings
         void Delete(Connection conn);
         IEnumerable<Connection> Connections { get; }
         event Action ConnectionsUpdated;
-        Connection CodeConnection { get; }
     }
 
     public class ConnectionStore : ApplicationSettings, IConnectionStore
@@ -37,14 +36,7 @@ namespace LinqEditor.Core.Settings
         }
 
         public event Action ConnectionsUpdated;
-
-        [JsonIgnore]
-        public Connection CodeConnection { get { return new Connection 
-        {
-            Id = CodeId,
-            DisplayName = "Code"
-        }; } }
-
+        
         [JsonProperty]
         private IList<Connection> _connections; // ignore naming for json rendering
 
@@ -113,7 +105,11 @@ namespace LinqEditor.Core.Settings
         public IEnumerable<Connection> Connections
         {
             get {
-                return _connections.Where(x => x.Id == CodeId)
+                return (new Connection[] { new Connection 
+                    {
+                        Id = CodeId,
+                        DisplayName = "Code"
+                    }})
                     .Concat(_connections.Where(x => x.Id != CodeId).OrderBy(x => x.DisplayName)
                     .Select(x => new Connection
                     {

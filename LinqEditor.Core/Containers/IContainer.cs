@@ -9,8 +9,6 @@ namespace LinqEditor.Core.Containers
         LoadAppDomainResult Initialize(string assemblyPath);
         LoadAppDomainResult Initialize();
         ExecuteResult Execute(byte[] assembly);
-        ExecuteResult Execute(byte[] assembly, CancellationToken ct);
         ExecuteResult Execute(string path);
-        ExecuteResult Execute(string path, CancellationToken ct);
     }
 }

@@ -32,18 +32,8 @@ namespace LinqEditor.Core.Containers
         {
             return ExecuteInternal(assembly, null);
         }
-
-        public ExecuteResult Execute(byte[] assembly, CancellationToken ct)
-        {
-            return ExecuteInternal(assembly, null);
-        }
-
+        
         public ExecuteResult Execute(string path)
-        {
-            return ExecuteInternal(null, path);
-        }
-
-        public ExecuteResult Execute(string path, CancellationToken ct)
         {
             return ExecuteInternal(null, path);
         }

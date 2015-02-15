@@ -79,6 +79,8 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             _statusBar.SizingGrip = false;
             _statusLabel = new ToolStripStatusLabel();
+            _statusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            //_statusLabel.Image = Resources.Icons.HighContrast_32_step06;
             _statusLabel.Alignment = ToolStripItemAlignment.Left;
             _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
             _timeLabel = new ToolStripStatusLabel();

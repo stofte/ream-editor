@@ -103,6 +103,106 @@ namespace LinqEditor.UI.WinForm.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step00 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step00", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step01 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step01", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step02 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step02", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step03 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step03", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step04 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step04", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step05 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step05", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step06 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step06", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step07 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step07", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step08 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step08", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap HighContrast_32_step09 {
+            get {
+                object obj = ResourceManager.GetObject("HighContrast_32_step09", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Offline_16xLG {
             get {
                 object obj = ResourceManager.GetObject("Offline_16xLG", resourceCulture);

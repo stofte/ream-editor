@@ -14,10 +14,14 @@ namespace LinqEditor.Core.Settings
         void Delete(Connection conn);
         IEnumerable<Connection> Connections { get; }
         event Action ConnectionsUpdated;
+        Connection CodeConnection { get; }
     }
 
     public class ConnectionStore : ApplicationSettings, IConnectionStore
     {
+        [JsonIgnore]
+        public static Guid CodeId = Guid.Parse("0E46086D-FCEB-4FF9-82B4-F99678E31EE5");
+
         // use a factory property, so we dont mess up our constructor with file reading logic
         public static ConnectionStore Instance
         {
@@ -34,12 +38,21 @@ namespace LinqEditor.Core.Settings
 
         public event Action ConnectionsUpdated;
 
+        [JsonIgnore]
+        public Connection CodeConnection { get { return new Connection 
+        {
+            Id = CodeId,
+            DisplayName = "Code"
+        }; } }
+
         [JsonProperty]
         private IList<Connection> _connections; // ignore naming for json rendering
 
         public void Add(Connection conn)
         {
             if (conn.Id == Guid.Empty) throw new ArgumentException("connection must have id");
+            if (conn.Id == CodeId) throw new ArgumentException("connection cannot use code id");
+
             if (_connections.Where(x => x.Id == conn.Id).Count() == 0)
             {
                 _connections.Add(conn);
@@ -50,10 +63,17 @@ namespace LinqEditor.Core.Settings
                     ConnectionsUpdated();
                 }
             }
+            else
+            {
+                throw new ArgumentException("Connection id already added");
+            }
         }
 
         public void Update(Connection conn)
         {
+            if (conn == null) throw new ArgumentNullException("Connection cannot be null");
+            if (conn.Id == CodeId) throw new ArgumentException("Cannot update code connection");
+
             foreach (var c in _connections)
             {
                 if (c.Id == conn.Id)
@@ -78,7 +98,10 @@ namespace LinqEditor.Core.Settings
 
         public void Delete(Connection conn)
         {
-            _connections = _connections.Where(x => x.Id != conn.Id).ToList();
+            if (conn == null) throw new ArgumentNullException("Connection cannot be null");
+            if (conn.Id == CodeId) throw new ArgumentException("Cannot delete code connection");
+
+                        _connections = _connections.Where(x => x.Id != conn.Id).ToList();
             Save();
             if (ConnectionsUpdated != null)
             {
@@ -89,7 +112,18 @@ namespace LinqEditor.Core.Settings
         [JsonIgnore]
         public IEnumerable<Connection> Connections
         {
-            get { return _connections; }
+            get {
+                return _connections.Where(x => x.Id == CodeId)
+                    .Concat(_connections.Where(x => x.Id != CodeId).OrderBy(x => x.DisplayName)
+                    .Select(x => new Connection
+                    {
+                        Id = x.Id,
+                        DisplayName = x.DisplayName,
+                        ConnectionString = x.ConnectionString,
+                        CachedSchemaFileName = x.CachedSchemaFileName,
+                        CachedSchemaNamespace = x.CachedSchemaNamespace
+                    })); 
+            }
         }
     }
 }

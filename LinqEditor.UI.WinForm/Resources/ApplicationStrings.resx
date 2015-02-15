@@ -141,4 +141,7 @@
   <data name="TOOLTIP_NEW_TAB" xml:space="preserve">
     <value>New tab (Ctrl+T)</value>
   </data>
+  <data name="TOOLTIP_STOP_EXECUTION" xml:space="preserve">
+    <value>Stop query (Shift+F5)</value>
+  </data>
 </root>

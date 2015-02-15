@@ -83,6 +83,16 @@ namespace LinqEditor.UI.WinForm.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap active_x_16xLG {
+            get {
+                object obj = ResourceManager.GetObject("active_x_16xLG", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap DatabaseOptions_12882 {
             get {
                 object obj = ResourceManager.GetObject("DatabaseOptions_12882", resourceCulture);
@@ -116,6 +126,16 @@ namespace LinqEditor.UI.WinForm.Resources {
         public static System.Drawing.Bitmap QueryResultsNewRow {
             get {
                 object obj = ResourceManager.GetObject("QueryResultsNewRow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Record_16xLG {
+            get {
+                object obj = ResourceManager.GetObject("Record_16xLG", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -3,7 +3,6 @@ using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LinqEditor.Core.Containers;
-using LinqEditor.Core.Context;
 using LinqEditor.Core.Scopes;
 
 namespace LinqEditor.Core.Installers
@@ -26,8 +25,8 @@ namespace LinqEditor.Core.Installers
                                         .UsingFactoryMethod(() => Settings.SettingsStore.Instance)
                                         .LifestyleSingleton());
             
-            container.Register(Component.For<IContainerMapper>()
-                                        .ImplementedBy<ContainerMapper>());
+            //container.Register(Component.For<IContainerMapper>()
+            //                            .ImplementedBy<ContainerMapper>());
 
             container.Register(Component.For<IIsolatedCodeContainerFactory>()
                                         .AsFactory());
@@ -35,10 +34,12 @@ namespace LinqEditor.Core.Installers
                                         .AsFactory());
             container.Register(Component.For<IIsolatedDatabaseContainer>()
                                         .ImplementedBy<IsolatedDatabaseContainer>()
-                                        .LifestyleScoped<IdScopeAccessor>());
+                                        .LifestyleTransient());
+                                        //.LifestyleScoped<IdScopeAccessor>());
             container.Register(Component.For<IIsolatedCodeContainer>()
                                         .ImplementedBy<IsolatedCodeContainer>()
-                                        .LifestyleScoped<IdScopeAccessor>());
+                                        .LifestyleTransient());
+                                        //.LifestyleScoped<IdScopeAccessor>());
         }
     }
 }

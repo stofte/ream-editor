@@ -4,6 +4,7 @@ using LinqEditor.Core.Models.Editor;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace LinqEditor.Core.Containers
 {
@@ -29,12 +30,22 @@ namespace LinqEditor.Core.Containers
 
         public ExecuteResult Execute(byte[] assembly)
         {
-            return Execute(assembly, null);
+            return ExecuteInternal(assembly, null);
+        }
+
+        public ExecuteResult Execute(byte[] assembly, CancellationToken ct)
+        {
+            return ExecuteInternal(assembly, null);
         }
 
         public ExecuteResult Execute(string path)
         {
-            return Execute(null, path);
+            return ExecuteInternal(null, path);
+        }
+
+        public ExecuteResult Execute(string path, CancellationToken ct)
+        {
+            return ExecuteInternal(null, path);
         }
 
         private LoadAppDomainResult Initialize(byte[] assemblyImage, string assemblyPath)
@@ -73,7 +84,7 @@ namespace LinqEditor.Core.Containers
             };
         }
 
-        private ExecuteResult Execute(byte[] assembly, string path)
+        private ExecuteResult ExecuteInternal(byte[] assembly, string path)
         {
             var assm = !string.IsNullOrEmpty(path) ? Assembly.LoadFile(path) : Assembly.Load(assembly);
             var queryType = assm.GetType(string.Format("{0}.Program", assm.GetName().Name));

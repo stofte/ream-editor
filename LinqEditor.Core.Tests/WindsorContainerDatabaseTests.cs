@@ -32,7 +32,7 @@ namespace LinqEditor.Core.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.SqlServer.Database("UnitTest");
+            _database = new LinqEditor.Test.Common.SqlServer.Database("WindsorContainerDatabaseTests");
             var schemaProvider = new SqlSchemaProvider();
             var templateService = new TemplateService();
             _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);
@@ -56,29 +56,12 @@ namespace LinqEditor.Core.Tests
         {
             var container = new WindsorContainer();
             container.AddFacility<TypedFactoryFacility>();
-
             container.Install(FromAssembly.Containing<IConnectionStore>()); // core
-
             var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
-            var dbId1 = Guid.NewGuid();
-            var dbId2 = Guid.NewGuid();
-            var instance1 = containerFactory.Create(dbId1);
-            var instance2 = containerFactory.Create(dbId2);
+  
+            var instance1 = containerFactory.Create();
+            var instance2 = containerFactory.Create();
             Assert.AreNotSame(instance1, instance2);
-        }
-
-        [Test]
-        public void Can_Load_The_Same_DatabaseContainer_Instance()
-        {
-            var container = new WindsorContainer();
-            container.AddFacility<TypedFactoryFacility>();
-            container.Install(FromAssembly.Containing<IConnectionStore>()); // core
-
-            var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
-            var dbId1 = Guid.NewGuid();
-            var instance1 = containerFactory.Create(dbId1);
-            var instance2 = containerFactory.Create(dbId1);
-            Assert.AreSame(instance1, instance2);
         }
     }
 }

@@ -26,9 +26,13 @@ namespace LinqEditor.Core.Containers
     {
         private AppDomain _domain;
         private T _value;
+        Guid _id;
+
+        public Guid Id { get { return _id; } }
 
         public Isolated(Guid id)
         {
+            _id = id;
             _domain = AppDomain.CreateDomain("Isolated:" + id,
                null, AppDomain.CurrentDomain.SetupInformation);
 
@@ -58,33 +62,35 @@ namespace LinqEditor.Core.Containers
 
     public class IsolatedDatabaseContainer : Isolated<DatabaseContainer>, IIsolatedDatabaseContainer 
     {
-        public IsolatedDatabaseContainer(Guid id) : base(id) {}
+        public IsolatedDatabaseContainer() : base(Guid.NewGuid()) {}
     }
 
     public class IsolatedCodeContainer : Isolated<CodeContainer>, IIsolatedCodeContainer 
     {
-        public IsolatedCodeContainer(Guid id) : base(id) { }
+        public IsolatedCodeContainer() : base(Guid.NewGuid()) { }
     }
 
     public interface IIsolatedDatabaseContainer : IDisposable
     {
+        Guid Id { get; }
         DatabaseContainer Value { get; }
     }
 
     public interface IIsolatedCodeContainer : IDisposable
     {
+        Guid Id { get; }
         CodeContainer Value { get; }
     }
 
     public interface IIsolatedDatabaseContainerFactory
     {
-        IIsolatedDatabaseContainer Create(Guid id);
+        IIsolatedDatabaseContainer Create();
         void Release(IIsolatedDatabaseContainer instance);
     }
 
     public interface IIsolatedCodeContainerFactory
     {
-        IIsolatedCodeContainer Create(Guid id);
+        IIsolatedCodeContainer Create();
         void Release(IIsolatedCodeContainer instance);
     }
 }

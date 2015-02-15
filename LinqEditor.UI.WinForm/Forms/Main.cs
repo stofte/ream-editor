@@ -1,14 +1,7 @@
-﻿using LinqEditor.Core.Context;
-using LinqEditor.Core.Models.Editor;
-using LinqEditor.Core.Backend;
-using LinqEditor.UI.WinForm.Controls;
-using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using LinqEditor.Core.Settings;
+﻿using LinqEditor.UI.WinForm.Controls;
 using LinqEditor.UI.WinForm.Resources;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace LinqEditor.UI.WinForm.Forms
 {

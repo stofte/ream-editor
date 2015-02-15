@@ -1,9 +1,5 @@
 ﻿using LinqEditor.Core.Models.Editor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace LinqEditor.Core.Containers
 {
@@ -13,6 +9,8 @@ namespace LinqEditor.Core.Containers
         LoadAppDomainResult Initialize(string assemblyPath);
         LoadAppDomainResult Initialize();
         ExecuteResult Execute(byte[] assembly);
+        ExecuteResult Execute(byte[] assembly, CancellationToken ct);
         ExecuteResult Execute(string path);
+        ExecuteResult Execute(string path, CancellationToken ct);
     }
 }

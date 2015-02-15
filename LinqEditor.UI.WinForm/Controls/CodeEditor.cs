@@ -1,12 +1,10 @@
-﻿using LinqEditor.Core.Context;
+﻿using LinqEditor.Core.Backend;
 using LinqEditor.Core.Models.Analysis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
-using LinqEditor.Core.CodeAnalysis.Services;
-using LinqEditor.Core.Backend;
-using System;
 
 namespace LinqEditor.UI.WinForm.Controls
 {

@@ -91,14 +91,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Containers\CodeContainer.cs" />
-    <Compile Include="Containers\ContainerMapper.cs" />
     <Compile Include="Containers\DatabaseContainer.cs" />
     <Compile Include="Containers\ExecutionContainer.cs" />
     <Compile Include="Containers\IContainer.cs" />
-    <Compile Include="Containers\IContainerMapper.cs" />
     <Compile Include="Containers\Isolated.cs" />
-    <Compile Include="Context\Context.cs" />
-    <Compile Include="Context\IContext.cs" />
     <Compile Include="Generated\Dumper.cs" />
     <Compile Include="Generated\ICodeProgram.cs" />
     <Compile Include="Helpers\GuidHelper.cs" />

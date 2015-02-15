@@ -1,8 +1,7 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Helpers;
-using LinqEditor.Core.Models.Analysis;
-using LinqEditor.Core.Context;
 using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Templates;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,8 +9,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
 namespace LinqEditor.Core.CodeAnalysis.Services
 {
@@ -20,7 +19,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         private bool _initialized;
         private MetadataReference[] _references;
         private ITemplateService _templateService;
-        private IContext _context;
         private string _initialSource;
         private string _currentSource;
         private int _sourceOffset;

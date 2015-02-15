@@ -1,6 +1,7 @@
 ﻿using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
+using Castle.Windsor.Installer;
 using LinqEditor.Core.Containers;
 using LinqEditor.Core.Scopes;
 using LinqEditor.Core.Settings;
@@ -14,39 +15,15 @@ namespace LinqEditor.Core.Tests
     public class WindsorContainerTests
     {
         [Test]
-        public void Can_Load_CodeContainer_From_Container()
-        {
-            var container = new WindsorContainer();
-            container.AddFacility<TypedFactoryFacility>();
-            container.Register(Component.For<IIsolatedCodeContainerFactory>().AsFactory());
-
-            container.Register(Component.For<IIsolatedCodeContainer>()
-                .ImplementedBy<IsolatedCodeContainer>()
-                .LifestyleScoped<IdScopeAccessor>());
-
-            var codeContainerFactory = container.Resolve<IIsolatedCodeContainerFactory>();
-            var id = Guid.NewGuid();
-            var instance1 = codeContainerFactory.Create(id);
-            var instance2 = codeContainerFactory.Create(id);
-            Assert.AreSame(instance1, instance2);
-        }
-
-        [Test]
         public void Can_Load_Different_DatabaseContainer_Instances()
         {
             var container = new WindsorContainer();
             container.AddFacility<TypedFactoryFacility>();
-
-            container.Register(Component.For<IIsolatedDatabaseContainerFactory>().AsFactory());
-            container.Register(Component.For<IIsolatedDatabaseContainer>()
-                .ImplementedBy<IsolatedDatabaseContainer>()
-                .LifestyleScoped<IdScopeAccessor>());
+            container.Install(FromAssembly.Containing<IConnectionStore>()); // core
 
             var containerFactory = container.Resolve<IIsolatedDatabaseContainerFactory>();
-            var dbId1 = Guid.NewGuid();
-            var dbId2 = Guid.NewGuid();
-            var instance1 = containerFactory.Create(dbId1);
-            var instance2 = containerFactory.Create(dbId2);
+            var instance1 = containerFactory.Create();
+            var instance2 = containerFactory.Create();
             Assert.AreNotSame(instance1, instance2);
         }
 

@@ -131,5 +131,14 @@ namespace LinqEditor.UI.WinForm.Resources {
                 return ResourceManager.GetString("TOOLTIP_NEW_TAB", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop query (Shift+F5).
+        /// </summary>
+        internal static string TOOLTIP_STOP_EXECUTION {
+            get {
+                return ResourceManager.GetString("TOOLTIP_STOP_EXECUTION", resourceCulture);
+            }
+        }
     }
 }

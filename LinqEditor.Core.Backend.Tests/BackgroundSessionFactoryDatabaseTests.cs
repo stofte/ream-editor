@@ -38,7 +38,7 @@ namespace LinqEditor.Core.Backend.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.SqlServer.Database("UnitTest");
+            _database = new LinqEditor.Test.Common.SqlServer.Database("BackgroundSessionFactoryDatabaseTests");
             var schemaProvider = new SqlSchemaProvider();
             var templateService = new TemplateService();
             _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);

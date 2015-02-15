@@ -1,6 +1,5 @@
 ﻿using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.CodeAnalysis.Services;
-using LinqEditor.Core.Context;
 using LinqEditor.Core.Templates;
 using Moq;
 using NUnit.Framework;
@@ -13,7 +12,6 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
     public class TemplateCodeAnalysisTests
     {
         private ITemplateService _templateService;
-        private IContext _context; 
 
         [TestFixtureSetUp]
         public void Initialize()
@@ -52,7 +50,6 @@ namespace Another.Generated
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(programSource);
             _templateService = m.Object;
-            _context = new Context.Context();
         }
 
         // "." is last char
@@ -66,7 +63,7 @@ namespace Another.Generated
         // not member completions
         [TestCase("var x = new List<int>();", 1, UserContext.Unknown, Description = "statement terminator")]
         [TestCase("3423", 1, UserContext.Unknown, Description = "illegal token?")]
-        public void TemplateCodeAnalysis_Returns_Correct_Context_For_Analyze(string src, int offset, UserContext editContex)
+        public void Returns_Correct_Context_For_Analyze(string src, int offset, UserContext editContex)
         {
             
             var editor = new TemplateCodeAnalysis(_templateService);
@@ -84,7 +81,7 @@ namespace Another.Generated
         [TestCase("var x = new List<int>();x.Where(y => y.", "IntegerValueInstance", 1, Description = "int instance 1")]
         [TestCase("var x = new List<int>();x.Where(y => y.)", "IntegerValueInstance", 2, Description = "int instance 2, add closing paren")]
         [TestCase("var x = new List<int>();x.Where(y => new { y.})", "IntegerValueInstance", 3, Description = "int instance 2, add closing paren")]
-        public void TemplateCodeAnalysis_Returns_Member_Access_Completions(string src, string vsEntriesKey, int offset)
+        public void Returns_Member_Access_Completions(string src, string vsEntriesKey, int offset)
         {
             var editor = new TemplateCodeAnalysis(_templateService);
             editor.Initialize();

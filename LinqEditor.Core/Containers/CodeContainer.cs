@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Containers
@@ -29,15 +30,61 @@ namespace LinqEditor.Core.Containers
 
         public ExecuteResult Execute(byte[] assembly)
         {
-            return Execute(assembly, null);
+            return ExecuteInternal(assembly, null);
+        }
+
+        public ExecuteResult Execute(byte[] assembly, CancellationToken ct)
+        {
+            if (ct != CancellationToken.None)
+            {
+                if (!ct.CanBeCanceled)
+                {
+                    throw new Exception("foo");
+                }
+
+                var timer = new System.Timers.Timer(100);
+                timer.Elapsed += delegate
+                {
+                    if (ct.IsCancellationRequested)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                    }
+                };
+                timer.AutoReset = true;
+                timer.Enabled = true;
+            }
+            return ExecuteInternal(assembly, null);
         }
 
         public ExecuteResult Execute(string path)
         {
-            return Execute(null, path);
+            return ExecuteInternal(null, path);
         }
 
-        private ExecuteResult Execute(byte[] assembly, string path)
+        public ExecuteResult Execute(string path, CancellationToken ct)
+        {
+            if (ct != CancellationToken.None)
+            {
+                if (!ct.CanBeCanceled)
+                {
+                    throw new Exception("foo");
+                }
+
+                var timer = new System.Timers.Timer(100);
+                timer.Elapsed += delegate
+                {
+                    if (ct.IsCancellationRequested)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                    }
+                    
+                };
+                timer.Enabled = true;
+            }
+            return ExecuteInternal(null, path);
+        }
+
+        private ExecuteResult ExecuteInternal(byte[] assembly, string path)
         {
             try
             {

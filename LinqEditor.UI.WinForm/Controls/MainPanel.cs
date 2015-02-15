@@ -1,13 +1,12 @@
 ﻿using LinqEditor.Core.Backend;
+using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Settings;
 using LinqEditor.UI.WinForm.Forms;
 using LinqEditor.UI.WinForm.Resources;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,6 +17,7 @@ namespace LinqEditor.UI.WinForm.Controls
         ToolStrip _toolbar;
         SplitContainer _mainContainer;
         ToolStripButton _executeButton;
+        ToolStripButton _stopButton;
         ToolStripButton _databaseButton;
         ToolStripButton _closeButton;
         StatusStrip _statusBar;
@@ -72,9 +72,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _mainContainer.Panel2MinSize = minHeight / 3;
             _mainContainer.GotFocus += _mainContainer_GotFocus;
             _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
-
             
-
             // status
             _statusBar.Dock = DockStyle.Bottom;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
@@ -118,17 +116,25 @@ namespace LinqEditor.UI.WinForm.Controls
             _executeButton.Click += _executeButton_Click;
             _executeButton.Enabled = false;
             _executeButton.ToolTipText = ApplicationStrings.TOOLTIP_EXECUTE;
+            // stop button
+            _stopButton = new ToolStripButton();
+            _stopButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            _stopButton.Image = Resources.Icons.Record_16xLG;
+            _stopButton.Enabled = false;
+            _stopButton.ToolTipText = ApplicationStrings.TOOLTIP_STOP_EXECUTION;
+            // connection manager
             _databaseButton = new ToolStripButton();
             _databaseButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             _databaseButton.Image = Resources.Icons.DatabaseOptions_12882;
             _databaseButton.ToolTipText = ApplicationStrings.TOOLTIP_CONNECTION_MANAGER;
             _databaseButton.Click += _databaseButton_Click;
+            // close tab
             _closeButton = new ToolStripButton();
             _closeButton.Alignment = ToolStripItemAlignment.Right;
             _closeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _closeButton.Image = Resources.Icons.Offline_16xLG;
+            _closeButton.Image = Resources.Icons.active_x_16xLG;
             _closeButton.ToolTipText = ApplicationStrings.TOOLTIP_CLOSE_TAB;
-            _toolbar.Items.AddRange(new[] { _executeButton, _databaseButton, _closeButton });
+            _toolbar.Items.AddRange(new[] { _executeButton, _stopButton, _databaseButton, _closeButton });
 
             _closeButton.Click += delegate
             {
@@ -180,7 +186,6 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             var selected = _contextSelector.SelectedItem as Connection;
             _contextSelector.Items.Clear();
-            _contextSelector.Items.Add(new Connection { Id = Guid.Empty, DisplayName = "", ConnectionString = "Code" });
             foreach (var conn in _connectionStore.Connections)
             {
                 _contextSelector.Items.Add(conn);
@@ -232,6 +237,11 @@ namespace LinqEditor.UI.WinForm.Controls
             _restoreEditorFocusOnSplitterMoved = false;
         }
 
+        /// <summary>
+        /// Handles the GotFocus event of the _mainContainer control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         void _mainContainer_GotFocus(object sender, EventArgs e)
         {
             _editorFocusTimer.Stop();
@@ -275,7 +285,16 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
             var btn = sender as ToolStripButton;
+            var cts = new CancellationTokenSource();
             btn.Enabled = false;
+            try
+            {
+
+            }
+            catch (OperationCanceledException)
+            {
+                _outputPane.BindOutput(new ExecuteResult { CodeOutput = "Cancelled query", Success = false });
+            }
             var result = await _session.ExecuteAsync(_editor.SourceCode);
             _outputPane.BindOutput(result);
             btn.Enabled = true;

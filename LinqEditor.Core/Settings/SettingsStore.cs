@@ -60,7 +60,7 @@ namespace LinqEditor.Core.Settings
                 {
                     store = new SettingsStore()
                     {
-                        LastConnectionUsed = Guid.Empty
+                        LastConnectionUsed = ConnectionStore.CodeId
                     };
                 }
                 return store;

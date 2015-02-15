@@ -1,5 +1,4 @@
 ﻿using LinqEditor.Core.Models.Analysis;
-using LinqEditor.Core.Context;
 using LinqEditor.Core.Templates;
 using System;
 using System.Collections.Generic;

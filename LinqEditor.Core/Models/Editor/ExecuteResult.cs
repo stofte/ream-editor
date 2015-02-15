@@ -18,7 +18,7 @@ namespace LinqEditor.Core.Models.Editor
             QueryText = string.Empty;
         }
 
-        public long Duration { get; set; }
+        public long DurationMs { get; set; }
         public IEnumerable<DataTable> Tables { get; set; }
         public IEnumerable<Warning> Warnings { get; set; }
         public IEnumerable<Error> Errors { get; set; }

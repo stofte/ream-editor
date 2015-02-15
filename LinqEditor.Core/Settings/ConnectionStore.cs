@@ -108,7 +108,8 @@ namespace LinqEditor.Core.Settings
                 return (new Connection[] { new Connection 
                     {
                         Id = CodeId,
-                        DisplayName = "Code"
+                        DisplayName = "Code",
+                        Kind = Models.Editor.ProgramType.Code,
                     }})
                     .Concat(_connections.Where(x => x.Id != CodeId).OrderBy(x => x.DisplayName)
                     .Select(x => new Connection
@@ -117,7 +118,7 @@ namespace LinqEditor.Core.Settings
                         DisplayName = x.DisplayName,
                         ConnectionString = x.ConnectionString,
                         CachedSchemaFileName = x.CachedSchemaFileName,
-                        CachedSchemaNamespace = x.CachedSchemaNamespace
+                        CachedSchemaNamespace = x.CachedSchemaNamespace,
                     })); 
             }
         }

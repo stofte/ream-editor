@@ -128,7 +128,10 @@ namespace LinqEditor.UI.WinForm.Forms
                 editSelector.Items.Clear();
                 foreach (var conn in _connectionStore.Connections)
                 {
-                    editSelector.Items.Add(conn);
+                    if (conn.Kind == Core.Models.Editor.ProgramType.Database)
+                    {
+                        editSelector.Items.Add(conn);
+                    }
                 }
                 editSelector.Enabled = editSelector.Items.Count > 0;
 

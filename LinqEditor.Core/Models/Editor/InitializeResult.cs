@@ -8,6 +8,7 @@ namespace LinqEditor.Core.Models.Editor
     [Serializable]
     public class InitializeResult
     {
+        public long DurationMs { get; set; }
         public Exception Error { get; set; }
         public string AssemblyPath { get; set; }
         public string SchemaNamespace { get; set; }

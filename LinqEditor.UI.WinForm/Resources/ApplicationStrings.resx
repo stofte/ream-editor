@@ -129,6 +129,15 @@
   <data name="EDITOR_SESSION_LOADING" xml:space="preserve">
     <value>Loading session</value>
   </data>
+  <data name="EDITOR_TIMER_QUERY_CANCELLED_AFTER" xml:space="preserve">
+    <value>(cancelled after {0}ms)</value>
+  </data>
+  <data name="EDITOR_TIMER_QUERY_COMPLETED_IN" xml:space="preserve">
+    <value>(completed in {0}ms)</value>
+  </data>
+  <data name="EDITOR_TIMER_SESSION_LOADED_IN" xml:space="preserve">
+    <value>(loaded in {0}ms)</value>
+  </data>
   <data name="TOOLTIP_CLOSE_TAB" xml:space="preserve">
     <value>Close tab (Ctrl+W)</value>
   </data>

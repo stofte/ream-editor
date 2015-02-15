@@ -97,6 +97,33 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (cancelled after {0}ms).
+        /// </summary>
+        internal static string EDITOR_TIMER_QUERY_CANCELLED_AFTER {
+            get {
+                return ResourceManager.GetString("EDITOR_TIMER_QUERY_CANCELLED_AFTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (completed in {0}ms).
+        /// </summary>
+        internal static string EDITOR_TIMER_QUERY_COMPLETED_IN {
+            get {
+                return ResourceManager.GetString("EDITOR_TIMER_QUERY_COMPLETED_IN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (loaded in {0}ms).
+        /// </summary>
+        internal static string EDITOR_TIMER_SESSION_LOADED_IN {
+            get {
+                return ResourceManager.GetString("EDITOR_TIMER_SESSION_LOADED_IN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close tab (Ctrl+W).
         /// </summary>
         internal static string TOOLTIP_CLOSE_TAB {

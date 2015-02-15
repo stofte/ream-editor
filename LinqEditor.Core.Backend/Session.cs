@@ -60,6 +60,7 @@ namespace LinqEditor.Core.Backend
 
         public InitializeResult Initialize(Guid connectionId)
         {
+            _watch.Restart();
             if (_initialized) throw new InvalidOperationException("Cannot initialize more then once");
             _codeSession = connectionId == ConnectionStore.CodeId;
             _initialized = true;
@@ -124,20 +125,23 @@ namespace LinqEditor.Core.Backend
 
                     containerResult = _codeSession ? _codeContainer.Value.Execute(result.AssemblyBytes) :
                     _databaseContainer.Value.Execute(result.AssemblyBytes);
-
-                    DebugLogger.Log("containerResult.CodeOutput " + containerResult.CodeOutput);
                 }
-                catch (AppDomainUnloadedException)
+                catch (AppDomainUnloadedException exn)
                 {
+                    DebugLogger.Log("AppDomainUnloadedException " + exn.ToString());
+
                     return new ExecuteResult
                     {
                         Success = false,
                         Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
                         QueryText = "Cancelled",
-                        Duration = _watch.ElapsedMilliseconds,
+                        DurationMs = _watch.ElapsedMilliseconds,
                         CodeOutput = "Cancelled"
                     };
                 }
+
+                DebugLogger.Log("containerResult.Success " + containerResult.Success);
+                DebugLogger.Log("containerResult.CodeOutput " + containerResult.CodeOutput);
 
                 return new ExecuteResult
                 {
@@ -145,7 +149,7 @@ namespace LinqEditor.Core.Backend
                     QueryText = containerResult.QueryText,
                     Tables = containerResult.Tables,
                     Warnings = result.Warnings,
-                    Duration = _watch.ElapsedMilliseconds,
+                    DurationMs = _watch.ElapsedMilliseconds,
                     CodeOutput = containerResult.CodeOutput,
                     Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
                 };
@@ -156,13 +160,14 @@ namespace LinqEditor.Core.Backend
                 Success = false,
                 Errors = result.Errors,
                 Warnings = result.Warnings,
-                Duration = _watch.ElapsedMilliseconds,
+                DurationMs = _watch.ElapsedMilliseconds,
                 Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
             };
         }
 
         public LoadAppDomainResult LoadAppDomain()
         {
+            _watch.Restart();
             if (_loadedAppDomain) throw new InvalidOperationException("Cannot load AppDomain more then once, unless execute was cancelled");
             Exception exn = null;
             // loads schema in new appdomain
@@ -185,6 +190,7 @@ namespace LinqEditor.Core.Backend
 
             return new LoadAppDomainResult
             {
+                DurationMs = _watch.ElapsedMilliseconds,
                 Error = exn, // only member set in runner
             };
         }
@@ -211,7 +217,10 @@ namespace LinqEditor.Core.Backend
         private InitializeResult InitCode()
         {
             _codeAnalysis.Initialize();
-            return new InitializeResult();
+            return new InitializeResult()
+            {
+                DurationMs = _watch.ElapsedMilliseconds,
+            };
         }
 
         private InitializeResult InitDatabase(Guid id)
@@ -240,8 +249,10 @@ namespace LinqEditor.Core.Backend
 
             return new InitializeResult
             {
+                // this shouldn't be needed anymore
                 AssemblyPath = _connection.CachedSchemaFileName,
-                SchemaNamespace = _connection.CachedSchemaNamespace
+                SchemaNamespace = _connection.CachedSchemaNamespace,
+                DurationMs = _watch.ElapsedMilliseconds
             };
         }
 

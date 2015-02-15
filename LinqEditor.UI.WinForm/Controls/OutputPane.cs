@@ -68,7 +68,7 @@ namespace LinqEditor.UI.WinForm.Controls
             if (result.Success)
             {
                 var isCode = !string.IsNullOrWhiteSpace(result.CodeOutput);
-                _console.AppendText(string.Format("{1} executed in {0} ms\n", result.Duration, isCode ? "Code" : "Query"));
+                _console.AppendText(string.Format("{1} executed in {0} ms\n", result.DurationMs, isCode ? "Code" : "Query"));
                 _console.AppendText((isCode ? result.CodeOutput.Trim() : result.QueryText.Trim())+"\n\n");
                 if (result.Tables != null)
                 {

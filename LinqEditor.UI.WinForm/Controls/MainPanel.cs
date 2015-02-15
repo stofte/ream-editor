@@ -22,6 +22,7 @@ namespace LinqEditor.UI.WinForm.Controls
         ToolStripButton _closeButton;
         StatusStrip _statusBar;
         ToolStripStatusLabel _statusLabel;
+        ToolStripStatusLabel _timeLabel;
         ToolStripStatusLabel _rowCountLabel;
         CodeEditor _editor;
         OutputPane _outputPane;
@@ -32,6 +33,7 @@ namespace LinqEditor.UI.WinForm.Controls
         IConnectionStore _connectionStore;
         ISettingsStore _settingsStore;
         bool _enableContextSelector = false;
+        long _sessionLoadMs = 0;
 
         Form _connectionManager;
 
@@ -81,9 +83,11 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusLabel = new ToolStripStatusLabel();
             _statusLabel.Alignment = ToolStripItemAlignment.Left;
             _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
+            _timeLabel = new ToolStripStatusLabel();
+            _timeLabel.Alignment = ToolStripItemAlignment.Left;
             _rowCountLabel = new ToolStripStatusLabel();
             _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
-            _statusBar.Items.AddRange(new[] { _statusLabel, _rowCountLabel });
+            _statusBar.Items.AddRange(new[] { _statusLabel, _timeLabel, _rowCountLabel });
 
             // scintilla
             _editor = editor;
@@ -151,12 +155,14 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 if (!_enableContextSelector) return;
                 _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
+                _timeLabel.Text = string.Empty;
                 var selected = _contextSelector.SelectedItem as Connection;
                 if (selected == null) return;
                 _executeButton.Enabled = false;
                 await BindSession(selected.Id);
                 _executeButton.Enabled = true;
                 _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
                 _settingsStore.LastConnectionUsed = selected.Id;
             };
             BindConnections();
@@ -213,8 +219,10 @@ namespace LinqEditor.UI.WinForm.Controls
             _session = _backgroundSessionFactory.Create(sessionId);
             _editor.Session(sessionId);
             var result = await _session.InitializeAsync(id);
+            _sessionLoadMs = result.DurationMs;
             // loads appdomain and initializes connection
-            await _session.LoadAppDomainAsync();
+            var loadResult = await _session.LoadAppDomainAsync();
+            _sessionLoadMs += loadResult.DurationMs;
         }
 
         void _databaseButton_Click(object sender, EventArgs e)
@@ -277,6 +285,7 @@ namespace LinqEditor.UI.WinForm.Controls
             }
             await BindSession(id);
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+            _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
             _executeButton.Enabled = true;
             _enableContextSelector = true;
         }
@@ -284,21 +293,14 @@ namespace LinqEditor.UI.WinForm.Controls
         async void _executeButton_Click(object sender, EventArgs e)
         {
             _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
+            _timeLabel.Text = string.Empty;
             var btn = sender as ToolStripButton;
-            var cts = new CancellationTokenSource();
             btn.Enabled = false;
-            try
-            {
-
-            }
-            catch (OperationCanceledException)
-            {
-                _outputPane.BindOutput(new ExecuteResult { CodeOutput = "Cancelled query", Success = false });
-            }
             var result = await _session.ExecuteAsync(_editor.SourceCode);
             _outputPane.BindOutput(result);
             btn.Enabled = true;
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+            _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_COMPLETED_IN, result.DurationMs);
         }
     }
 }

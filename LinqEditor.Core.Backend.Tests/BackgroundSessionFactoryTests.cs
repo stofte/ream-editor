@@ -50,11 +50,28 @@ namespace LinqEditor.Core.Backend.Tests
             Assert.AreNotSame(session2, session3);
         }
 
+
+        [Test]
+        public async void Session_Returns_DurationMs_For_Main_Methods()
+        {
+            DebugLogger.Log("test start");
+            var factory = _container.Resolve<IBackgroundSessionFactory>();
+            var id = Guid.NewGuid();
+            var src = "Write(\"foo\");";
+            var session = factory.Create(id);
+            var initRes = await session.InitializeAsync(ConnectionStore.CodeId);
+            var loadRes = await session.LoadAppDomainAsync();
+            var execRes = await session.ExecuteAsync(src);
+            Assert.Greater(initRes.DurationMs, 0);
+            Assert.Greater(loadRes.DurationMs, 0);
+            Assert.Greater(execRes.DurationMs, 0);
+        }
+
         [Test]
         public async void Can_Create_And_Cancel_Background_Code_Session()
         {
-            DebugLogger.Log("Can_Create_And_Cancel_Background_Code_Session");
-            // todo: this test fails randomly 
+            DebugLogger.Log("test start");
+            // todo: this test fails randomly (less often now that debug code is inserted ...)
             var factory = _container.Resolve<IBackgroundSessionFactory>();
             var id = Guid.NewGuid();
             var ms = 5 * 60 * 1000;

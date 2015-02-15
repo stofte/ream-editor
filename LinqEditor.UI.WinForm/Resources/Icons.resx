@@ -118,13 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="play" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="QueryResultsNewRow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\QueryResultsNewRow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="startwithoutdebugging_6556" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="start" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\resources\startwithoutdebugging_6556.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="DatabaseOptions_12882" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -133,46 +127,16 @@
   <data name="action_add_16xMD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\resources\action_add_16xMD.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="action_Cancel_16xLG" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\action_Cancel_16xLG.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Offline_16xLG" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\Offline_16xLG.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="active_x_16xLG" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\resources\active_x_16xLG.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Record_16xLG" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\resources\Record_16xLG.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="HighContrast_32_step00" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step00.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="spinner" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\resources\spinner.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="HighContrast_32_step01" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step02" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step02.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step03" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step03.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step04" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step04.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step05" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step05.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step06" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step06.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step07" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step07.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step08" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step08.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HighContrast_32_step09" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\resources\HighContrast_32_step09.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ok_grey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\resources\ok_grey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -25,6 +25,8 @@ namespace LinqEditor.UI.WinForm.Controls
         CodeEditor _editor;
         OutputPane _outputPane;
         ComboBox _contextSelector;
+        Timer _statusTimer;
+        int _busyIcon = 0;
 
         IBackgroundSession _session;
         IBackgroundSessionFactory _backgroundSessionFactory;
@@ -48,6 +50,14 @@ namespace LinqEditor.UI.WinForm.Controls
             _connectionStore = connectionStore;
             _settingsStore = settingsStore;
             _statusBar = new StatusStrip();
+            _statusTimer = new Timer();
+            _statusTimer.Interval = 20;
+            // dont think this is that intensive, otherwise, ther animation skips updates it seems
+            _statusTimer.Tick += delegate
+            {
+                _statusLabel.Invalidate();
+            };
+            
 
             _statusBar.SuspendLayout();
             SuspendLayout();
@@ -80,7 +90,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusBar.SizingGrip = false;
             _statusLabel = new ToolStripStatusLabel();
             _statusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
-            //_statusLabel.Image = Resources.Icons.HighContrast_32_step06;
+            _statusLabel.Image = Resources.Icons.spinner;
             _statusLabel.Alignment = ToolStripItemAlignment.Left;
             _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
             _timeLabel = new ToolStripStatusLabel();
@@ -116,7 +126,7 @@ namespace LinqEditor.UI.WinForm.Controls
             // play button
             _executeButton = new ToolStripButton();
             _executeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            _executeButton.Image = Resources.Icons.startwithoutdebugging_6556;
+            _executeButton.Image = Resources.Icons.start;
             _executeButton.Click += _executeButton_Click;
             _executeButton.Enabled = false;
             _executeButton.ToolTipText = ApplicationStrings.TOOLTIP_EXECUTE;
@@ -190,6 +200,7 @@ namespace LinqEditor.UI.WinForm.Controls
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);
             Controls.Add(_statusBar);
+            
             _statusBar.ResumeLayout(false);
             _statusBar.PerformLayout();
             ResumeLayout(false);
@@ -282,6 +293,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void Main_Load(object sender, EventArgs e)
         {
+            _statusTimer.Enabled = true;
             // restore last used context
             var id = _settingsStore.LastConnectionUsed;
             foreach (Connection conn in _contextSelector.Items)
@@ -295,6 +307,8 @@ namespace LinqEditor.UI.WinForm.Controls
             await BindSession(id);
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
             _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
+            _statusTimer.Enabled = false;
+            _statusLabel.Image = Icons.ok_grey;
             _executeButton.Enabled = true;
             _enableContextSelector = true;
         }
@@ -302,6 +316,8 @@ namespace LinqEditor.UI.WinForm.Controls
         async void _executeButton_Click(object sender, EventArgs e)
         {
             _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
+            _statusTimer.Enabled = true;
+            _statusLabel.Image = Icons.spinner;
             _timeLabel.Text = string.Empty;
             var btn = sender as ToolStripButton;
             btn.Enabled = false;
@@ -310,6 +326,8 @@ namespace LinqEditor.UI.WinForm.Controls
             btn.Enabled = true;
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
             _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_COMPLETED_IN, result.DurationMs);
+            _statusTimer.Enabled = false;
+            _statusLabel.Image = Icons.ok_grey;
         }
     }
 }

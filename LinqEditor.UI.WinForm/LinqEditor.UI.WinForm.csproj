@@ -152,56 +152,20 @@
     <Content Include="..\resources\action_add_16xMD.png">
       <Link>Resources\ToolStripIcons\action_add_16xMD.png</Link>
     </Content>
-    <Content Include="..\resources\action_Cancel_16xLG.png">
-      <Link>Resources\ToolStripIcons\action_Cancel_16xLG.png</Link>
-    </Content>
     <Content Include="..\resources\active_x_16xLG.png">
       <Link>Resources\ToolStripIcons\active_x_16xLG.png</Link>
     </Content>
     <Content Include="..\resources\DatabaseOptions_12882.png">
       <Link>Resources\ToolStripIcons\DatabaseOptions_12882.png</Link>
     </Content>
-    <Content Include="..\resources\HighContrast_32_step00.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step00.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step01.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step01.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step02.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step02.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step03.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step03.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step04.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step04.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step05.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step05.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step06.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step06.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step07.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step07.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step08.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step08.png</Link>
-    </Content>
-    <Content Include="..\resources\HighContrast_32_step09.png">
-      <Link>Resources\ToolStripIcons\HighContrast_32_step09.png</Link>
-    </Content>
-    <Content Include="..\resources\Offline_16xLG.png">
-      <Link>Resources\ToolStripIcons\Offline_16xLG.png</Link>
-    </Content>
-    <Content Include="..\resources\play.png">
-      <Link>Resources\ToolStripIcons\play.png</Link>
-    </Content>
-    <Content Include="..\resources\QueryResultsNewRow.png">
-      <Link>Resources\ToolStripIcons\QueryResultsNewRow.png</Link>
+    <Content Include="..\resources\ok_grey.png">
+      <Link>Resources\ToolStripIcons\ok_grey.png</Link>
     </Content>
     <Content Include="..\resources\Record_16xLG.png">
       <Link>Resources\ToolStripIcons\Record_16xLG.png</Link>
+    </Content>
+    <Content Include="..\resources\spinner.gif">
+      <Link>Resources\ToolStripIcons\spinner.gif</Link>
     </Content>
     <Content Include="..\resources\startwithoutdebugging_6556.png">
       <Link>Resources\ToolStripIcons\startwithoutdebugging_6556.png</Link>

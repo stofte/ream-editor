@@ -24,7 +24,7 @@ namespace LinqEditor.Core.Backend.Tests
     public class BackgroundSessionFactoryTests
     {
         [Test]
-        public void Can_Create_BackgroundSession()
+        public void Can_Create_BackgroundSessions()
         {
             var container = new WindsorContainer();
             container.AddFacility<TypedFactoryFacility>();
@@ -42,7 +42,6 @@ namespace LinqEditor.Core.Backend.Tests
             var session1 = factory.Create(id1);
             var session2 = factory.Create(id1);
             var session3 = factory.Create(id2);
-
 
             Assert.IsNotNull(session1);
             Assert.AreEqual(session1.Id, id1);

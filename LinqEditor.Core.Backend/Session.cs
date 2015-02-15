@@ -115,6 +115,7 @@ namespace LinqEditor.Core.Backend
             else
             {
                 var id = _containerMapper.MapConnectionString(_connection.ConnectionString);
+                // todo: race condition or something 
                 _databaseContainer = _databaseContainerFactory.Create(id);
                 var res = _databaseContainer.Value.Initialize(_connection.CachedSchemaFileName);
                 exn = res.Error;

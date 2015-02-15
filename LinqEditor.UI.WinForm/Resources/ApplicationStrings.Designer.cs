@@ -95,5 +95,41 @@ namespace LinqEditor.UI.WinForm.Resources {
                 return ResourceManager.GetString("EDITOR_SESSION_LOADING", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close tab (Ctrl+W).
+        /// </summary>
+        internal static string TOOLTIP_CLOSE_TAB {
+            get {
+                return ResourceManager.GetString("TOOLTIP_CLOSE_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection manager.
+        /// </summary>
+        internal static string TOOLTIP_CONNECTION_MANAGER {
+            get {
+                return ResourceManager.GetString("TOOLTIP_CONNECTION_MANAGER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run query (F5).
+        /// </summary>
+        internal static string TOOLTIP_EXECUTE {
+            get {
+                return ResourceManager.GetString("TOOLTIP_EXECUTE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New tab (Ctrl+T).
+        /// </summary>
+        internal static string TOOLTIP_NEW_TAB {
+            get {
+                return ResourceManager.GetString("TOOLTIP_NEW_TAB", resourceCulture);
+            }
+        }
     }
 }

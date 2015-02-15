@@ -34,14 +34,16 @@ namespace LinqEditor.UI.WinForm.Forms
             MinimumSize = new Size(MinWidth, MinHeight);
 
             _tabControl = new TabControl2();
-            var x = Resources.Icons.action_add_16xMD;
             _tabControl.ImageList = new ImageList();
-            _tabControl.ImageList.Images.Add(x);
+            _tabControl.ImageList.Images.Add(Resources.Icons.action_add_16xMD);
+            _tabControl.ShowToolTips = true;
             _createTab = new TabPage();
-            var createLabel = new Label();
-            createLabel.Text = "empty";
             _createTab.ImageIndex = 0;
+            _createTab.ToolTipText = ApplicationStrings.TOOLTIP_NEW_TAB;
+            
             var lastSelected = 0;
+
+            _tabControl.Multiline = true;
 
             _tabControl.Deselecting += delegate(object sender, TabControlCancelEventArgs e)
             {
@@ -52,8 +54,6 @@ namespace LinqEditor.UI.WinForm.Forms
             {
                 if (e.TabPage == _createTab)
                 {
-                    //e.Cancel = true;
-
                     if (_tabControl.CtrlTabSwitching)
                     {
                         _tabControl.SelectedIndex = lastSelected == 0 ? _tabControl.TabPages.Count - 2 : 0;
@@ -63,7 +63,7 @@ namespace LinqEditor.UI.WinForm.Forms
                         var newForm = Program.Container.Resolve<MainPanel>();
                         newForm.Dock = DockStyle.Fill;
                         var newTab = new TabPage();
-                        newTab.Text = string.Format(" Query {0}  ", _tabCounter++);
+                        newTab.Text = string.Format(" Query {0} ", _tabCounter++);
                         
                         newTab.Controls.Add(newForm);
                         _tabControl.TabPages.Insert(_tabControl.TabPages.Count - 1, newTab);
@@ -98,6 +98,16 @@ namespace LinqEditor.UI.WinForm.Forms
             SuspendLayout();
             Controls.Add(_tabControl);
             ResumeLayout();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.T))
+            {
+                _tabControl.SelectedTab = _createTab;
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

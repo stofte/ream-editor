@@ -73,6 +73,8 @@ namespace LinqEditor.UI.WinForm.Controls
             _mainContainer.GotFocus += _mainContainer_GotFocus;
             _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
 
+            
+
             // status
             _statusBar.Dock = DockStyle.Bottom;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
@@ -115,29 +117,22 @@ namespace LinqEditor.UI.WinForm.Controls
             _executeButton.Image = Resources.Icons.startwithoutdebugging_6556;
             _executeButton.Click += _executeButton_Click;
             _executeButton.Enabled = false;
+            _executeButton.ToolTipText = ApplicationStrings.TOOLTIP_EXECUTE;
             _databaseButton = new ToolStripButton();
             _databaseButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             _databaseButton.Image = Resources.Icons.DatabaseOptions_12882;
+            _databaseButton.ToolTipText = ApplicationStrings.TOOLTIP_CONNECTION_MANAGER;
             _databaseButton.Click += _databaseButton_Click;
             _closeButton = new ToolStripButton();
             _closeButton.Alignment = ToolStripItemAlignment.Right;
             _closeButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             _closeButton.Image = Resources.Icons.Offline_16xLG;
+            _closeButton.ToolTipText = ApplicationStrings.TOOLTIP_CLOSE_TAB;
             _toolbar.Items.AddRange(new[] { _executeButton, _databaseButton, _closeButton });
 
             _closeButton.Click += delegate
             {
                 if (RemoveTab != null) RemoveTab();
-                return;
-                var page = Parent as TabPage;
-                if (page != null)
-                {
-                    var pageParent = page.Parent as TabControl;
-                    if (pageParent != null)
-                    {
-                        pageParent.TabPages.Remove(page);
-                    }
-                }
             };
 
             //_toolbar.Items.Add(dropButton);
@@ -248,6 +243,11 @@ namespace LinqEditor.UI.WinForm.Controls
             if (keyData == Keys.F5)
             {
                 _executeButton.PerformClick();
+                return true;
+            }
+            else if (keyData == (Keys.Control | Keys.W))
+            {
+                _closeButton.PerformClick();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);

@@ -129,4 +129,16 @@
   <data name="EDITOR_SESSION_LOADING" xml:space="preserve">
     <value>Loading session</value>
   </data>
+  <data name="TOOLTIP_CLOSE_TAB" xml:space="preserve">
+    <value>Close tab (Ctrl+W)</value>
+  </data>
+  <data name="TOOLTIP_CONNECTION_MANAGER" xml:space="preserve">
+    <value>Connection manager</value>
+  </data>
+  <data name="TOOLTIP_EXECUTE" xml:space="preserve">
+    <value>Run query (F5)</value>
+  </data>
+  <data name="TOOLTIP_NEW_TAB" xml:space="preserve">
+    <value>New tab (Ctrl+T)</value>
+  </data>
 </root>

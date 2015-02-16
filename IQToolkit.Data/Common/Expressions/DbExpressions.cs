@@ -56,9 +56,23 @@ namespace IQToolkit.Data.Common
 
     public abstract class DbExpression : Expression
     {
+        ExpressionType eType;
+        Type type;
+
         protected DbExpression(DbExpressionType eType, Type type)
-            : base((ExpressionType)eType, type)
         {
+            this.eType = (ExpressionType)eType;
+            this.type = type;
+        }
+
+        public override ExpressionType NodeType 
+        { 
+            get { return this.eType; } 
+        }
+
+        public override Type Type 
+        { 
+            get { return this.type; } 
         }
 
         public override string ToString()
@@ -721,14 +735,17 @@ namespace IQToolkit.Data.Common
         LambdaExpression operation;
         Expression batchSize;
         Expression stream;
+        ExpressionType eType;
+        Type type;
 
         public BatchExpression(Expression input, LambdaExpression operation, Expression batchSize, Expression stream)
-            : base((ExpressionType)DbExpressionType.Batch, typeof(IEnumerable<>).MakeGenericType(operation.Body.Type))
         {
             this.input = input;
             this.operation = operation;
             this.batchSize = batchSize;
             this.stream = stream;
+            this.eType = (ExpressionType)DbExpressionType.Batch;
+            this.type = typeof(IEnumerable<>).MakeGenericType(operation.Body.Type);
         }
 
         public Expression Input
@@ -749,6 +766,16 @@ namespace IQToolkit.Data.Common
         public Expression Stream
         {
             get { return this.stream; }
+        }
+
+        public override ExpressionType NodeType
+        {
+            get { return this.eType; }
+        }
+
+        public override Type Type
+        {
+            get { return this.type; }
         }
     }
 
@@ -989,12 +1016,15 @@ namespace IQToolkit.Data.Common
     {
         string name;
         QueryType queryType;
+        ExpressionType eType;
+        Type type;
 
         public VariableExpression(string name, Type type, QueryType queryType)
-            : base((ExpressionType)DbExpressionType.Variable, type)
         {
             this.name = name;
             this.queryType = queryType;
+            this.eType = (ExpressionType)DbExpressionType.Variable;
+            this.type = type;
         }
 
         public string Name
@@ -1005,6 +1035,16 @@ namespace IQToolkit.Data.Common
         public QueryType QueryType
         {
             get { return this.queryType; }
+        }
+
+        public override ExpressionType NodeType
+        {
+            get { return this.eType; }
+        }
+
+        public override Type Type
+        {
+            get { return this.type; }
         }
     }
 }

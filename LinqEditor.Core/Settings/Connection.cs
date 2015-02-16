@@ -1,5 +1,6 @@
 ﻿using LinqEditor.Core.Models.Editor;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -20,32 +21,83 @@ namespace LinqEditor.Core.Settings
         public string CachedSchemaNamespace { get; set; }
         public ProgramType Kind { get; set; }
 
+        // string values from
+        // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlconnection.connectionstring(VS.71).aspx
+
+        public bool UsingIntegratedSecurity
+        {
+            get
+            {
+                if (Kind == ProgramType.Database && !string.IsNullOrWhiteSpace(ConnectionString))
+                {
+                    var part = ParseConnectionStringPart(@"(integrated security|trusted_connection)=([^;]*)");
+                    return new string[] { "true", "yes", "sspi" }.Contains(part.ToLower());
+                }
+                return false;
+            }
+        }
+
+        public string DatabaseSecurity
+        {
+            get
+            {
+                string val = string.Empty;
+                if (Kind == ProgramType.Database && !string.IsNullOrWhiteSpace(ConnectionString))
+                {
+                    if (UsingIntegratedSecurity)
+                    {
+                        val = "Integrated Security";
+                    }
+                    else
+                    {
+                        return ParseConnectionStringPart(@"(user id|uid)=([^;]*)");
+                    }
+                }
+                return val;
+            }
+        }
+
+        public string DatabaseServer
+        {
+            get
+            {
+                return ParseConnectionStringPart(@"(data source|server|address|addr|network address)=([^;]*)");
+            }
+        }
+
+        public string InitialCatalog
+        {
+            get
+            {
+                return ParseConnectionStringPart(@"(initial catalog|database)=([^;]*)");
+            }
+        }
+
+        private string ParseConnectionStringPart(string regexInput)
+        {
+            string val = string.Empty;
+            if (Kind == ProgramType.Database && !string.IsNullOrWhiteSpace(ConnectionString))
+            {
+                var regex = new Regex(regexInput, RegexOptions.IgnoreCase);
+                var m = regex.Match(ConnectionString);
+                if (m.Success)
+                {
+                    val = m.Groups[2].Value.Trim();
+                }
+            }
+            return val;
+        }
+
         public override string ToString()
         {
-            if (!string.IsNullOrWhiteSpace(DisplayName))
+            string val = DisplayName ?? string.Empty;
+
+            if (Kind == ProgramType.Database) 
             {
-                return DisplayName;
+                val += string.Format("{3}{0}.{1} ({2})", DatabaseServer, InitialCatalog, DatabaseSecurity, string.IsNullOrWhiteSpace(val) ? string.Empty : " ");
             }
 
-            if (!string.IsNullOrWhiteSpace(ConnectionString))
-            {
-                var db = new Regex(@"data source=([^;]*)", RegexOptions.IgnoreCase);
-                var catalog = new Regex(@"initial catalog=([^;]*)", RegexOptions.IgnoreCase);
-                var integratedSecurity = new Regex(@"integrated security=([^;]*)", RegexOptions.IgnoreCase);
-                var dbMatch = db.Match(ConnectionString);
-                var catalogMatch = catalog.Match(ConnectionString);
-                var integratedSecurityMatch = integratedSecurity.Match(ConnectionString);
-                if (dbMatch.Success && catalogMatch.Success)
-                {
-                    // integrated security values
-                    // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlconnection.connectionstring(VS.71).aspx
-                    var isIntegratedSecurity = new string[] { "true", "yes", "sspi" }.Contains(integratedSecurityMatch.Groups[1].Value.Trim().ToLower()); 
-                    var suffix = integratedSecurityMatch.Success ? " (Integrated Security)" : string.Empty;
-                    return string.Format("{0}.{1}{2}", dbMatch.Groups[1].Value, catalogMatch.Groups[1].Value, suffix);
-                }
-                return string.Format("{0} ({1})", DisplayName, ConnectionString);
-            }
-            return DisplayName;
+            return val;
         }
     }
 }

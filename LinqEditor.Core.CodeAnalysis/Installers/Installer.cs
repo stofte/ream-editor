@@ -11,8 +11,6 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
         {
             container.Register(Component.For<ITemplateCodeAnalysis>()
                                         .ImplementedBy<TemplateCodeAnalysis>());
-            container.Register(Component.For<IAsyncTemplateCodeAnalysis>()
-                                        .ImplementedBy<AsyncTemplateCodeAnalysis>());
         }
     }
 }

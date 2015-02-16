@@ -30,6 +30,7 @@ namespace LinqEditor.Core.Settings
             {
                 if (Kind == ProgramType.Database && !string.IsNullOrWhiteSpace(ConnectionString))
                 {
+                    var s = new List<int>();
                     var part = ParseConnectionStringPart(@"(integrated security|trusted_connection)=([^;]*)");
                     return new string[] { "true", "yes", "sspi" }.Contains(part.ToLower());
                 }

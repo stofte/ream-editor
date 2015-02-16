@@ -173,8 +173,6 @@ namespace LinqEditor.UI.WinForm.Controls
                 }
             };
 
-            //_toolbar.Items.Add(dropButton);
-
             // select context
             _contextSelector = new ComboBox();
             _contextSelector.Dock = DockStyle.Top;
@@ -183,6 +181,7 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 if (!_enableContextSelector) return;
                 _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
+                _statusLabel.Image = Icons.spinner;
                 _timeLabel.Text = string.Empty;
                 var selected = _contextSelector.SelectedItem as Connection;
                 if (selected == null) return;
@@ -190,6 +189,7 @@ namespace LinqEditor.UI.WinForm.Controls
                 await BindSession(selected.Id);
                 _executeButton.Enabled = true;
                 _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+                _statusLabel.Image = Icons.ok_grey;
                 _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
                 _settingsStore.LastConnectionUsed = selected.Id;
             };

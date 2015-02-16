@@ -26,7 +26,6 @@ namespace LinqEditor.UI.WinForm.Controls
         OutputPane _outputPane;
         ComboBox _contextSelector;
         Timer _statusTimer;
-        int _busyIcon = 0;
 
         IBackgroundSession _session;
         IBackgroundSessionFactory _backgroundSessionFactory;
@@ -169,6 +168,7 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 if (_tokenSource != null)
                 {
+                    _stopButton.Enabled = false;
                     _tokenSource.Cancel();
                 }
             };
@@ -290,6 +290,11 @@ namespace LinqEditor.UI.WinForm.Controls
             if (keyData == Keys.F5)
             {
                 _executeButton.PerformClick();
+                return true;
+            }
+            else if (keyData == (Keys.F5 | Keys.Shift))
+            {
+                _stopButton.PerformClick();
                 return true;
             }
             else if (keyData == (Keys.Control | Keys.W))

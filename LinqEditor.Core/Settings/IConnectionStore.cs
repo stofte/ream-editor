@@ -5,6 +5,7 @@ namespace LinqEditor.Core.Settings
 {
     public interface IConnectionStore
     {
+        bool LoadingError { get; }
         void Add(Connection conn);
         void Update(Connection conn);
         void Delete(Connection conn);

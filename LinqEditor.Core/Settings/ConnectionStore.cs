@@ -15,10 +15,25 @@ namespace LinqEditor.Core.Settings
         {
             get 
             {
-                ConnectionStore connStore = Read<ConnectionStore>();
+                ConnectionStore connStore = null;
+                Exception exn = null;
+                try
+                {
+                    connStore = Read<ConnectionStore>();
+                }
+                catch(Exception e)
+                {
+                    exn = e;
+                }
+
                 if (connStore == null)
                 {
                     connStore = new ConnectionStore() { _connections = new List<Connection>() };
+
+                    if (exn != null)
+                    {
+                        connStore._errorLoading = true;
+                    }
                 }
                 return connStore;
             }

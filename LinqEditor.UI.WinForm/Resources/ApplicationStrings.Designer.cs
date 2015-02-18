@@ -133,6 +133,15 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred reading {0} file. The data will be lost if overwritten. File is located in {1}.
+        /// </summary>
+        internal static string MESSAGE_BODY_ERROR_LOADING_CONNECTIONS {
+            get {
+                return ResourceManager.GetString("MESSAGE_BODY_ERROR_LOADING_CONNECTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string MESSAGE_CAPTION_ERROR {

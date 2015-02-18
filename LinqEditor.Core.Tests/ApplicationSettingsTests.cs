@@ -75,5 +75,19 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual("bar", reflectedValue[0].CachedSchemaFileName);
         }
 
+        [Test]
+        public void Detects_Error_Loading_File()
+        {
+            using (var file = File.CreateText(connStorePath))
+            {
+                file.Write(0x2a);
+            }
+
+            var app = ConnectionStore.Instance;
+
+            Assert.IsTrue(app.LoadingError);
+
+        }
+
     }
 }

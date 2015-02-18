@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.UI.WinForm", "LinqEditor.UI.WinForm\LinqEditor.UI.WinForm.csproj", "{4540D92F-4F25-4713-ABCB-D4FA078CCEEA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Templates", "LinqEditor.Core.Templates\LinqEditor.Core.Templates.csproj", "{800D694F-1037-4D5F-A860-DBD724DDCE5E}"

@@ -141,6 +141,9 @@
   <data name="MESSAGE_BODY_CONNECTION_STRING_PARSE_ERROR" xml:space="preserve">
     <value>Could not validate the connection string</value>
   </data>
+  <data name="MESSAGE_BODY_ERROR_LOADING_CONNECTIONS" xml:space="preserve">
+    <value>An error occurred reading {0} file. The data will be lost if overwritten. File is located in {1}</value>
+  </data>
   <data name="MESSAGE_CAPTION_ERROR" xml:space="preserve">
     <value>Error</value>
   </data>

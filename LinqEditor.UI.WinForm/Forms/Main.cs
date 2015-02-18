@@ -1,6 +1,9 @@
-﻿using LinqEditor.UI.WinForm.Controls;
+﻿using LinqEditor.Core.Settings;
+using LinqEditor.UI.WinForm.Controls;
 using LinqEditor.UI.WinForm.Resources;
 using System.Drawing;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LinqEditor.UI.WinForm.Forms
@@ -13,9 +16,11 @@ namespace LinqEditor.UI.WinForm.Forms
 
         TabControl2 _tabControl;
         TabPage _createTab;
+        IConnectionStore _store;
 
-        public Main()
+        public Main(IConnectionStore store)
         {
+            _store = store;
             InitializeControl();
         }
 
@@ -83,9 +88,22 @@ namespace LinqEditor.UI.WinForm.Forms
             Width = 800;
             Height = 500;
 
-            Load += delegate
+            Load += async delegate
             {
                 _tabControl.TabPages.Remove(triggerTab);
+                if (_store.LoadingError)
+                {
+                    await Task.Delay(200);
+                    var path = ApplicationSettings.FileName(typeof(ConnectionStore));
+                    
+                    var fileName = Path.GetFileNameWithoutExtension(path);
+                    var folderName = Path.GetDirectoryName(path);
+
+                    var msg = string.Format(ApplicationStrings.MESSAGE_BODY_ERROR_LOADING_CONNECTIONS, fileName, folderName);
+                    
+                    MessageBox.Show(msg, ApplicationStrings.MESSAGE_CAPTION_ERROR,
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             };
 
             SuspendLayout();

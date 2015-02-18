@@ -11,6 +11,10 @@ namespace LinqEditor.Core.Settings
     public abstract class ApplicationSettings
     {
         protected ApplicationSettings _storedInstance;
+        protected bool _errorLoading;
+
+        [JsonIgnore]
+        public bool LoadingError { get { return _errorLoading; } }
         
         protected static T Read<T>()
         {
@@ -18,11 +22,7 @@ namespace LinqEditor.Core.Settings
             if (File.Exists(path))
             {
                 var fileData = File.ReadAllText(path);
-                try
-                {
-                    return JsonConvert.DeserializeObject<T>(fileData);
-                }
-                catch { }
+                return JsonConvert.DeserializeObject<T>(fileData);
             }
             return default(T);
         }

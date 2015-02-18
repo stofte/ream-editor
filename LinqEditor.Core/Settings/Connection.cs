@@ -9,17 +9,34 @@ namespace LinqEditor.Core.Settings
     [Serializable]
     public class Connection
     {
+        private string _connectionString;
+
         public Connection()
         {
             Kind = ProgramType.Database;
+            _connectionString = string.Empty;
         }
 
         public Guid Id { get; set; }
-        public string ConnectionString { get; set; }
+
         public string DisplayName { get; set; }
         public string CachedSchemaFileName { get; set; }
         public string CachedSchemaNamespace { get; set; }
         public ProgramType Kind { get; set; }
+
+        public string ConnectionString
+        {
+            get
+            {
+                return _connectionString;
+            }
+            set
+            {
+                // not so nice to throw from a property
+                new System.Data.SqlClient.SqlConnection(value);
+                _connectionString = value;
+            }
+        }
 
         // string values from
         // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlconnection.connectionstring(VS.71).aspx
@@ -89,13 +106,31 @@ namespace LinqEditor.Core.Settings
             return val;
         }
 
+        public bool IsValidConnectionString
+        {
+            get
+            {
+                return DatabaseServer.Length > 0 &&
+                    InitialCatalog.Length > 0 &&
+                    (UsingIntegratedSecurity ||
+                    !UsingIntegratedSecurity && DatabaseSecurity.Length > 0);
+            }
+        }
+
         public override string ToString()
         {
             string val = DisplayName ?? string.Empty;
 
             if (Kind == ProgramType.Database) 
             {
-                val += string.Format("{3}{0}.{1} ({2})", DatabaseServer, InitialCatalog, DatabaseSecurity, string.IsNullOrWhiteSpace(val) ? string.Empty : " ");
+                if (IsValidConnectionString)
+                {
+                    val += string.Format("{3}{0}.{1} ({2})", DatabaseServer, InitialCatalog, DatabaseSecurity, string.IsNullOrWhiteSpace(val) ? string.Empty : " ");
+                }
+                else
+                {
+                    val += ConnectionString;
+                }
             }
 
             return val;

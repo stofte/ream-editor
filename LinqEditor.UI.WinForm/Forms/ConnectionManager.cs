@@ -1,6 +1,8 @@
 ﻿using LinqEditor.Core.Settings;
 using LinqEditor.UI.WinForm.Controls;
+using LinqEditor.UI.WinForm.Resources;
 using System;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -170,29 +172,45 @@ namespace LinqEditor.UI.WinForm.Forms
 
             saveBtn.Click += delegate
             {
-                var conn = editSelector.SelectedItem as Connection;
-                conn.ConnectionString = editConnStr.Text;
-                conn.DisplayName = editTitle.Text;
-                clearEdit();
-                _connectionStore.Update(conn);
-                bindConnections();
+                try
+                {
+                    var conn = editSelector.SelectedItem as Connection;
+                    conn.ConnectionString = editConnStr.Text;
+                    conn.DisplayName = editTitle.Text;
+                    clearEdit();
+                    _connectionStore.Update(conn);
+                    bindConnections();
+                }
+                catch (ArgumentException)
+                {
+                    MessageBox.Show(ApplicationStrings.MESSAGE_BODY_CONNECTION_STRING_PARSE_ERROR, ApplicationStrings.MESSAGE_CAPTION_ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             };
             
             addButton.Click += delegate
             {
                 var id =  Guid.NewGuid();
-                _connectionStore.Add(new Connection { Id = id, ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
-                addConnStr.Text = string.Empty;
-                addTitle.Text = string.Empty;
-                addButton.Enabled = false;
-                bindConnections();
-                foreach (Connection obj in editSelector.Items)
+
+                try
                 {
-                    if (obj.Id == id)
+                    // connection throws 
+                    _connectionStore.Add(new Connection { Id = id, ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
+                    addConnStr.Text = string.Empty;
+                    addTitle.Text = string.Empty;
+                    addButton.Enabled = false;
+                    bindConnections();
+                    foreach (Connection obj in editSelector.Items)
                     {
-                        editSelector.SelectedItem = obj;
-                        break;
+                        if (obj.Id == id)
+                        {
+                            editSelector.SelectedItem = obj;
+                            break;
+                        }
                     }
+                }
+                catch (ArgumentException)
+                {
+                    MessageBox.Show(ApplicationStrings.MESSAGE_BODY_CONNECTION_STRING_PARSE_ERROR, ApplicationStrings.MESSAGE_CAPTION_ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             };
 

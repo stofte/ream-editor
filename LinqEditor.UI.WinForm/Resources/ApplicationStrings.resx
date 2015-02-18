@@ -138,6 +138,12 @@
   <data name="EDITOR_TIMER_SESSION_LOADED_IN" xml:space="preserve">
     <value>(loaded in {0}ms)</value>
   </data>
+  <data name="MESSAGE_BODY_CONNECTION_STRING_PARSE_ERROR" xml:space="preserve">
+    <value>Could not validate the connection string</value>
+  </data>
+  <data name="MESSAGE_CAPTION_ERROR" xml:space="preserve">
+    <value>Error</value>
+  </data>
   <data name="TOOLTIP_CLOSE_TAB" xml:space="preserve">
     <value>Close tab (Ctrl+W)</value>
   </data>

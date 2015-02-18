@@ -5,6 +5,7 @@ using Castle.Windsor.Installer;
 using LinqEditor.Core.Containers;
 using LinqEditor.Core.Scopes;
 using LinqEditor.Core.Settings;
+using LinqEditor.Test.Common;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace LinqEditor.Core.Tests
     [TestFixture]
     public class WindsorContainerTests
     {
+        
         [Test]
         public void Can_Load_Different_DatabaseContainer_Instances()
         {
@@ -33,13 +35,12 @@ namespace LinqEditor.Core.Tests
             // this generates the file on disc
             var id = Guid.NewGuid();
             var app = ConnectionStore.Instance;
-            app.Add(new Connection { Id = id, ConnectionString = "foo", CachedSchemaFileName = "bar" });
+            app.Add(new Connection { Id = id, ConnectionString = DatabaseTestData.Connstr1, CachedSchemaFileName = "bar" });
 
             // hook up castle  registration
             var container = new WindsorContainer();
             container.Register(Component.For<ConnectionStore>().UsingFactoryMethod(() => ConnectionStore.Instance));
 
-            // resolve store, and check that values match "foo"/"bar", which was persisted by an earlier instance
             var store = container.Resolve<ConnectionStore>();
 
             Assert.IsInstanceOf<ConnectionStore>(store);

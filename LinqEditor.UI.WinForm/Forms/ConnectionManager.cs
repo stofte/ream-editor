@@ -19,8 +19,12 @@ namespace LinqEditor.UI.WinForm.Forms
         private void InitializeComponent()
         {
             var width = 380;
-            var height = 480;
+            var height = 456;
+            var addOffset = 220;
+            var lastOffset = 405;
+
             var font = new Font("Consolas", 10);
+
 
             var layoutEdit = new FlowLayoutPanel();
             var editSelector = new ComboBox();
@@ -45,27 +49,27 @@ namespace LinqEditor.UI.WinForm.Forms
             layoutAdd.SuspendLayout();
             SuspendLayout();
 
-            Width = width;
-            Height = height;
             ShowInTaskbar = false;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
-            Padding = new System.Windows.Forms.Padding() { All = 10 };
             Text = "Connection manager";
+
+            var editOffset = 20;
 
             layoutEdit.BackColor = Color.Transparent;
             layoutEdit.FlowDirection = FlowDirection.LeftToRight;
-            layoutEdit.Location = new Point(15, 35);
+            layoutEdit.Location = new Point(15, editOffset + 15);
             layoutEdit.Height = 165;
+            layoutEdit.Padding = new System.Windows.Forms.Padding(0);
             editRuler.AutoSize = false;
             editRuler.Height = 2;
             editRuler.Text = "";
             editRuler.BorderStyle = BorderStyle.Fixed3D;
-            editRuler.Location = new Point(0, 20);
+            editRuler.Location = new Point(0, editOffset);
             editHeader.Text = "Existing connections";
             editHeader.Width = 105;
-            editHeader.Location = new Point(20, 14);
+            editHeader.Location = new Point(20, editOffset - 7);
             editType.Enabled = false;
             editType.Width = width / 4;
             editTitle.Enabled = false;
@@ -84,13 +88,10 @@ namespace LinqEditor.UI.WinForm.Forms
 
             /////////////////////////////////////////////////////////////
 
-            var addOffset = 220;
-
             layoutAdd.BackColor = Color.Transparent;
             layoutAdd.FlowDirection = FlowDirection.LeftToRight;
             layoutAdd.Location = new Point(15, addOffset + 15);
             layoutAdd.Height = 160;
-
             addRuler.AutoSize = false;
             addRuler.Height = 2;
             addRuler.Text = "";
@@ -218,8 +219,6 @@ namespace LinqEditor.UI.WinForm.Forms
 
             ////////////////////////////////////////////////////////////////////
 
-            var lastOffset = 405;
-
             var lastRuler = new Label();
             lastRuler.AutoSize = false;
             lastRuler.Height = 2;
@@ -229,7 +228,7 @@ namespace LinqEditor.UI.WinForm.Forms
 
             var closeButton = new Button();
             closeButton.Text = "Close";
-            closeButton.Location = new Point(width - 95, lastOffset + 15);
+            closeButton.Location = new Point(width - 91, lastOffset + 15);
             closeButton.Click += delegate { Hide(); };
             CancelButton = closeButton;
 
@@ -267,6 +266,12 @@ namespace LinqEditor.UI.WinForm.Forms
                     editSelector.SelectedItem = null;
                     bindConnections();
                 }
+            };
+
+            Load += delegate
+            {
+                // triggers sizing of content
+                ClientSize = new Size(width, height);
             };
 
             layoutEdit.Controls.AddRange(new Control[] { editSelector, editConnStr, editTitle, editType, deleteBtn, saveBtn });

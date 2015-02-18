@@ -3,11 +3,13 @@ using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Containers;
 using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Models.Analysis;
+using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Settings;
 using LinqEditor.Core.Templates;
 using System;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -222,6 +224,12 @@ namespace LinqEditor.Core.Backend
             };
         }
 
+        /// <summary>
+        /// Initializes the database session by compiling the required schema assemblies.
+        /// If there is no cached schema, one is obtained from the connection string.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private InitializeResult InitDatabase(Guid id)
         {
             _connection = _connectionStore.Connections.Where(x => x.Id == id).SingleOrDefault();
@@ -232,7 +240,21 @@ namespace LinqEditor.Core.Backend
             {
                 var schemaId = Guid.NewGuid();
                 var schemaNamespace = schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);
-                var sqlSchema = _schemaProvider.GetSchema(_connection.ConnectionString);
+
+                // network access
+                DatabaseSchema sqlSchema = null;
+                try
+                {
+                    sqlSchema = _schemaProvider.GetSchema(_connection.ConnectionString);
+                }
+                catch(SqlException exn)
+                {
+                    return new InitializeResult
+                    {
+                        Error = exn
+                    };
+                }
+                
                 var schemaSource = _generator.GenerateSchema(schemaId, sqlSchema);
                 var result = CSharpCompiler.CompileToFile(schemaSource, schemaNamespace, Core.PathUtility.CachePath);
                 

@@ -6,6 +6,7 @@ using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Settings;
 using LinqEditor.Core.Templates;
+using LinqEditor.Test.Common;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
@@ -97,6 +98,21 @@ namespace LinqEditor.Core.Backend.Tests
             //Thread.Sleep(1000);
             var result2 = await session.ExecuteAsync(src2);
             Assert.AreEqual("foo", result2.CodeOutput);
+        }
+
+        [Test]
+        public async void SqlClientException_Is_Returned_When_Trying_To_Connect_To_Non_Existant_Server()
+        {
+            var store = _container.Resolve<IConnectionStore>();
+            var connId = Guid.NewGuid();
+            store.Add(new Connection { Id = connId, ConnectionString = DatabaseTestData.NonExistingServerConnStr });
+
+            var factory = _container.Resolve<IBackgroundSessionFactory>();
+            var id = Guid.NewGuid();
+            var session = factory.Create(id);
+            var initRes = await session.InitializeAsync(connId);
+
+            Assert.IsInstanceOf<System.Data.SqlClient.SqlException>(initRes.Error);
         }
     }
 }

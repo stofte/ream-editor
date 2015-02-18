@@ -103,6 +103,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Icons.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\LibraryExtractor.cs" />
     <Compile Include="Resources\Types.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -141,14 +142,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\lib\SciLexer.dll">
+    <None Include="..\lib\SciLexer.dll">
       <Link>SciLexer.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\lib\SciLexer64.dll">
+    </None>
+    <None Include="..\lib\SciLexer64.dll">
       <Link>SciLexer64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <Content Include="..\resources\action_add_16xMD.png">
       <Link>Resources\ToolStripIcons\action_add_16xMD.png</Link>
     </Content>

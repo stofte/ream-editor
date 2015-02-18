@@ -38,8 +38,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _initialized = false;
             _templateService = templateService;
             _references = CSharpCompiler.GetStandardReferences();
-            //_context = context;
-            //_context.ContextUpdated += Initialize;
         }
 
         public void Initialize(string assemblyPath = null)

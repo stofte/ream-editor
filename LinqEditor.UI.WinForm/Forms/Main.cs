@@ -12,6 +12,10 @@ namespace LinqEditor.UI.WinForm.Forms
     {
         public const int MinHeight = 290;
         public const int MinWidth = 400;
+
+        public const int DefaultHeight = 500;
+        public const int DefaultWidth = 800;
+
         int _tabCounter = 1;
 
         TabControl2 _tabControl;
@@ -29,7 +33,7 @@ namespace LinqEditor.UI.WinForm.Forms
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             Text = ApplicationStrings.APPLICATION_TITLE;
-            MinimumSize = new Size(MinWidth, MinHeight);
+            //MinimumSize = new Size(MinWidth, MinHeight);
 
             _tabControl = new TabControl2();
             _tabControl.ImageList = new ImageList();
@@ -85,8 +89,8 @@ namespace LinqEditor.UI.WinForm.Forms
                 _tabControl.Size = ClientSize;
             };
 
-            Width = 800;
-            Height = 500;
+            Width = DefaultWidth;
+            Height = DefaultHeight;
 
             Load += async delegate
             {

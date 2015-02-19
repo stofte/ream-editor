@@ -54,6 +54,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _connectionStore = connectionStore;
             _settingsStore = settingsStore;
             _statusBar = new StatusStrip();
+            _mainContainer = new SplitContainer();
             _statusTimer = new Timer();
             _statusTimer.Interval = 20;
             // dont think this is that intensive, otherwise, ther animation skips updates it seems
@@ -61,7 +62,8 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 _statusLabel.Invalidate();
             };
-            
+
+            _mainContainer.SuspendLayout();
             _statusBar.SuspendLayout();
             SuspendLayout();
 
@@ -69,23 +71,21 @@ namespace LinqEditor.UI.WinForm.Controls
             Load += Main_Load;
 
             _editorFocusTimer = new Stopwatch();
-            _mainContainer = new SplitContainer();
+            
             _mainContainer.Location = new Point(0, 0);
+            
             _mainContainer.Orientation = Orientation.Horizontal;
             _mainContainer.Dock = DockStyle.Fill;
             _mainContainer.TabStop = false;
+            // splitcontainer is tricky, set height from main form (approx seems ok)
             _mainContainer.FixedPanel = FixedPanel.None;
-            // must set this for panel minsizes to work. subtract height for statusbar+toolbar
-            var minHeight = Main.MinHeight;
-            var minWidth = Main.MinWidth;
-            _mainContainer.MinimumSize = new Size(minWidth - 15, minHeight - 100);
-            // fudged values
-            _mainContainer.SplitterDistance = minHeight / 10;
-            _mainContainer.Panel1MinSize = minHeight / 4;
-            _mainContainer.Panel2MinSize = minHeight / 3;
+            _mainContainer.Height = Main.DefaultHeight;
+            _mainContainer.SplitterDistance = 200;
+            _mainContainer.Panel1MinSize = 45;
+            _mainContainer.Panel2MinSize = 20;
             _mainContainer.GotFocus += _mainContainer_GotFocus;
             _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
-            
+
             // status
             _statusBar.Dock = DockStyle.Bottom;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
@@ -228,7 +228,8 @@ namespace LinqEditor.UI.WinForm.Controls
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);
             Controls.Add(_statusBar);
-            
+            _mainContainer.ResumeLayout(false);
+            _mainContainer.PerformLayout();
             _statusBar.ResumeLayout(false);
             _statusBar.PerformLayout();
             ResumeLayout(false);
@@ -337,6 +338,8 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void Main_Load(object sender, EventArgs e)
         {
+            _mainContainer.Size = ClientSize;
+            
             _statusTimer.Enabled = true;
             // restore last used context
             var id = _settingsStore.LastConnectionUsed;

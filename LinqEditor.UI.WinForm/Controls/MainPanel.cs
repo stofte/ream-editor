@@ -343,6 +343,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusTimer.Enabled = true;
             // restore last used context
             var id = _settingsStore.LastConnectionUsed;
+            _contextId = id;
             foreach (Connection conn in _contextSelector.Items)
             {
                 if (conn.Id == id)

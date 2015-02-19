@@ -88,6 +88,15 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No session.
+        /// </summary>
+        internal static string EDITOR_SESSION_INITIALIZATION_ERROR {
+            get {
+                return ResourceManager.GetString("EDITOR_SESSION_INITIALIZATION_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading session.
         /// </summary>
         internal static string EDITOR_SESSION_LOADING {
@@ -97,20 +106,20 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (completed in {0}ms).
+        /// </summary>
+        internal static string EDITOR_TIMER_COMPLETED_IN {
+            get {
+                return ResourceManager.GetString("EDITOR_TIMER_COMPLETED_IN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (cancelled after {0}ms).
         /// </summary>
         internal static string EDITOR_TIMER_QUERY_CANCELLED_AFTER {
             get {
                 return ResourceManager.GetString("EDITOR_TIMER_QUERY_CANCELLED_AFTER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (completed in {0}ms).
-        /// </summary>
-        internal static string EDITOR_TIMER_QUERY_COMPLETED_IN {
-            get {
-                return ResourceManager.GetString("EDITOR_TIMER_QUERY_COMPLETED_IN", resourceCulture);
             }
         }
         
@@ -133,11 +142,24 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred reading {0} file. The data will be lost if overwritten. File is located in {1}.
+        ///   Looks up a localized string similar to An error occurred reading {0} file. The data will be lost if overwritten. File is located in
+        ///
+        ///{1}.
         /// </summary>
         internal static string MESSAGE_BODY_ERROR_LOADING_CONNECTIONS {
             get {
                 return ResourceManager.GetString("MESSAGE_BODY_ERROR_LOADING_CONNECTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not initialize &quot;{0}.&quot; Select the connection in the menu again to retry. Full exception message was 
+        ///
+        ///{1}.
+        /// </summary>
+        internal static string MESSAGE_BODY_SESSION_INITIALIZATION_ERROR {
+            get {
+                return ResourceManager.GetString("MESSAGE_BODY_SESSION_INITIALIZATION_ERROR", resourceCulture);
             }
         }
         

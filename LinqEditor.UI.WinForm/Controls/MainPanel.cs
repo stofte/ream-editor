@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Backend;
+using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Settings;
 using LinqEditor.UI.WinForm.Forms;
 using LinqEditor.UI.WinForm.Resources;
@@ -27,12 +28,15 @@ namespace LinqEditor.UI.WinForm.Controls
         ComboBox _contextSelector;
         Timer _statusTimer;
 
-        IBackgroundSession _session;
-        IBackgroundSessionFactory _backgroundSessionFactory;
-        IConnectionStore _connectionStore;
-        ISettingsStore _settingsStore;
+        IBackgroundSession _session = null;
+        IBackgroundSessionFactory _backgroundSessionFactory = null;
+        IConnectionStore _connectionStore = null;
+        ISettingsStore _settingsStore = null;
         bool _enableContextSelector = false;
         long _sessionLoadMs = 0;
+        bool _sessionLoaded = false;
+        string _initErrorMsg = string.Empty;
+        Guid _contextId = Guid.Empty;
         System.Threading.CancellationTokenSource _tokenSource;
 
         Form _connectionManager;
@@ -41,7 +45,7 @@ namespace LinqEditor.UI.WinForm.Controls
         bool _restoreEditorFocusOnSplitterMoved;
 
         public event Action RemoveTab;
-
+        
         public MainPanel(IBackgroundSessionFactory sessionFactory, IConnectionStore connectionStore, ISettingsStore settingsStore,
             OutputPane outputPane, CodeEditor editor, ConnectionManager connectionManager)
         {
@@ -58,7 +62,6 @@ namespace LinqEditor.UI.WinForm.Controls
                 _statusLabel.Invalidate();
             };
             
-
             _statusBar.SuspendLayout();
             SuspendLayout();
 
@@ -155,15 +158,6 @@ namespace LinqEditor.UI.WinForm.Controls
                 if (RemoveTab != null) RemoveTab();
             };
 
-            _executeButton.EnabledChanged += delegate(object sender, EventArgs args)
-            {
-                var btn = sender as ToolStripButton;
-                if (btn != null)
-                {
-                    _stopButton.Enabled = !btn.Enabled;
-                }
-            };
-
             _stopButton.Click += delegate
             {
                 if (_tokenSource != null)
@@ -177,22 +171,47 @@ namespace LinqEditor.UI.WinForm.Controls
             _contextSelector = new ComboBox();
             _contextSelector.Dock = DockStyle.Top;
             _contextSelector.DropDownStyle = ComboBoxStyle.DropDownList;
-            _contextSelector.SelectedIndexChanged += async delegate
+
+            _contextSelector.SelectedIndexChanged += async delegate(object sender, EventArgs e)
             {
                 if (!_enableContextSelector) return;
+                var selected = _contextSelector.SelectedItem as Connection;
+                if (selected == null) return;
+
+                if (_contextId == selected.Id && _sessionLoaded) return;
+                _contextId = selected.Id;
+                // prevents reselecting the same menu item, if session is still loading.
+                // BindSession updates _sessionLoaded to the actual outcome
+                _sessionLoaded = true;
+            
                 _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
                 _statusLabel.Image = Icons.spinner;
                 _timeLabel.Text = string.Empty;
-                var selected = _contextSelector.SelectedItem as Connection;
-                if (selected == null) return;
+
                 _executeButton.Enabled = false;
                 await BindSession(selected.Id);
-                _executeButton.Enabled = true;
-                _statusLabel.Text = ApplicationStrings.EDITOR_READY;
-                _statusLabel.Image = Icons.ok_grey;
-                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
-                _settingsStore.LastConnectionUsed = selected.Id;
+
+                // if the context changed, dont do anything
+                if (_contextSelector.SelectedItem != selected) return;
+
+                if (_sessionLoaded)
+                {
+                    _executeButton.Enabled = true;
+                    _statusLabel.Text = ApplicationStrings.EDITOR_READY;
+                    _statusLabel.Image = Icons.ok_grey;
+                    _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
+                    _settingsStore.LastConnectionUsed = selected.Id;
+                }
+                else
+                {
+                    _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_INITIALIZATION_ERROR;
+                    _statusLabel.Image = Icons.critical;
+                    _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_COMPLETED_IN, _sessionLoadMs);
+                    var msg = string.Format(ApplicationStrings.MESSAGE_BODY_SESSION_INITIALIZATION_ERROR, selected.ToString(), _initErrorMsg);
+                    MessageBox.Show(msg, ApplicationStrings.MESSAGE_CAPTION_ERROR, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
             };
+
             BindConnections();
 
             _connectionStore.ConnectionsUpdated += delegate
@@ -240,18 +259,29 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async Task BindSession(Guid id)
         {
+            int oldSession = -1;
             if (_session != null)
             {
+                oldSession = _session.GetHashCode();
                 _backgroundSessionFactory.Release(_session);
             }
             var sessionId = Guid.NewGuid();
             _session = _backgroundSessionFactory.Create(sessionId);
+            Debug.Assert(oldSession != _session.GetHashCode());
             _editor.Session(sessionId);
             var result = await _session.InitializeAsync(id);
+            _sessionLoaded = result.Error == null;
             _sessionLoadMs = result.DurationMs;
-            // loads appdomain and initializes connection
-            var loadResult = await _session.LoadAppDomainAsync();
-            _sessionLoadMs += loadResult.DurationMs;
+            if (_sessionLoaded)
+            {
+                var loadResult = await _session.LoadAppDomainAsync();
+                // loads appdomain and initializes connection
+                _sessionLoadMs += loadResult.DurationMs;
+            }
+            else
+            {
+                _initErrorMsg = result.Error.Message;
+            }
         }
 
         void _databaseButton_Click(object sender, EventArgs e)
@@ -336,6 +366,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _timeLabel.Text = string.Empty;
             var btn = sender as ToolStripButton;
             btn.Enabled = false;
+            _stopButton.Enabled = true;
             var result = await _session.ExecuteAsync(_editor.SourceCode, _tokenSource.Token);
             _outputPane.BindOutput(result);
 
@@ -348,13 +379,14 @@ namespace LinqEditor.UI.WinForm.Controls
             }
             else
             {
-                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_COMPLETED_IN, result.DurationMs);
+                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_COMPLETED_IN, result.DurationMs);
             }
 
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
             _statusTimer.Enabled = false;
             _statusLabel.Image = Icons.ok_grey;
             btn.Enabled = true;
+            _stopButton.Enabled = false;
         }
     }
 }

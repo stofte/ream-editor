@@ -251,7 +251,8 @@ namespace LinqEditor.Core.Backend
                 {
                     return new InitializeResult
                     {
-                        Error = exn
+                        Error = exn,
+                        DurationMs = _watch.ElapsedMilliseconds
                     };
                 }
                 

@@ -156,6 +156,9 @@
     <Content Include="..\resources\active_x_16xLG.png">
       <Link>Resources\ToolStripIcons\active_x_16xLG.png</Link>
     </Content>
+    <Content Include="..\resources\critical.png">
+      <Link>Resources\ToolStripIcons\critical.png</Link>
+    </Content>
     <Content Include="..\resources\DatabaseOptions_12882.png">
       <Link>Resources\ToolStripIcons\DatabaseOptions_12882.png</Link>
     </Content>
@@ -164,6 +167,9 @@
     </Content>
     <Content Include="..\resources\Record_16xLG.png">
       <Link>Resources\ToolStripIcons\Record_16xLG.png</Link>
+    </Content>
+    <Content Include="..\resources\reload.png">
+      <Link>Resources\ToolStripIcons\reload.png</Link>
     </Content>
     <Content Include="..\resources\spinner.gif">
       <Link>Resources\ToolStripIcons\spinner.gif</Link>

@@ -67,7 +67,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             var possibleExtensions = interfaceNames
                 .SelectMany(x => extensionMethods.ContainsKey(x) ? extensionMethods[x] : new List<TypeMember>());
 
-            return possibleExtensions;
+            // add on any universal type entries
+            return possibleExtensions.Concat(extensionMethods[UniversalTypeKey]);
         }
 
         public static TypeInformation GetTypeInformation(TypeInfo typeInfo, ISymbol symbolInfo)
@@ -161,6 +162,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             }
 
             var dict = new ExtensionMethodCollection();
+            // always add this list
+            dict.Add(UniversalTypeKey, new List<TypeMember>());
             foreach (var m in availableExtensionMethods)
             {
                 var t = m.Parameters.First().Type;

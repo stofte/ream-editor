@@ -99,13 +99,11 @@ namespace Another.Generated
             }
         }
 
-        //[Test]
+        [Test]
         public void Can_Detect_LinqEditor_Core_Generated_Dumper_Extension_Methods()
         {
             var programSource = @"
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using LinqEditor.Core.Generated;
 
 namespace Test
@@ -131,9 +129,7 @@ namespace Test
 
             var result = editor.Analyze(stub, stub.Length - 1);
 
-            var dumpMethod = result.MemberCompletions.Where(x => x.Value == "Dump" && x.Kind == MemberKind.ExtensionMethod);
-
-            Assert.AreSame(dumpMethod.Count(), 1);
+            Assert.IsNotNull(result.MemberCompletions.FirstOrDefault(x => x.Value == "Dump" && x.Kind == MemberKind.ExtensionMethod));
         }
     }
 }

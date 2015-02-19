@@ -10,6 +10,12 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 {
     public static class CodeAnalysisHelper
     {
+        /// <summary>
+        /// Extension methods that apply to all types (T), will be entered in the dictionary 
+        /// using this key to avoid conflicting with other legal identifiers.
+        /// </summary>
+        public const string UniversalTypeKey = "*";
+
         public static IEnumerable<Warning> GetWarnings(ImmutableArray<Diagnostic> diagnostics)
         {
             return diagnostics.Where(w => w.Severity == DiagnosticSeverity.Warning).Select(x =>
@@ -141,6 +147,10 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 .OfType<INamedTypeSymbol>()
                 .Where(x => x.CanBeReferencedByName && x.IsStatic && !x.IsAbstract);
 
+            var foo = availableTypes.Where(x => x.Name == "Dumper");
+
+            var foox = foo.FirstOrDefault();
+
             // lookup extension methods on available types
             var availableExtensionMethods = new List<IMethodSymbol>();
             foreach (var type in availableTypes)
@@ -154,7 +164,9 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             foreach (var m in availableExtensionMethods)
             {
                 var t = m.Parameters.First().Type;
-                var key = t.OriginalDefinition != null && t.OriginalDefinition != t ?
+
+                var key = t.TypeKind == TypeKind.TypeParameter ? UniversalTypeKey :
+                    t.OriginalDefinition != null && t.OriginalDefinition != t ?
                     t.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) :
                     t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 

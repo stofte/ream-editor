@@ -86,7 +86,6 @@ namespace Another.Generated
             var editor = new TemplateCodeAnalysis(_templateService);
             editor.Initialize();
             var vsEntries = VSCompletionTestData.Data[vsEntriesKey];
-            //_context.UpdateContext("", ""); // fire bogus event to init class
             var result = editor.Analyze(src, src.Length - offset);
             var suggesitons = result.MemberCompletions.ToArray();
 
@@ -98,6 +97,43 @@ namespace Another.Generated
                 Assert.AreEqual(suggesitons[i].Value, vsEntries[i].Item1);
                 Assert.AreEqual(suggesitons[i].Kind, vsEntries[i].Item2);
             }
+        }
+
+        //[Test]
+        public void Can_Detect_LinqEditor_Core_Generated_Dumper_Extension_Methods()
+        {
+            var programSource = @"
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using LinqEditor.Core.Generated;
+
+namespace Test
+{
+    public class Program
+    {
+        public void Query() 
+        {
+" + SchemaConstants.Marker + @"
+        }
+    }
+}
+";
+
+            var m = new Mock<ITemplateService>();
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(programSource);
+            
+            var editor = new TemplateCodeAnalysis(m.Object);
+            editor.Initialize();
+
+            var stub = "var x = new List<int>();x.";
+
+            var result = editor.Analyze(stub, stub.Length - 1);
+
+            var dumpMethod = result.MemberCompletions.Where(x => x.Value == "Dump" && x.Kind == MemberKind.ExtensionMethod);
+
+            Assert.AreSame(dumpMethod.Count(), 1);
         }
     }
 }

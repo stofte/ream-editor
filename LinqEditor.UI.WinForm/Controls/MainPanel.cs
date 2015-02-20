@@ -62,7 +62,7 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 _statusLabel.Invalidate();
             };
-
+            
             _mainContainer.SuspendLayout();
             _statusBar.SuspendLayout();
             SuspendLayout();

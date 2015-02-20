@@ -21,10 +21,12 @@ namespace LinqEditor.UI.WinForm.Forms
         TabControl2 _tabControl;
         TabPage _createTab;
         IConnectionStore _store;
+        ISettingsStore _settings;
 
-        public Main(IConnectionStore store)
+        public Main(IConnectionStore store, ISettingsStore settings)
         {
             _store = store;
+            _settings = settings;
             InitializeControl();
         }
 
@@ -33,7 +35,10 @@ namespace LinqEditor.UI.WinForm.Forms
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             Text = ApplicationStrings.APPLICATION_TITLE;
-            //MinimumSize = new Size(MinWidth, MinHeight);
+            if (_settings.MainMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
 
             _tabControl = new TabControl2();
             _tabControl.ImageList = new ImageList();
@@ -108,6 +113,11 @@ namespace LinqEditor.UI.WinForm.Forms
                     MessageBox.Show(msg, ApplicationStrings.MESSAGE_CAPTION_ERROR,
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+            };
+
+            SizeChanged += delegate
+            {
+                _settings.MainMaximized = WindowState == FormWindowState.Maximized;
             };
 
             SuspendLayout();

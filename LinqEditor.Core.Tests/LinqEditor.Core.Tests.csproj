@@ -66,6 +66,7 @@
     <Compile Include="ApplicationSettingsTests.cs" />
     <Compile Include="CodeContainerTests.cs" />
     <Compile Include="ConnectionTests.cs" />
+    <Compile Include="SettingsStoreTests.cs" />
     <Compile Include="WindsorContainerDatabaseTests.cs" />
     <Compile Include="WindsorContainerTests.cs" />
     <Compile Include="DatabaseContainerTests.cs" />

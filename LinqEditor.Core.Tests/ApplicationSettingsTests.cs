@@ -18,9 +18,7 @@ namespace LinqEditor.Core.Tests
         string connStorePath = ConnectionStore.FileName(typeof(ConnectionStore));
         string settingsPath = SettingsStore.FileName(typeof(SettingsStore));
 
-        [TestFixtureSetUp]
-        [TestFixtureTearDown]
-        [SetUp]
+        [TestFixtureSetUp, TestFixtureTearDown, SetUp]
         public void InitializeAndCleanup()
         {
             // delete any previous test file, before and after all and any tests
@@ -86,8 +84,6 @@ namespace LinqEditor.Core.Tests
             var app = ConnectionStore.Instance;
 
             Assert.IsTrue(app.LoadingError);
-
         }
-
     }
 }

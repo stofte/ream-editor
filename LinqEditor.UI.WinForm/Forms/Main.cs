@@ -94,11 +94,21 @@ namespace LinqEditor.UI.WinForm.Forms
                 _tabControl.Size = ClientSize;
             };
 
-            Width = DefaultWidth;
-            Height = DefaultHeight;
-
             Load += async delegate
             {
+                // todo: check if position is on screen
+                // must be set in load?
+                
+                if (_settings.MainX != 0)
+                {
+                    Left = (int)_settings.MainX;
+                }
+
+                if (_settings.MainY != 0)
+                {
+                    Top = (int)_settings.MainY;
+                }
+
                 _tabControl.TabPages.Remove(triggerTab);
                 if (_store.LoadingError)
                 {
@@ -119,6 +129,16 @@ namespace LinqEditor.UI.WinForm.Forms
             {
                 _settings.MainMaximized = WindowState == FormWindowState.Maximized;
             };
+
+            // fired after window is moved
+            ResizeEnd += delegate
+            {
+                _settings.MainX = Left;
+                _settings.MainY = Top;
+            };
+
+            Width = DefaultWidth;
+            Height = DefaultHeight;
 
             SuspendLayout();
             Controls.Add(_tabControl);

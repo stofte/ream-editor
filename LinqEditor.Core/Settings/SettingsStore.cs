@@ -10,16 +10,16 @@ namespace LinqEditor.Core.Settings
         private IDictionary<string, object> _settings = new Dictionary<string, object>();
         
         [JsonIgnore]
-        public int MainX 
+        public long MainX 
         {
-            get { return Get<int>("mainX"); }
+            get { return Get<long>("mainX"); }
             set { Set("mainX", value); }
         }
 
         [JsonIgnore]
-        public int MainY 
+        public long MainY 
         {
-            get { return Get<int>("mainY"); }
+            get { return Get<long>("mainY"); }
             set { Set("mainY", value); }
         }
 
@@ -31,16 +31,16 @@ namespace LinqEditor.Core.Settings
         }
 
         [JsonIgnore]
-        public int ConnectionManagerX 
+        public long ConnectionManagerX 
         {
-            get { return Get<int>("connectionManagerX"); }
+            get { return Get<long>("connectionManagerX"); }
             set { Set("connectionManagerX", value); }
         }
 
         [JsonIgnore]
-        public int ConnectionManagerY 
+        public long ConnectionManagerY 
         {
-            get { return Get<int>("connectionManagerY"); }
+            get { return Get<long>("connectionManagerY"); }
             set { Set("connectionManagerY", value); }
         }
 

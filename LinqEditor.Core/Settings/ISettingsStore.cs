@@ -4,11 +4,11 @@ namespace LinqEditor.Core.Settings
 {
     public interface ISettingsStore
     {
-        int MainX { get; set; }
-        int MainY { get; set; }
+        long MainX { get; set; }
+        long MainY { get; set; }
         bool MainMaximized { get; set; }
-        int ConnectionManagerX { get; set; }
-        int ConnectionManagerY { get; set; }
+        long ConnectionManagerX { get; set; }
+        long ConnectionManagerY { get; set; }
         Guid LastConnectionUsed { get; set; }
     }
 }

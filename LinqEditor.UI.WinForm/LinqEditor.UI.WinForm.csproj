@@ -87,6 +87,9 @@
     <Compile Include="Forms\ConnectionManager.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\ToolTip2.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Forms\Main.cs">
       <SubType>Form</SubType>

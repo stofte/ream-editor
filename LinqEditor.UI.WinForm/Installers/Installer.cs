@@ -30,6 +30,8 @@ namespace LinqEditor.Installers
                                         .LifestyleTransient());
             container.Register(Component.For<OutputPane>()
                                         .LifestyleTransient());
+            container.Register(Component.For<ToolTip2>()
+                                        .LifestyleSingleton());
         }
     }
 }

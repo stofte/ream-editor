@@ -22,9 +22,11 @@ namespace LinqEditor.UI.WinForm.Forms
         TabPage _createTab;
         IConnectionStore _store;
         ISettingsStore _settings;
+        ToolTip2 _tooltip;
 
-        public Main(IConnectionStore store, ISettingsStore settings)
+        public Main(IConnectionStore store, ISettingsStore settings, ToolTip2 tt)
         {
+            _tooltip = tt;
             _store = store;
             _settings = settings;
             InitializeControl();
@@ -108,6 +110,8 @@ namespace LinqEditor.UI.WinForm.Forms
                 {
                     Top = (int)_settings.MainY;
                 }
+
+                _tooltip.Show();
 
                 _tabControl.TabPages.Remove(triggerTab);
                 if (_store.LoadingError)

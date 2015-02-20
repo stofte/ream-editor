@@ -47,7 +47,12 @@ namespace LinqEditor.Core.Settings
         [JsonIgnore]
         public Guid LastConnectionUsed 
         {
-            get { return Get<Guid>("lastConnectionUsed"); }
+            get 
+            {
+                var res = Guid.Empty;
+                Guid.TryParse(Get<string>("lastConnectionUsed"), out res);
+                return res;
+            }
             set { Set("lastConnectionUsed", value); }
         }
 

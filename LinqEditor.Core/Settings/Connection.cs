@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Models.Editor;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace LinqEditor.Core.Settings
 
         // string values from
         // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlconnection.connectionstring(VS.71).aspx
-
+        [JsonIgnore]
         public bool UsingIntegratedSecurity
         {
             get
@@ -55,6 +56,7 @@ namespace LinqEditor.Core.Settings
             }
         }
 
+        [JsonIgnore]
         public string DatabaseSecurity
         {
             get
@@ -75,6 +77,7 @@ namespace LinqEditor.Core.Settings
             }
         }
 
+        [JsonIgnore]
         public string DatabaseServer
         {
             get
@@ -83,6 +86,7 @@ namespace LinqEditor.Core.Settings
             }
         }
 
+        [JsonIgnore]
         public string InitialCatalog
         {
             get
@@ -106,6 +110,7 @@ namespace LinqEditor.Core.Settings
             return val;
         }
 
+        [JsonIgnore]
         public bool IsValidConnectionString
         {
             get

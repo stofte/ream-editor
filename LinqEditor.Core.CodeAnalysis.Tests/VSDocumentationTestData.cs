@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
-    public class VSDocumentationTestData
+    public static class VSDocumentationTestData
     {
         public const string VarDeclerationOfInt32 = "Int32";
         public const string VarDeclerationOfHashSet = "HashSet";
         public const string VarDeclerationOfDataColumn = "DataColumn";
+        public const string VarDeclerationOfQueryable = "ListAsQueryable";
+        public const string VarDeclerationOfMultipleInts = "MultipleInts";
 
-        public void Foo()
+        static void Foo()
         {
-            HashSet<int> set = new HashSet<int>();
-            DataColumn col = new DataColumn(); 
-
+            int x1 = 10, x2 = 20, x3 = 42;
         }
 
         public static Dictionary<string, Tuple<string, int, string, string, IEnumerable<string>, string>> Data = 
@@ -30,13 +30,13 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
             // Item5 = Specializations
             // Item6 = DocumentationId
             {VarDeclerationOfInt32, Tuple.Create(// mscorlib.dll
-                @"int x = 0x2a;", 0, 
+                @"var x = 0x2a;", 0, 
                 "struct System.Int32", 
                 "Represents a 32-bit signed integer.", 
                 new List<string>{ }.AsEnumerable(),
                 @"T:System.Int32")},
             {VarDeclerationOfHashSet, Tuple.Create(// System.Core.dll 4.0
-                @"HashSet<int> set = new HashSet<int>();", 0, 
+                @"var set = new HashSet<int>();", 0, 
                 "class System.Collections.Generic.HashSet<T>", 
                 "Represents a set of values", 
                 new List<string>{ "T is System.Int32" }.AsEnumerable(),
@@ -47,6 +47,18 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
                 "Represents the schema of a column in a System.Data.DataTable.", 
                 new List<string>{  }.AsEnumerable(),
                 "T:System.Data.DataColumn")},
+            {VarDeclerationOfQueryable, Tuple.Create(
+                @"var x = new List<int>().AsQueryable();", 0, 
+                "interface System.Linq.IQueryable<out T>", 
+                "Provides functionality to evaluate queries against a specific data source wherein the type of the data is known.", 
+                new List<string>{  }.AsEnumerable(),
+                "T:System.Linq.IQueryable`1")},
+            {VarDeclerationOfMultipleInts, Tuple.Create(
+                @"int x1 = 10, x2 = 20, x3 = 42;", 0, 
+                "struct System.Int32", 
+                "Represents a 32-bit signed integer.", 
+                new List<string>{ }.AsEnumerable(),
+                @"T:System.Int32")},
         };
     }
 }

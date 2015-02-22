@@ -16,18 +16,20 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         public const string UniversalTypeKey = "*";
 
-        public static string GetToolTipDisplayName(TypeInfo type)
+        public static string GetToolTipDisplayName(TypeInfo type, SymbolInfo symbol)
         {
-            var t = type.Type;
-         
+            var t = type.Type.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?
+                type.Type.OriginalDefinition : type.Type;
+
+            var s = symbol.Symbol.OriginalDefinition != null && symbol.Symbol != symbol.Symbol.OriginalDefinition ?
+                symbol.Symbol.OriginalDefinition : symbol.Symbol;
+
             var kind = t.IsValueType ? "struct" : 
+                        t.IsReferenceType && t.TypeKind == TypeKind.Interface ? "interface" :
                         t.IsReferenceType ? "class" :
                         t.IsNamespace ? "namespace" : string.Empty;
 
-            var name = string.Join("", 
-                t.OriginalDefinition != null && t.OriginalDefinition != t ?
-                t.OriginalDefinition.ToDisplayParts(SymbolDisplayFormat.CSharpErrorMessageFormat) :
-                t.ToDisplayParts(SymbolDisplayFormat.CSharpErrorMessageFormat));
+            var name = string.Join("", t.ToDisplayParts(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
             if (!t.IsNamespace && !name.Contains(".")) // namespaces can be top level
             {
@@ -36,35 +38,35 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 name = GetBasicName(t);
             }
 
-            return string.Format("{0} {1}", kind, name);
-        }
-
-        /// <summary>
-        /// roslyn doesn't seem to be able to provide proper ids for all types
-        /// this method attempts to map a type to the correct key
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static string GetDocumentationIdForType(TypeInfo type)
-        {
-            var t = type.Type;
-
-            var prefix = t.IsReferenceType || t.IsValueType ? "T" : string.Empty;
-            var basicName = GetBasicName(t); // unardorned type name 
-            if (t.MetadataName != t.Name) // checks for generic
+            if (name.Contains("<"))
             {
-                basicName = basicName.Substring(0, basicName.LastIndexOf(".") + 1);
-                basicName += t.MetadataName;
+                var tt = t.GetType();
+                var propInfo = tt.GetProperty("ConstructedFrom", 
+                    System.Reflection.BindingFlags.Instance | 
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Public);
+
+                var namedSymbol = propInfo.GetValue(t, null) as INamedTypeSymbol;
+                string varianceStr = string.Empty;
+                // attempt to construct a new generic string with specific variance, eg "<out T>"
+                if (namedSymbol != null)
+                {
+                    varianceStr = string.Format("<{0}>", 
+                        string.Join(", ", namedSymbol.TypeParameters.Select(x => 
+                            string.Format("{0}{1}",
+                                x.Variance != VarianceKind.None ? x.Variance.ToString().ToLower() + " " : string.Empty, 
+                                x.Name))));
+                }
+
+                if (!string.IsNullOrWhiteSpace(varianceStr))
+                {
+                    var firstIdx = name.IndexOf("<");
+                    var length = name.IndexOf(">") - firstIdx;
+                    name = name.Replace(name.Substring(firstIdx, length + 1), varianceStr);
+                }
             }
 
-            return string.Format("{0}:{1}", prefix, basicName);
-        }
-
-        public static string GetDocumentationIdForType2(SymbolInfo symbol)
-        {
-            var t = symbol.Symbol.Locations;
-
-            return string.Empty;
+            return string.Format("{0} {1}", kind, name);
         }
 
         private static string GetBasicName(ITypeSymbol t)

@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -131,12 +132,14 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 if (syntaxNode != null)
                 {
                     var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
+                    var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Type);
                     var t = typeInfo.Type;
                     var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
                         t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
+
                     var docs = _documentationService.GetDocumentation(docMemberId);
-                    
-                    tooltip.TypeAndName = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo);
+
+                    tooltip.TypeAndName = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo, symInfo);
                     tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
 
                     if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName) &&

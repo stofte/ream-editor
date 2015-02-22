@@ -58,6 +58,7 @@ namespace Test
         string _source4 = @"
 using System;
 using System.Data;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Test
@@ -152,6 +153,8 @@ namespace Test
         [TestCase(VSDocumentationTestData.VarDeclerationOfInt32)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfDataColumn)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfMultipleInts)]
         public void GetToolTipDisplayName_Formats_Type_Correctly(string testDataKey)
         {
             var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
@@ -171,40 +174,13 @@ namespace Test
 
             var semanticModel = compilation.GetSemanticModel(tree);
 
+            var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
             var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
-
-            var actualOutput = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo);
+            var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Type);
+            
+            var actualOutput = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo, symInfo);
 
             Assert.AreEqual(toolTipTestData.Item3, actualOutput);
-        }
-
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfDataColumn)]
-        public void Generates_Expected_Documentation_Id_For_Types(string testDataKey)
-        {
-            var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
-            var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
-            var tree = CSharpSyntaxTree.ParseText(source);
-
-            var dotTextSpan = new TextSpan(_stubOffset4 + toolTipTestData.Item2, 1);
-            var syntaxNode = tree.GetRoot()
-                    .DescendantNodes(dotTextSpan)
-                    .OfType<VariableDeclarationSyntax>()
-                    .LastOrDefault();
-
-            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
-                .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences())
-                .AddSyntaxTrees(new SyntaxTree[] { tree });
-
-            var semanticModel = compilation.GetSemanticModel(tree);
-
-            var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
-
-            var actualOutput = CodeAnalysisHelper.GetDocumentationIdForType(typeInfo);
-
-            Assert.AreEqual(toolTipTestData.Item6, actualOutput);
         }
     }
 }

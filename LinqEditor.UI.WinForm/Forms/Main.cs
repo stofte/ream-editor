@@ -111,8 +111,6 @@ namespace LinqEditor.UI.WinForm.Forms
                     Top = (int)_settings.MainY;
                 }
 
-                _tooltip.Show();
-
                 _tabControl.TabPages.Remove(triggerTab);
                 if (_store.LoadingError)
                 {
@@ -132,6 +130,17 @@ namespace LinqEditor.UI.WinForm.Forms
             SizeChanged += delegate
             {
                 _settings.MainMaximized = WindowState == FormWindowState.Maximized;
+            };
+
+            // always kill tooltip on leaving main window and on main window losing focus
+            Deactivate += delegate
+            {
+                _tooltip.EnableTimer(false);
+            };
+
+            Activated += delegate
+            {
+                _tooltip.EnableTimer(true);
             };
 
             // fired after window is moved

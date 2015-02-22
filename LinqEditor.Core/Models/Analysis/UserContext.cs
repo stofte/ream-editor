@@ -11,6 +11,10 @@ namespace LinqEditor.Core.Models.Analysis
         /// </summary>
         MemberCompletion,
         /// <summary>
+        /// Tooltip context
+        /// </summary>
+        ToolTip,
+        /// <summary>
         /// Could not infer type
         /// </summary>
         Unknown

@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Core.CodeAnalysis.Helpers;
 using LinqEditor.Core.Templates;
 using Microsoft.CodeAnalysis;
@@ -52,17 +53,33 @@ namespace Test
     }
 }
 ";
-        
+
+        int _stubOffset4;
+        string _source4 = @"
+using System;
+using System.Data;
+using System.Collections.Generic;
+
+namespace Test
+{
+    public class Program
+    {
+        public void Query() 
+        {
+" + SchemaConstants.Marker + @"
+        }
+    }
+}
+";
+        CSharpCompilationOptions _compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
 
         [TestFixtureSetUp]
         public void Initialize()
         {
-            var compilerOptions = new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug);
-
             // template with universal type extension method
             _tree1 = CSharpSyntaxTree.ParseText(_source1);
             var compilation1 = CSharpCompilation.Create("comp1")
-                .WithOptions(compilerOptions)
+                .WithOptions(_compilerOptions)
                 .AddReferences(CSharpCompiler.GetStandardReferences())
                 .AddSyntaxTrees(new SyntaxTree[] { _tree1 });
 
@@ -73,7 +90,7 @@ namespace Test
             _source2 = _source1.Replace(SchemaConstants.Marker, _sourceStub2);
             _tree2 = CSharpSyntaxTree.ParseText(_source2);
             var compilation2 = CSharpCompilation.Create("comp2")
-                .WithOptions(compilerOptions)
+                .WithOptions(_compilerOptions)
                 .AddReferences(CSharpCompiler.GetStandardReferences())
                 .AddSyntaxTrees(new SyntaxTree[] { _tree2 });
             _model2 = compilation2.GetSemanticModel(_tree2);
@@ -83,12 +100,15 @@ namespace Test
             // plain template
             _tree3 = CSharpSyntaxTree.ParseText(_source3);
             var compilation3 = CSharpCompilation.Create("comp3")
-                .WithOptions(compilerOptions)
+                .WithOptions(_compilerOptions)
                 .AddReferences(CSharpCompiler.GetStandardReferences())
                 .AddSyntaxTrees(new SyntaxTree[] { _tree3 });
 
             var warns = CodeAnalysisHelper.GetErrors(compilation3.GetDiagnostics());
             _model3 = compilation3.GetSemanticModel(_tree3);
+
+            // full template
+            _stubOffset4 = _source4.IndexOf(SchemaConstants.Marker) + SchemaConstants.Marker.Length - 1;
         }
 
         [Test]
@@ -127,6 +147,64 @@ namespace Test
 
             Assert.AreEqual(extensions.Count(), 1);
             Assert.AreEqual(extensions.Single().Name, "Dump");
+        }
+
+        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfDataColumn)]
+        public void GetToolTipDisplayName_Formats_Type_Correctly(string testDataKey)
+        {
+            var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
+            var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
+            var tree = CSharpSyntaxTree.ParseText(source);
+
+            var dotTextSpan = new TextSpan(_stubOffset4 + toolTipTestData.Item2, 1);
+            var syntaxNode = tree.GetRoot()
+                    .DescendantNodes(dotTextSpan)
+                    .OfType<VariableDeclarationSyntax>()
+                    .LastOrDefault();
+
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
+                .WithOptions(_compilerOptions)
+                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddSyntaxTrees(new SyntaxTree[] { tree });
+
+            var semanticModel = compilation.GetSemanticModel(tree);
+
+            var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
+
+            var actualOutput = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo);
+
+            Assert.AreEqual(toolTipTestData.Item3, actualOutput);
+        }
+
+        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfDataColumn)]
+        public void Generates_Expected_Documentation_Id_For_Types(string testDataKey)
+        {
+            var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
+            var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
+            var tree = CSharpSyntaxTree.ParseText(source);
+
+            var dotTextSpan = new TextSpan(_stubOffset4 + toolTipTestData.Item2, 1);
+            var syntaxNode = tree.GetRoot()
+                    .DescendantNodes(dotTextSpan)
+                    .OfType<VariableDeclarationSyntax>()
+                    .LastOrDefault();
+
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
+                .WithOptions(_compilerOptions)
+                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddSyntaxTrees(new SyntaxTree[] { tree });
+
+            var semanticModel = compilation.GetSemanticModel(tree);
+
+            var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
+
+            var actualOutput = CodeAnalysisHelper.GetDocumentationIdForType(typeInfo);
+
+            Assert.AreEqual(toolTipTestData.Item6, actualOutput);
         }
     }
 }

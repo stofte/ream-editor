@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace LinqEditor.Core.CodeAnalysis.Services
 {
@@ -23,6 +24,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         private string _currentSource;
         private int _sourceOffset;
         ExtensionMethodCollection _extensionMethods;
+        IDocumentationService _documentationService;
         
         /// <summary>
         /// Filters by VS semantics (name and kind)
@@ -33,10 +35,11 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             public int GetHashCode(TypeMember obj) { return (obj.Name + obj.Kind.ToString()).GetHashCode(); }
         }
 
-        public TemplateCodeAnalysis(ITemplateService templateService)
+        public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService)
         {
             _initialized = false;
             _templateService = templateService;
+            _documentationService = documentationService;
             _references = CSharpCompiler.GetStandardReferences();
         }
 
@@ -81,23 +84,27 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
             IEnumerable<Warning> warnings = new List<Warning>();
             IEnumerable<Error> errors = new List<Error>();
+            ToolTipData tooltip = new ToolTipData();
+            
+            _currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
+            var tree = CSharpSyntaxTree.ParseText(_currentSource);
+            var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
+
+
+            var oneCharTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
+            
 
             if (sourceFragment[updateIndex] == '.')
             {
                 // check if context is really member access
-                _currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
-                var tree = CSharpSyntaxTree.ParseText(_currentSource);
-                var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
-                var dotTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
-
                 var syntaxNode = tree.GetRoot()
-                    .DescendantNodes(dotTextSpan)
+                    .DescendantNodes(oneCharTextSpan)
                     .OfType<MemberAccessExpressionSyntax>()
                     .LastOrDefault();
                 
                 if (syntaxNode != null)
                 {
-                    if (syntaxNode == null || syntaxNode.Expression == null) goto exit;
+                    if (syntaxNode.Expression == null) goto exit;
                     var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Expression);
                     var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Expression);
                     if (symInfo.Symbol == null) goto exit;
@@ -113,16 +120,44 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     suggestions = MapSuggestions(typeInformation, extensions, isStatic);
                 }
             }
+            else
+            {
+                // check for tooltip infomation
+                var syntaxNode = tree.GetRoot()
+                    .DescendantNodes(oneCharTextSpan)
+                    .OfType<VariableDeclarationSyntax>()
+                    .LastOrDefault();
+
+                if (syntaxNode != null)
+                {
+                    var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
+                    var t = typeInfo.Type;
+                    var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
+                        t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
+                    var docs = _documentationService.GetDocumentation(docMemberId);
+                    
+                    tooltip.TypeAndName = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo);
+                    tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
+
+                    if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName) &&
+                        !string.IsNullOrWhiteSpace(tooltip.Description))
+                    {
+                        ctx = UserContext.ToolTip;
+                    }
+                }
+            }
+
             exit:
             return new AnalysisResult
             {
                 Context = ctx,
                 MemberCompletions = suggestions.OrderBy(x => x.Value).ThenBy(x => x.Kind),
                 Errors = errors,
-                Warnings = warnings
+                Warnings = warnings,
+                ToolTip = tooltip
             };
         }
-        
+
         private SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);

@@ -70,7 +70,7 @@ namespace LinqEditor.Core.Backend.Tests
         }
 
         [Test]
-        public void Can_Initialize_Multiple_BackgroundSessions()
+        public async void Can_Initialize_Second_BackgroundSession_After_Initialization()
         {
             
             var container = new WindsorContainer();
@@ -89,21 +89,32 @@ namespace LinqEditor.Core.Backend.Tests
 
             var factory1 = container.Resolve<IBackgroundSessionFactory>();
             var factory2 = container.Resolve<IBackgroundSessionFactory>();
-            var id1 = Guid.NewGuid();
-            Action a1 = () =>
+            var id = Guid.NewGuid();
+
+            int firstHash = 0;
+            int secondHash = 0;
+
+            Task startSession = Task.Run(() => 
             {
-                var s = factory1.Create(id1);
+                var s = factory1.Create(id);
+                firstHash = s.GetHashCode();
                 s.InitializeAsync(_connectionId);
                 s.LoadAppDomainAsync();
-            };
-            Action a2 = () =>
+            });
+
+            // first session loads and inits session
+            Task.WaitAll(startSession);
+
+            Task loadSecond = Task.Run(() => 
             {
-                System.Threading.Thread.Sleep(1000);
-                var s = factory1.Create(id1);
-                s.InitializeAsync(_connectionId);
-                s.LoadAppDomainAsync();
-            };
-            Parallel.Invoke(a1, a2);
+                var s = factory2.Create(id);
+                secondHash = s.GetHashCode();
+            });
+
+            Task.WaitAll(loadSecond);
+
+            // second session must be same instance
+            Assert.AreEqual(firstHash, secondHash);
         }
     }
 }

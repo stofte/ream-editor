@@ -32,5 +32,23 @@ namespace LinqEditor.Core
         {
             get { return Environment.CurrentDirectory + @"\"; }
         }
+
+        /// <summary>
+        /// Returns all common folders for .NET XML documentation files.
+        /// </summary>
+        public static string[] DocumentationPaths
+        {
+            get
+            {
+                var programFilesx86 = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
+                
+                var path1 = string.Format(@"{0}\Reference Assemblies\Microsoft\Framework\.NETFramework", programFilesx86);
+
+                return new [] 
+                {
+                    path1
+                };
+            }
+        }
     }
 }

@@ -16,16 +16,16 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         public const string UniversalTypeKey = "*";
 
-        public static string GetToolTipSpecializations(TypeInfo type, SymbolInfo symbol)
+        /// <summary>
+        /// Returns the VS style display name of the passed type, along with any type specializations.
+        /// </summary>
+        public static Tuple<string, IEnumerable<string>> GetDisplayNameAndSpecializations(TypeInfo type, SymbolInfo symbol)
         {
+            var t = type.Type;
+                //.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?
+                //type.Type.OriginalDefinition : type.Type;
 
-            return string.Empty;
-        }
-
-        public static string GetToolTipDisplayName(TypeInfo type, SymbolInfo symbol)
-        {
-            var t = type.Type.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?
-                type.Type.OriginalDefinition : type.Type;
+            var specializations = new List<string>();
 
             var kind = t.IsValueType ? "struct" : 
                         t.IsReferenceType && t.TypeKind == TypeKind.Interface ? "interface" :
@@ -41,21 +41,21 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 name = GetBasicName(t);
             }
 
-            if (name.Contains("<"))
-            {
-                var tt = t.GetType();
-                var propInfo = tt.GetProperty("ConstructedFrom", 
-                    System.Reflection.BindingFlags.Instance | 
-                    System.Reflection.BindingFlags.NonPublic |
-                    System.Reflection.BindingFlags.Public);
 
-                var namedSymbol = propInfo.GetValue(t, null) as INamedTypeSymbol;
-                string varianceStr = string.Empty;
+            // if the type is generic, assume it's a namedtype
+            if (name.Contains("<") && t is INamedTypeSymbol)
+            {
+                var namedT = t as INamedTypeSymbol;
+
+                // this assumes the collections are sorted in the same order
+                specializations.AddRange(namedT.TypeParameters.Select((x, i) => string.Format("{0} is {1}", x, GetBasicName(namedT.TypeArguments[i]))));
+
                 // attempt to construct a new generic string with specific variance, eg "<out T>"
-                if (namedSymbol != null)
+                string varianceStr = string.Empty;
+                if (namedT != null)
                 {
                     varianceStr = string.Format("<{0}>", 
-                        string.Join(", ", namedSymbol.TypeParameters.Select(x => 
+                        string.Join(", ", namedT.TypeParameters.Select((x, i) => 
                             string.Format("{0}{1}",
                                 x.Variance != VarianceKind.None ? x.Variance.ToString().ToLower() + " " : string.Empty, 
                                 x.Name))));
@@ -69,7 +69,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 }
             }
 
-            return string.Format("{0} {1}", kind, name);
+            return Tuple.Create(string.Format("{0} {1}", kind, name), specializations.AsEnumerable());
         }
 
         private static string GetBasicName(ITypeSymbol t)

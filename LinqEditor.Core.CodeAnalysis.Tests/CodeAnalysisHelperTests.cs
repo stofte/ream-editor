@@ -179,15 +179,10 @@ namespace Test
             var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
             var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Type);
             
-            var actualOutput = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo, symInfo);
+            var actualOutput = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
 
-            Assert.AreEqual(toolTipTestData.Item3, actualOutput);
-        }
-
-        [Test]
-        public void Returns_Correct_ToolTip_Specializations_For_Types()
-        {
-
+            Assert.AreEqual(toolTipTestData.Item3, actualOutput.Item1);
+            Assert.AreEqual(toolTipTestData.Item5, actualOutput.Item2);
         }
     }
 }

@@ -157,7 +157,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
                     var docs = _documentationService.GetDocumentation(docMemberId);
 
-                    tooltip.TypeAndName = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo, symInfo);
+                    var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
+
+                    tooltip.TypeAndName = nameAndTypes.Item1;
                     tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
 
                     if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName) &&

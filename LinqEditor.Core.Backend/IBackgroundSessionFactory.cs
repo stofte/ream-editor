@@ -2,9 +2,9 @@
 
 namespace LinqEditor.Core.Backend
 {
-    public interface IBackgroundSessionFactory
+    public interface IAsyncSessionFactory
     {
-        IBackgroundSession Create(Guid id);
-        void Release(IBackgroundSession session);
+        IAsyncSession Create(Guid id);
+        void Release(IAsyncSession session);
     }
 }

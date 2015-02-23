@@ -78,7 +78,7 @@ namespace LinqEditor.Core.Backend.Tests
 
             container.Install(FromAssembly.Containing<IConnectionStore>()); // core
             container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
-            container.Install(FromAssembly.Containing<IBackgroundSessionFactory>()); // core.backend
+            container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
             container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
             container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
 
@@ -87,8 +87,8 @@ namespace LinqEditor.Core.Backend.Tests
                                         .Named("test-connections")
                                         .IsDefault());
 
-            var factory1 = container.Resolve<IBackgroundSessionFactory>();
-            var factory2 = container.Resolve<IBackgroundSessionFactory>();
+            var factory1 = container.Resolve<IAsyncSessionFactory>();
+            var factory2 = container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
 
             int firstHash = 0;

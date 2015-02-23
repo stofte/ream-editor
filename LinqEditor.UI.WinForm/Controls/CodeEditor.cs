@@ -14,8 +14,8 @@ namespace LinqEditor.UI.WinForm.Controls
     {
         ScintillaNET.Scintilla _editor;
         ScintillaNET.INativeScintilla _editorNative;
-        IBackgroundSession _session;
-        IBackgroundSessionFactory _sessionFactory;
+        IAsyncSession _session;
+        IAsyncSessionFactory _sessionFactory;
         ToolTip2 _tooltip;
         
         Timer _timer;
@@ -34,7 +34,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
         public string SourceCode { get { return _editor.Text; } }
 
-        public CodeEditor(IBackgroundSessionFactory sessionFactory, ToolTip2 tooltip)
+        public CodeEditor(IAsyncSessionFactory sessionFactory, ToolTip2 tooltip)
         {
             _sessionFactory = sessionFactory;
             _tooltip = tooltip;

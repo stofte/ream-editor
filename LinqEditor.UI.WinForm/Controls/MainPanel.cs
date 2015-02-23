@@ -28,8 +28,8 @@ namespace LinqEditor.UI.WinForm.Controls
         ComboBox _contextSelector;
         Timer _statusTimer;
 
-        IBackgroundSession _session = null;
-        IBackgroundSessionFactory _backgroundSessionFactory = null;
+        IAsyncSession _session = null;
+        IAsyncSessionFactory _backgroundSessionFactory = null;
         IConnectionStore _connectionStore = null;
         ISettingsStore _settingsStore = null;
         bool _enableContextSelector = false;
@@ -46,7 +46,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
         public event Action RemoveTab;
         
-        public MainPanel(IBackgroundSessionFactory sessionFactory, IConnectionStore connectionStore, ISettingsStore settingsStore,
+        public MainPanel(IAsyncSessionFactory sessionFactory, IConnectionStore connectionStore, ISettingsStore settingsStore,
             OutputPane outputPane, CodeEditor editor, ConnectionManager connectionManager)
         {
             _backgroundSessionFactory = sessionFactory;

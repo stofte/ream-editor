@@ -27,7 +27,7 @@ namespace LinqEditor.Core.Backend.Tests
 
             _container.Install(FromAssembly.Containing<IConnectionStore>()); // core
             _container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
-            _container.Install(FromAssembly.Containing<IBackgroundSessionFactory>()); // core.backend
+            _container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
             _container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
             _container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
         }
@@ -35,7 +35,7 @@ namespace LinqEditor.Core.Backend.Tests
         [Test]
         public void Can_Create_BackgroundSessions()
         {
-            var factory = _container.Resolve<IBackgroundSessionFactory>();
+            var factory = _container.Resolve<IAsyncSessionFactory>();
 
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
@@ -55,7 +55,7 @@ namespace LinqEditor.Core.Backend.Tests
         public async void Session_Returns_DurationMs_For_Main_Methods()
         {
             DebugLogger.Log("test start");
-            var factory = _container.Resolve<IBackgroundSessionFactory>();
+            var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
             var src = "Write(\"foo\");";
             var session = factory.Create(id);
@@ -72,7 +72,7 @@ namespace LinqEditor.Core.Backend.Tests
         {
             DebugLogger.Log("test start");
             // todo: this test fails randomly (less often now that debug code is inserted ...)
-            var factory = _container.Resolve<IBackgroundSessionFactory>();
+            var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
             var ms = 5 * 60 * 1000;
             var src1 = string.Format("System.Threading.Thread.Sleep({0});", ms);
@@ -107,7 +107,7 @@ namespace LinqEditor.Core.Backend.Tests
             var connId = Guid.NewGuid();
             store.Add(new Connection { Id = connId, ConnectionString = DatabaseTestData.NonExistingServerConnStr });
 
-            var factory = _container.Resolve<IBackgroundSessionFactory>();
+            var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
             var session = factory.Create(id);
             var initRes = await session.InitializeAsync(connId);

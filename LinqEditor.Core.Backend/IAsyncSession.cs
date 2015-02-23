@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Backend
 {
-    public interface IBackgroundSession
+    public interface IAsyncSession
     {
         Task<InitializeResult> InitializeAsync(Guid id);
         Task<InitializeResult> ReinitializeAsync();

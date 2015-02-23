@@ -11,10 +11,10 @@ namespace LinqEditor.Core.Backend.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<IBackgroundSessionFactory>()
+            container.Register(Component.For<IAsyncSessionFactory>()
                                         .AsFactory());
-            container.Register(Component.For<IBackgroundSession>()
-                                        .ImplementedBy<BackgroundSession>()
+            container.Register(Component.For<IAsyncSession>()
+                                        .ImplementedBy<AsyncSession>()
                                         .LifestyleScoped<IdScopeAccessor>());
         }
     }

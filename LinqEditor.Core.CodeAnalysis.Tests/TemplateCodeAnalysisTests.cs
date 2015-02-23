@@ -168,7 +168,7 @@ namespace Another.Generated
         [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.FullDeclerationOfInt32, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 0, UserContext.ToolTip)]
-        //[TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 9, UserContext.Unknown)] // => int literal

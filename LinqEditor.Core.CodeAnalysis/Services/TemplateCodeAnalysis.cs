@@ -132,6 +132,10 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 var allNodes = nodes
                     .OfType<CSharpSyntaxNode>();
 
+                var invocNode = nodes
+                    .OfType<InvocationExpressionSyntax>()
+                    .FirstOrDefault();
+
                 var declNode = nodes
                     .OfType<PredefinedTypeSyntax>()
                     .FirstOrDefault();
@@ -141,9 +145,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     .FirstOrDefault();
 
                 // the vardecl node spans the entire statement, so check for predefinedtype node,
-                // which maps to "int" or "HashSet" decl types, and also for identNode which are equal to "var"
-                // this is probably gonna fail pretty easy
-                var initialNode = declNode != null || identNode != null && identNode.ToString().ToLower() == "var";
+                // which maps to "int" or "HashSet" decl types, and also for identNode which are equal to "var".
+                // since identnode maps to lots of stuff, we filter those out
+                var initialNode = declNode != null || (identNode != null && invocNode == null);
 
                 if (syntaxNode != null && initialNode)
                 {

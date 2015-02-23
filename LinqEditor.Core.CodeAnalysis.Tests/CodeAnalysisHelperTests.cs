@@ -155,6 +155,7 @@ namespace Test
         [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable)]
         [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList)]
         public void GetToolTipDisplayName_Formats_Type_Correctly(string testDataKey)
         {
             var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
@@ -181,6 +182,12 @@ namespace Test
             var actualOutput = CodeAnalysisHelper.GetToolTipDisplayName(typeInfo, symInfo);
 
             Assert.AreEqual(toolTipTestData.Item3, actualOutput);
+        }
+
+        [Test]
+        public void Returns_Correct_ToolTip_Specializations_For_Types()
+        {
+
         }
     }
 }

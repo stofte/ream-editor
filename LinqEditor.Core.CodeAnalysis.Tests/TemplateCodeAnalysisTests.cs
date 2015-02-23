@@ -171,9 +171,11 @@ namespace Another.Generated
         [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 0, UserContext.ToolTip)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 9, UserContext.Unknown)] // => int literal
         [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 5, UserContext.Unknown)] // => var name
         [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 30, UserContext.Unknown)] // => method
+        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 18, UserContext.Unknown)] // => int type
         public void Can_Corrrect_Return_ToolTip_Context_Information_For_Variables(string testDataKey, int offset, UserContext ctx)
         {
             var m = new Mock<ITemplateService>();
@@ -188,5 +190,6 @@ namespace Another.Generated
             
             Assert.AreEqual(ctx, result.Context);
         }
+
     }
 }

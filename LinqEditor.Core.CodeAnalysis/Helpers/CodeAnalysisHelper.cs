@@ -16,6 +16,12 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         public const string UniversalTypeKey = "*";
 
+        public static string GetToolTipSpecializations(TypeInfo type, SymbolInfo symbol)
+        {
+
+            return string.Empty;
+        }
+
         public static string GetToolTipDisplayName(TypeInfo type, SymbolInfo symbol)
         {
             var t = type.Type.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?

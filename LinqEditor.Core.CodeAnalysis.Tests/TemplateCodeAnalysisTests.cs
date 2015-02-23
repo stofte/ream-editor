@@ -48,10 +48,8 @@ namespace Test
     }
 }
 ";
-        [TestFixtureSetUp]
-        public void Initialize()
-        {
-            var programSource = @"
+
+        string _advancedProgram = @"
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -64,6 +62,7 @@ namespace First.Generated {
         public int Bar { get; set; } 
         public int Baz() { return 42; }
     }
+
 }
 
 namespace Another.Generated
@@ -81,9 +80,13 @@ namespace Another.Generated
     }
 }
 ";
+
+        [TestFixtureSetUp]
+        public void Initialize()
+        {
             var m = new Mock<ITemplateService>();
-            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(programSource);
-            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(programSource);
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
             _templateService = m.Object;
 
             var docMock = new Mock<IDocumentationService>();
@@ -108,7 +111,6 @@ namespace Another.Generated
 
             var editor = new TemplateCodeAnalysis(_templateService, _mockDocumentationService);
             editor.Initialize();
-            //_context.UpdateContext("", ""); // fire bogus event to init class
             var result = editor.Analyze(src, src.Length - offset);
             Assert.AreEqual(editContex, result.Context);
         }
@@ -176,13 +178,13 @@ namespace Another.Generated
         [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 5, UserContext.Unknown)] // => var name
         [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 30, UserContext.Unknown)] // => method
         [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 18, UserContext.Unknown)] // => int type
-        public void Can_Corrrect_Return_ToolTip_Context_Information_For_Variables(string testDataKey, int offset, UserContext ctx)
+        public void Returns_Correct_UserContext_For_VariableDeclarations(string testDataKey, int offset, UserContext ctx)
         {
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
 
-            var editor = new TemplateCodeAnalysis(m.Object, _realDocumentationService);
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
             editor.Initialize();
             var testData = VSDocumentationTestData.Data[testDataKey];
 
@@ -191,5 +193,21 @@ namespace Another.Generated
             Assert.AreEqual(ctx, result.Context);
         }
 
+        //[Test]
+        public void Can_Find_Inherited_Members_On_This()
+        {
+            var m = new Mock<ITemplateService>();
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgram);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgram);
+
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            editor.Initialize();
+
+            var stub = "var x = new List<int>();x.";
+
+            var result = editor.Analyze(stub, stub.Length - 1);
+
+            Assert.IsNotNull(result.MemberCompletions.FirstOrDefault(x => x.Value == "Dump" && x.Kind == MemberKind.ExtensionMethod));
+        }
     }
 }

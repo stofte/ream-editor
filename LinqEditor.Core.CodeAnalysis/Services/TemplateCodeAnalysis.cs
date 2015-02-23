@@ -160,10 +160,10 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
 
                     tooltip.TypeAndName = nameAndTypes.Item1;
+                    tooltip.Specializations = nameAndTypes.Item2;
                     tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
 
-                    if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName) &&
-                        !string.IsNullOrWhiteSpace(tooltip.Description))
+                    if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
                     {
                         ctx = UserContext.ToolTip;
                     }

@@ -25,10 +25,10 @@ namespace LinqEditor.UI.WinForm.Forms
         Point _end;
         string _type;
         string _desc;
-        string _spec;
+        IEnumerable<string> _spec;
 
         const int _paddingHorizontal = 10;
-        const int _paddingTopVertical = 7;
+        const int _paddingTopVertical = 9;
         const int _paddingBottomVertical = 13;
         const int _maxWidth = 500;
         const int _textOffset = 2;
@@ -72,7 +72,8 @@ namespace LinqEditor.UI.WinForm.Forms
         {
             if (lineHeight < 1) throw new ArgumentException("lineHeight must be positive");
 
-            if (start == _start && end == _end && _type == data.TypeAndName && _desc == data.Description) // assumes same lineheight
+            if (start == _start && end == _end && _type == data.TypeAndName && _desc == data.Description &&
+                data.Specializations.All(x => _spec.Contains(x))) // assumes same lineheight
             {
                 _showIntent = true;
                 return;
@@ -82,8 +83,13 @@ namespace LinqEditor.UI.WinForm.Forms
             _end = end;
             _type = data.TypeAndName;
             _desc = data.Description;
+            _spec = data.Specializations ?? new List<string>();
 
-            var tooltipText = string.Format("{0}\n{1}", _type, _desc);
+            var tooltipText = string.Format("{0}{1}{2}{3}{4}", _type,
+                !string.IsNullOrWhiteSpace(_desc) ? "\n" : string.Empty, 
+                !string.IsNullOrWhiteSpace(_desc) ? _desc : string.Empty, 
+                _spec.Count() > 0 ? "\n\n" : string.Empty,
+                _spec.Count() > 0 ? string.Join("\n", _spec) : string.Empty);
             var textSize = TextRenderer.MeasureText(tooltipText, _text.Font);
 
             if (textSize.Width + _paddingHorizontal * 2 > _maxWidth)

@@ -9,7 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.Backend
+namespace LinqEditor.Core.Session
 {
     // ok to use Task.Run when "just" offloading from UI thread
     // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true

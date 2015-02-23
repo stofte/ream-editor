@@ -12,10 +12,10 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-namespace LinqEditor.Core.Backend.Tests
+namespace LinqEditor.Core.Session.Tests
 {
     [TestFixture]
-    public class BackgroundSessionFactoryTests
+    public class AsyncSessionFactoryTests
     {
         WindsorContainer _container;
 

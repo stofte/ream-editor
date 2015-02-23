@@ -15,10 +15,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.Backend.Tests
+namespace LinqEditor.Core.Session.Tests
 {
     [TestFixture(Category="Database")]
-    public class BackgroundSessionFactoryDatabaseTests
+    public class AsyncSessionFactoryDatabaseTests
     {
         LinqEditor.Test.Common.SqlServer.Database _database;
         string _schemaAssemblyPath;
@@ -36,7 +36,7 @@ namespace LinqEditor.Core.Backend.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.SqlServer.Database("BackgroundSessionFactoryDatabaseTests");
+            _database = new LinqEditor.Test.Common.SqlServer.Database("AsyncSessionFactoryDatabaseTests");
             var schemaProvider = new SqlSchemaProvider();
             var templateService = new TemplateService();
             _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);

@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Data.SqlClient", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Schema", "LinqEditor.Core.Schema\LinqEditor.Core.Schema.csproj", "{2BEA4DEC-069D-4C2C-A022-F9696C268E64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Backend", "LinqEditor.Core.Backend\LinqEditor.Core.Backend.csproj", "{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Session", "LinqEditor.Core.Session\LinqEditor.Core.Session.csproj", "{9D6C745C-4E54-48C0-8D46-CAE2BB29BE29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.CodeAnalysis", "LinqEditor.Core.CodeAnalysis\LinqEditor.Core.CodeAnalysis.csproj", "{A9A7B56D-772C-4475-ACE4-2B4B495794DD}"
 EndProject
@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Templates.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Test.Common", "LinqEditor.Test.Common\LinqEditor.Test.Common.csproj", "{9EC90760-15FE-40ED-AAA4-FA63A79CD050}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Backend.Tests", "LinqEditor.Core.Backend.Tests\LinqEditor.Core.Backend.Tests.csproj", "{4D19D2DF-EF0E-4B28-8918-49430229EBBA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Session.Tests", "LinqEditor.Core.Session.Tests\LinqEditor.Core.Session.Tests.csproj", "{4D19D2DF-EF0E-4B28-8918-49430229EBBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScintillaNET", "ScintillaNET\ScintillaNET.csproj", "{F9B6DABD-BBC1-4638-8CE6-A5C9506BFDCB}"
 EndProject

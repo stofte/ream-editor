@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LinqEditor.Core.Backend
+namespace LinqEditor.Core.Session
 {
     public interface IAsyncSessionFactory
     {

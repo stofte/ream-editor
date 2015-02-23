@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Backend;
+﻿using LinqEditor.Core.Session;
 using LinqEditor.Core.Models.Analysis;
 using LinqEditor.UI.WinForm.Forms;
 using System;

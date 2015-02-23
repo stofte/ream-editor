@@ -202,9 +202,9 @@
       <Project>{0da62a7c-3b40-456f-a4b2-b3e19ed4080e}</Project>
       <Name>IQToolkit</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Core.Backend\LinqEditor.Core.Backend.csproj">
+    <ProjectReference Include="..\LinqEditor.Core.Session\LinqEditor.Core.Session.csproj">
       <Project>{9d6c745c-4e54-48c0-8d46-cae2bb29be29}</Project>
-      <Name>LinqEditor.Core.Backend</Name>
+      <Name>LinqEditor.Core.Session</Name>
     </ProjectReference>
     <ProjectReference Include="..\LinqEditor.Core.CodeAnalysis\LinqEditor.Core.CodeAnalysis.csproj">
       <Project>{a9a7b56d-772c-4475-ace4-2b4b495794dd}</Project>

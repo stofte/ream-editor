@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LinqEditor.Core.Backend
+namespace LinqEditor.Core.Session
 {
     public interface IAsyncSession
     {

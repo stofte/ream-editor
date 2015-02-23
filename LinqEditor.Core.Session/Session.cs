@@ -14,7 +14,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace LinqEditor.Core.Backend
+namespace LinqEditor.Core.Session
 {
     /// <summary>
     /// well designed class with single responsibility of doing everything

@@ -3,7 +3,7 @@ using LinqEditor.Core.Models.Editor;
 using System;
 using System.Threading;
 
-namespace LinqEditor.Core.Backend
+namespace LinqEditor.Core.Session
 {
     public interface ISession
     {

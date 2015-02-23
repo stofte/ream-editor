@@ -10,7 +10,8 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(Component.For<ITemplateCodeAnalysis>()
-                                        .ImplementedBy<TemplateCodeAnalysis>());
+                                        .ImplementedBy<TemplateCodeAnalysis>()
+                                        .LifestyleTransient());
             container.Register(Component.For<IDocumentationService>()
                             .ImplementedBy<DocumentationService>()
                             .LifestyleSingleton());

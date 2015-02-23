@@ -38,6 +38,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
         public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService)
         {
+            DebugLogger.Log(GetHashCode());
             _initialized = false;
             _templateService = templateService;
             _documentationService = documentationService;
@@ -81,6 +82,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
         public AnalysisResult Analyze(string sourceFragment, int updateIndex)
         {
+            DebugLogger.Log("src(" + updateIndex + ")=" + sourceFragment);
             var ctx = UserContext.Unknown;
             IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
             IEnumerable<Warning> warnings = new List<Warning>();
@@ -125,34 +127,30 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             {
                 var nodes = tree.GetRoot().DescendantNodes(oneCharTextSpan);
                 // for tooltips, we need a var decl, to obtain the actual type to show
-                var syntaxNode = nodes
+                var varNode = nodes
                     .OfType<VariableDeclarationSyntax>()
                     .LastOrDefault();
 
                 var allNodes = nodes
                     .OfType<CSharpSyntaxNode>();
 
-                var invocNode = nodes
-                    .OfType<InvocationExpressionSyntax>()
-                    .FirstOrDefault();
-
-                var declNode = nodes
+                var preNode = nodes
                     .OfType<PredefinedTypeSyntax>()
                     .FirstOrDefault();
 
-                var identNode = nodes
+                var idNode = nodes
                     .OfType<IdentifierNameSyntax>()
                     .FirstOrDefault();
 
-                // the vardecl node spans the entire statement, so check for predefinedtype node,
-                // which maps to "int" or "HashSet" decl types, and also for identNode which are equal to "var".
-                // since identnode maps to lots of stuff, we filter those out
-                var initialNode = declNode != null || (identNode != null && invocNode == null);
-
-                if (syntaxNode != null && initialNode)
+                if (varNode != null)
                 {
-                    var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
-                    var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Type);
+                    var isInitialNode = preNode != null && preNode.Span.Start == varNode.SpanStart ||
+                        idNode != null && idNode.SpanStart == varNode.SpanStart;
+
+                    if (!isInitialNode) goto exit;
+
+                    var typeInfo = semanticModel.GetTypeInfo(varNode.Type);
+                    var symInfo = semanticModel.GetSymbolInfo(varNode.Type);
                     var t = typeInfo.Type;
                     var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
                         t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();

@@ -13,7 +13,7 @@ namespace LinqEditor.Core.Scopes
         public ILifetimeScope GetScope(Castle.MicroKernel.Context.CreationContext context)
         {
             var id = (Guid)context.AdditionalArguments["id"];
-            return collection.GetOrAdd(id, k => new DefaultLifetimeScope());
+            return collection.GetOrAdd(id, k => new ThreadSafeDefaultLifetimeScope());
         }
 
         public void Dispose()

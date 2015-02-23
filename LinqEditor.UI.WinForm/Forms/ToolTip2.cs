@@ -23,6 +23,9 @@ namespace LinqEditor.UI.WinForm.Forms
         int _left;
         Point _start;
         Point _end;
+        string _type;
+        string _desc;
+        string _spec;
 
         const int _paddingHorizontal = 10;
         const int _paddingTopVertical = 7;
@@ -62,27 +65,25 @@ namespace LinqEditor.UI.WinForm.Forms
                 _timer.Stop();
                 Visible = false;
             }
-            Debug.WriteLine("EnableTimer: " + enable);
         }
 
         // start/end is the upper bounding edge of the word box
         public void PlaceTip(Point start, Point end, int lineHeight, ToolTipData data)
         {
             if (lineHeight < 1) throw new ArgumentException("lineHeight must be positive");
-            Debug.WriteLineIf(start == _start && end == _end, "PlaceTip same pos");
-            
-            if (start == _start && end == _end) // assumes same data/lineheight
+
+            if (start == _start && end == _end && _type == data.TypeAndName && _desc == data.Description) // assumes same lineheight
             {
                 _showIntent = true;
                 return;
             }
 
-            Debug.WriteLine("PlaceTip new pos");
-
             _start = start;
             _end = end;
+            _type = data.TypeAndName;
+            _desc = data.Description;
 
-            var tooltipText = string.Format("{0}\n{1}", data.TypeAndName, data.Description);
+            var tooltipText = string.Format("{0}\n{1}", _type, _desc);
             var textSize = TextRenderer.MeasureText(tooltipText, _text.Font);
 
             if (textSize.Width + _paddingHorizontal * 2 > _maxWidth)

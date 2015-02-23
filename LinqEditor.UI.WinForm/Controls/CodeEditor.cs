@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using LinqEditor.Core.Helpers;
 
 namespace LinqEditor.UI.WinForm.Controls
 {
@@ -199,7 +200,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
                 if (prev != current && !signalled)
                 {
-                    Debug.WriteLine("Changed noticed: " + current);
+                    //Debug.WriteLine("Changed noticed: " + current);
                     if (current == -1)
                     {
                         _tooltip.KillTip();
@@ -214,9 +215,11 @@ namespace LinqEditor.UI.WinForm.Controls
 
                         var startPos = _editor.PointToScreen(new System.Drawing.Point(startX, startY));
                         var analysisResult = await _session.AnalyzeAsync(_editor.Text, current);
-                        Debug.WriteLine("analysisResult " + analysisResult.Success + ", " + analysisResult.Context);
+                        
                         if (current == _wordPos && analysisResult.Context == UserContext.ToolTip)
                         {
+                            DebugLogger.Log("analysisResult " + analysisResult.ToolTip.TypeAndName);
+                            //Debug.WriteLine("analysisResult " + analysisResult.Success + ", " + analysisResult.Context);
                             var endPos = _editor.PointToScreen(new System.Drawing.Point(endX, endY));
                             _tooltip.PlaceTip(startPos, endPos, _textLineHeight, analysisResult.ToolTip);
                         }

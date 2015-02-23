@@ -1,6 +1,7 @@
 ﻿using LinqEditor.Core.Models.Analysis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -59,19 +60,24 @@ namespace LinqEditor.UI.WinForm.Forms
             else
             {
                 _timer.Stop();
+                Visible = false;
             }
+            Debug.WriteLine("EnableTimer: " + enable);
         }
 
         // start/end is the upper bounding edge of the word box
         public void PlaceTip(Point start, Point end, int lineHeight, ToolTipData data)
         {
             if (lineHeight < 1) throw new ArgumentException("lineHeight must be positive");
-
+            Debug.WriteLineIf(start == _start && end == _end, "PlaceTip same pos");
+            
             if (start == _start && end == _end) // assumes same data/lineheight
             {
                 _showIntent = true;
                 return;
             }
+
+            Debug.WriteLine("PlaceTip new pos");
 
             _start = start;
             _end = end;

@@ -13,5 +13,12 @@ namespace LinqEditor.Core.Models.Analysis
         public UserContext Context { get; set; }
         public IEnumerable<Warning> Warnings { get; set; }
         public IEnumerable<Error> Errors { get; set; }
+        public bool Success
+        {
+            get 
+            {
+                return Errors == null || Errors.Count() == 0;
+            }
+        }
     }
 }

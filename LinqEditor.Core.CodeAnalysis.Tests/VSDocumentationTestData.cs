@@ -11,13 +11,15 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
     {
         public const string VarDeclerationOfInt32 = "Int32";
         public const string VarDeclerationOfHashSet = "HashSet";
-        public const string VarDeclerationOfDataColumn = "DataColumn";
         public const string VarDeclerationOfQueryable = "ListAsQueryable";
-        public const string VarDeclerationOfMultipleInts = "MultipleInts";
+        public const string FullDeclerationOfDataColumn = "DataColumn"; // full: Foo x = new Foo(); vs var x = new Foo();
+        public const string FullDeclerationOfMultipleInts = "MultipleInts";
+        public const string FullDeclerationOfInt32 = "FullInt";
 
         static void Foo()
         {
-            int x1 = 10, x2 = 20, x3 = 42;
+            int x1 = 10;
+            DataColumn col = new DataColumn();
         }
 
         public static Dictionary<string, Tuple<string, int, string, string, IEnumerable<string>, string>> Data = 
@@ -41,7 +43,7 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
                 "Represents a set of values", 
                 new List<string>{ "T is System.Int32" }.AsEnumerable(),
                 @"T:System.Collections.Generic.HashSet`1")},
-            {VarDeclerationOfDataColumn, Tuple.Create( // System.Data.dll
+            {FullDeclerationOfDataColumn, Tuple.Create( // System.Data.dll
                 @"DataColumn col = new DataColumn();", 0, 
                 "class System.Data.DataColumn", 
                 "Represents the schema of a column in a System.Data.DataTable.", 
@@ -53,8 +55,14 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
                 "Provides functionality to evaluate queries against a specific data source wherein the type of the data is known.", 
                 new List<string>{  }.AsEnumerable(),
                 "T:System.Linq.IQueryable`1")},
-            {VarDeclerationOfMultipleInts, Tuple.Create(
+            {FullDeclerationOfMultipleInts, Tuple.Create(
                 @"int x1 = 10, x2 = 20, x3 = 42;", 0, 
+                "struct System.Int32", 
+                "Represents a 32-bit signed integer.", 
+                new List<string>{ }.AsEnumerable(),
+                @"T:System.Int32")},
+            {FullDeclerationOfInt32, Tuple.Create(
+                @"int x1 = 10;", 0, 
                 "struct System.Int32", 
                 "Represents a 32-bit signed integer.", 
                 new List<string>{ }.AsEnumerable(),

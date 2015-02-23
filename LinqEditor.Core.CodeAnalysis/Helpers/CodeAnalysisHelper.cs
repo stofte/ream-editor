@@ -21,9 +21,6 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             var t = type.Type.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?
                 type.Type.OriginalDefinition : type.Type;
 
-            var s = symbol.Symbol.OriginalDefinition != null && symbol.Symbol != symbol.Symbol.OriginalDefinition ?
-                symbol.Symbol.OriginalDefinition : symbol.Symbol;
-
             var kind = t.IsValueType ? "struct" : 
                         t.IsReferenceType && t.TypeKind == TypeKind.Interface ? "interface" :
                         t.IsReferenceType ? "class" :

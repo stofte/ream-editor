@@ -32,8 +32,9 @@ namespace Test
 ";
         string _simpleProgramWithAllUsings = @"
 using System;
-using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Collections.Generic;
 using LinqEditor.Core.Generated;
 
 namespace Test
@@ -163,10 +164,17 @@ namespace Another.Generated
         // Item5 = Specializations
         // Item6 = DocumentationId
 
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfDataColumn, UserContext.ToolTip)]
-        public void Can_Corrrect_Return_ToolTip_Context_Information_For_Variables(string testDataKey, UserContext ctx)
+        
+        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfInt32, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 0, UserContext.ToolTip)]
+        //[TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts, 0, UserContext.ToolTip)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 9, UserContext.Unknown)] // => int literal
+        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 5, UserContext.Unknown)] // => var name
+        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 30, UserContext.Unknown)] // => method
+        public void Can_Corrrect_Return_ToolTip_Context_Information_For_Variables(string testDataKey, int offset, UserContext ctx)
         {
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
@@ -176,7 +184,7 @@ namespace Another.Generated
             editor.Initialize();
             var testData = VSDocumentationTestData.Data[testDataKey];
 
-            var result = editor.Analyze(testData.Item1, testData.Item2);
+            var result = editor.Analyze(testData.Item1, testData.Item2 + offset);
             
             Assert.AreEqual(ctx, result.Context);
         }

@@ -123,13 +123,29 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
-                // check for tooltip infomation
-                var syntaxNode = tree.GetRoot()
-                    .DescendantNodes(oneCharTextSpan)
+                var nodes = tree.GetRoot().DescendantNodes(oneCharTextSpan);
+                // for tooltips, we need a var decl, to obtain the actual type to show
+                var syntaxNode = nodes
                     .OfType<VariableDeclarationSyntax>()
                     .LastOrDefault();
 
-                if (syntaxNode != null)
+                var allNodes = nodes
+                    .OfType<CSharpSyntaxNode>();
+
+                var declNode = nodes
+                    .OfType<PredefinedTypeSyntax>()
+                    .FirstOrDefault();
+
+                var identNode = nodes
+                    .OfType<IdentifierNameSyntax>()
+                    .FirstOrDefault();
+
+                // the vardecl node spans the entire statement, so check for predefinedtype node,
+                // which maps to "int" or "HashSet" decl types, and also for identNode which are equal to "var"
+                // this is probably gonna fail pretty easy
+                var initialNode = declNode != null || identNode != null && identNode.ToString().ToLower() == "var";
+
+                if (syntaxNode != null && initialNode)
                 {
                     var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
                     var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Type);

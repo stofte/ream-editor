@@ -152,9 +152,9 @@ namespace Test
 
         [TestCase(VSDocumentationTestData.VarDeclerationOfInt32)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfDataColumn)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn)]
         [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfMultipleInts)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts)]
         public void GetToolTipDisplayName_Formats_Type_Correctly(string testDataKey)
         {
             var toolTipTestData = VSDocumentationTestData.Data[testDataKey];

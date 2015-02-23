@@ -199,6 +199,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
                 if (prev != current && !signalled)
                 {
+                    Debug.WriteLine("Changed noticed: " + current);
                     if (current == -1)
                     {
                         _tooltip.KillTip();
@@ -213,7 +214,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
                         var startPos = _editor.PointToScreen(new System.Drawing.Point(startX, startY));
                         var analysisResult = await _session.AnalyzeAsync(_editor.Text, current);
-
+                        Debug.WriteLine("analysisResult " + analysisResult.Success + ", " + analysisResult.Context);
                         if (current == _wordPos && analysisResult.Context == UserContext.ToolTip)
                         {
                             var endPos = _editor.PointToScreen(new System.Drawing.Point(endX, endY));

@@ -145,9 +145,21 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             return possibleExtensions.Concat(extensionMethods[UniversalTypeKey]);
         }
 
-        public static TypeInformation GetTypeInformation(TypeInfo typeInfo, ISymbol symbolInfo)
+
+        // todo: anonymous?
+        public static TypeInformation GetTypeInformation(INamedTypeSymbol t, string entryClass)
         {
-            var t = typeInfo.Type;
+            var objectEntries = new[] {
+                new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
+                new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "ReferenceEquals" },
+
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "GetHashCode" },
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "GetType" },
+                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "ToString" }
+            };
+
+            //var t = typeInfo.Type as INamedTypeSymbol;
 
             Func<Accessibility, AccessibilityModifier> mapAccess = (mod) =>
                 mod == Accessibility.Public ? AccessibilityModifier.Public :
@@ -184,25 +196,15 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     Name = x.Name
                 });
 
-            var objectEntries = new[] {
-                new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
-                new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "ReferenceEquals" },
-
-                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
-                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "GetHashCode" },
-                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "GetType" },
-                new TypeMember { IsStatic = false, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "ToString" }
-            };
-
             return new TypeInformation
             {
                 IsStatic = t.IsStatic,
                 Name = t.Name,
                 Namespace = t.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                Members = methods.Concat(properties).Concat(fields).Concat(objectEntries)
+                Members = methods.Concat(properties).Concat(fields).Concat(objectEntries),
+                EntryClass = GetBasicName(t) == entryClass
             };
         }
-
 
         /// <summary>
         /// Gets the extension methods available inside the scope of the last method.

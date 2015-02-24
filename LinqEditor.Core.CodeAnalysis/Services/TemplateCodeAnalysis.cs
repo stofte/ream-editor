@@ -26,7 +26,10 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         private int _sourceOffset;
         ExtensionMethodCollection _extensionMethods;
         IDocumentationService _documentationService;
-        
+
+        string _namespace;
+        string _entryClass;
+
         /// <summary>
         /// Filters by VS semantics (name and kind)
         /// </summary>
@@ -71,6 +74,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _extensionMethods = CodeAnalysisHelper.GetExtensionMethods(semanticModel);
             _sourceOffset = _initialSource.IndexOf(SchemaConstants.Marker);
             _initialized = true;
+
+            var nodes = tree.GetRoot().DescendantNodes();
+            var nsNode = nodes.OfType<NamespaceDeclarationSyntax>().LastOrDefault();
+            var clsNode = nodes.OfType<ClassDeclarationSyntax>().LastOrDefault();
+
+            _namespace = nsNode.Name.ToString();
+            _entryClass = clsNode.Identifier.ToString();
         }
 
         public bool IsReady { get { return _initialized; } }
@@ -95,52 +105,65 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
 
             var oneCharTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
+            var nodes = tree.GetRoot().DescendantNodes(oneCharTextSpan);
+            var allNodes = nodes.OfType<CSharpSyntaxNode>();
             
-
             if (sourceFragment[updateIndex] == '.')
             {
                 // check if context is really member access
-                var syntaxNode = tree.GetRoot()
-                    .DescendantNodes(oneCharTextSpan)
-                    .OfType<MemberAccessExpressionSyntax>()
-                    .LastOrDefault();
+                var syntaxNode = nodes.OfType<MemberAccessExpressionSyntax>().LastOrDefault();
                 
-                if (syntaxNode != null)
+                if (syntaxNode != null && syntaxNode.Expression != null)
                 {
-                    if (syntaxNode.Expression == null) goto exit;
+                    var clsNode = tree.GetRoot().DescendantNodes()
+                        .OfType<ClassDeclarationSyntax>().LastOrDefault();
+                    var nsNode = tree.GetRoot().DescendantNodes()
+                        .OfType<NamespaceDeclarationSyntax>().LastOrDefault();
+
+                    // used for filtering the this object specially
+                    var entryClass = string.Format("{0}.{1}", nsNode.Name, clsNode.Identifier);
+
                     var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Expression);
                     var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Expression);
+
                     if (symInfo.Symbol == null) goto exit;
                     // should be ok to work with symbols
                     ctx = UserContext.MemberCompletion;
                     // get all applicable extensions
                     var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo, _extensionMethods);
-                    var typeInformation = CodeAnalysisHelper.GetTypeInformation(typeInfo, symInfo.Symbol);
-                    // possibly use DeclaringSyntaxReferences.Count() == 0
-                    var anyPrivate = typeInformation.Members.Where(x => x.Accessibility == AccessibilityModifier.Private).Count();
+                    TypeInformation mainType = CodeAnalysisHelper.GetTypeInformation(typeInfo.Type as INamedTypeSymbol, entryClass);
+                    TypeInformation subType = null;
                     var isStatic = symInfo.Symbol.IsStatic || symInfo.Symbol.Kind == SymbolKind.NamedType;
 
-                    suggestions = MapSuggestions(typeInformation, extensions, isStatic);
+                    if (mainType.EntryClass)
+                    {
+                        subType = CodeAnalysisHelper.GetTypeInformation(typeInfo.Type.BaseType, entryClass);
+
+                        var modifiedType = new TypeInformation
+                        {
+                            EntryClass = true,
+                            Name = mainType.Name,
+                            Namespace = mainType.Namespace,
+                            Members = subType.Members.Where(x => x.Kind == MemberKind.Property)
+                        };
+
+                        suggestions = MapSuggestions(modifiedType, new List<TypeMember>(), isStatic);
+                    }
+                    else
+                    {
+                        
+                        suggestions = MapSuggestions(mainType, extensions, isStatic);
+                    }
+                    // possibly use DeclaringSyntaxReferences.Count() == 0
+                    //var anyPrivate = typeInformation.Members.Where(x => x.Accessibility == AccessibilityModifier.Private).Count();
                 }
             }
             else
             {
-                var nodes = tree.GetRoot().DescendantNodes(oneCharTextSpan);
                 // for tooltips, we need a var decl, to obtain the actual type to show
-                var varNode = nodes
-                    .OfType<VariableDeclarationSyntax>()
-                    .LastOrDefault();
-
-                var allNodes = nodes
-                    .OfType<CSharpSyntaxNode>();
-
-                var preNode = nodes
-                    .OfType<PredefinedTypeSyntax>()
-                    .FirstOrDefault();
-
-                var idNode = nodes
-                    .OfType<IdentifierNameSyntax>()
-                    .FirstOrDefault();
+                var varNode = nodes.OfType<VariableDeclarationSyntax>().LastOrDefault();
+                var preNode = nodes.OfType<PredefinedTypeSyntax>().FirstOrDefault();
+                var idNode = nodes.OfType<IdentifierNameSyntax>().FirstOrDefault();
 
                 if (varNode != null)
                 {

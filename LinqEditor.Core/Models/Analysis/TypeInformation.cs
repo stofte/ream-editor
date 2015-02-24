@@ -11,5 +11,6 @@ namespace LinqEditor.Core.Models.Analysis
         public string Name { get; set; }
         public string Namespace { get; set; }
         public IEnumerable<TypeMember> Members { get; set; }
+        public bool EntryClass { get; set; }
     }
 }

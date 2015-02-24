@@ -9,7 +9,7 @@ namespace LinqEditor.Core.Generated
     /// </summary>
     public interface IDatabaseProgram
     {
-        string ConnectionString { get; }
+        string ConnectionString();
         IEnumerable<DataTable> Execute(IEntityProvider entityProvider);
     }
 }

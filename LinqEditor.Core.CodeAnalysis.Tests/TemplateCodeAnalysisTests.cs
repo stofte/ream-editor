@@ -70,7 +70,7 @@ namespace Another.Generated
     using First.Generated;
 
     public abstract class ProgramBase { protected int MyInheritedProperty { get; set; } }
-    public class Program
+    public class Program : ProgramBase
     {
         protected int MyProperty { get; set; }
         public void Query() 
@@ -193,21 +193,21 @@ namespace Another.Generated
             Assert.AreEqual(ctx, result.Context);
         }
 
-        //[Test]
-        public void Can_Find_Inherited_Members_On_This()
+        [Test]
+        public void Member_Access_On_This_Shows_Inherited_Properties()
         {
             var m = new Mock<ITemplateService>();
-            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgram);
-            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgram);
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
 
             var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
             editor.Initialize();
 
-            var stub = "var x = new List<int>();x.";
+            var stub = "var x = this;x.";
 
             var result = editor.Analyze(stub, stub.Length - 1);
 
-            Assert.IsNotNull(result.MemberCompletions.FirstOrDefault(x => x.Value == "Dump" && x.Kind == MemberKind.ExtensionMethod));
+            Assert.IsNotNull(result.MemberCompletions.FirstOrDefault(x => x.Value == "MyInheritedProperty" && x.Kind == MemberKind.Property));
         }
     }
 }

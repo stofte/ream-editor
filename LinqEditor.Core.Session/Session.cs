@@ -236,7 +236,8 @@ namespace LinqEditor.Core.Session
             if (_connection == null) throw new ArgumentException("unknown connection id");
 
             // check cache
-            if (string.IsNullOrEmpty(_connection.CachedSchemaFileName))
+            if (string.IsNullOrEmpty(_connection.CachedSchemaFileName) ||
+                !System.IO.File.Exists(_connection.CachedSchemaFileName))
             {
                 var schemaId = Guid.NewGuid();
                 var schemaNamespace = schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix);

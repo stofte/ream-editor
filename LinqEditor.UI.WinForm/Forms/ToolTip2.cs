@@ -16,13 +16,16 @@ namespace LinqEditor.UI.WinForm.Forms
         Color _backColor = ColorTranslator.FromHtml("#F6F6F6");
         Label _text;
         Timer _timer;
-
-        // current data
-        bool _showIntent; // if the tooltip should be visible or not
+        
+        // placement data
+        bool _showing;
+        Rectangle _capture;
         int _top;
         int _left;
         Point _start;
         Point _end;
+
+        // text data
         string _type;
         string _desc;
         IEnumerable<string> _spec;
@@ -45,15 +48,9 @@ namespace LinqEditor.UI.WinForm.Forms
         const long WS_SYSMENU = 0x00080000L;
         
         // pretty crude
-        public int CurrentWordStart { get; set; }
         public UserControl CurrentOwner { get; set; }
-        public bool ClientIsActive { get; set; }
-
-        public void KillTip()
-        {
-            _showIntent = false;
-        }
-
+        public bool Showing { get { return _showing; } }
+        
         public void EnableTimer(bool enable)
         {
             if (enable)
@@ -63,7 +60,7 @@ namespace LinqEditor.UI.WinForm.Forms
             else
             {
                 _timer.Stop();
-                Visible = false;
+                Visible = _showing = false;
             }
         }
 
@@ -71,11 +68,11 @@ namespace LinqEditor.UI.WinForm.Forms
         public void PlaceTip(Point start, Point end, int lineHeight, ToolTipData data)
         {
             if (lineHeight < 1) throw new ArgumentException("lineHeight must be positive");
-
+            Debug.Assert(start.X < end.X && start.Y == end.Y);
             if (start == _start && end == _end && _type == data.TypeAndName && _desc == data.Description &&
                 data.Specializations.All(x => _spec.Contains(x))) // assumes same lineheight
             {
-                _showIntent = true;
+                _showing = true;
                 return;
             }
 
@@ -85,11 +82,12 @@ namespace LinqEditor.UI.WinForm.Forms
             _desc = data.Description;
             _spec = data.Specializations ?? new List<string>();
 
-            var tooltipText = string.Format("{0}{1}{2}{3}{4}", _type,
-                !string.IsNullOrWhiteSpace(_desc) ? "\n" : string.Empty, 
-                !string.IsNullOrWhiteSpace(_desc) ? _desc : string.Empty, 
-                _spec.Count() > 0 ? "\n\n" : string.Empty,
-                _spec.Count() > 0 ? string.Join("\n", _spec) : string.Empty);
+            //var tooltipText = string.Format("{0}{1}{2}{3}{4}", _type,
+            //    !string.IsNullOrWhiteSpace(_desc) ? "\n" : string.Empty, 
+            //    !string.IsNullOrWhiteSpace(_desc) ? _desc : string.Empty, 
+            //    _spec.Count() > 0 ? "\n\n" : string.Empty,
+            //    _spec.Count() > 0 ? string.Join("\n", _spec) : string.Empty);
+            var tooltipText = data.ToString();
             var textSize = TextRenderer.MeasureText(tooltipText, _text.Font);
 
             if (textSize.Width + _paddingHorizontal * 2 > _maxWidth)
@@ -101,13 +99,15 @@ namespace LinqEditor.UI.WinForm.Forms
             var newHeight = textSize.Height + _paddingTopVertical + _paddingBottomVertical;
             Width = newWidth;
             Height = newHeight;
-            
+
+            // capture is the text area (rect) that the tip is associated with
+            _capture = new Rectangle(start, new Size(end.X - start.X, lineHeight));
             _left = end.X - Width;
             _top = end.Y + lineHeight + _textOffset;
             _text.Size = textSize;
             _text.Text = tooltipText;
 
-            _showIntent = true;
+            _showing = true;
         }
 
         public ToolTip2()
@@ -123,7 +123,9 @@ namespace LinqEditor.UI.WinForm.Forms
             _timer.Interval = 50;
             _timer.Tick += delegate
             {
-                Visible = _showIntent;
+                //Debug.WriteLine("tooltip", )
+                _showing = _capture != null ? _capture.Contains(MousePosition) : _showing;
+                Visible = _showing;
                 Top = _top;
                 Left = _left;
             };

@@ -18,7 +18,6 @@ namespace LinqEditor.Installers
             container.Install(FromAssembly.Named("LinqEditor.Core.CodeAnalysis"));
             container.Install(FromAssembly.Named("LinqEditor.Core.Schema"));
             container.Install(FromAssembly.Named("LinqEditor.Core.Templates"));
-            
             // install forms
             container.Register(Component.For<Main>()
                                         .LifestyleTransient());

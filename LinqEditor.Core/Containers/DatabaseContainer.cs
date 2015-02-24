@@ -57,7 +57,7 @@ namespace LinqEditor.Core.Containers
                 // warm up connection
                 var warmupType = _baseAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _baseAssembly.GetName().Name));
                 var instance = Activator.CreateInstance(warmupType) as IDatabaseProgram;
-                _connectionString = instance.ConnectionString;
+                _connectionString = instance.ConnectionString();
                 var res = ExecuteInstance(instance);
                
                 base.InitializeAppDomain();

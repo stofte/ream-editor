@@ -87,10 +87,10 @@ foreach(var table in Tables) {
     {
         private Database _db;
 
-        public string ConnectionString { get { return @"<#=ConnectionString#>"; } }
+        public string ConnectionString() { return @"<#=ConnectionString#>"; }
 
 <# foreach(var table in Tables) { #>
-        protected IEntityTable<<#=table.Name#>> <#=table.Name#>;
+        protected IEntityTable<<#=table.Name#>> <#=table.Name#> { get; set; }
 <# } #>
 
         // entry point for static code

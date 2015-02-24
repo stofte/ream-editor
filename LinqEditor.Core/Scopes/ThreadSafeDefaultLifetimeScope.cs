@@ -1,6 +1,7 @@
 ﻿using Castle.Core;
 using Castle.MicroKernel;
 using Castle.MicroKernel.Lifestyle.Scoped;
+using LinqEditor.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace LinqEditor.Core.Scopes
         {
             lock (@lock)
             {
+                DebugLogger.Log("ThreadSafeDefaultLifetimeScope.Dispose");
                 if (scopeCache == null)
                 {
                     return;

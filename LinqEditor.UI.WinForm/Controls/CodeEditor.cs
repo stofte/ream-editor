@@ -15,8 +15,12 @@ using System.Drawing;
 
 namespace LinqEditor.UI.WinForm.Controls
 {
-    public class CodeEditor : UserControl
+    public class CodeEditor : UserControl, IDisposable
     {
+        const int TimerTickMs = 100;
+        const int AnalyzeTickMs = 1000;
+        Font EditorFont = new Font("Consolas", 14);
+
         public readonly char[] StopCharacters = new[] { ' ', '=', '(', ')', ';', '\n' };
 
         ScintillaNET.Scintilla _editor;
@@ -27,9 +31,7 @@ namespace LinqEditor.UI.WinForm.Controls
         Timer _tipTimer;
         int _tipWord;
         int _textLineHeight;
-
-        DateTime _updatedText = DateTime.MinValue;
-
+        bool _textUpdated;
         Timer _analyzeTimer;
 
         public string SourceCode { get { return _editor.Text; } }
@@ -63,21 +65,20 @@ namespace LinqEditor.UI.WinForm.Controls
 
         private void InitializeComponent()
         {
-            var editorFont = new System.Drawing.Font("Arial", 9);
-            var uiFont = new System.Drawing.Font("Consolas", 10);
-
             // set editor focus on tab changes
             VisibleChanged += delegate 
             {
                 if (Visible)
                 {
                     _tipTimer.Start();
+                    _analyzeTimer.Start();
                     _tooltip.CurrentOwner = this;
                     _editor.Focus();
                 }
                 else
                 {
                     _tipTimer.Stop();
+                    _analyzeTimer.Stop();
                 }
             };
 
@@ -91,7 +92,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.MatchBraces = true;
             _editor.LineWrapping.VisualFlags = ScintillaNET.LineWrappingVisualFlags.End;
             _editor.Caret.Width = 2;
-            //_editor.Font = editorFont;
+            _editor.Font = EditorFont;
             _editor.Name = "_scintilla";
             _editor.TabIndex = 0;
             _editor.Text = "var x = 10;";
@@ -99,11 +100,11 @@ namespace LinqEditor.UI.WinForm.Controls
             
             _editor.TextChanged += delegate
             {
-                
+                _textUpdated = true;
             };
 
             // https://scintillanet.codeplex.com/discussions/538501
-            _editorNative.SetMouseDwellTime(150);
+            _editorNative.SetMouseDwellTime(TimerTickMs);
             _editor.DwellStart += delegate(object sender, ScintillaNET.ScintillaMouseEventArgs e)
             {
                 var mousePos = _editor.PointToClient(MousePosition);
@@ -150,15 +151,23 @@ namespace LinqEditor.UI.WinForm.Controls
             // timer handles reading changes to the currently hovered word (defined by scintilla.)
             // when the word changes, the timer attempts to get tooltip info for the new word.
             _tipTimer = new Timer();
-            _tipTimer.Interval = 150;
+            _tipTimer.Interval = TimerTickMs;
             _tipTimer.Tick += tipTick;
 
             _analyzeTimer = new Timer();
-            _analyzeTimer.Interval = 150;
+            _analyzeTimer.Interval = AnalyzeTickMs;
             _analyzeTimer.Tick += async delegate
             {
                 _analyzeTimer.Stop();
-                var result = await _session.AnalyzeAsync(_editor.Text);
+                if (_textUpdated)
+                {
+                    _textUpdated = false;
+                    var result = await _session.AnalyzeAsync(_editor.Text);
+                    if (result.Context == UserContext.NotReady) 
+                    {
+                        _textUpdated = true; // retry
+                    }
+                }
                 _analyzeTimer.Start();
             };
         }
@@ -177,6 +186,10 @@ namespace LinqEditor.UI.WinForm.Controls
                     _editor.AutoComplete.Show();
                 }
             }
+
+            // scintilla keeps refiring dwell events, so the tooltip will not reshow untill 
+            // the mouse has been moved from the location the tip was killed.
+            _tooltip.HideTip(); 
         }
 
         async void tipTick(object sender, EventArgs e)
@@ -212,6 +225,17 @@ namespace LinqEditor.UI.WinForm.Controls
         private List<string> GetAutoCompleteList(IEnumerable<CompletionEntry> suggestions)
         {
             return suggestions.Select(x => string.Format("{0}?{1}", x.Value, (int)x.Kind)).ToList();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _tipTimer.Dispose();
+            _analyzeTimer.Dispose();
+            if (_session != null)
+            {
+                _sessionFactory.Release(_session);
+            }
+            base.Dispose(disposing);
         }
     }
 }

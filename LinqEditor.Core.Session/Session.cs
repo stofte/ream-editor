@@ -19,7 +19,7 @@ namespace LinqEditor.Core.Session
     /// <summary>
     /// well designed class with single responsibility of doing everything
     /// </summary>
-    public class Session : ISession
+    public class Session : ISession, IDisposable
     {
         // session is one-time bind only
         private bool _codeSession;
@@ -46,7 +46,7 @@ namespace LinqEditor.Core.Session
 
         public Guid Id { get { return _id; } }
 
-        public Session(Guid contextId, ISqlSchemaProvider schemaProvider, ITemplateService generator,// ISchemaStore userSettings,
+        public Session(Guid contextId, ISqlSchemaProvider schemaProvider, ITemplateService generator,
             IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory,
             IConnectionStore connectionStore, ITemplateCodeAnalysis codeAnalysis)
         {
@@ -201,7 +201,7 @@ namespace LinqEditor.Core.Session
         {
             if (!_codeAnalysis.IsReady)
             {
-                return new AnalysisResult { Context = UserContext.Unknown };
+                return new AnalysisResult { Context = UserContext.NotReady };
             }
             return _codeAnalysis.Analyze(sourceFragment, updateIndex);
         }
@@ -210,7 +210,7 @@ namespace LinqEditor.Core.Session
         {
             if (!_codeAnalysis.IsReady)
             {
-                return new AnalysisResult { Context = UserContext.Unknown };
+                return new AnalysisResult { Context = UserContext.NotReady };
             }
             return _codeAnalysis.Analyze(sourceFragment);
         }
@@ -279,5 +279,9 @@ namespace LinqEditor.Core.Session
             };
         }
 
+        public void Dispose()
+        {
+            DebugLogger.Log("Disposing session");
+        }
     }
 }

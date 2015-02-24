@@ -87,7 +87,10 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         {
             if (sourceFragment == null) throw new ArgumentNullException("sourceFragment");
 
-            UpdateModel(sourceFragment);
+            if (_currentStub != sourceFragment)
+            {
+                UpdateModel(sourceFragment);
+            }
 
             return new AnalysisResult
             {
@@ -107,17 +110,12 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 UpdateModel(sourceFragment);
             }
 
-            DebugLogger.Log("src(" + updateIndex + ")=" + sourceFragment);
             var ctx = UserContext.Unknown;
             IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
             IEnumerable<Warning> warnings = new List<Warning>();
             IEnumerable<Error> errors = new List<Error>();
             ToolTipData tooltip = new ToolTipData();
             
-            //var currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
-            //var tree = CSharpSyntaxTree.ParseText(currentSource);
-            //var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
-
             var oneCharTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
             var nodes = _currentTree.DescendantNodes(oneCharTextSpan);
             var allNodes = _currentTree.DescendantNodes().OfType<CSharpSyntaxNode>();
@@ -204,6 +202,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
 
             exit:
+
             return new AnalysisResult
             {
                 Context = ctx,

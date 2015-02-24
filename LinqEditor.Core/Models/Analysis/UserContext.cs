@@ -17,6 +17,10 @@ namespace LinqEditor.Core.Models.Analysis
         /// <summary>
         /// Could not infer type
         /// </summary>
+        NotReady,
+        /// <summary>
+        /// Could not infer type
+        /// </summary>
         Unknown
     }
 }

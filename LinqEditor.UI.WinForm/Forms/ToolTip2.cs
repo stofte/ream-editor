@@ -17,9 +17,14 @@ namespace LinqEditor.UI.WinForm.Forms
         Label _text;
         Timer _timer;
         
-        // placement data
+        
+        // when the tooltip is hidden, we store the mouse cords, 
+        // and don't show again until the user moves the mouse again
+        Point _mouseLoc;
+        bool _mouseMoved = true;
+        // other placement data
         bool _showing;
-        Rectangle _capture;
+        Rectangle _capture = Rectangle.Empty;
         int _top;
         int _left;
         Point _start;
@@ -49,7 +54,14 @@ namespace LinqEditor.UI.WinForm.Forms
         
         // pretty crude
         public UserControl CurrentOwner { get; set; }
-        public bool Showing { get { return _showing; } }
+        public bool Showing 
+        { 
+            get 
+            { 
+                // if we're not showing, but want to appear to (for the ui to stop spamming us)
+                return _showing || !_showing && !_mouseMoved; 
+            } 
+        }
         
         public void EnableTimer(bool enable)
         {
@@ -64,13 +76,27 @@ namespace LinqEditor.UI.WinForm.Forms
             }
         }
 
+        public void HideTip()
+        {
+            _showing = false;
+            _mouseMoved = false;
+            _mouseLoc = MousePosition;
+        }
+
         // start/end is the upper bounding edge of the word box
         public void PlaceTip(Point start, Point end, int lineHeight, ToolTipData data)
         {
             if (lineHeight < 1) throw new ArgumentException("lineHeight must be positive");
             Debug.Assert(start.X < end.X && start.Y == end.Y);
+
+            // if we haven't detected a mouse move since last manual kill, dont do anything
+            if (!_mouseMoved)
+            {
+                return;
+            }
+
             if (start == _start && end == _end && _type == data.TypeAndName && _desc == data.Description &&
-                data.Specializations.All(x => _spec.Contains(x))) // assumes same lineheight
+                data.Specializations.All(x => _spec.Contains(x)) && _mouseMoved) // assumes same lineheight
             {
                 _showing = true;
                 return;
@@ -82,11 +108,6 @@ namespace LinqEditor.UI.WinForm.Forms
             _desc = data.Description;
             _spec = data.Specializations ?? new List<string>();
 
-            //var tooltipText = string.Format("{0}{1}{2}{3}{4}", _type,
-            //    !string.IsNullOrWhiteSpace(_desc) ? "\n" : string.Empty, 
-            //    !string.IsNullOrWhiteSpace(_desc) ? _desc : string.Empty, 
-            //    _spec.Count() > 0 ? "\n\n" : string.Empty,
-            //    _spec.Count() > 0 ? string.Join("\n", _spec) : string.Empty);
             var tooltipText = data.ToString();
             var textSize = TextRenderer.MeasureText(tooltipText, _text.Font);
 
@@ -123,20 +144,26 @@ namespace LinqEditor.UI.WinForm.Forms
             _timer.Interval = 50;
             _timer.Tick += delegate
             {
-                //Debug.WriteLine("tooltip", )
-                _showing = _capture != null ? _capture.Contains(MousePosition) : _showing;
+                
+                var pos = MousePosition;
+                if (Visible && !_capture.Contains(pos))
+                {
+                    // user moved beyond text box
+                    _showing = false;
+                }
+
+                // this is kinda ugly, alternative is to install global keyboard hooks.
+                // http://stackoverflow.com/questions/3312752/capturing-mouse-keyboard-events-outside-of-form-app-running-in-background
+                if (!_mouseMoved && _mouseLoc != MousePosition)
+                {
+                    _mouseMoved = true;
+                }
+
                 Visible = _showing;
                 Top = _top;
                 Left = _left;
             };
             _timer.Start();
-
-            MouseEnter += delegate
-            {
-                Visible = false;
-            };
-
-            Height = 100;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -161,6 +188,12 @@ namespace LinqEditor.UI.WinForm.Forms
                 baseParams.ExStyle |= (int)(WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
                 return baseParams;
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _timer.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

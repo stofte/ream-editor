@@ -13,7 +13,7 @@ namespace LinqEditor.Core.Helpers
 #if DEBUG
 
             var id = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString();
-            var str = string.Format("[DEBUG] {4} {0}:{1}:{2} = {3}", sourcePath, sourceLine, member, msg, id);
+            var str = string.Format("{3} [{4} {0}:{1}:{2}]", sourcePath, sourceLine, member, msg, id);
             System.Diagnostics.Debug.WriteLine(str);
 #endif
         }

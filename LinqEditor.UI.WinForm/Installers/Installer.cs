@@ -2,6 +2,8 @@
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor.Installer;
+using LinqEditor.Core.Scopes;
+using LinqEditor.Core.Session;
 using LinqEditor.UI.WinForm.Controls;
 using LinqEditor.UI.WinForm.Forms;
 

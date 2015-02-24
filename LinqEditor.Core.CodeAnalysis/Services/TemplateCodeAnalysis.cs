@@ -34,7 +34,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         protected string _currentStub;
         protected IEnumerable<Warning> _warnings;
         protected IEnumerable<Error> _errors;
-        protected IEnumerable<SyntaxNode> _nodes;
+        protected SyntaxNode _currentTree;
         protected SemanticModel _currentModel;
 
         public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService)
@@ -85,11 +85,28 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         
         public AnalysisResult Analyze(string sourceFragment)
         {
-            throw new NotImplementedException();
+            if (sourceFragment == null) throw new ArgumentNullException("sourceFragment");
+
+            UpdateModel(sourceFragment);
+
+            return new AnalysisResult
+            {
+                Errors = _errors,
+                Warnings = _warnings,
+                Context = UserContext.Unknown
+            };
         }
+
 
         public AnalysisResult Analyze(string sourceFragment, int updateIndex)
         {
+            if (sourceFragment == null) throw new ArgumentNullException("sourceFragment");
+
+            if (_currentStub != sourceFragment)
+            {
+                UpdateModel(sourceFragment);
+            }
+
             DebugLogger.Log("src(" + updateIndex + ")=" + sourceFragment);
             var ctx = UserContext.Unknown;
             IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
@@ -97,31 +114,29 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             IEnumerable<Error> errors = new List<Error>();
             ToolTipData tooltip = new ToolTipData();
             
-            var currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
-            var tree = CSharpSyntaxTree.ParseText(currentSource);
-            var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
+            //var currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
+            //var tree = CSharpSyntaxTree.ParseText(currentSource);
+            //var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
 
             var oneCharTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
-            var nodes = tree.GetRoot().DescendantNodes(oneCharTextSpan);
-            var allNodes = nodes.OfType<CSharpSyntaxNode>();
-            
-            if (sourceFragment[updateIndex] == '.')
+            var nodes = _currentTree.DescendantNodes(oneCharTextSpan);
+            var allNodes = _currentTree.DescendantNodes().OfType<CSharpSyntaxNode>();
+
+            if (_currentStub[updateIndex] == '.')
             {
                 // check if context is really member access
                 var syntaxNode = nodes.OfType<MemberAccessExpressionSyntax>().LastOrDefault();
                 
                 if (syntaxNode != null && syntaxNode.Expression != null)
                 {
-                    var clsNode = tree.GetRoot().DescendantNodes()
-                        .OfType<ClassDeclarationSyntax>().LastOrDefault();
-                    var nsNode = tree.GetRoot().DescendantNodes()
-                        .OfType<NamespaceDeclarationSyntax>().LastOrDefault();
+                    var clsNode = allNodes.OfType<ClassDeclarationSyntax>().LastOrDefault();
+                    var nsNode = allNodes.OfType<NamespaceDeclarationSyntax>().LastOrDefault();
 
                     // used for filtering the this object specially
                     var entryClass = string.Format("{0}.{1}", nsNode.Name, clsNode.Identifier);
 
-                    var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Expression);
-                    var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Expression);
+                    var typeInfo = _currentModel.GetTypeInfo(syntaxNode.Expression);
+                    var symInfo = _currentModel.GetSymbolInfo(syntaxNode.Expression);
 
                     if (symInfo.Symbol == null) goto exit;
                     // should be ok to work with symbols
@@ -136,15 +151,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     {
                         subType = CodeAnalysisHelper.GetTypeInformation(typeInfo.Type.BaseType, entryClass);
 
-                        var modifiedType = new TypeInformation
+                        suggestions = MapSuggestions(new TypeInformation
                         {
                             EntryClass = true,
                             Name = mainType.Name,
                             Namespace = mainType.Namespace,
                             Members = subType.Members.Where(x => x.Kind == MemberKind.Property)
-                        };
-
-                        suggestions = MapSuggestions(modifiedType, new List<TypeMember>(), isStatic);
+                        }, new List<TypeMember>(), isStatic);
                     }
                     else
                     {
@@ -169,8 +182,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
                     if (!isInitialNode) goto exit;
 
-                    var typeInfo = semanticModel.GetTypeInfo(varNode.Type);
-                    var symInfo = semanticModel.GetSymbolInfo(varNode.Type);
+                    var typeInfo = _currentModel.GetTypeInfo(varNode.Type);
+                    var symInfo = _currentModel.GetSymbolInfo(varNode.Type);
                     var t = typeInfo.Type;
                     var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
                         t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
@@ -200,6 +213,16 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 ToolTip = tooltip
             };
         }
+
+        protected void UpdateModel(string sourceFragment)
+        {
+            _currentStub = sourceFragment;
+            var currentSource = _initialSource.Replace(SchemaConstants.Marker, _currentStub);
+            var tree = CSharpSyntaxTree.ParseText(currentSource);
+            _currentModel = GetModelAndDiagnostics(tree, out _warnings, out _errors);
+            _currentTree = tree.GetRoot();
+        }
+
 
         protected SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
         {

@@ -17,23 +17,20 @@ namespace LinqEditor.UI.WinForm.Controls
 {
     public class CodeEditor : UserControl
     {
-        readonly char[] StopCharacters = new[] { ' ', '=', '(', ')', ';', '\n' };
+        public readonly char[] StopCharacters = new[] { ' ', '=', '(', ')', ';', '\n' };
 
         ScintillaNET.Scintilla _editor;
         ScintillaNET.INativeScintilla _editorNative;
         IAsyncSession _session;
         IAsyncSessionFactory _sessionFactory;
         ToolTip2 _tooltip;
-
-        
-        Timer _timer;
+        Timer _tipTimer;
         int _tipWord;
-
-        //bool _timerEnabled;
-
-
         int _textLineHeight;
-        
+
+        DateTime _updatedText = DateTime.MinValue;
+
+        Timer _analyzeTimer;
 
         public string SourceCode { get { return _editor.Text; } }
 
@@ -74,13 +71,13 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 if (Visible)
                 {
-                    _timer.Start();
+                    _tipTimer.Start();
                     _tooltip.CurrentOwner = this;
                     _editor.Focus();
                 }
                 else
                 {
-                    _timer.Stop();
+                    _tipTimer.Stop();
                 }
             };
 
@@ -99,6 +96,12 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.TabIndex = 0;
             _editor.Text = "var x = 10;";
             _editor.CharAdded += _editor_CharAdded;
+            
+            _editor.TextChanged += delegate
+            {
+                
+            };
+
             // https://scintillanet.codeplex.com/discussions/538501
             _editorNative.SetMouseDwellTime(150);
             _editor.DwellStart += delegate(object sender, ScintillaNET.ScintillaMouseEventArgs e)
@@ -146,35 +149,17 @@ namespace LinqEditor.UI.WinForm.Controls
 
             // timer handles reading changes to the currently hovered word (defined by scintilla.)
             // when the word changes, the timer attempts to get tooltip info for the new word.
-            _timer = new Timer();
-            _timer.Interval = 150;
-            _timer.Tick += async delegate
+            _tipTimer = new Timer();
+            _tipTimer.Interval = 150;
+            _tipTimer.Tick += tipTick;
+
+            _analyzeTimer = new Timer();
+            _analyzeTimer.Interval = 150;
+            _analyzeTimer.Tick += async delegate
             {
-                _timer.Stop();
-                var inside = CursorInside;
-                var current = _tipWord;
-                if (current > -1 && inside && !_tooltip.Showing)
-                {
-                    var end = _editorNative.WordEndPosition(current, true);
-                    var startX = _editorNative.PointXFromPosition(current);
-                    var startY = _editorNative.PointYFromPosition(current);
-                    var endX = _editorNative.PointXFromPosition(end);
-                    var endY = _editorNative.PointYFromPosition(end);
-
-                    var analysisResult = await _session.AnalyzeAsync(_editor.Text, current);
-
-                    if (current == _tipWord && analysisResult.Context == UserContext.ToolTip)
-                    {
-                        var startPos = _editor.PointToScreen(new System.Drawing.Point(startX, startY));
-                        var endPos = _editor.PointToScreen(new System.Drawing.Point(endX, endY));
-                        _tooltip.PlaceTip(startPos, endPos, _textLineHeight, analysisResult.ToolTip);
-                    }
-                }
-                else if (!inside)
-                {
-                    _tipWord = -1;
-                }
-                _timer.Start();
+                _analyzeTimer.Stop();
+                var result = await _session.AnalyzeAsync(_editor.Text);
+                _analyzeTimer.Start();
             };
         }
 
@@ -192,6 +177,36 @@ namespace LinqEditor.UI.WinForm.Controls
                     _editor.AutoComplete.Show();
                 }
             }
+        }
+
+        async void tipTick(object sender, EventArgs e)
+        {
+            _tipTimer.Stop();
+            // handle tooltip logic
+            var inside = CursorInside;
+            var current = _tipWord;
+            if (current > -1 && inside && !_tooltip.Showing)
+            {
+                var end = _editorNative.WordEndPosition(current, true);
+                var startX = _editorNative.PointXFromPosition(current);
+                var startY = _editorNative.PointYFromPosition(current);
+                var endX = _editorNative.PointXFromPosition(end);
+                var endY = _editorNative.PointYFromPosition(end);
+
+                var analysisResult = await _session.AnalyzeAsync(_editor.Text, current);
+
+                if (current == _tipWord && analysisResult.Context == UserContext.ToolTip)
+                {
+                    var startPos = _editor.PointToScreen(new System.Drawing.Point(startX, startY));
+                    var endPos = _editor.PointToScreen(new System.Drawing.Point(endX, endY));
+                    _tooltip.PlaceTip(startPos, endPos, _textLineHeight, analysisResult.ToolTip);
+                }
+            }
+            else if (!inside)
+            {
+                _tipWord = -1;
+            }
+            _tipTimer.Start();
         }
 
         private List<string> GetAutoCompleteList(IEnumerable<CompletionEntry> suggestions)

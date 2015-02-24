@@ -18,26 +18,24 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 {
     public class TemplateCodeAnalysis : ITemplateCodeAnalysis
     {
-        private bool _initialized;
-        private MetadataReference[] _references;
-        private ITemplateService _templateService;
-        private string _initialSource;
-        private string _currentSource;
-        private int _sourceOffset;
-        ExtensionMethodCollection _extensionMethods;
-        IDocumentationService _documentationService;
+        protected IDocumentationService _documentationService;
+        protected ITemplateService _templateService;
+        protected MetadataReference[] _references;
+        protected ExtensionMethodCollection _extensionMethods; 
+        
+        // instance data
+        protected bool _initialized;
+        protected string _initialSource;
+        protected int _sourceOffset;
+        protected string _namespace;
+        protected string _entryClass;
 
-        string _namespace;
-        string _entryClass;
-
-        /// <summary>
-        /// Filters by VS semantics (name and kind)
-        /// </summary>
-        class FilterByNameAndKind : IEqualityComparer<TypeMember>
-        {
-            public bool Equals(TypeMember x, TypeMember y) { return x.Name == y.Name && x.Kind == y.Kind; }
-            public int GetHashCode(TypeMember obj) { return (obj.Name + obj.Kind.ToString()).GetHashCode(); }
-        }
+        // current analysis model
+        protected string _currentStub;
+        protected IEnumerable<Warning> _warnings;
+        protected IEnumerable<Error> _errors;
+        protected IEnumerable<SyntaxNode> _nodes;
+        protected SemanticModel _currentModel;
 
         public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService)
         {
@@ -54,17 +52,17 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             Initialize(assemblyPath, assemblyPath != null ? Path.GetFileNameWithoutExtension(assemblyPath) : string.Empty);
         }
 
-        private void Initialize(string assemblyPath, string schemaNamespace)
+        protected void Initialize(string assemblyPath, string schemaNamespace)
         {
             // update references
             if (!string.IsNullOrEmpty(assemblyPath))
             {
                 _references = _references.Concat(new[] { MetadataReference.CreateFromFile(assemblyPath) }).ToArray();
-                _currentSource = _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
+                _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
             }
             else
             {
-                _currentSource = _initialSource = _templateService.GenerateCodeStatements(Guid.NewGuid(), SchemaConstants.Marker);
+                _initialSource = _templateService.GenerateCodeStatements(Guid.NewGuid(), SchemaConstants.Marker);
             }
             
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
@@ -99,10 +97,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             IEnumerable<Error> errors = new List<Error>();
             ToolTipData tooltip = new ToolTipData();
             
-            _currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
-            var tree = CSharpSyntaxTree.ParseText(_currentSource);
+            var currentSource = _initialSource.Replace(SchemaConstants.Marker, sourceFragment);
+            var tree = CSharpSyntaxTree.ParseText(currentSource);
             var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
-
 
             var oneCharTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
             var nodes = tree.GetRoot().DescendantNodes(oneCharTextSpan);
@@ -204,7 +201,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             };
         }
 
-        private SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
+        protected SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var comp = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix(SchemaConstants.QueryPrefix))
@@ -219,6 +216,15 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         }
 
         /// <summary>
+        /// Filters by VS semantics (name and kind)
+        /// </summary>
+        protected class FilterByNameAndKind : IEqualityComparer<TypeMember>
+        {
+            public bool Equals(TypeMember x, TypeMember y) { return x.Name == y.Name && x.Kind == y.Kind; }
+            public int GetHashCode(TypeMember obj) { return (obj.Name + obj.Kind.ToString()).GetHashCode(); }
+        }
+
+        /// <summary>
         /// Map the type and extension method information for static/non-static 
         /// context into a filtered suggestionentry list for the ui
         /// </summary>
@@ -226,7 +232,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         /// <param name="extensionMethods">The extension methods.</param>
         /// <param name="staticAccess">if set to <c>true</c>, access is static (if false, access is instance).</param>
         /// <returns></returns>
-        private IEnumerable<CompletionEntry> MapSuggestions(TypeInformation fullInfo, IEnumerable<TypeMember> extensionMethods, bool staticAccess)
+        protected IEnumerable<CompletionEntry> MapSuggestions(TypeInformation fullInfo, IEnumerable<TypeMember> extensionMethods, bool staticAccess)
         {
             var l = fullInfo.Members
                 .Concat(extensionMethods)

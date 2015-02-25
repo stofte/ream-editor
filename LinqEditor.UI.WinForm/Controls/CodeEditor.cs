@@ -19,7 +19,8 @@ namespace LinqEditor.UI.WinForm.Controls
     {
         const int TimerTickMs = 100;
         const int AnalyzeTickMs = 1000;
-        Font EditorFont = new Font("Consolas", 14);
+        const int NotReadyTickMs = 50;
+        Font EditorFont = new Font("Consolas", 10);
 
         public readonly char[] StopCharacters = new[] { ' ', '=', '(', ')', ';', '\n' };
 
@@ -31,7 +32,7 @@ namespace LinqEditor.UI.WinForm.Controls
         Timer _tipTimer;
         int _tipWord;
         int _textLineHeight;
-        bool _textUpdated;
+        bool _textUpdated = true; // sets analyser timer going
         Timer _analyzeTimer;
 
         public string SourceCode { get { return _editor.Text; } }
@@ -95,7 +96,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.Font = EditorFont;
             _editor.Name = "_scintilla";
             _editor.TabIndex = 0;
-            _editor.Text = "var x = 10;";
+            _editor.Text = "this";
             _editor.CharAdded += _editor_CharAdded;
             
             _editor.TextChanged += delegate
@@ -139,13 +140,17 @@ namespace LinqEditor.UI.WinForm.Controls
             
             _editor.AutoComplete.RegisterImages(imageList, System.Drawing.Color.Magenta);
             _editor.AutoComplete.MaxHeight = 10;
-            
             _editor.ConfigurationManager.Language = "cs";
 
             Load += delegate
             {
                 // todo: runtime font-size changes
                 _textLineHeight = _editorNative.TextHeight(0);
+                foreach (var key in _editor.Lexing.StyleNameMap)
+                {
+                    _editor.Styles[key.Value].Font = EditorFont;
+                    _editor.Styles[key.Value].FontName = EditorFont.Name;
+                }
             };
 
             // timer handles reading changes to the currently hovered word (defined by scintilla.)
@@ -155,7 +160,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _tipTimer.Tick += tipTick;
 
             _analyzeTimer = new Timer();
-            _analyzeTimer.Interval = AnalyzeTickMs;
+            _analyzeTimer.Interval = NotReadyTickMs;
             _analyzeTimer.Tick += async delegate
             {
                 _analyzeTimer.Stop();
@@ -166,6 +171,11 @@ namespace LinqEditor.UI.WinForm.Controls
                     if (result.Context == UserContext.NotReady) 
                     {
                         _textUpdated = true; // retry
+                    }
+                    else
+                    {
+                        // first time we hit this branch we completed the analysis
+                        _analyzeTimer.Interval = AnalyzeTickMs;
                     }
                 }
                 _analyzeTimer.Start();

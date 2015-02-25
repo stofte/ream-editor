@@ -96,7 +96,6 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.Font = EditorFont;
             _editor.Name = "_scintilla";
             _editor.TabIndex = 0;
-            _editor.Text = "this";
             _editor.CharAdded += _editor_CharAdded;
             
             _editor.TextChanged += delegate

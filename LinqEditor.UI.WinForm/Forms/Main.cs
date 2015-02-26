@@ -29,6 +29,7 @@ namespace LinqEditor.UI.WinForm.Forms
             _tooltip = tt;
             _store = store;
             _settings = settings;
+            Font = SystemFonts.MenuFont;
             InitializeControl();
         }
 

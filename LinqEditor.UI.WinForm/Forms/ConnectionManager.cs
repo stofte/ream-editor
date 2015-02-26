@@ -14,6 +14,7 @@ namespace LinqEditor.UI.WinForm.Forms
 
         public ConnectionManager(IConnectionStore connectionStore)
         {
+            Font = SystemFonts.MenuFont;
             _connectionStore = connectionStore;
             InitializeComponent();
         }

@@ -268,8 +268,7 @@ namespace LinqEditor.UI.WinForm.Controls
             }
             var sessionId = Guid.NewGuid();
             _session = _backgroundSessionFactory.Create(sessionId);
-            Debug.Assert(oldSession != _session.GetHashCode());
-            _editor.Session(sessionId);
+            Debug.Assert(oldSession != _session.GetHashCode() && sessionId == _session.Id);
             var result = await _session.InitializeAsync(id);
             _sessionLoaded = result.Error == null;
             _sessionLoadMs = result.DurationMs;

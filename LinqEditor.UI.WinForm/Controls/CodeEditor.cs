@@ -108,7 +108,6 @@ namespace LinqEditor.UI.WinForm.Controls
             _editor.TextChanged += delegate
             {
                 _updatedTimer.Restart();
-                _textUpdated = true;
             };
 
             // https://scintillanet.codeplex.com/discussions/538501
@@ -173,7 +172,6 @@ namespace LinqEditor.UI.WinForm.Controls
                 _analyzeTimer.Stop();
                 if (_updatedTimer.ElapsedMilliseconds > UpdateTimeoutMs && _session != null)
                 {
-                    _textUpdated = false;
                     var result = await _session.AnalyzeAsync(_editor.Text);
                     DrawErrors(result.Errors);
                 }

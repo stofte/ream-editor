@@ -276,6 +276,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _sessionLoadMs = result.DurationMs;
             if (_sessionLoaded)
             {
+                _editor.Session(sessionId);
                 var loadResult = await _session.LoadAppDomainAsync();
                 // loads appdomain and initializes connection
                 _sessionLoadMs += loadResult.DurationMs;

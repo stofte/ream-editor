@@ -129,6 +129,7 @@ namespace LinqEditor.UI.WinForm.Controls
                         newTab.ClientSizeChanged += TabClientSizeChangedHandler;
                         newTab.Enter += TabEnterHandler;
                         var grid = new DataGridView();
+                        grid.Font = SystemFonts.DialogFont;
                         grid.ReadOnly = true;
                         grid.AllowDrop = false;
                         grid.AllowUserToAddRows = false;

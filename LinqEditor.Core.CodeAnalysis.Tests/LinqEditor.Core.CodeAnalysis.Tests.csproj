@@ -127,6 +127,10 @@
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
       <Name>LinqEditor.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Test.Common\LinqEditor.Test.Common.csproj">
+      <Project>{9ec90760-15fe-40ed-aaa4-fa63a79cd050}</Project>
+      <Name>LinqEditor.Test.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

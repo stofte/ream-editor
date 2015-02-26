@@ -1,6 +1,7 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Templates;
+using LinqEditor.Test.Common;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -193,6 +194,33 @@ namespace Another.Generated
             Assert.AreEqual(ctx, result.Context);
         }
 
+        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 0)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfInt32, 0)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 0)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 0)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts, 0)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 0)]
+        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 9)] // => int literal
+        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 5)] // => var name
+        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 30)] // => method
+        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 18)] // => int type
+        public void Returned_Collections_Are_Always_Non_Null(string testDataKey, int offset)
+        {
+            var m = new Mock<ITemplateService>();
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
+            
+            var testData = VSDocumentationTestData.Data[testDataKey];
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            editor.Initialize();
+            
+            var result = editor.Analyze(testData.Item1, testData.Item2 + offset);
+
+            Assert.IsNotNull(result.Errors);
+            Assert.IsNotNull(result.Warnings);
+        }
+
         [Test]
         public void Member_Access_On_This_Shows_Inherited_Properties()
         {
@@ -208,6 +236,27 @@ namespace Another.Generated
             var result = editor.Analyze(stub, stub.Length - 1);
 
             Assert.IsNotNull(result.MemberCompletions.FirstOrDefault(x => x.Value == "MyInheritedProperty" && x.Kind == MemberKind.Property));
+        }
+
+        [TestCase(SourceCodeFragments.ErrorExample1)]
+        [TestCase(SourceCodeFragments.ErrorExample2)]
+        public void Errors_Locations_Are_Mapped_To_Stub_Fragment(string sourceFragment)
+        {
+            var m = new Mock<ITemplateService>();
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
+
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            editor.Initialize();
+            var result = editor.Analyze(sourceFragment, sourceFragment.Length - 1);
+
+            foreach (var err in result.Errors)
+            {
+                var byIndex = sourceFragment.Substring(err.Location.StartIndex, err.Location.EndIndex - err.Location.StartIndex);
+                var byLineColumn = err.Location.GetText(sourceFragment);
+
+                Assert.AreEqual(byIndex, byLineColumn);
+            }
         }
     }
 }

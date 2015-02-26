@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis.Text;
 using NUnit.Framework;
 using System;
 using System.Linq;
+using LinqEditor.Test.Common;
+using System.Text;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
@@ -183,6 +185,31 @@ namespace Test
 
             Assert.AreEqual(toolTipTestData.Item3, actualOutput.Item1);
             Assert.AreEqual(toolTipTestData.Item5, actualOutput.Item2);
+        }
+
+        [TestCase(SourceCodeFragments.ErrorExample1)]
+        [TestCase(SourceCodeFragments.ErrorExample2)]
+        public void Errors_Are_Returned_With_Line_Column_And_Index_Indicators(string sourceStub)
+        {
+            var source = _source4.Replace(SchemaConstants.Marker, sourceStub);
+            var tree = CSharpSyntaxTree.ParseText(source);
+
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
+                .WithOptions(_compilerOptions)
+                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddSyntaxTrees(new SyntaxTree[] { tree });
+
+            var semanticModel = compilation.GetSemanticModel(tree);
+
+            var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
+
+            foreach(var err in errors)
+            {
+                var byIndex = source.Substring(err.Location.StartIndex, err.Location.EndIndex - err.Location.StartIndex);
+                var byLineColumn = err.Location.GetText(source);
+
+                Assert.AreEqual(byIndex, byLineColumn);
+            }
         }
     }
 }

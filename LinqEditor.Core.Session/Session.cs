@@ -96,6 +96,18 @@ namespace LinqEditor.Core.Session
             var prefix = _codeSession ? SchemaConstants.CodePrefix : SchemaConstants.QueryPrefix;
             var result = CSharpCompiler.CompileToBytes(programSource, programId.ToIdentifierWithPrefix(prefix), references);
 
+            // map line info to sourceFragment offset
+            result.Errors = result.Errors.Select(x => new Error 
+            { 
+                Location = x.Location.Offset(-_codeAnalysis.IndexOffset, -_codeAnalysis.LineOffset), 
+                Message = x.Message 
+            });
+            result.Warnings = result.Warnings.Select(x => new Warning
+            {
+                Location = x.Location.Offset(-_codeAnalysis.IndexOffset, -_codeAnalysis.LineOffset),
+                Message = x.Message
+            });
+
             if (result.Success)
             {
                 // this is probably wrong
@@ -150,6 +162,7 @@ namespace LinqEditor.Core.Session
                     QueryText = containerResult.QueryText,
                     Tables = containerResult.Tables,
                     Warnings = result.Warnings,
+                    Errors = result.Errors,
                     DurationMs = _watch.ElapsedMilliseconds,
                     CodeOutput = containerResult.CodeOutput,
                     Kind = _codeSession ? ProgramType.Code : ProgramType.Database,

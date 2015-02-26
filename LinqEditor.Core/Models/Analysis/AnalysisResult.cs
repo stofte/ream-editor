@@ -8,6 +8,13 @@ namespace LinqEditor.Core.Models.Analysis
 {
     public class AnalysisResult
     {
+        public AnalysisResult()
+        {
+            Errors = new List<Error>();
+            Warnings = new List<Warning>();
+            MemberCompletions = new List<CompletionEntry>();
+        }
+
         public IEnumerable<CompletionEntry> MemberCompletions { get; set; }
         public ToolTipData ToolTip { get; set; }
         public UserContext Context { get; set; }

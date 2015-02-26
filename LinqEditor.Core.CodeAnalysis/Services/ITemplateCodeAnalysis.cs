@@ -7,6 +7,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
     /// </summary>
     public interface ITemplateCodeAnalysis
     {
+        int IndexOffset { get; }
+        int LineOffset { get; }
         bool IsReady { get; }
         void Initialize(string assemblyPath = null);
         /// <summary>

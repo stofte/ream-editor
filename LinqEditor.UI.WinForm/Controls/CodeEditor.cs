@@ -17,6 +17,7 @@ namespace LinqEditor.UI.WinForm.Controls
 {
     public class CodeEditor : UserControl, IDisposable
     {
+        const string Zws = "\u200B";
         const int TimerTickMs = 100;
         const int AnalyzeTickMs = 1000;
         const int NotReadyTickMs = 50;
@@ -35,7 +36,11 @@ namespace LinqEditor.UI.WinForm.Controls
         bool _textUpdated = true; // sets analyser timer going
         Timer _analyzeTimer;
 
-        public string SourceCode { get { return _editor.Text; } }
+        public string SourceCode { get {
+
+            return _editor.Text.Replace(Zws, "");
+        }
+        }
 
         public CodeEditor(IAsyncSessionFactory sessionFactory, ToolTip2 tooltip)
         {
@@ -176,9 +181,25 @@ namespace LinqEditor.UI.WinForm.Controls
                         // first time we hit this branch we completed the analysis
                         _analyzeTimer.Interval = AnalyzeTickMs;
                     }
+
+                    DrawErrors(result.Errors);
                 }
                 _analyzeTimer.Start();
             };
+        }
+
+        void DrawErrors(IEnumerable<Error> errors)
+        {
+            
+            _editor.Indicators[0].Style = ScintillaNET.IndicatorStyle.Squiggle;
+            _editor.Indicators[0].Color = Color.Red;
+            _editor.GetRange().ClearIndicator(0); 
+            foreach (var err in errors)
+            {
+                var offset = err.Location.StartIndex == err.Location.EndIndex ? 1 : 0;
+                var range = _editor.GetRange(err.Location.StartIndex - offset, err.Location.EndIndex);
+                range.SetIndicator(0);
+            }
         }
 
         async void _editor_CharAdded(object sender, ScintillaNET.CharAddedEventArgs e)
@@ -187,7 +208,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
             if (e.Ch == '.')
             {
-                var result = await _session.AnalyzeAsync(_editor.Text, _editor.CurrentPos - 1);
+                var result = await _session.AnalyzeAsync(SourceCode, _editor.CurrentPos - 1);
                 if (result.Context == UserContext.MemberCompletion)
                 {
                     _editor.AutoComplete.FillUpCharacters = "";
@@ -215,7 +236,7 @@ namespace LinqEditor.UI.WinForm.Controls
                 var endX = _editorNative.PointXFromPosition(end);
                 var endY = _editorNative.PointYFromPosition(end);
 
-                var analysisResult = await _session.AnalyzeAsync(_editor.Text, current);
+                var analysisResult = await _session.AnalyzeAsync(SourceCode, current);
 
                 if (current == _tipWord && analysisResult.Context == UserContext.ToolTip)
                 {

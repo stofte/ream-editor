@@ -109,7 +109,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             });
         }
 
-        public static IEnumerable<Error> GetErrors(ImmutableArray<Diagnostic> diagnostics)
+        public static IEnumerable<Error> GetErrors(ImmutableArray<Diagnostic> diagnostics, int markerOffset = 0)
         {
             return diagnostics.Where(e => e.Severity == DiagnosticSeverity.Error).Select(x =>
             {
@@ -119,8 +119,11 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     // errors are for display purposes, so offsetting one
                     Location = new LocationSpan
                     {
+                        // the index is for the editor
+                        StartIndex = x.Location.SourceSpan.Start,
                         StartLine = loc.Start.Line + 1,
                         StartColumn = loc.Start.Character + 1,
+                        EndIndex = x.Location.SourceSpan.End,
                         EndLine = loc.End.Line + 1,
                         EndColumn = loc.End.Character + 1
                     },

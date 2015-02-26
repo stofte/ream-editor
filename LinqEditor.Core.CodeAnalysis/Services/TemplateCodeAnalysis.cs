@@ -26,7 +26,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         // instance data
         protected bool _initialized;
         protected string _initialSource;
-        protected int _sourceOffset;
+        public int IndexOffset { get; set; }
+        public int LineOffset { get; set; }
         protected string _namespace;
         protected string _entryClass;
 
@@ -68,9 +69,22 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var tree = CSharpSyntaxTree.ParseText(_initialSource);
             IEnumerable<Warning> warnings = new List<Warning>();
             IEnumerable<Error> errors = new List<Error>();
-            var semanticModel = GetModelAndDiagnostics(tree, out warnings, out errors);
+            var result = GetModelAndDiagnostics(tree);
+            var semanticModel = result.Item1;
+            _warnings = result.Item2;
+            _errors = result.Item3;
             _extensionMethods = CodeAnalysisHelper.GetExtensionMethods(semanticModel);
-            _sourceOffset = _initialSource.IndexOf(SchemaConstants.Marker);
+            // assumes marker is at column 0
+            var lines = _initialSource.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            for (var i = 0; i < lines.Length; i++) 
+            {
+                if (lines[i].StartsWith(SchemaConstants.Marker))
+                {
+                    LineOffset = i;
+                    break;
+                }
+            }
+            IndexOffset = _initialSource.IndexOf(SchemaConstants.Marker);
             _initialized = true;
 
             var nodes = tree.GetRoot().DescendantNodes();
@@ -112,11 +126,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
             var ctx = UserContext.Unknown;
             IEnumerable<CompletionEntry> suggestions = new List<CompletionEntry>();
-            IEnumerable<Warning> warnings = new List<Warning>();
-            IEnumerable<Error> errors = new List<Error>();
             ToolTipData tooltip = new ToolTipData();
             
-            var oneCharTextSpan = new TextSpan(_sourceOffset + updateIndex, 1);
+            var oneCharTextSpan = new TextSpan(IndexOffset + updateIndex, 1);
             var nodes = _currentTree.DescendantNodes(oneCharTextSpan);
             var allNodes = _currentTree.DescendantNodes().OfType<CSharpSyntaxNode>();
 
@@ -207,8 +219,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             {
                 Context = ctx,
                 MemberCompletions = suggestions.OrderBy(x => x.Value).ThenBy(x => x.Kind),
-                Errors = errors,
-                Warnings = warnings,
+                Errors = _errors,
+                Warnings = _warnings,
                 ToolTip = tooltip
             };
         }
@@ -218,12 +230,15 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _currentStub = sourceFragment;
             var currentSource = _initialSource.Replace(SchemaConstants.Marker, _currentStub);
             var tree = CSharpSyntaxTree.ParseText(currentSource);
-            _currentModel = GetModelAndDiagnostics(tree, out _warnings, out _errors);
+            var result = GetModelAndDiagnostics(tree);
+            _currentModel = result.Item1;
+            _warnings = result.Item2;
+            _errors = result.Item3;
             _currentTree = tree.GetRoot();
         }
 
 
-        protected SemanticModel GetModelAndDiagnostics(SyntaxTree tree, out IEnumerable<Warning> warnings, out IEnumerable<Error> errors)
+        protected Tuple<SemanticModel, IEnumerable<Warning>, IEnumerable<Error>> GetModelAndDiagnostics(SyntaxTree tree)
         {
             var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var comp = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix(SchemaConstants.QueryPrefix))
@@ -232,9 +247,20 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 .AddSyntaxTrees(tree);
 
             var diag = comp.GetDiagnostics();
-            warnings = CodeAnalysisHelper.GetWarnings(diag);
-            errors = CodeAnalysisHelper.GetErrors(diag);
-            return comp.GetSemanticModel(tree);
+            var warnings = CodeAnalysisHelper.GetWarnings(diag)
+                .Select(x => new Warning 
+                { 
+                    Location = x.Location.Offset(-IndexOffset, -LineOffset), 
+                    Message = x.Message 
+                });
+            var errors = CodeAnalysisHelper.GetErrors(diag)
+                .Select(x => new Error 
+                { 
+                    Location = x.Location.Offset(-IndexOffset, -LineOffset), 
+                    Message = x.Message 
+                });
+            return Tuple.Create(comp.GetSemanticModel(tree), warnings, errors);
+            //return comp.GetSemanticModel(tree);
         }
 
         /// <summary>

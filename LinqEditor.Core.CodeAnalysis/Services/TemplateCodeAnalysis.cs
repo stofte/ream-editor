@@ -132,7 +132,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var nodes = _currentTree.DescendantNodes(oneCharTextSpan);
             var allNodes = _currentTree.DescendantNodes().OfType<CSharpSyntaxNode>();
 
-            if (_currentStub[updateIndex] == '.')
+            if (!string.IsNullOrWhiteSpace(_currentStub) && 
+                updateIndex < _currentStub.Length &&
+                _currentStub[updateIndex] == '.')
             {
                 // check if context is really member access
                 var syntaxNode = nodes.OfType<MemberAccessExpressionSyntax>().LastOrDefault();

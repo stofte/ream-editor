@@ -5,3 +5,5 @@ TestResults
 */**/*.csproj.user
 packages/*
 *.gpState
+*.vsp
+*.psess

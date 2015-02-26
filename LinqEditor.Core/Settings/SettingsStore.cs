@@ -53,7 +53,7 @@ namespace LinqEditor.Core.Settings
                 Guid.TryParse(Get<string>("lastConnectionUsed"), out res);
                 return res;
             }
-            set { Set("lastConnectionUsed", value); }
+            set { Set("lastConnectionUsed", value.ToString()); }
         }
 
         void Set(string key, object val)

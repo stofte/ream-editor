@@ -168,7 +168,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _analyzeTimer.Tick += async delegate
             {
                 _analyzeTimer.Stop();
-                if (_textUpdated)
+                if (_textUpdated && _session != null)
                 {
                     _textUpdated = false;
                     var result = await _session.AnalyzeAsync(_editor.Text);

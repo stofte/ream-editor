@@ -20,6 +20,7 @@ namespace LinqEditor.UI.WinForm.Controls
         const string Zws = "\u200B";
         const int TimerTickMs = 100;
         const int AnalyzeTickMs = 1000;
+        const int UpdateTimeoutMs = 1500;
         const int NotReadyTickMs = 50;
         Font EditorFont = new Font("Consolas", 10);
 
@@ -33,8 +34,8 @@ namespace LinqEditor.UI.WinForm.Controls
         Timer _tipTimer;
         int _tipWord;
         int _textLineHeight;
-        bool _textUpdated = true; // sets analyser timer going
         Timer _analyzeTimer;
+        Stopwatch _updatedTimer;
 
         public string SourceCode { get {
 
@@ -46,6 +47,7 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             _sessionFactory = sessionFactory;
             _tooltip = tooltip;
+            _updatedTimer = new Stopwatch();
             InitializeComponent();
         }
 
@@ -105,6 +107,7 @@ namespace LinqEditor.UI.WinForm.Controls
             
             _editor.TextChanged += delegate
             {
+                _updatedTimer.Restart();
                 _textUpdated = true;
             };
 
@@ -164,24 +167,14 @@ namespace LinqEditor.UI.WinForm.Controls
             _tipTimer.Tick += tipTick;
 
             _analyzeTimer = new Timer();
-            _analyzeTimer.Interval = NotReadyTickMs;
+            _analyzeTimer.Interval = AnalyzeTickMs;
             _analyzeTimer.Tick += async delegate
             {
                 _analyzeTimer.Stop();
-                if (_textUpdated && _session != null)
+                if (_updatedTimer.ElapsedMilliseconds > UpdateTimeoutMs && _session != null)
                 {
                     _textUpdated = false;
                     var result = await _session.AnalyzeAsync(_editor.Text);
-                    if (result.Context == UserContext.NotReady) 
-                    {
-                        _textUpdated = true; // retry
-                    }
-                    else
-                    {
-                        // first time we hit this branch we completed the analysis
-                        _analyzeTimer.Interval = AnalyzeTickMs;
-                    }
-
                     DrawErrors(result.Errors);
                 }
                 _analyzeTimer.Start();
@@ -190,7 +183,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
         void DrawErrors(IEnumerable<Error> errors)
         {
-            
+            if (_editor.AutoComplete.IsActive) return;
             _editor.Indicators[0].Style = ScintillaNET.IndicatorStyle.Squiggle;
             _editor.Indicators[0].Color = Color.Red;
             _editor.GetRange().ClearIndicator(0); 

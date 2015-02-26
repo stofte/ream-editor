@@ -85,6 +85,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _mainContainer.Panel2MinSize = 20;
             _mainContainer.GotFocus += _mainContainer_GotFocus;
             _mainContainer.SplitterMoved += _mainContainer_SplitterMoved;
+            _mainContainer.LostFocus += _mainContainer_LostFocus;
 
             // status
             _statusBar.Dock = DockStyle.Bottom;
@@ -237,6 +238,7 @@ namespace LinqEditor.UI.WinForm.Controls
         }
 
 
+
         void BindConnections()
         {
             var selected = _contextSelector.SelectedItem as Connection;
@@ -298,6 +300,14 @@ namespace LinqEditor.UI.WinForm.Controls
             }
         }
 
+        void _mainContainer_LostFocus(object sender, EventArgs e)
+        {
+            if (_restoreEditorFocusOnSplitterMoved)
+            {
+                _editor.Focus();
+            }
+        }
+
         void _editor_LostFocus(object sender, EventArgs e)
         {
             _editorFocusTimer.Restart();
@@ -314,6 +324,8 @@ namespace LinqEditor.UI.WinForm.Controls
             _editorFocusTimer.Stop();
             _restoreEditorFocusOnSplitterMoved = _editorFocusTimer.ElapsedMilliseconds < 50; // more fudging
         }
+
+
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {

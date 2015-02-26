@@ -228,7 +228,7 @@ namespace LinqEditor.UI.WinForm.Controls
             // handle tooltip logic
             var inside = CursorInside;
             var current = _tipWord;
-            if (current > -1 && inside && !_tooltip.Showing)
+            if (_session != null && current > -1 && inside && !_tooltip.Showing)
             {
                 var end = _editorNative.WordEndPosition(current, true);
                 var startX = _editorNative.PointXFromPosition(current);

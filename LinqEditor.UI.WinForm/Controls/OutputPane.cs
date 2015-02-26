@@ -37,7 +37,9 @@ namespace LinqEditor.UI.WinForm.Controls
             });
             _diagnosticsTab = new TabPage("Errors");
             _diagnosticsTab.ClientSizeChanged += TabClientSizeChangedHandler;
+            
             _diagnosticsList = new DataGridView();
+            _diagnosticsList.Font = SystemFonts.DialogFont;
             _diagnosticsList.ReadOnly = true;
             _diagnosticsList.AllowUserToAddRows = false;
             _diagnosticsList.DataBindingComplete += DiagnosticsListDataBindingCompleteHandler;

@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.Models.Analysis;
+using LinqEditor.Core.Models.Database;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -150,7 +151,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 
 
         // todo: anonymous?
-        public static TypeInformation GetTypeInformation(INamedTypeSymbol t, string entryClass)
+        public static TypeInformation GetTypeInformation(INamedTypeSymbol t, string entryClass, string schemaNs = null, DatabaseSchema schema = null)
         {
             var objectEntries = new[] {
                 new TypeMember { IsStatic = true, Accessibility = AccessibilityModifier.Public, Kind = MemberKind.Method, Name = "Equals" },
@@ -179,13 +180,22 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     Name = x.Name
                 });
 
+            Func<IPropertySymbol, MemberKind> mapPropery = (prop) =>
+            {
+                var typeStr = GetBasicName(prop.Type) ?? string.Empty;
+                var containerStr = GetBasicName(prop.ContainingType) ?? string.Empty;
+
+                return typeStr.StartsWith("IQToolkit.IEntityTable") ? MemberKind.DatabaseTable :
+                    !string.IsNullOrWhiteSpace(schemaNs) && containerStr.StartsWith(schemaNs) ? MemberKind.TableColumn : MemberKind.Property;
+            };
+
             var properties = t.GetMembers().OfType<IPropertySymbol>()
                 .Where(x => x.CanBeReferencedByName && !x.IsIndexer)
                 .Select(x => new TypeMember
                 {
                     IsStatic = x.IsStatic,
                     Accessibility = mapAccess(x.DeclaredAccessibility),
-                    Kind = MemberKind.Property,
+                    Kind = mapPropery(x),
                     Name = x.Name
                 });
 

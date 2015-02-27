@@ -30,6 +30,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         public int LineOffset { get; set; }
         protected string _namespace;
         protected string _entryClass;
+        protected string _schemaNamespace;
 
         // current analysis model
         protected string _currentStub;
@@ -58,6 +59,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             // update references
             if (!string.IsNullOrEmpty(assemblyPath))
             {
+                _schemaNamespace = schemaNamespace;
                 _references = _references.Concat(new[] { MetadataReference.CreateFromFile(assemblyPath) }).ToArray();
                 _initialSource = _templateService.GenerateQuery(Guid.NewGuid(), SchemaConstants.Marker, schemaNamespace);
             }
@@ -155,7 +157,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     ctx = UserContext.MemberCompletion;
                     // get all applicable extensions
                     var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo, _extensionMethods);
-                    TypeInformation mainType = CodeAnalysisHelper.GetTypeInformation(typeInfo.Type as INamedTypeSymbol, entryClass);
+                    TypeInformation mainType = CodeAnalysisHelper.GetTypeInformation(typeInfo.Type as INamedTypeSymbol, entryClass, _schemaNamespace);
                     TypeInformation subType = null;
                     var isStatic = symInfo.Symbol.IsStatic || symInfo.Symbol.Kind == SymbolKind.NamedType;
 
@@ -168,7 +170,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                             EntryClass = true,
                             Name = mainType.Name,
                             Namespace = mainType.Namespace,
-                            Members = subType.Members.Where(x => x.Kind == MemberKind.Property)
+                            Members = subType.Members.Where(x => 
+                                new [] {MemberKind.Property, MemberKind.DatabaseTable, MemberKind.TableColumn}.Contains(x.Kind))
                         }, new List<TypeMember>(), isStatic);
                     }
                     else

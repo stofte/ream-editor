@@ -143,6 +143,8 @@ namespace LinqEditor.UI.WinForm.Controls
             imageList.Images.Add(Resources.Types.Property_501);
             imageList.Images.Add(Resources.Types.Method_636);
             imageList.Images.Add(Resources.Types.ExtensionMethod_9571);
+            imageList.Images.Add(Resources.Types.Table_748);
+            imageList.Images.Add(Resources.Types.column_16xLG);
             
             _editor.AutoComplete.RegisterImages(imageList, System.Drawing.Color.Magenta);
             _editor.AutoComplete.MaxHeight = 10;

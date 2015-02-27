@@ -6,6 +6,8 @@ namespace LinqEditor.Core.Models.Analysis
         Field = 0,
         Property,
         Method,
-        ExtensionMethod
+        ExtensionMethod,
+        DatabaseTable,
+        TableColumn
     }
 }

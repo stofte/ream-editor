@@ -5,10 +5,12 @@ using Castle.Windsor.Installer;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Settings;
 using LinqEditor.Core.Templates;
+using LinqEditor.Test.Common;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -32,6 +34,7 @@ namespace LinqEditor.Core.Session.Tests
         Guid _queryId3 = Guid.NewGuid();
         Guid _connectionId;
         IConnectionStore _testConnections;
+        IWindsorContainer _container;
 
         [TestFixtureSetUp]
         public void Initialize()
@@ -67,28 +70,27 @@ namespace LinqEditor.Core.Session.Tests
                 }
             }.AsEnumerable());
             _testConnections = mockConnections.Object;
-        }
 
-        [Test]
-        public async void Can_Initialize_Second_BackgroundSession_After_Initialization()
-        {
-            
-            var container = new WindsorContainer();
-            container.AddFacility<TypedFactoryFacility>();
+            _container = new WindsorContainer();
+            _container.AddFacility<TypedFactoryFacility>();
 
-            container.Install(FromAssembly.Containing<IConnectionStore>()); // core
-            container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
-            container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
-            container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
-            container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
+            _container.Install(FromAssembly.Containing<IConnectionStore>()); // core
+            _container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
+            _container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
+            _container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
+            _container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
 
-            container.Register(Component.For<IConnectionStore>()
+            _container.Register(Component.For<IConnectionStore>()
                                         .Instance(_testConnections)
                                         .Named("test-connections")
                                         .IsDefault());
+        }
 
-            var factory1 = container.Resolve<IAsyncSessionFactory>();
-            var factory2 = container.Resolve<IAsyncSessionFactory>();
+        [Test]
+        public void Can_Initialize_Second_BackgroundSession_After_Initialization()
+        {
+            var factory1 = _container.Resolve<IAsyncSessionFactory>();
+            var factory2 = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
 
             int firstHash = 0;
@@ -115,6 +117,28 @@ namespace LinqEditor.Core.Session.Tests
 
             // second session must be same instance
             Assert.AreEqual(firstHash, secondHash);
+        }
+
+        [TestCase(VSCompletionTestData.ThisAccessInDb)]
+        [TestCase(VSCompletionTestData.FooColumnAccessInDb)]
+        public async void Maps_Member_Completions_To_Database_Types(string testDataKey)
+        {
+            var stub = VSCompletionTestData.SourceAndData[testDataKey].Item1;
+            var offset = VSCompletionTestData.SourceAndData[testDataKey].Item2;
+            var vsEntries = VSCompletionTestData.SourceAndData[testDataKey].Item3.ToArray();
+            var factory = _container.Resolve<IAsyncSessionFactory>();
+            var id = Guid.NewGuid();
+            var session = factory.Create(id);
+            await session.InitializeAsync(_connectionId);
+            await session.LoadAppDomainAsync();
+            var result = await session.AnalyzeAsync(stub, offset);
+            var suggestions = result.MemberCompletions.ToArray();
+
+            for (var i = 0; i < vsEntries.Length; i++)
+            {
+                Assert.AreEqual(vsEntries[i].Item1, suggestions[i].Value);
+                Assert.AreEqual(vsEntries[i].Item2, suggestions[i].Kind);
+            }
         }
     }
 }

@@ -162,6 +162,12 @@
     <Content Include="..\resources\DatabaseOptions_12882.png">
       <Link>Resources\ToolStripIcons\DatabaseOptions_12882.png</Link>
     </Content>
+    <Content Include="..\resources\dbicons\column_16xLG.png">
+      <Link>Resources\TypeIcons\column_16xLG.png</Link>
+    </Content>
+    <Content Include="..\resources\dbicons\Table_748.png">
+      <Link>Resources\TypeIcons\Table_748.png</Link>
+    </Content>
     <Content Include="..\resources\ok_grey.png">
       <Link>Resources\ToolStripIcons\ok_grey.png</Link>
     </Content>

@@ -130,15 +130,15 @@ namespace Another.Generated
             editor.Initialize();
             var vsEntries = VSCompletionTestData.Data[vsEntriesKey];
             var result = editor.Analyze(src, src.Length - offset);
-            var suggesitons = result.MemberCompletions.ToArray();
+            var suggestions = result.MemberCompletions.ToArray();
 
-            var debugstr1 = string.Join("|", suggesitons.Select(x => x.Value).OrderBy(x => x));
+            var debugstr1 = string.Join("|", suggestions.Select(x => x.Value).OrderBy(x => x));
             var debugstr2 = string.Join("|", vsEntries.Select(x => x.Item1).OrderBy(x => x));
 
             for (var i = 0; i < vsEntries.Length; i++)
             {
-                Assert.AreEqual(suggesitons[i].Value, vsEntries[i].Item1);
-                Assert.AreEqual(suggesitons[i].Kind, vsEntries[i].Item2);
+                Assert.AreEqual(vsEntries[i].Item1, suggestions[i].Value);
+                Assert.AreEqual(vsEntries[i].Item2, suggestions[i].Kind);
             }
         }
 

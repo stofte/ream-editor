@@ -107,8 +107,6 @@
     <Compile Include="TemplateCodeAnalysisTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CodeAnalysisHelperTests.cs" />
-    <Compile Include="VSCompletionTestData.cs" />
-    <Compile Include="VSDocumentationTestData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LinqEditor.Core.CodeAnalysis\LinqEditor.Core.CodeAnalysis.csproj">

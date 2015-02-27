@@ -1,12 +1,43 @@
 ﻿using LinqEditor.Core.Models.Analysis;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using T = System.Tuple;
 
-namespace LinqEditor.Core.CodeAnalysis.Tests
+namespace LinqEditor.Test.Common
 {
     public static class VSCompletionTestData
     {
+        public const string ThisAccessInDb = "DbContainerThisAccess";
+        public const string FooColumnAccessInDb = "DbContainerFooAccess";
+
+        public static Dictionary<string, Tuple<string, int, IEnumerable<Tuple<string, MemberKind>>>> SourceAndData =
+            new Dictionary<string, Tuple<string, int, IEnumerable<Tuple<string, MemberKind>>>>
+        {
+            // Item1 = source stub
+            // Item2 = offset
+            // Item3 = completions list (string,type)
+            {ThisAccessInDb, 
+                Tuple.Create("this.", 4,
+                    new Tuple<string, MemberKind>[] {
+                        T.Create("Foo", MemberKind.DatabaseTable),
+                        T.Create("TypeTestTable", MemberKind.DatabaseTable)
+                    }.AsEnumerable())
+            },
+            {FooColumnAccessInDb, 
+                Tuple.Create("Foo.Select(x => x.", 17,
+                    new Tuple<string, MemberKind>[] {
+                        T.Create("Description", MemberKind.TableColumn),
+                        T.Create("Dump", MemberKind.ExtensionMethod),
+                        T.Create("Equals", MemberKind.Method),
+                        T.Create("GetHashCode", MemberKind.Method),
+                        T.Create("GetType", MemberKind.Method),
+                        T.Create("Id", MemberKind.TableColumn),
+                        T.Create("ToString", MemberKind.Method),
+                    }.AsEnumerable())
+            },
+        };
+
         // lets us pass constant keys to access the test data 
         public static Dictionary<string, Tuple<string, MemberKind>[]> Data = new Dictionary<string, Tuple<string, MemberKind>[]>
         {

@@ -83,7 +83,7 @@ namespace Test
             _tree1 = CSharpSyntaxTree.ParseText(_source1);
             var compilation1 = CSharpCompilation.Create("comp1")
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
                 .AddSyntaxTrees(new SyntaxTree[] { _tree1 });
 
             _model1 = compilation1.GetSemanticModel(_tree1);
@@ -94,7 +94,7 @@ namespace Test
             _tree2 = CSharpSyntaxTree.ParseText(_source2);
             var compilation2 = CSharpCompilation.Create("comp2")
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
                 .AddSyntaxTrees(new SyntaxTree[] { _tree2 });
             _model2 = compilation2.GetSemanticModel(_tree2);
             _stubOffset = _source1.IndexOf(SchemaConstants.Marker) + _sourceStub2.Length - 1;
@@ -104,7 +104,7 @@ namespace Test
             _tree3 = CSharpSyntaxTree.ParseText(_source3);
             var compilation3 = CSharpCompilation.Create("comp3")
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
                 .AddSyntaxTrees(new SyntaxTree[] { _tree3 });
 
             var warns = CodeAnalysisHelper.GetErrors(compilation3.GetDiagnostics());
@@ -172,7 +172,7 @@ namespace Test
 
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             var semanticModel = compilation.GetSemanticModel(tree);
@@ -196,7 +196,7 @@ namespace Test
 
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences())
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             var semanticModel = compilation.GetSemanticModel(tree);

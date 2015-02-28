@@ -67,7 +67,11 @@ namespace LinqEditor.UI.WinForm.Controls
                 _statusLabel.Invalidate();
                 var elapsed = _elapsedTimer.Elapsed;
                 // assumes 24 hours is enough
-                _elapsedLabel.Text = string.Format("{0}:{1}:{2}:{3}", elapsed.Hours, elapsed.Minutes.ToString("D2"), elapsed.Seconds.ToString("D2"), elapsed.Milliseconds.ToString("D3"));
+                _elapsedLabel.Text = string.Format("{0}:{1}:{2}:{3}", 
+                    elapsed.Hours, 
+                    elapsed.Minutes.ToString("D2"), 
+                    elapsed.Seconds.ToString("D2"), 
+                    elapsed.Milliseconds.ToString("D3"));
             };
             _statusTimer.Start();
             
@@ -78,8 +82,6 @@ namespace LinqEditor.UI.WinForm.Controls
             // loads schema etc in async handlers
             Load += Main_Load;
 
-            
-            
             _mainContainer.Location = new Point(0, 0);
             _mainContainer.Orientation = Orientation.Horizontal;
             _mainContainer.Dock = DockStyle.Fill;
@@ -107,12 +109,12 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusLabel.Alignment = ToolStripItemAlignment.Left;
             _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
             _timeLabel = new ToolStripStatusLabel();
-            _timeLabel.Alignment = ToolStripItemAlignment.Left;
+            _timeLabel.Alignment = ToolStripItemAlignment.Right;
             _rowCountLabel = new ToolStripStatusLabel();
             _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
             _elapsedLabel = new ToolStripStatusLabel();
             _elapsedLabel.Alignment = ToolStripItemAlignment.Right;
-            _statusBar.Items.AddRange(new[] { _statusLabel, _timeLabel, _elapsedLabel, _rowCountLabel });
+            _statusBar.Items.AddRange(new[] { _statusLabel, _elapsedLabel, _rowCountLabel });
 
             // scintilla
             _editor = editor;
@@ -214,14 +216,14 @@ namespace LinqEditor.UI.WinForm.Controls
                     _executeButton.Enabled = true;
                     _statusLabel.Text = ApplicationStrings.EDITOR_READY;
                     _statusLabel.Image = Icons.ok_grey;
-                    _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
+                    _timeLabel.Text = ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN;
                     _settingsStore.LastConnectionUsed = selected.Id;
                 }
                 else
                 {
                     _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_INITIALIZATION_ERROR;
                     _statusLabel.Image = Icons.critical;
-                    _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_COMPLETED_IN, _sessionLoadMs);
+                    _timeLabel.Text = ApplicationStrings.EDITOR_TIMER_COMPLETED_IN;
                     var msg = string.Format(ApplicationStrings.MESSAGE_BODY_SESSION_INITIALIZATION_ERROR, selected.ToString(), _initErrorMsg);
                     MessageBox.Show(msg, ApplicationStrings.MESSAGE_CAPTION_ERROR, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -250,8 +252,6 @@ namespace LinqEditor.UI.WinForm.Controls
             ResumeLayout(false);
             PerformLayout();
         }
-
-
 
         void BindConnections()
         {
@@ -341,8 +341,6 @@ namespace LinqEditor.UI.WinForm.Controls
             _restoreEditorFocusOnSplitterMoved = _editorFocusTimer.ElapsedMilliseconds < 50; // more fudging
         }
 
-
-
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.F5)
@@ -379,7 +377,7 @@ namespace LinqEditor.UI.WinForm.Controls
             }
             await BindSession(id);
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
-            _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
+            _timeLabel.Text = ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN;
             
             _statusLabel.Image = Icons.ok_grey;
             _executeButton.Enabled = true;
@@ -406,11 +404,11 @@ namespace LinqEditor.UI.WinForm.Controls
             {
                 _statusLabel.Text = ApplicationStrings.EDITOR_SESSION_LOADING;
                 var reInitResult = await _session.ReinitializeAsync();
-                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_QUERY_CANCELLED_AFTER, result.DurationMs + reInitResult.DurationMs);
+                _timeLabel.Text = ApplicationStrings.EDITOR_TIMER_QUERY_CANCELLED_AFTER;
             }
             else
             {
-                _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_COMPLETED_IN, result.DurationMs);
+                _timeLabel.Text = ApplicationStrings.EDITOR_TIMER_COMPLETED_IN;
             }
 
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;

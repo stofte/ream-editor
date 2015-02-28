@@ -45,7 +45,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _initialized = false;
             _templateService = templateService;
             _documentationService = documentationService;
-            _references = CSharpCompiler.GetStandardReferences();
+            _references = CSharpCompiler.GetStandardReferences(includeDocumentation: false);
         }
 
         public void Initialize(string assemblyPath = null)

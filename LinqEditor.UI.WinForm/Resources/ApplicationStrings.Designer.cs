@@ -106,7 +106,7 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (completed in {0}ms).
+        ///   Looks up a localized string similar to Completed in.
         /// </summary>
         internal static string EDITOR_TIMER_COMPLETED_IN {
             get {
@@ -115,7 +115,7 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (cancelled after {0}ms).
+        ///   Looks up a localized string similar to Cancelled after.
         /// </summary>
         internal static string EDITOR_TIMER_QUERY_CANCELLED_AFTER {
             get {
@@ -124,7 +124,7 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (loaded in {0}ms).
+        ///   Looks up a localized string similar to Loaded in.
         /// </summary>
         internal static string EDITOR_TIMER_SESSION_LOADED_IN {
             get {

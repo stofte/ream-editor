@@ -133,13 +133,13 @@
     <value>Loading session</value>
   </data>
   <data name="EDITOR_TIMER_COMPLETED_IN" xml:space="preserve">
-    <value>(completed in {0}ms)</value>
+    <value>Completed in</value>
   </data>
   <data name="EDITOR_TIMER_QUERY_CANCELLED_AFTER" xml:space="preserve">
-    <value>(cancelled after {0}ms)</value>
+    <value>Cancelled after</value>
   </data>
   <data name="EDITOR_TIMER_SESSION_LOADED_IN" xml:space="preserve">
-    <value>(loaded in {0}ms)</value>
+    <value>Loaded in</value>
   </data>
   <data name="MESSAGE_BODY_CONNECTION_STRING_PARSE_ERROR" xml:space="preserve">
     <value>Could not validate the connection string</value>

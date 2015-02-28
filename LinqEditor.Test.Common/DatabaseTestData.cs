@@ -13,6 +13,7 @@ namespace LinqEditor.Test.Common
         public const string Connstr2 = @"Data Source=sql.somewhere,1437; UID=yyy; PWD=xxx; DATABASE=mydbname";
         public const string Invalid1 = @"not a connection string";
 
-        public const string NonExistingServerConnStr = @"Data Source=nowhere;Integrated Security=True;Initial Catalog=Opera56100DB";
+        // also sets lower timeout to speed up test
+        public const string NonExistingServerConnStr = @"Data Source=nowhere;Integrated Security=True;Initial Catalog=Opera56100DB;Timeout=3";
     }
 }

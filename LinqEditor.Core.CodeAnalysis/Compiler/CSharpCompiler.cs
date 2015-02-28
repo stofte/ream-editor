@@ -37,7 +37,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             };
         }
 
-        public static MetadataReference[] GetStandardReferences()
+        public static MetadataReference[] GetStandardReferences(bool includeDocumentation = true)
         {
             var assems = new List<MetadataReference>();
             // todo: supposedly passing in CustomDocumentationProvider here would
@@ -46,7 +46,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             // from a custom service (DocumentationService), which builds a list of 
             // CustomDocumentationProvider by using the above GetAssemblies methods.
             return assems
-                .Concat(GetCoreAssemblies().Select(x => 
+                .Concat(GetCoreAssemblies().Select(x => !includeDocumentation ? MetadataReference.CreateFromAssembly(x) :
                     MetadataReference.CreateFromAssembly(x, MetadataReferenceProperties.Assembly, new CustomDocumentationProvider(x))))
                 .Concat(GetCustomAssemblies().Select(x => MetadataReference.CreateFromAssembly(x)))
                 .ToArray();
@@ -60,7 +60,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             }
             var refs = references.Select(x => x is string ? 
                 MetadataReference.CreateFromFile(x as string) : MetadataReference.CreateFromImage(x as byte[]));
-            return Compile(src, assemblyName, outputFolder, GetStandardReferences().Concat(refs));
+            return Compile(src, assemblyName, outputFolder, GetStandardReferences(includeDocumentation: false).Concat(refs));
         }
 
         public static CompilerResult CompileToBytes(string src, string assemblyName, params object[] references)
@@ -71,7 +71,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             }
             var refs = references.Select(x => x is string ? 
                 MetadataReference.CreateFromFile(x as string) : MetadataReference.CreateFromImage(x as byte[]));
-            return Compile(src, assemblyName, null, GetStandardReferences().Concat(refs));
+            return Compile(src, assemblyName, null, GetStandardReferences(includeDocumentation: false).Concat(refs));
         }
 
         private static CompilerResult Compile(string src, string assemblyName, string outputFolder, IEnumerable<MetadataReference> references)

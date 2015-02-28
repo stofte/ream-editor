@@ -58,6 +58,7 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusBar = new StatusStrip();
             _mainContainer = new SplitContainer();
             _statusTimer = new Timer();
+            _editorFocusTimer = new Stopwatch();
             _elapsedTimer = new Stopwatch();
             _statusTimer.Interval = 20;
             // dont think this is that intensive, otherwise, ther animation skips updates it seems
@@ -77,10 +78,9 @@ namespace LinqEditor.UI.WinForm.Controls
             // loads schema etc in async handlers
             Load += Main_Load;
 
-            _editorFocusTimer = new Stopwatch();
+            
             
             _mainContainer.Location = new Point(0, 0);
-            
             _mainContainer.Orientation = Orientation.Horizontal;
             _mainContainer.Dock = DockStyle.Fill;
             _mainContainer.TabStop = false;
@@ -191,9 +191,7 @@ namespace LinqEditor.UI.WinForm.Controls
                 if (selected == null) return;
                 if (_contextId == selected.Id && _sessionLoaded) return;
 
-                //_statusTimer.Enabled = true;
                 _elapsedTimer.Restart();
-
                 _contextId = selected.Id;
                 // prevents reselecting the same menu item, if session is still loading.
                 // BindSession updates _sessionLoaded to the actual outcome
@@ -210,7 +208,6 @@ namespace LinqEditor.UI.WinForm.Controls
                 if (_contextSelector.SelectedItem != selected) return;
 
                 _elapsedTimer.Stop();
-                //_statusTimer.Enabled = false;
 
                 if (_sessionLoaded)
                 {
@@ -240,18 +237,12 @@ namespace LinqEditor.UI.WinForm.Controls
             };
 
             // add controls and resume
-            
-            
-            
-            
             _mainContainer.Panel1.Controls.Add(_editor);
             _mainContainer.Panel1.Controls.Add(_contextSelector);
-            
             _mainContainer.Panel2.Controls.Add(_outputPane);
             _mainContainer.Panel2.Controls.Add(_statusBar);
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);
-            //Controls.Add(secondStrip);
             _mainContainer.ResumeLayout(false);
             _mainContainer.PerformLayout();
             _statusBar.ResumeLayout(false);
@@ -374,7 +365,6 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void Main_Load(object sender, EventArgs e)
         {
-            //_statusTimer.Enabled = true;
             _elapsedTimer.Restart();
             // restore last used context
             var id = _settingsStore.LastConnectionUsed;
@@ -395,12 +385,10 @@ namespace LinqEditor.UI.WinForm.Controls
             _executeButton.Enabled = true;
             _enableContextSelector = true;
             _elapsedTimer.Stop();
-            //_statusTimer.Enabled = false;
         }
 
         async void _executeButton_Click(object sender, EventArgs e)
         {
-            //_statusTimer.Enabled = true;
             _elapsedTimer.Restart();
             _tokenSource = new System.Threading.CancellationTokenSource();
             _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
@@ -430,7 +418,6 @@ namespace LinqEditor.UI.WinForm.Controls
             btn.Enabled = true;
             _stopButton.Enabled = false;
             _elapsedTimer.Stop();
-            //_statusTimer.Enabled = false;
         }
     }
 }

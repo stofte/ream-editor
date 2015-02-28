@@ -65,15 +65,7 @@ namespace LinqEditor.UI.WinForm.Forms
         
         public void EnableTimer(bool enable)
         {
-            //if (enable)
-            //{
-            //    _timer.Start();
-            //}
-            //else
-            //{
-            //    _timer.Stop();
-            //    Visible = _showing = false;
-            //}
+            ;
         }
 
         public void HideTip()
@@ -152,6 +144,7 @@ namespace LinqEditor.UI.WinForm.Forms
             _timer.Interval = 50;
             _timer.Tick += delegate
             {
+                _timer.Stop();
                 var pos = MousePosition;
                 if (Visible && !_capture.Contains(pos))
                 {
@@ -169,6 +162,7 @@ namespace LinqEditor.UI.WinForm.Forms
                 Visible = _showing;
                 Top = _top;
                 Left = _left;
+                _timer.Start();
             };
             _timer.Start();
         }

@@ -65,15 +65,15 @@ namespace LinqEditor.UI.WinForm.Forms
         
         public void EnableTimer(bool enable)
         {
-            if (enable)
-            {
-                _timer.Start();
-            }
-            else
-            {
-                _timer.Stop();
-                Visible = _showing = false;
-            }
+            //if (enable)
+            //{
+            //    _timer.Start();
+            //}
+            //else
+            //{
+            //    _timer.Stop();
+            //    Visible = _showing = false;
+            //}
         }
 
         public void HideTip()
@@ -91,6 +91,14 @@ namespace LinqEditor.UI.WinForm.Forms
 
             // if we haven't detected a mouse move since last manual kill, dont do anything
             if (!_mouseMoved)
+            {
+                return;
+            }
+
+            var incomingCapture = new Rectangle(start, new Size(end.X - start.X, lineHeight));
+
+            // check if the desired location is actually still relevant (mouse may have moved already)
+            if (!incomingCapture.Contains(MousePosition))
             {
                 return;
             }
@@ -122,7 +130,7 @@ namespace LinqEditor.UI.WinForm.Forms
             Height = newHeight;
 
             // capture is the text area (rect) that the tip is associated with
-            _capture = new Rectangle(start, new Size(end.X - start.X, lineHeight));
+            _capture = incomingCapture;
             _left = end.X - Width;
             _top = end.Y + lineHeight + _textOffset;
             _text.Size = textSize;
@@ -144,7 +152,6 @@ namespace LinqEditor.UI.WinForm.Forms
             _timer.Interval = 50;
             _timer.Tick += delegate
             {
-                
                 var pos = MousePosition;
                 if (Visible && !_capture.Contains(pos))
                 {
@@ -154,7 +161,7 @@ namespace LinqEditor.UI.WinForm.Forms
 
                 // this is kinda ugly, alternative is to install global keyboard hooks.
                 // http://stackoverflow.com/questions/3312752/capturing-mouse-keyboard-events-outside-of-form-app-running-in-background
-                if (!_mouseMoved && _mouseLoc != MousePosition)
+                if (!_mouseMoved && _mouseLoc != pos)
                 {
                     _mouseMoved = true;
                 }

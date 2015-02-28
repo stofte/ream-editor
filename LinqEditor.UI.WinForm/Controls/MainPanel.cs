@@ -88,7 +88,9 @@ namespace LinqEditor.UI.WinForm.Controls
             _mainContainer.LostFocus += _mainContainer_LostFocus;
 
             // status
-            _statusBar.Dock = DockStyle.Bottom;
+            var secondStrip = new StatusStrip();
+            secondStrip.Dock = DockStyle.Bottom;
+            _statusBar.Dock = DockStyle.Top;
             _statusBar.GripStyle = ToolStripGripStyle.Hidden;
             _statusBar.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             _statusBar.SizingGrip = false;
@@ -223,12 +225,18 @@ namespace LinqEditor.UI.WinForm.Controls
             };
 
             // add controls and resume
+            
+            
+            
+            
             _mainContainer.Panel1.Controls.Add(_editor);
             _mainContainer.Panel1.Controls.Add(_contextSelector);
+            
             _mainContainer.Panel2.Controls.Add(_outputPane);
+            _mainContainer.Panel2.Controls.Add(_statusBar);
             Controls.Add(_mainContainer);
             Controls.Add(_toolbar);
-            Controls.Add(_statusBar);
+            //Controls.Add(secondStrip);
             _mainContainer.ResumeLayout(false);
             _mainContainer.PerformLayout();
             _statusBar.ResumeLayout(false);

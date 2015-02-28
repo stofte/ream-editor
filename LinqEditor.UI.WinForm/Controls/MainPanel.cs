@@ -23,10 +23,12 @@ namespace LinqEditor.UI.WinForm.Controls
         ToolStripStatusLabel _statusLabel;
         ToolStripStatusLabel _timeLabel;
         ToolStripStatusLabel _rowCountLabel;
+        ToolStripStatusLabel _elapsedLabel;
         CodeEditor _editor;
         OutputPane _outputPane;
         ComboBox _contextSelector;
         Timer _statusTimer;
+        Stopwatch _elapsedTimer;
 
         IAsyncSession _session = null;
         IAsyncSessionFactory _backgroundSessionFactory = null;
@@ -56,12 +58,17 @@ namespace LinqEditor.UI.WinForm.Controls
             _statusBar = new StatusStrip();
             _mainContainer = new SplitContainer();
             _statusTimer = new Timer();
+            _elapsedTimer = new Stopwatch();
             _statusTimer.Interval = 20;
             // dont think this is that intensive, otherwise, ther animation skips updates it seems
             _statusTimer.Tick += delegate
             {
                 _statusLabel.Invalidate();
+                var elapsed = _elapsedTimer.Elapsed;
+                // assumes 24 hours is enough
+                _elapsedLabel.Text = string.Format("{0}:{1}:{2}:{3}", elapsed.Hours, elapsed.Minutes.ToString("D2"), elapsed.Seconds.ToString("D2"), elapsed.Milliseconds.ToString("D3"));
             };
+            _statusTimer.Start();
             
             _mainContainer.SuspendLayout();
             _statusBar.SuspendLayout();
@@ -103,7 +110,9 @@ namespace LinqEditor.UI.WinForm.Controls
             _timeLabel.Alignment = ToolStripItemAlignment.Left;
             _rowCountLabel = new ToolStripStatusLabel();
             _rowCountLabel.Alignment = ToolStripItemAlignment.Right;
-            _statusBar.Items.AddRange(new[] { _statusLabel, _timeLabel, _rowCountLabel });
+            _elapsedLabel = new ToolStripStatusLabel();
+            _elapsedLabel.Alignment = ToolStripItemAlignment.Right;
+            _statusBar.Items.AddRange(new[] { _statusLabel, _timeLabel, _elapsedLabel, _rowCountLabel });
 
             // scintilla
             _editor = editor;
@@ -180,8 +189,11 @@ namespace LinqEditor.UI.WinForm.Controls
                 if (!_enableContextSelector) return;
                 var selected = _contextSelector.SelectedItem as Connection;
                 if (selected == null) return;
-
                 if (_contextId == selected.Id && _sessionLoaded) return;
+
+                //_statusTimer.Enabled = true;
+                _elapsedTimer.Restart();
+
                 _contextId = selected.Id;
                 // prevents reselecting the same menu item, if session is still loading.
                 // BindSession updates _sessionLoaded to the actual outcome
@@ -196,6 +208,9 @@ namespace LinqEditor.UI.WinForm.Controls
 
                 // if the context changed, dont do anything
                 if (_contextSelector.SelectedItem != selected) return;
+
+                _elapsedTimer.Stop();
+                //_statusTimer.Enabled = false;
 
                 if (_sessionLoaded)
                 {
@@ -270,6 +285,7 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async Task BindSession(Guid id)
         {
+
             int oldSession = -1;
             if (_session != null)
             {
@@ -358,9 +374,8 @@ namespace LinqEditor.UI.WinForm.Controls
 
         async void Main_Load(object sender, EventArgs e)
         {
-            _mainContainer.Size = ClientSize;
-            
-            _statusTimer.Enabled = true;
+            //_statusTimer.Enabled = true;
+            _elapsedTimer.Restart();
             // restore last used context
             var id = _settingsStore.LastConnectionUsed;
             _contextId = id;
@@ -375,17 +390,21 @@ namespace LinqEditor.UI.WinForm.Controls
             await BindSession(id);
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
             _timeLabel.Text = string.Format(ApplicationStrings.EDITOR_TIMER_SESSION_LOADED_IN, _sessionLoadMs);
-            _statusTimer.Enabled = false;
+            
             _statusLabel.Image = Icons.ok_grey;
             _executeButton.Enabled = true;
             _enableContextSelector = true;
+            _elapsedTimer.Stop();
+            //_statusTimer.Enabled = false;
         }
 
         async void _executeButton_Click(object sender, EventArgs e)
         {
+            //_statusTimer.Enabled = true;
+            _elapsedTimer.Restart();
             _tokenSource = new System.Threading.CancellationTokenSource();
             _statusLabel.Text = ApplicationStrings.EDITOR_QUERY_EXECUTING;
-            _statusTimer.Enabled = true;
+            
             _statusLabel.Image = Icons.spinner;
             _timeLabel.Text = string.Empty;
             var btn = sender as ToolStripButton;
@@ -407,10 +426,11 @@ namespace LinqEditor.UI.WinForm.Controls
             }
 
             _statusLabel.Text = ApplicationStrings.EDITOR_READY;
-            _statusTimer.Enabled = false;
             _statusLabel.Image = Icons.ok_grey;
             btn.Enabled = true;
             _stopButton.Enabled = false;
+            _elapsedTimer.Stop();
+            //_statusTimer.Enabled = false;
         }
     }
 }

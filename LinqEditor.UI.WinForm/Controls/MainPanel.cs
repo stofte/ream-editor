@@ -124,9 +124,14 @@ namespace LinqEditor.UI.WinForm.Controls
             // output thingy
             _outputPane = outputPane;
             _outputPane.Dock = DockStyle.Fill;
-            _outputPane.DisplayedRowCountUpdated += delegate(int count)
+            _outputPane.DisplayedRowCountUpdated += delegate(int? count)
             {
-                _rowCountLabel.Text = string.Format("{0} rows", count);
+                if (count.HasValue)
+                {
+                    
+                    _rowCountLabel.Text = string.Format("{0} rows", count);
+                }
+                _rowCountLabel.Visible = count.HasValue;
             };
 
             // toolbar

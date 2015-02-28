@@ -29,6 +29,10 @@ namespace LinqEditor.UI.WinForm.Controls
             _tabControl = new TabControl();
             _tabControl.Dock = DockStyle.Fill;
             _consoleTab = new TabPage("Console");
+            _consoleTab.Enter += delegate
+            {
+                BindRowCount(null);
+            };
             _diagnostics = new DataTable();
             _diagnostics.Columns.AddRange(new[]{
                 new DataColumn("Category", typeof(string)),
@@ -37,6 +41,10 @@ namespace LinqEditor.UI.WinForm.Controls
             });
             _diagnosticsTab = new TabPage("Errors");
             _diagnosticsTab.ClientSizeChanged += TabClientSizeChangedHandler;
+            _diagnosticsTab.Enter += delegate
+            {
+                BindRowCount(null);
+            };
             
             _diagnosticsList = new DataGridView();
             _diagnosticsList.Font = SystemFonts.DialogFont;
@@ -60,7 +68,7 @@ namespace LinqEditor.UI.WinForm.Controls
             ResumeLayout();
         }
 
-        public event Action<int> DisplayedRowCountUpdated;
+        public event Action<int?> DisplayedRowCountUpdated;
 
         public void BindOutput(ExecuteResult result)
         {
@@ -199,7 +207,7 @@ namespace LinqEditor.UI.WinForm.Controls
             }
         }
 
-        private void BindRowCount(int rows)
+        private void BindRowCount(int? rows)
         {
             if (DisplayedRowCountUpdated != null)
             {
@@ -219,7 +227,10 @@ namespace LinqEditor.UI.WinForm.Controls
         {
             var tab = sender as TabPage;
             var grid = tab.Controls[0] as DataGridView;
-            BindRowCount(grid.RowCount);
+            if (grid != null)
+            {
+                BindRowCount(grid.RowCount);
+            }
         }
 
         void DiagnosticsListDataBindingCompleteHandler(object sender, DataGridViewBindingCompleteEventArgs e)

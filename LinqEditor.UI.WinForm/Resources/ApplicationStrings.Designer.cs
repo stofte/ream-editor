@@ -97,7 +97,7 @@ namespace LinqEditor.UI.WinForm.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Loading session.
+        ///   Looks up a localized string similar to Loading.
         /// </summary>
         internal static string EDITOR_SESSION_LOADING {
             get {

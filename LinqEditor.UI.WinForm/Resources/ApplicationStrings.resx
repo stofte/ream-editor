@@ -130,7 +130,7 @@
     <value>No session</value>
   </data>
   <data name="EDITOR_SESSION_LOADING" xml:space="preserve">
-    <value>Loading session</value>
+    <value>Loading</value>
   </data>
   <data name="EDITOR_TIMER_COMPLETED_IN" xml:space="preserve">
     <value>Completed in</value>

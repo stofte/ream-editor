@@ -17,7 +17,6 @@ namespace LinqEditor.UI.WinForm.Forms
         Label _text;
         Timer _timer;
         
-        
         // when the tooltip is hidden, we store the mouse cords, 
         // and don't show again until the user moves the mouse again
         Point _mouseLoc;
@@ -29,6 +28,9 @@ namespace LinqEditor.UI.WinForm.Forms
         int _left;
         Point _start;
         Point _end;
+
+        // used to get the screen the main form is active on
+        Main _mainForm;
 
         // text data
         string _type;
@@ -53,6 +55,7 @@ namespace LinqEditor.UI.WinForm.Forms
         const long WS_SYSMENU = 0x00080000L;
         
         // pretty crude
+        public Func<Screen> GetPrimaryScreen { get; set; }
         public UserControl CurrentOwner { get; set; }
         public bool Showing 
         { 
@@ -87,30 +90,25 @@ namespace LinqEditor.UI.WinForm.Forms
                 return;
             }
 
-            var incomingCapture = new Rectangle(start, new Size(end.X - start.X, lineHeight));
-
             // check if the desired location is actually still relevant (mouse may have moved already)
+            var incomingCapture = new Rectangle(start, new Size(end.X - start.X, lineHeight));
             if (!incomingCapture.Contains(MousePosition))
             {
                 return;
             }
 
-            if (start == _start && end == _end && _type == data.TypeAndName && _desc == data.Description &&
-                data.Specializations.All(x => _spec.Contains(x)) && _mouseMoved) // assumes same lineheight
-            {
-                _showing = true;
-                return;
-            }
-
+            // update data
             _start = start;
             _end = end;
             _type = data.TypeAndName;
             _desc = data.Description;
             _spec = data.Specializations ?? new List<string>();
+            // capture is the text area (rect) that the tip is associated with
+            _capture = incomingCapture;
 
+            // measure up text to set overall form size
             var tooltipText = data.ToString();
             var textSize = TextRenderer.MeasureText(tooltipText, _text.Font);
-
             if (textSize.Width + _paddingHorizontal * 2 > _maxWidth)
             {
                 textSize = TextRenderer.MeasureText(tooltipText, _text.Font, proposedSize: new Size(_maxWidth, 10000));
@@ -121,13 +119,30 @@ namespace LinqEditor.UI.WinForm.Forms
             Width = newWidth;
             Height = newHeight;
 
-            // capture is the text area (rect) that the tip is associated with
-            _capture = incomingCapture;
-            _left = end.X - Width;
-            _top = end.Y + lineHeight + _textOffset;
+            // figure out where to place the tip
+            var leftEdge = end.X - Width;
+            var topEdge = end.Y + lineHeight + _textOffset;
+            if (GetPrimaryScreen != null)
+            {
+                var screen = GetPrimaryScreen().WorkingArea;
+                // see if the tip can fit in the default position
+                if (!screen.Contains(new Point(leftEdge, screen.Y)))
+                {
+                    leftEdge = start.X;
+                }
+
+                // must be able to contain all of tooltip
+                if (!screen.Contains(new Point(screen.X, topEdge + newHeight)))
+                {
+                    topEdge = end.Y - _textOffset - newHeight;
+                }
+            }
+
+            // updates positional data and control content
+            _left = leftEdge;
+            _top = topEdge;
             _text.Size = textSize;
             _text.Text = tooltipText;
-
             _showing = true;
         }
 

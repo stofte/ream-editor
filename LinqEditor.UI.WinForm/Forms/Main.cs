@@ -27,6 +27,10 @@ namespace LinqEditor.UI.WinForm.Forms
         public Main(IConnectionStore store, ISettingsStore settings, ToolTip2 tt)
         {
             _tooltip = tt;
+            _tooltip.GetPrimaryScreen = () =>
+            {
+                return Screen.FromControl(this);
+            };
             _store = store;
             _settings = settings;
             Font = SystemFonts.MenuFont;

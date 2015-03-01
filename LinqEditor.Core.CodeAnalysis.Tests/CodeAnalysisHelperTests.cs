@@ -152,15 +152,16 @@ namespace Test
             Assert.AreEqual(extensions.Single().Name, "Dump");
         }
 
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
         public void GetToolTipDisplayName_Formats_Type_Correctly(string testDataKey)
         {
             var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
+            var docData = toolTipTestData.Item3;
             var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
             var tree = CSharpSyntaxTree.ParseText(source);
 
@@ -183,8 +184,8 @@ namespace Test
             
             var actualOutput = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
 
-            Assert.AreEqual(toolTipTestData.Item3, actualOutput.Item1);
-            Assert.AreEqual(toolTipTestData.Item5, actualOutput.Item2);
+            Assert.AreEqual(docData.Item1, actualOutput.Item1);
+            Assert.AreEqual(docData.Item3, actualOutput.Item2);
         }
 
         [TestCase(SourceCodeFragments.ErrorExample1)]

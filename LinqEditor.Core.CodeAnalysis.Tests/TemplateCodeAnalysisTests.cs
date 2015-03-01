@@ -166,20 +166,14 @@ namespace Another.Generated
         // Item4 = Description
         // Item5 = Specializations
         // Item6 = DocumentationId
-
-        
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfInt32, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 0, UserContext.ToolTip)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 9, UserContext.Unknown)] // => int literal
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 5, UserContext.Unknown)] // => var name
-        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 30, UserContext.Unknown)] // => method
-        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 18, UserContext.Unknown)] // => int type
-        public void Returns_Correct_UserContext_For_VariableDeclarations(string testDataKey, int offset, UserContext ctx)
+        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
+        public void Returns_ToolTip_UserContext_For(string testDataKey)
         {
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
@@ -189,23 +183,19 @@ namespace Another.Generated
             editor.Initialize();
             var testData = VSDocumentationTestData.Data[testDataKey];
 
-            var result = editor.Analyze(testData.Item1, testData.Item2 + offset);
+            var result = editor.Analyze(testData.Item1, testData.Item2);
             
-            Assert.AreEqual(ctx, result.Context);
+            Assert.AreEqual(UserContext.ToolTip, result.Context);
         }
 
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 0)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfInt32, 0)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 0)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfDataColumn, 0)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 0)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfMultipleInts, 0)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 0)]
-        [TestCase(VSDocumentationTestData.VarDeclerationOfInt32, 9)] // => int literal
-        [TestCase(VSDocumentationTestData.VarDeclerationOfHashSet, 5)] // => var name
-        [TestCase(VSDocumentationTestData.VarDeclerationOfQueryable, 30)] // => method
-        [TestCase(VSDocumentationTestData.VarDeclerationOfGenericIntList, 18)] // => int type
-        public void Returned_Collections_Are_Always_Non_Null(string testDataKey, int offset)
+        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
+        public void Returned_Collections_Are_Always_Non_Null(string testDataKey)
         {
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
@@ -215,7 +205,7 @@ namespace Another.Generated
             var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
             editor.Initialize();
             
-            var result = editor.Analyze(testData.Item1, testData.Item2 + offset);
+            var result = editor.Analyze(testData.Item1, testData.Item2);
 
             Assert.IsNotNull(result.Errors);
             Assert.IsNotNull(result.Warnings);

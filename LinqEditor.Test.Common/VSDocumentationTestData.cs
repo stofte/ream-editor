@@ -27,7 +27,7 @@ namespace LinqEditor.Test.Common
                 @"T:System.Int32")},
             {HashSetDoc, Tuple.Create(
                 "class System.Collections.Generic.HashSet<T>", 
-                "Represents a set of values", 
+                "Represents a set of values.", 
                 new List<string>{ "T is System.Int32" }.AsEnumerable(),
                 @"T:System.Collections.Generic.HashSet`1")},
             {DataColumnDoc, Tuple.Create(
@@ -69,6 +69,7 @@ namespace LinqEditor.Test.Common
             DataColumn col = new DataColumn();
             var x = new List<int>();
             var xx = new List<int>(10).AsQueryable();
+            var set = new HashSet<int>();
         }
 
         public static Dictionary<string, Tuple<string, int, Tuple<string, string, IEnumerable<string>, string>>> Data = 

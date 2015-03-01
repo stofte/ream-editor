@@ -62,6 +62,7 @@ namespace LinqEditor.Test.Common
         public const string VarDeclOfIntListAtZero = "VarDeclOfIntList0";
 
         public const string VarDeclOfQueryableAtTen = "VarDeclOfQueryable10";
+        public const string VarDeclOfListWithCopyFromCtorAt56 = "VarDeclOfListWithCopyFromCtor56";
 
         static void Foo()
         {
@@ -93,6 +94,7 @@ namespace LinqEditor.Test.Common
 
             // access the new construtor statement
             {VarDeclOfQueryableAtTen, Tuple.Create(SourceCodeFragments.VarDeclOfQueryable, 10, DocumentationData[IntListCtorDoc])},
+            {VarDeclOfListWithCopyFromCtorAt56, Tuple.Create(SourceCodeFragments.VarDeclOfListWithCopyFromCtor, 56, DocumentationData[IntListCtorDoc])},
         };
 
     }

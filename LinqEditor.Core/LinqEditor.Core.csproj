@@ -122,6 +122,7 @@
     <Compile Include="Models\Analysis\AccessibilityModifier.cs" />
     <Compile Include="Models\Analysis\AnalysisResult.cs" />
     <Compile Include="Models\Analysis\CompletionEntry.cs" />
+    <Compile Include="Models\Analysis\DocumentationElement.cs" />
     <Compile Include="Models\Analysis\ToolTipData.cs" />
     <Compile Include="Models\Analysis\Error.cs" />
     <Compile Include="Models\Analysis\ExtensionMethodCollection.cs" />

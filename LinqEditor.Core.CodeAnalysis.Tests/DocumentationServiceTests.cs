@@ -37,7 +37,6 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
             var doc = _service.GetDocumentation(memberName);
 
             Assert.AreEqual(doc.ToString(), XElement.Parse(expectedDocumentation).ToString());
-
         }
     }
 }

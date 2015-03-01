@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.CodeAnalysis.Helpers;
+﻿using LinqEditor.Core.CodeAnalysis.Documentation;
+using LinqEditor.Core.CodeAnalysis.Helpers;
 using LinqEditor.Core.CodeAnalysis.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -37,8 +38,40 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             };
         }
 
+        private static DocumentationProvider GetDocumentationService(Assembly targetAssembly)
+        {
+            // this doesn't work either ...
+            var asm = typeof(Microsoft.CodeAnalysis.Workspace).Assembly;
+            Type providerType = null;
+            DocumentationProvider providerInstance = null;
+            try
+            {
+                var count = asm.DefinedTypes.Count();
+            }
+            // some types cannot be loaded, but the one we need can be resolved
+            catch (ReflectionTypeLoadException exn)
+            {
+                providerType = exn.Types.FirstOrDefault(x => x != null &&
+                    // the provider is a nested private sealed class
+                    x.FullName == "Microsoft.CodeAnalysis.XmlDocumentationProvider+ContentBasedXmlDocumentationProvider");
+            }
+            var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(targetAssembly);
+
+            if (providerType != null && !string.IsNullOrWhiteSpace(path))
+            {
+                var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance;
+                providerInstance = Activator.CreateInstance(providerType, flags, null, new object[] { File.ReadAllBytes(path) }, null) 
+                    as DocumentationProvider;
+            }
+
+            return providerInstance;
+        }
+
         public static MetadataReference[] GetStandardReferences(bool includeDocumentation = true)
         {
+            //var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(GetCoreAssemblies().First());
+            //var docReader = NuDoq.DocReader.Read(path);
+            //var visitor = docReader.Accept(new DocumentationVisitor());
             var assems = new List<MetadataReference>();
             // todo: supposedly passing in CustomDocumentationProvider here would
             // cause the api to return the docs through the api (GetDocumentationCommentXml)

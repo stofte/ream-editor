@@ -19,6 +19,10 @@ x.DoesNotExists();
         public const string VarDeclOfIntHashSet = @"var set = new HashSet<int>();";
         public const string FullDeclOfDataColumn = @"DataColumn col = new DataColumn();";
         public const string VarDeclOfQueryable = @"var x = new List<int>(10).AsQueryable();";
+        public const string VarDeclOfListWithCopyFromCtor = @"
+var from = new List<int> { 1, 2, 3, 4 };
+var x = new List<int>(from).AsQueryable();
+";
         public const string FullDeclOfMultipleInts = @"int x1 = 10, x2 = 20, x3 = 42;";
         public const string VarDeclOfIntList = @"var x = new List<int>();";
     }

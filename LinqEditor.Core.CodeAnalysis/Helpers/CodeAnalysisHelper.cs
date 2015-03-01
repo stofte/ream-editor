@@ -57,14 +57,29 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 // obtains symbols of any passed arguments
                 var argSymbols = ctorNode.ArgumentList.Arguments.Select(x => model.GetTypeInfo(x.Expression));
                 // match the ctor based on the arguments
-                var calledCtor = (symInfo.Symbol as INamedTypeSymbol).Constructors.FirstOrDefault(x => x.Parameters.Count() == argSymbols.Count() &&
-                    x.Parameters.Select((p, i) => p.Type == argSymbols.ElementAt(i).Type).All(b => b == true));
+                var calledCtor = (symInfo.Symbol as INamedTypeSymbol)
+                    .Constructors
+                    .FirstOrDefault(x => 
+                        // if the count matches
+                        x.Parameters.Count() == argSymbols.Count() &&
+                        x.Parameters
+                            // select into the passed args and check that either the type is a 
+                            // direct match, or that it implements the required interface
+                            .Select((p, i) => 
+                                p.Type == argSymbols.ElementAt(i).Type ||
+                                argSymbols.ElementAt(i).Type.AllInterfaces.Contains(p.Type))
+                            // all the params must match
+                            .All(b => b == true)); 
+
+
                 
                 if (calledCtor != null)
                 {
+                    // resolve the original definition, if the ctor is generic
                     var t = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ? calledCtor.OriginalDefinition : calledCtor;
                     var parts = t.ToDisplayParts();
                     var docMemberId = t.GetDocumentationCommentId();
+                    var doccsss = t.GetDocumentationCommentXml(expandIncludes: true);
                     var docs = documentationService.GetDocumentation(docMemberId);
 
                     if (docs != null)

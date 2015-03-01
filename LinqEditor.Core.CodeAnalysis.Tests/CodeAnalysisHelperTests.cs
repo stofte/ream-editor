@@ -225,6 +225,7 @@ namespace Test
         [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
         [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
         //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfListWithCopyFromCtorAt56)]
         public void Formats_ToolTip_Correctly(string testDataKey)
         {
             var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
@@ -238,7 +239,7 @@ namespace Test
 
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: true))
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             var semanticModel = compilation.GetSemanticModel(tree);

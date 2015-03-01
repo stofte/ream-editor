@@ -22,7 +22,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         public CustomDocumentationProvider(Assembly assembly)
         {
             if (assembly == null) throw new ArgumentNullException("assembly");
-
+            
             _assembly = assembly;
             _documentation = GetAssemblyDocumentation(assembly);
         }
@@ -56,27 +56,31 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
         protected XDocument GetAssemblyDocumentation(Assembly assembly)
         {
+            var path = GetAssemblyDocmentationPath(assembly);
+            return string.IsNullOrWhiteSpace(path) ? null : XDocument.Load(path);
+        }
+
+        public static string GetAssemblyDocmentationPath(Assembly assembly)
+        {
             var assemblyName = assembly.GetName().Name;
             var commonDocFolders = PathUtility.DocumentationPaths;
             var frameworkName = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
             var match = new Regex("Version=" + _versionRegex).Match(frameworkName);
             var tag = match.Groups[1].Value;
-            
-            XDocument doc = null;
+
+            string locatedDoc = null;
             foreach (var rootPath in commonDocFolders)
             {
-                var locatedDoc = GetDocPath(rootPath, assemblyName, tag);
+                locatedDoc = GetDocPath(rootPath, assemblyName, tag);
                 if (!string.IsNullOrWhiteSpace(locatedDoc))
                 {
-                    doc = XDocument.Load(locatedDoc);
-                    goto exit;
+                    break;
                 }
             }
-            exit:
-            return doc;
+            return locatedDoc;
         }
 
-        protected string GetDocPath(string folder, string assemblyName, string versionTag)
+        static string GetDocPath(string folder, string assemblyName, string versionTag)
         {
             // this folder walk assumes that the initial root folder points
             var rootInfo = new DirectoryInfo(folder);

@@ -11,12 +11,14 @@ using System;
 using System.Linq;
 using LinqEditor.Test.Common;
 using System.Text;
+using LinqEditor.Core.CodeAnalysis.Services;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
     [TestFixture]
     public class CodeAnalysisHelperTests
     {
+        IDocumentationService _documentationService;
         SemanticModel _model1;
         SyntaxTree _tree1;
         string _source1 = @"
@@ -111,7 +113,9 @@ namespace Test
             _model3 = compilation3.GetSemanticModel(_tree3);
 
             // full template
-            _stubOffset4 = _source4.IndexOf(SchemaConstants.Marker) + SchemaConstants.Marker.Length - 1;
+            _stubOffset4 = _source4.IndexOf(SchemaConstants.Marker);
+
+            _documentationService = new DocumentationService();
         }
 
         [Test]
@@ -211,6 +215,40 @@ namespace Test
 
                 Assert.AreEqual(byIndex, byLineColumn);
             }
+        }
+
+        [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
+        public void Formats_ToolTip_Correctly(string testDataKey)
+        {
+            var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
+            var docData = toolTipTestData.Item3;
+            var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
+            var tree = CSharpSyntaxTree.ParseText(source);
+
+            var dotTextSpan = new TextSpan(_stubOffset4 + toolTipTestData.Item2, 1);
+            var nodes = tree.GetRoot()
+                    .DescendantNodes(dotTextSpan);
+
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
+                .WithOptions(_compilerOptions)
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                .AddSyntaxTrees(new SyntaxTree[] { tree });
+
+            var semanticModel = compilation.GetSemanticModel(tree);
+            var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
+
+            var tip = CodeAnalysisHelper.GetToolTip(nodes, semanticModel, _documentationService);
+
+            Assert.AreEqual(docData.Item1, tip.TypeAndName);
+            Assert.AreEqual(docData.Item2, tip.Description);
+            Assert.AreEqual(docData.Item3, tip.Specializations);
         }
     }
 }

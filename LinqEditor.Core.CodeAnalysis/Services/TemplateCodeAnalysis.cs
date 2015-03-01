@@ -185,36 +185,10 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
-                // for tooltips, we need a var decl, to obtain the actual type to show
-                var varNode = nodes.OfType<VariableDeclarationSyntax>().LastOrDefault();
-                var preNode = nodes.OfType<PredefinedTypeSyntax>().FirstOrDefault();
-                var idNode = nodes.OfType<IdentifierNameSyntax>().FirstOrDefault();
-
-                if (varNode != null)
+                tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService);
+                if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
                 {
-                    var isInitialNode = preNode != null && preNode.Span.Start == varNode.SpanStart ||
-                        idNode != null && idNode.SpanStart == varNode.SpanStart;
-
-                    if (!isInitialNode) goto exit;
-
-                    var typeInfo = _currentModel.GetTypeInfo(varNode.Type);
-                    var symInfo = _currentModel.GetSymbolInfo(varNode.Type);
-                    var t = typeInfo.Type;
-                    var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
-                        t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
-
-                    var docs = _documentationService.GetDocumentation(docMemberId);
-
-                    var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
-
-                    tooltip.TypeAndName = nameAndTypes.Item1;
-                    tooltip.Specializations = nameAndTypes.Item2;
-                    tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
-
-                    if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
-                    {
-                        ctx = UserContext.ToolTip;
-                    }
+                    ctx = UserContext.ToolTip;
                 }
             }
 

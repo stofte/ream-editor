@@ -61,13 +61,14 @@ namespace LinqEditor.Test.Common
         public const string FullDeclerationOfIntAtZero = "FullDeclOfInt0";
         public const string VarDeclOfIntListAtZero = "VarDeclOfIntList0";
 
-        public const string VarDeclOfIntListAtTen = "VarDeclOfIntList10";
+        public const string VarDeclOfQueryableAtTen = "VarDeclOfQueryable10";
 
         static void Foo()
         {
             int x1 = 10;
             DataColumn col = new DataColumn();
             var x = new List<int>();
+            var xx = new List<int>(10).AsQueryable();
         }
 
         public static Dictionary<string, Tuple<string, int, Tuple<string, string, IEnumerable<string>, string>>> Data = 
@@ -90,7 +91,7 @@ namespace LinqEditor.Test.Common
             {VarDeclOfIntListAtZero, Tuple.Create(SourceCodeFragments.VarDeclOfIntList, 0, DocumentationData[IntListDoc])},
 
             // access the new construtor statement
-            {VarDeclOfIntListAtTen, Tuple.Create(SourceCodeFragments.VarDeclOfIntList, 10, DocumentationData[IntListCtorDoc])},
+            {VarDeclOfQueryableAtTen, Tuple.Create(SourceCodeFragments.VarDeclOfQueryable, 10, DocumentationData[IntListCtorDoc])},
         };
 
     }

@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Models.Analysis;
+﻿using LinqEditor.Core.CodeAnalysis.Services;
+using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Models.Database;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,6 +17,65 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// using this key to avoid conflicting with other legal identifiers.
         /// </summary>
         public const string UniversalTypeKey = "*";
+
+        /// <summary>
+        /// Attempts to find the most relevant tooltip data for the passed nodes.
+        /// </summary>
+        public static ToolTipData GetToolTip(IEnumerable<SyntaxNode> nodes, SemanticModel model, IDocumentationService documentationService)
+        {
+            ToolTipData tooltip = new ToolTipData();
+
+            var varNode = nodes.OfType<VariableDeclarationSyntax>().LastOrDefault();
+            var preNode = nodes.OfType<PredefinedTypeSyntax>().FirstOrDefault();
+            var idNode = nodes.OfType<IdentifierNameSyntax>().FirstOrDefault();
+            var ctorNode = nodes.OfType<ObjectCreationExpressionSyntax>().FirstOrDefault();
+
+            var isInitialNode = varNode != null && preNode != null && preNode.Span.Start == varNode.SpanStart ||
+                idNode != null && idNode.SpanStart == varNode.SpanStart;
+
+            var isCtorExpr = ctorNode != null;
+
+            if (isInitialNode)
+            {
+                var typeInfo = model.GetTypeInfo(varNode.Type);
+                var symInfo = model.GetSymbolInfo(varNode.Type);
+                var t = typeInfo.Type;
+                var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
+                    t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
+
+                var docs = documentationService.GetDocumentation(docMemberId);
+
+                var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
+
+                tooltip.TypeAndName = nameAndTypes.Item1;
+                tooltip.Specializations = nameAndTypes.Item2;
+                tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
+            }
+            else if (isCtorExpr)
+            {
+                var symInfo = model.GetSymbolInfo(ctorNode.Type);
+                // obtains symbols of any passed arguments
+                var argSymbols = ctorNode.ArgumentList.Arguments.Select(x => model.GetTypeInfo(x.Expression));
+                // match the ctor based on the arguments
+                var calledCtor = (symInfo.Symbol as INamedTypeSymbol).Constructors.FirstOrDefault(x => x.Parameters.Count() == argSymbols.Count() &&
+                    x.Parameters.Select((p, i) => p.Type == argSymbols.ElementAt(i).Type).All(b => b == true));
+                
+                if (calledCtor != null)
+                {
+                    var t = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ? calledCtor.OriginalDefinition : calledCtor;
+                    var parts = t.ToDisplayParts();
+                    var docMemberId = t.GetDocumentationCommentId();
+                    var docs = documentationService.GetDocumentation(docMemberId);
+
+                    if (docs != null)
+                    {
+                        tooltip.Description = docs.Element("summary").Value;
+                    }
+                }
+            }
+
+            return tooltip;
+        }
 
         /// <summary>
         /// Returns the VS style display name of the passed type, along with any type specializations.

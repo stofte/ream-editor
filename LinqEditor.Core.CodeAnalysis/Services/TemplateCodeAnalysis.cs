@@ -21,6 +21,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
     {
         // instance data
         protected IDocumentationService _documentationService;
+        protected ISymbolStore _symbolStore;
         protected ITemplateService _templateService;
         protected MetadataReference[] _references;
         protected ExtensionMethodCollection _extensionMethods;
@@ -42,12 +43,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         protected SemanticModel _currentModel;
         
 
-        public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService)
+        public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService, ISymbolStore symbolStore)
         {
             DebugLogger.Log(GetHashCode());
             _initialized = false;
             _templateService = templateService;
             _documentationService = documentationService;
+            _symbolStore = symbolStore;
             _references = CSharpCompiler.GetStandardReferences(includeDocumentation: false);
         }
 
@@ -95,6 +97,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var nodes = tree.GetRoot().DescendantNodes();
             var nsNode = nodes.OfType<NamespaceDeclarationSyntax>().LastOrDefault();
             var clsNode = nodes.OfType<ClassDeclarationSyntax>().LastOrDefault();
+            
+            // cache symbols for documentation usage
+            _symbolStore.Record(semanticModel.LookupSymbols(IndexOffset).OfType<INamedTypeSymbol>());
 
             _availableSymbols = semanticModel.LookupSymbols(IndexOffset)
                 .Where(x => x.CanBeReferencedByName).OfType<INamedTypeSymbol>();
@@ -190,6 +195,33 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
+                string commentText = string.Format(@"/// <see cref=""{0}""/>", "System.Int32");
+
+                SyntaxTriviaList leadingTrivia = SyntaxFactory.ParseLeadingTrivia(commentText);
+                Debug.Assert(leadingTrivia.Count == 1);
+                SyntaxTrivia trivia = leadingTrivia.First();
+                DocumentationCommentTriviaSyntax structure = (DocumentationCommentTriviaSyntax)trivia.GetStructure();
+                Debug.Assert(structure.Content.Count == 2);
+                XmlEmptyElementSyntax elementSyntax = (XmlEmptyElementSyntax)structure.Content[1];
+                Debug.Assert(elementSyntax.Attributes.Count == 1);
+                XmlAttributeSyntax attributeSyntax = (XmlAttributeSyntax)elementSyntax.Attributes[0];
+
+                var crefNode = attributeSyntax.CSharpKind() == SyntaxKind.XmlCrefAttribute ? attributeSyntax as XmlCrefAttributeSyntax : null;
+
+                var cref2 = CSharpSyntaxTree.ParseText(@"namespace Foo
+{
+    /// <summary>This is an xml doc comment <see cref=""T:System.Int32"" /></summary>
+    class MyClass {}
+}");
+
+                var cref1 = CSharpSyntaxTree.ParseText(@"namespace Foo
+{
+    /// <summary>This is an xml doc comment <see cref=""MyClass"" /></summary>
+    class MyClass {}
+}");
+                var xx1 = cref1.GetRoot().DescendantNodes(descendIntoTrivia: true);
+                var xx2 = cref2.GetRoot().DescendantNodes(descendIntoTrivia: true);
+
                 tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService, _availableSymbols);
                 if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
                 {

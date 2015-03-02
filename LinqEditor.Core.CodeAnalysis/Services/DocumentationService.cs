@@ -11,12 +11,15 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 {
     public class DocumentationService : IDocumentationService
     {
+        ISymbolStore _symbolStore;
+
         IEnumerable<DocumentMembers> _documents;
 
         IEnumerable<CustomDocumentationProvider> _providers;
 
-        public DocumentationService()
+        public DocumentationService(ISymbolStore symbolStore)
         {
+            _symbolStore = symbolStore;
             var list = new List<CustomDocumentationProvider>();
             var list2 = new List<DocumentMembers>();
             foreach (var assembly in CSharpCompiler.GetCoreAssemblies())

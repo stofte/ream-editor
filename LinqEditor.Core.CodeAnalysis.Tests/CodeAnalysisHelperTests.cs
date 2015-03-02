@@ -12,6 +12,7 @@ using System.Linq;
 using LinqEditor.Test.Common;
 using System.Text;
 using LinqEditor.Core.CodeAnalysis.Services;
+using Moq;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
@@ -115,7 +116,8 @@ namespace Test
             // full template
             _stubOffset4 = _source4.IndexOf(SchemaConstants.Marker);
 
-            _documentationService = new DocumentationService();
+            var symbolStoreMock = new Mock<ISymbolStore>();
+            _documentationService = new DocumentationService(symbolStoreMock.Object);
         }
 
         [Test]

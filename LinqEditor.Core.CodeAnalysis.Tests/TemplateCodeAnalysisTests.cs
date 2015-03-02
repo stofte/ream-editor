@@ -13,6 +13,7 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
     [TestFixture]
     public class TemplateCodeAnalysisTests
     {
+        ISymbolStore _mockSymbolStore;
         IDocumentationService _mockDocumentationService;
         IDocumentationService _realDocumentationService;
         ITemplateService _templateService;
@@ -90,10 +91,13 @@ namespace Another.Generated
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
             _templateService = m.Object;
 
+            var m2 = new Mock<ISymbolStore>();
+            _mockSymbolStore = m2.Object;
+
             var docMock = new Mock<IDocumentationService>();
             _mockDocumentationService = docMock.Object;
 
-            _realDocumentationService = new DocumentationService();
+            _realDocumentationService = new DocumentationService(_mockSymbolStore);
         }
 
         // "." is last char
@@ -110,7 +114,7 @@ namespace Another.Generated
         public void Returns_Correct_Context_For_Analyze(string src, int offset, UserContext editContex)
         {
 
-            var editor = new TemplateCodeAnalysis(_templateService, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(_templateService, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
             var result = editor.Analyze(src, src.Length - offset);
             Assert.AreEqual(editContex, result.Context);
@@ -126,7 +130,7 @@ namespace Another.Generated
         [TestCase("var x = new List<int>();x.Where(y => new { y.})", "IntegerValueInstance", 3, Description = "int instance 2, add closing paren")]
         public void Returns_Member_Access_Completions(string src, string vsEntriesKey, int offset)
         {
-            var editor = new TemplateCodeAnalysis(_templateService, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(_templateService, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
             var vsEntries = VSCompletionTestData.Data[vsEntriesKey];
             var result = editor.Analyze(src, src.Length - offset);
@@ -149,7 +153,7 @@ namespace Another.Generated
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgram);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgram);
 
-            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
 
             var stub = "var x = new List<int>();x.";
@@ -166,21 +170,21 @@ namespace Another.Generated
         // Item4 = Description
         // Item5 = Specializations
         // Item6 = DocumentationId
-        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
+        //[TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
+        //[TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
+        //[TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
         public void Returns_ToolTip_UserContext_For(string testDataKey)
         {
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
 
-            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
             var testData = VSDocumentationTestData.Data[testDataKey];
 
@@ -203,7 +207,7 @@ namespace Another.Generated
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
             
             var testData = VSDocumentationTestData.Data[testDataKey];
-            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
             
             var result = editor.Analyze(testData.Item1, testData.Item2);
@@ -219,7 +223,7 @@ namespace Another.Generated
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
 
-            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
 
             var stub = "var x = this;x.";
@@ -237,7 +241,7 @@ namespace Another.Generated
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
 
-            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService);
+            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService, _mockSymbolStore);
             editor.Initialize();
             var result = editor.Analyze(sourceFragment, sourceFragment.Length - 1);
 

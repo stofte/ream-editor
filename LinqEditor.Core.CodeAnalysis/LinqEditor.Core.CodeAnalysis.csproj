@@ -110,9 +110,11 @@
     <Compile Include="Services\CustomDocumentationProvider.cs" />
     <Compile Include="Services\DocumentationService.cs" />
     <Compile Include="Services\IDocumentationService.cs" />
+    <Compile Include="Services\ISymbolStore.cs" />
     <Compile Include="Services\ITemplateCodeAnalysis.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\SymbolStore.cs" />
     <Compile Include="Services\TemplateCodeAnalysis.cs">
       <SubType>Code</SubType>
     </Compile>

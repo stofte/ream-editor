@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Services;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _service = new DocumentationService();
+            var mockStore = new Mock<ISymbolStore>();
+            _service = new DocumentationService(mockStore.Object);
         }
 
         [TestCase("T:System.Int32", @"

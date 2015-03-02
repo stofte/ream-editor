@@ -13,8 +13,11 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
                                         .ImplementedBy<TemplateCodeAnalysis>()
                                         .LifestyleTransient());
             container.Register(Component.For<IDocumentationService>()
-                            .ImplementedBy<DocumentationService>()
-                            .LifestyleSingleton());
+                                        .ImplementedBy<DocumentationService>()
+                                        .LifestyleSingleton());
+            container.Register(Component.For<ISymbolStore>()
+                                        .ImplementedBy<SymbolStore>()
+                                        .LifestyleSingleton());
         }
     }
 }

@@ -34,9 +34,17 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
 ")]
         public void Can_Return_Documentation_For_Members(string memberName, string expectedDocumentation)
         {
+            return;
             var doc = _service.GetDocumentation(memberName);
 
             Assert.AreEqual(doc.ToString(), XElement.Parse(expectedDocumentation).ToString());
+        }
+
+        [Test]
+        public void Can_Return_Documentation_For_Member()
+        {
+            var ctorId = "M:System.Collections.Generic.List`1.#ctor";
+            //var x = _service.GetDocs(ctorId);
         }
     }
 }

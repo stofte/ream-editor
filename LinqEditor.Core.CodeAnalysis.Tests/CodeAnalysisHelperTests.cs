@@ -218,7 +218,7 @@ namespace Test
         }
 
         [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        //[TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
         [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
         [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
         [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
@@ -243,9 +243,10 @@ namespace Test
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             var semanticModel = compilation.GetSemanticModel(tree);
+            var availableSymbols = semanticModel.LookupSymbols(_stubOffset4).Where(x => x.CanBeReferencedByName).OfType<INamedTypeSymbol>();
             var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
 
-            var tip = CodeAnalysisHelper.GetToolTip(nodes, semanticModel, _documentationService);
+            var tip = CodeAnalysisHelper.GetToolTip(nodes, semanticModel, _documentationService, availableSymbols);
 
             Assert.AreEqual(docData.Item1, tip.TypeAndName);
             Assert.AreEqual(docData.Item2, tip.Description);

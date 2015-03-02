@@ -97,7 +97,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 
                 foreach (var file in rootInfo.EnumerateFiles("*.xml"))
                 {
-                    if (Path.GetFileNameWithoutExtension(file.Name) == assemblyName)
+                    if (Path.GetFileNameWithoutExtension(file.Name).ToLower() == assemblyName.ToLower())
                     {
                         Debug.Assert(match.Groups[0].Value == versionTag);
                         return file.FullName;

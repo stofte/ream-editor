@@ -21,7 +21,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// <summary>
         /// Attempts to find the most relevant tooltip data for the passed nodes.
         /// </summary>
-        public static ToolTipData GetToolTip(IEnumerable<SyntaxNode> nodes, SemanticModel model, IDocumentationService documentationService)
+        public static ToolTipData GetToolTip(IEnumerable<SyntaxNode> nodes, SemanticModel model,
+            IDocumentationService documentationService, IEnumerable<INamedTypeSymbol> availableSymbols)
         {
             ToolTipData tooltip = new ToolTipData();
 
@@ -81,10 +82,11 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     var docMemberId = t.GetDocumentationCommentId();
                     var doccsss = t.GetDocumentationCommentXml(expandIncludes: true);
                     var docs = documentationService.GetDocumentation(docMemberId);
+                    var d2 = documentationService.GetDocs(docMemberId, availableSymbols);
 
-                    if (docs != null)
+                    if (d2 != null)
                     {
-                        tooltip.Description = docs.Element("summary").Value;
+                        tooltip.Description = d2.Summary;
                     }
                 }
             }
@@ -148,7 +150,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             return Tuple.Create(string.Format("{0} {1}", kind, name), specializations.AsEnumerable());
         }
 
-        private static string GetBasicName(ITypeSymbol t)
+        public static string GetBasicName(ITypeSymbol t)
         {
             var nss = new List<string>();
             nss.Add(t.Name); // todo: generics?

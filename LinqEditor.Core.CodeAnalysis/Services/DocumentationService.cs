@@ -1,12 +1,10 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Documentation;
 using LinqEditor.Core.Models.Analysis;
+using Microsoft.CodeAnalysis;
 using NuDoq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Immutable;
 using System.Xml.Linq;
 
 namespace LinqEditor.Core.CodeAnalysis.Services
@@ -23,9 +21,9 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var list2 = new List<DocumentMembers>();
             foreach (var assembly in CSharpCompiler.GetCoreAssemblies())
             {
-                //var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(assembly);
+                var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(assembly);
                 list.Add(new CustomDocumentationProvider(assembly));
-                //list2.Add(NuDoq.DocReader.Read(path));
+                list2.Add(NuDoq.DocReader.Read(path));
             }
             _providers = list;
             _documents = list2;
@@ -44,14 +42,23 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             return null;
         }
 
-        public DocumentationElement GetDocs(string memberName)
+        public DocumentationElement GetDocs(string documentationId, IEnumerable<INamedTypeSymbol> availableSymbols)
         {
+            DocumentationElement elm = null;
             foreach (var doc in _documents)
             {
-                var result = doc.Accept(new DocumentationVisitor(memberName));
-                
+                var res = doc.Accept(new DocumentationVisitor(documentationId, availableSymbols));
+                if (res.Matched)
+                {
+                    elm = new DocumentationElement
+                    {
+                        Id = documentationId,
+                        Summary = res.Summary
+                    };
+                    break;
+                }
             }
-            return null;
+            return elm;
         }
     }
 }

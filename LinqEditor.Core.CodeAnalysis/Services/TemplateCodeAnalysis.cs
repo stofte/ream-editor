@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,12 +19,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 {
     public class TemplateCodeAnalysis : ITemplateCodeAnalysis
     {
+        // instance data
         protected IDocumentationService _documentationService;
         protected ITemplateService _templateService;
         protected MetadataReference[] _references;
-        protected ExtensionMethodCollection _extensionMethods; 
+        protected ExtensionMethodCollection _extensionMethods;
+        protected IEnumerable<INamedTypeSymbol> _availableSymbols;
         
-        // instance data
         protected bool _initialized;
         protected string _initialSource;
         public int IndexOffset { get; set; }
@@ -38,6 +40,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         protected IEnumerable<Error> _errors;
         protected SyntaxNode _currentTree;
         protected SemanticModel _currentModel;
+        
 
         public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService)
         {
@@ -93,6 +96,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var nsNode = nodes.OfType<NamespaceDeclarationSyntax>().LastOrDefault();
             var clsNode = nodes.OfType<ClassDeclarationSyntax>().LastOrDefault();
 
+            _availableSymbols = semanticModel.LookupSymbols(IndexOffset)
+                .Where(x => x.CanBeReferencedByName).OfType<INamedTypeSymbol>();
             _namespace = nsNode.Name.ToString();
             _entryClass = clsNode.Identifier.ToString();
         }
@@ -185,7 +190,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
-                tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService);
+                tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService, _availableSymbols);
                 if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
                 {
                     ctx = UserContext.ToolTip;

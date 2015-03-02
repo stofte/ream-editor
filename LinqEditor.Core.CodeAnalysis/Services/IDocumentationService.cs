@@ -7,7 +7,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
 {
     public interface IDocumentationService
     {
-        XElement GetDocumentation(string memberName);
-        DocumentationElement GetDocs(string documentationId, IEnumerable<INamedTypeSymbol> availableSymbols);
+        DocumentationElement GetDocumentation(string documentationId);
     }
 }

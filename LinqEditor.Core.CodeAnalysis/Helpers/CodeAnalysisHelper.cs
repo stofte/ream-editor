@@ -44,13 +44,13 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
                     t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
 
-                var docs = documentationService.GetDocumentation(docMemberId);
+                //var docs = documentationService.GetDocumentation(docMemberId);
 
                 var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
 
                 tooltip.TypeAndName = nameAndTypes.Item1;
                 tooltip.Specializations = nameAndTypes.Item2;
-                tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
+                //tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
             }
             else if (isCtorExpr)
             {
@@ -82,12 +82,6 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     var docMemberId = t.GetDocumentationCommentId();
                     var doccsss = t.GetDocumentationCommentXml(expandIncludes: true);
                     var docs = documentationService.GetDocumentation(docMemberId);
-                    var d2 = documentationService.GetDocs(docMemberId, availableSymbols);
-
-                    if (d2 != null)
-                    {
-                        tooltip.Description = d2.Summary;
-                    }
                 }
             }
 

@@ -31,26 +31,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _providers = list;
             _documents = list2;
         }
-
-        public XElement GetDocumentation(string memberName)
-        {
-            foreach (var provider in _providers)
-            {
-                var result = provider.GetDocumentation(memberName);
-                if (!string.IsNullOrWhiteSpace(result))
-                {
-                    return XElement.Parse(result);
-                }
-            }
-            return null;
-        }
-
-        public DocumentationElement GetDocs(string documentationId, IEnumerable<INamedTypeSymbol> availableSymbols)
+        
+        public DocumentationElement GetDocumentation(string documentationId)
         {
             DocumentationElement elm = null;
             foreach (var doc in _documents)
             {
-                var res = doc.Accept(new DocumentationVisitor(documentationId, availableSymbols));
+                var res = doc.Accept(new DocumentationVisitor(documentationId, _symbolStore));
                 if (res.Matched)
                 {
                     elm = new DocumentationElement

@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Helpers;
+using LinqEditor.Core.CodeAnalysis.Services;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,34 +13,24 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
         public string Summary { get; set; }
 
         string _id;
-        IEnumerable<INamedTypeSymbol> _availableSymbols;
+        ISymbolStore _symbolStore;
 
-        public DocumentationVisitor(string id, IEnumerable<INamedTypeSymbol> availableSymbols)
+        public DocumentationVisitor(string id, ISymbolStore symbolStore)
         {
             _id = id;
-            _availableSymbols = availableSymbols;
-        }
-
-        private string TranslateCref(NuDoq.See see)
-        {
-            var symbol = _availableSymbols.FirstOrDefault(x => 
-                x.GetDocumentationCommentId() == see.Cref ||
-                x.GetMembers().Any(m => m.GetDocumentationCommentId() == see.Cref));
-            var symbolName = CodeAnalysisHelper.GetBasicName(symbol);
-            return symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+            _symbolStore = symbolStore;
         }
 
         public override void VisitMethod(NuDoq.Method method)
         {
             if (method.Id == _id)
             {
-                Debug.Assert(!Matched);
-                var sym = _availableSymbols.FirstOrDefault(x => x.GetMembers().Any(m => m.GetDocumentationCommentId() == _id));
-                Matched = true;
                 var sum = method.Elements.OfType<NuDoq.Summary>().FirstOrDefault();
                 if (sum != null)
                 {
-                    Summary = string.Join("", sum.Elements.Select(x => x is NuDoq.See ? TranslateCref(x as NuDoq.See) : x.ToText()));
+                    Debug.Assert(!Matched);
+                    Matched = true;
+                    Summary = string.Join("", sum.Elements.Select(x => x is NuDoq.See ? _symbolStore.TranslateCref(((NuDoq.See)x).Cref) : x.ToText()));
                 }
                 var typeParams = method.Elements.OfType<NuDoq.TypeParam>();
             }            

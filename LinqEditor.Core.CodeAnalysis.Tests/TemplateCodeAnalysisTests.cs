@@ -170,14 +170,14 @@ namespace Another.Generated
         // Item4 = Description
         // Item5 = Specializations
         // Item6 = DocumentationId
-        //[TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
+        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
+        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
+        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
         public void Returns_ToolTip_UserContext_For(string testDataKey)
         {
             var m = new Mock<ITemplateService>();

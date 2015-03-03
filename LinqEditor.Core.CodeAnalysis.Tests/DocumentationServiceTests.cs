@@ -85,9 +85,9 @@ namespace Test
         {
             var expected = "Initializes a new instance of the System.Collections.Generic.List<T> class that is empty and has the default initial capacity.";
             var ctorId = "M:System.Collections.Generic.List`1.#ctor";
-            var x = _service.GetDocs(ctorId);
+            var x = _service.GetDocumentation(ctorId);
 
-            Assert.AreEqual(x, expected);
+            Assert.AreEqual(x.Summary, expected);
         }
     }
 }

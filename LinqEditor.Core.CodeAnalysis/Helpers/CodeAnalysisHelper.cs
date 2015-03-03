@@ -44,13 +44,12 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
                     t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
 
-                //var docs = documentationService.GetDocumentation(docMemberId);
-
+                var docs = documentationService.GetDocumentation(docMemberId);
                 var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
 
                 tooltip.TypeAndName = nameAndTypes.Item1;
                 tooltip.Specializations = nameAndTypes.Item2;
-                //tooltip.Description = docs != null ? docs.Element("summary").Value : string.Empty;
+                tooltip.Description = docs != null ? docs.Summary : string.Empty;
             }
             else if (isCtorExpr)
             {

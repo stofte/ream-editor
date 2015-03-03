@@ -195,33 +195,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
-                string commentText = string.Format(@"/// <see cref=""{0}""/>", "System.Int32");
-
-                SyntaxTriviaList leadingTrivia = SyntaxFactory.ParseLeadingTrivia(commentText);
-                Debug.Assert(leadingTrivia.Count == 1);
-                SyntaxTrivia trivia = leadingTrivia.First();
-                DocumentationCommentTriviaSyntax structure = (DocumentationCommentTriviaSyntax)trivia.GetStructure();
-                Debug.Assert(structure.Content.Count == 2);
-                XmlEmptyElementSyntax elementSyntax = (XmlEmptyElementSyntax)structure.Content[1];
-                Debug.Assert(elementSyntax.Attributes.Count == 1);
-                XmlAttributeSyntax attributeSyntax = (XmlAttributeSyntax)elementSyntax.Attributes[0];
-
-                var crefNode = attributeSyntax.CSharpKind() == SyntaxKind.XmlCrefAttribute ? attributeSyntax as XmlCrefAttributeSyntax : null;
-
-                var cref2 = CSharpSyntaxTree.ParseText(@"namespace Foo
-{
-    /// <summary>This is an xml doc comment <see cref=""T:System.Int32"" /></summary>
-    class MyClass {}
-}");
-
-                var cref1 = CSharpSyntaxTree.ParseText(@"namespace Foo
-{
-    /// <summary>This is an xml doc comment <see cref=""MyClass"" /></summary>
-    class MyClass {}
-}");
-                var xx1 = cref1.GetRoot().DescendantNodes(descendIntoTrivia: true);
-                var xx2 = cref2.GetRoot().DescendantNodes(descendIntoTrivia: true);
-
                 tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService, _availableSymbols);
                 if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
                 {

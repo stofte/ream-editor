@@ -17,6 +17,7 @@ x.DoesNotExists();
         public const string VarDeclOfInt = @"var x = 0x2a;";
         public const string FullDeclOfInt = @"int x1 = 10;";
         public const string VarDeclOfIntHashSet = @"var set = new HashSet<int>();";
+        public const string VarDeclOfDictionaryWithTuples = @"var dict = new Dictionary<string, Tuple<string, IEnumerable<string>>>();";
         public const string FullDeclOfDataColumn = @"DataColumn col = new DataColumn();";
         public const string VarDeclOfQueryable = @"var x = new List<int>(10).AsQueryable();";
         public const string VarDeclOfListWithCopyFromCtor = @"

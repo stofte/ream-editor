@@ -1,6 +1,8 @@
-﻿using Castle.MicroKernel.Registration;
+﻿using Castle.Facilities.TypedFactory;
+using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
+using LinqEditor.Core.CodeAnalysis.Helpers;
 using LinqEditor.Core.CodeAnalysis.Services;
 
 namespace LinqEditor.Core.CodeAnalysis.Installers
@@ -18,6 +20,10 @@ namespace LinqEditor.Core.CodeAnalysis.Installers
             container.Register(Component.For<ISymbolStore>()
                                         .ImplementedBy<SymbolStore>()
                                         .LifestyleSingleton());
+            container.Register(Component.For<IToolTipHelper>()
+                             .ImplementedBy<ToolTipHelper>()
+                             .LifestyleTransient());
+            container.Register(Component.For<IToolTipHelperFactory>().AsFactory());
         }
     }
 }

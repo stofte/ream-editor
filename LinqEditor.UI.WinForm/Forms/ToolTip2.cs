@@ -100,9 +100,9 @@ namespace LinqEditor.UI.WinForm.Forms
             // update data
             _start = start;
             _end = end;
-            _type = data.TypeAndName;
+            _type = data.ItemName;
             _desc = data.Description;
-            _spec = data.Specializations ?? new List<string>();
+            _spec = data.Addendums ?? new List<string>();
             // capture is the text area (rect) that the tip is associated with
             _capture = incomingCapture;
 

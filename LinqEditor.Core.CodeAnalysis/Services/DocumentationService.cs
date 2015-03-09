@@ -12,24 +12,18 @@ namespace LinqEditor.Core.CodeAnalysis.Services
     public class DocumentationService : IDocumentationService
     {
         ISymbolStore _symbolStore;
-
         IEnumerable<DocumentMembers> _documents;
-
-        IEnumerable<CustomDocumentationProvider> _providers;
-
+        
         public DocumentationService(ISymbolStore symbolStore)
         {
             _symbolStore = symbolStore;
-            var list = new List<CustomDocumentationProvider>();
-            var list2 = new List<DocumentMembers>();
+            var list = new List<DocumentMembers>();
             foreach (var assembly in CSharpCompiler.GetCoreAssemblies())
             {
                 var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(assembly);
-                list.Add(new CustomDocumentationProvider(assembly));
-                list2.Add(NuDoq.DocReader.Read(path));
+                list.Add(NuDoq.DocReader.Read(path));
             }
-            _providers = list;
-            _documents = list2;
+            _documents = list;
         }
         
         public DocumentationElement GetDocumentation(string documentationId)
@@ -40,11 +34,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 var res = doc.Accept(new DocumentationVisitor(documentationId, _symbolStore));
                 if (res.Matched)
                 {
-                    elm = new DocumentationElement
-                    {
-                        Id = documentationId,
-                        Summary = res.Summary
-                    };
+                    elm = res.Documentation;
                     break;
                 }
             }

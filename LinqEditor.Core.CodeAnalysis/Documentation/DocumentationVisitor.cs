@@ -1,6 +1,6 @@
-﻿using LinqEditor.Core.CodeAnalysis.Helpers;
-using LinqEditor.Core.CodeAnalysis.Services;
-using Microsoft.CodeAnalysis;
+﻿using LinqEditor.Core.CodeAnalysis.Services;
+using LinqEditor.Core.Models.Analysis;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,16 +9,22 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
 {
     public class DocumentationVisitor : NuDoq.Visitor
     {
-        public bool Matched { get; set; }
-        public string Summary { get; set; }
-
         string _id;
         ISymbolStore _symbolStore;
+        DocumentationElement _docs;
+
+        public bool Matched { get; set; }
+        public DocumentationElement Documentation { get { return _docs; } }
 
         public DocumentationVisitor(string id, ISymbolStore symbolStore)
         {
             _id = id;
             _symbolStore = symbolStore;
+            _docs = new DocumentationElement
+            {
+                MethodExceptions = new List<string>(),
+                MethodParameters = new List<Tuple<string, string>>(),
+            };
         }
 
         public override void VisitMethod(NuDoq.Method method)
@@ -30,9 +36,13 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
                 {
                     Debug.Assert(!Matched);
                     Matched = true;
-                    Summary = string.Join("", sum.Elements.Select(x => x is NuDoq.See ? _symbolStore.TranslateCref(((NuDoq.See)x).Cref) : x.ToText()));
+                    _docs.Summary = string.Join(" ", sum.Elements.Select(x => x is NuDoq.See ? 
+                        _symbolStore.TranslateCref(((NuDoq.See)x).Cref).Trim() : x.ToText().Trim()));
+                    _docs.MethodExceptions = method.Elements.OfType<NuDoq.Exception>()
+                        .Select(x => _symbolStore.TranslateCref(x.Cref));
+                    _docs.MethodParameters = method.Elements.OfType<NuDoq.Param>()
+                        .Select(x => Tuple.Create(x.Name, x.ToText().Trim()));
                 }
-                var typeParams = method.Elements.OfType<NuDoq.TypeParam>();
             }            
         }
 
@@ -43,8 +53,7 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
                 Debug.Assert(!Matched);
                 Matched = true; 
                 var sum = type.Elements.OfType<NuDoq.Summary>().FirstOrDefault();
-                Summary = sum != null ? sum.ToText() : null;
-                var typeParams = type.Elements.OfType<NuDoq.TypeParam>();
+                _docs.Summary = sum != null ? sum.ToText().Trim() : string.Empty;
             }
         }
     }

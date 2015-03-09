@@ -20,6 +20,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
     public class TemplateCodeAnalysis : ITemplateCodeAnalysis
     {
         // instance data
+        protected IToolTipHelperFactory _tooltipFactory;
         protected IDocumentationService _documentationService;
         protected ISymbolStore _symbolStore;
         protected ITemplateService _templateService;
@@ -41,15 +42,16 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         protected IEnumerable<Error> _errors;
         protected SyntaxNode _currentTree;
         protected SemanticModel _currentModel;
-        
 
-        public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService, ISymbolStore symbolStore)
+
+        public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService, ISymbolStore symbolStore, IToolTipHelperFactory tooltipFactory)
         {
             DebugLogger.Log(GetHashCode());
             _initialized = false;
             _templateService = templateService;
             _documentationService = documentationService;
             _symbolStore = symbolStore;
+            _tooltipFactory = tooltipFactory;
             _references = CSharpCompiler.GetStandardReferences(includeDocumentation: false);
         }
 
@@ -195,8 +197,8 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
-                tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService, _availableSymbols);
-                if (!string.IsNullOrWhiteSpace(tooltip.TypeAndName))
+                //tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService);
+                if (!string.IsNullOrWhiteSpace(tooltip.ItemName))
                 {
                     ctx = UserContext.ToolTip;
                 }

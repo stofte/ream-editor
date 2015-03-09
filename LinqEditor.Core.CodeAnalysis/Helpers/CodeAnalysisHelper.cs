@@ -22,7 +22,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// Attempts to find the most relevant tooltip data for the passed nodes.
         /// </summary>
         public static ToolTipData GetToolTip(IEnumerable<SyntaxNode> nodes, SemanticModel model,
-            IDocumentationService documentationService, IEnumerable<INamedTypeSymbol> availableSymbols)
+            IDocumentationService documentationService)
         {
             ToolTipData tooltip = new ToolTipData();
 
@@ -47,8 +47,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 var docs = documentationService.GetDocumentation(docMemberId);
                 var nameAndTypes = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
 
-                tooltip.TypeAndName = nameAndTypes.Item1;
-                tooltip.Specializations = nameAndTypes.Item2;
+                tooltip.ItemName = nameAndTypes.Item1;
+                tooltip.Addendums = nameAndTypes.Item2;
                 tooltip.Description = docs != null ? docs.Summary : string.Empty;
             }
             else if (isCtorExpr)
@@ -71,15 +71,11 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                             // all the params must match
                             .All(b => b == true)); 
 
-
-                
                 if (calledCtor != null)
                 {
                     // resolve the original definition, if the ctor is generic
                     var t = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ? calledCtor.OriginalDefinition : calledCtor;
-                    var parts = t.ToDisplayParts();
                     var docMemberId = t.GetDocumentationCommentId();
-                    var doccsss = t.GetDocumentationCommentXml(expandIncludes: true);
                     var docs = documentationService.GetDocumentation(docMemberId);
                 }
             }
@@ -92,6 +88,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         public static Tuple<string, IEnumerable<string>> GetDisplayNameAndSpecializations(TypeInfo type, SymbolInfo symbol)
         {
+            var s = symbol.Symbol as ITypeSymbol;
             var t = type.Type;
                 //.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?
                 //type.Type.OriginalDefinition : type.Type;

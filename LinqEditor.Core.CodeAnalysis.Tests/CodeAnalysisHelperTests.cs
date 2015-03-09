@@ -115,9 +115,18 @@ namespace Test
 
             // full template
             _stubOffset4 = _source4.IndexOf(SchemaConstants.Marker);
+            var tree4 = CSharpSyntaxTree.ParseText(_source4);
+            // need to compile to get symbol list
+            var compilation4 = CSharpCompilation.Create("comp4")
+                            .WithOptions(_compilerOptions)
+                            .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                            .AddSyntaxTrees(new SyntaxTree[] { tree4 });
 
             var symbolStoreMock = new Mock<ISymbolStore>();
-            _documentationService = new DocumentationService(symbolStoreMock.Object);
+            var realSymbolStore = new SymbolStore();
+            var model4 = compilation4.GetSemanticModel(tree4);
+            realSymbolStore.Record(model4.LookupSymbols(_source4.IndexOf(SchemaConstants.Marker)).OfType<INamedTypeSymbol>());
+            _documentationService = new DocumentationService(realSymbolStore);
         }
 
         [Test]
@@ -157,43 +166,7 @@ namespace Test
             Assert.AreEqual(extensions.Count(), 1);
             Assert.AreEqual(extensions.Single().Name, "Dump");
         }
-
-        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
-        public void GetToolTipDisplayName_Formats_Type_Correctly(string testDataKey)
-        {
-            var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
-            var docData = toolTipTestData.Item3;
-            var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
-            var tree = CSharpSyntaxTree.ParseText(source);
-
-            var dotTextSpan = new TextSpan(_stubOffset4 + toolTipTestData.Item2, 1);
-            var syntaxNode = tree.GetRoot()
-                    .DescendantNodes(dotTextSpan)
-                    .OfType<VariableDeclarationSyntax>()
-                    .LastOrDefault();
-
-            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
-                .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
-                .AddSyntaxTrees(new SyntaxTree[] { tree });
-
-            var semanticModel = compilation.GetSemanticModel(tree);
-
-            var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
-            var typeInfo = semanticModel.GetTypeInfo(syntaxNode.Type);
-            var symInfo = semanticModel.GetSymbolInfo(syntaxNode.Type);
-            
-            var actualOutput = CodeAnalysisHelper.GetDisplayNameAndSpecializations(typeInfo, symInfo);
-
-            Assert.AreEqual(docData.Item1, actualOutput.Item1);
-            Assert.AreEqual(docData.Item3, actualOutput.Item2);
-        }
-
+        
         [TestCase(SourceCodeFragments.ErrorExample1)]
         [TestCase(SourceCodeFragments.ErrorExample2)]
         public void Errors_Are_Returned_With_Line_Column_And_Index_Indicators(string sourceStub)
@@ -217,42 +190,6 @@ namespace Test
 
                 Assert.AreEqual(byIndex, byLineColumn);
             }
-        }
-
-        [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
-        [TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
-        [TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfListWithCopyFromCtorAt56)]
-        public void Formats_ToolTip_Correctly(string testDataKey)
-        {
-            var toolTipTestData = VSDocumentationTestData.Data[testDataKey];
-            var docData = toolTipTestData.Item3;
-            var source = _source4.Replace(SchemaConstants.Marker, toolTipTestData.Item1);
-            var tree = CSharpSyntaxTree.ParseText(source);
-
-            var dotTextSpan = new TextSpan(_stubOffset4 + toolTipTestData.Item2, 1);
-            var nodes = tree.GetRoot()
-                    .DescendantNodes(dotTextSpan);
-
-            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
-                .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: true))
-                .AddSyntaxTrees(new SyntaxTree[] { tree });
-
-            var semanticModel = compilation.GetSemanticModel(tree);
-            var availableSymbols = semanticModel.LookupSymbols(_stubOffset4).Where(x => x.CanBeReferencedByName).OfType<INamedTypeSymbol>();
-            var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
-
-            var tip = CodeAnalysisHelper.GetToolTip(nodes, semanticModel, _documentationService, availableSymbols);
-
-            Assert.AreEqual(docData.Item1, tip.TypeAndName);
-            Assert.AreEqual(docData.Item2, tip.Description);
-            Assert.AreEqual(docData.Item3, tip.Specializations);
         }
     }
 }

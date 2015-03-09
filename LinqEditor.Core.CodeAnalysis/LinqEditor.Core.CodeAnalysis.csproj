@@ -105,6 +105,9 @@
     <Compile Include="Compiler\CSharpCompiler.cs" />
     <Compile Include="Documentation\DocumentationVisitor.cs" />
     <Compile Include="Helpers\CodeAnalysisHelper.cs" />
+    <Compile Include="Helpers\IToolTipHelper.cs" />
+    <Compile Include="Helpers\IToolTipHelperFactory.cs" />
+    <Compile Include="Helpers\ToolTipHelper.cs" />
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CustomDocumentationProvider.cs" />

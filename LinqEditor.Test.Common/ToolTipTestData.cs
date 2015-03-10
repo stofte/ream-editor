@@ -1,7 +1,6 @@
 ﻿using LinqEditor.Core.Models.Analysis;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,15 +9,16 @@ namespace LinqEditor.Test.Common
 {
     public static class ToolTipTestData
     {
-        public const string VarDeclOfInt_InitialDecl = "VarDeclOfInt0"; // initial decl
-        public const string VarDeclOfIntHashSet_InitialDecl = "VarDeclOfIntHashSet0"; // initial decl
-        public const string VarDeclOfIntHashSet_Ctor = "VarDeclOfIntHashSet11"; // ctor
-        public const string VarDeclOfIntHashSet_IntGenericTypeParam = "VarDeclOfIntHashSet24"; // int type param
-        public const string VarDeclOfListWithCopyFromCtor_Ctor = "VarDeclOfListWithCopyFromCtor52"; // ctor
-        public const string FullDeclOfDataColumn_InitialDecl = "FullDeclOfDataColumn0"; // initial decl
-        public const string FullDeclOfDataColumn_Ctor = "FullDeclOfDataColumn19"; // ctor
-        public const string VarDeclOfDictionaryWithTuples_InitialDecl = "VarDeclOfDictionaryWithTuples0"; // initial decl
-        public const string VarDeclOfDictionaryWithTuples_TupleGenericTypeParam = "VarDeclOfDictionaryWithTuples37"; // tuple type param
+        public const string VarDeclOfInt_InitialDecl = "VarDeclOfInt_InitialDecl"; // initial decl
+        public const string VarDeclOfIntHashSet_InitialDecl = "VarDeclOfIntHashSet_InitialDecl"; // initial decl
+        public const string VarDeclOfIntHashSet_Ctor = "VarDeclOfIntHashSet_Ctor"; // ctor
+        public const string VarDeclOfIntHashSet_IntGenericTypeParam = "VarDeclOfIntHashSet_IntGenericTypeParam"; // int type param
+        public const string VarDeclOfListWithCopyFromCtor_Ctor = "VarDeclOfListWithCopyFromCtor_Ctor"; // ctor
+        public const string FullDeclOfDataColumn_InitialDecl = "FullDeclOfDataColumn_InitialDecl"; // initial decl
+        public const string FullDeclOfDataColumn_Ctor = "FullDeclOfDataColumn_Ctor"; // ctor
+        public const string FullDeclOfDataColumn_MemberProperty = "FullDeclOfDataColumn_MemberProperty"; // property access
+        public const string VarDeclOfDictionaryWithTuples_InitialDecl = "VarDeclOfDictionaryWithTuples_InitialDecl"; // initial decl
+        public const string VarDeclOfDictionaryWithTuples_TupleGenericTypeParam = "VarDeclOfDictionaryWithTuples_TupleGenericTypeParam"; // tuple type param
 
         // key ->
         // tuple(
@@ -26,6 +26,7 @@ namespace LinqEditor.Test.Common
         //     item2: offset,
         //     item3: tooltip
         // )
+        
         public static Dictionary<string, Tuple<string, int, ToolTipData>> Data =
             new Dictionary<string, Tuple<string, int, ToolTipData>>
         {
@@ -49,17 +50,17 @@ namespace LinqEditor.Test.Common
                 Description = "Represents a 32-bit signed integer.",
                 Addendums = new List<string> { }
             })},
-            {VarDeclOfListWithCopyFromCtor_Ctor, Tuple.Create(SourceCodeFragments.VarDeclOfListWithCopyFromCtor, 52, new ToolTipData {
+            {VarDeclOfListWithCopyFromCtor_Ctor, Tuple.Create(SourceCodeFragments.VarDeclOfListWithCopyFromCtor, 53, new ToolTipData {
                 ItemName = "List<int>.List(IEnumerable<int> collection) (+ 2 overload(s))",
                 Description = "Initializes a new instance of the System.Collections.Generic.List<T> class that contains elements copied from the specified collection and has sufficient capacity to accommodate the number of elements copied.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
             })},
-            {FullDeclOfDataColumn_InitialDecl, Tuple.Create(SourceCodeFragments.FullDeclOfDataColumn, 0, new ToolTipData {
+            {FullDeclOfDataColumn_InitialDecl, Tuple.Create(SourceCodeFragments.FullDeclOfDataColumn, 3, new ToolTipData {
                 ItemName = "class System.Data.DataColumn",
                 Description = "Represents the schema of a column in a System.Data.DataTable.",
                 Addendums = new List<string> { }
             })},
-            {FullDeclOfDataColumn_Ctor, Tuple.Create(SourceCodeFragments.FullDeclOfDataColumn, 19, new ToolTipData {
+            {FullDeclOfDataColumn_Ctor, Tuple.Create(SourceCodeFragments.FullDeclOfDataColumn, 20, new ToolTipData {
                 ItemName = "DataColumn.DataColumn() (+ 4 overload(s))",
                 Description = "Initializes a new instance of a System.Data.DataColumn class as type string.",
                 Addendums = new List<string> { }
@@ -74,11 +75,17 @@ namespace LinqEditor.Test.Common
                 Description = "Represents a 2-tuple, or pair.",
                 Addendums = new List<string> { "T1 is System.String", "T2 is System.Collections.Generic.IEnumerable<System.String>" }
             })},
+            {FullDeclOfDataColumn_MemberProperty, Tuple.Create(SourceCodeFragments.FullDeclOfDataColumn, 55, new ToolTipData {
+                ItemName = "object DataColumn.DefaultValue",
+                Description = "Gets or sets the default value for the column when you are creating new rows.",
+                Addendums = new List<string> { "Exceptions:", "\tSystem.InvalidCastException" }
+            })},
         };
 
         static void stub()
         {
-            var dict = new Dictionary<string, Tuple<string, IEnumerable<string>>>();
+            var from = new List<int> { 1, 2, 3, 4 };
+            var x = new List<int>(from).AsQueryable();
         }
     }
 }

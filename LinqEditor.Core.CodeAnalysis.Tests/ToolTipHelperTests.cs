@@ -70,13 +70,14 @@ namespace Test
 
         [TestCase(ToolTipTestData.VarDeclOfInt_InitialDecl)]
         [TestCase(ToolTipTestData.VarDeclOfIntHashSet_InitialDecl)]
+        [TestCase(ToolTipTestData.FullDeclOfDataColumn_InitialDecl)]
+        [TestCase(ToolTipTestData.VarDeclOfDictionaryWithTuples_InitialDecl)]
         [TestCase(ToolTipTestData.VarDeclOfIntHashSet_Ctor)]
         [TestCase(ToolTipTestData.VarDeclOfListWithCopyFromCtor_Ctor)]
-        [TestCase(ToolTipTestData.FullDeclOfDataColumn_InitialDecl)]
         [TestCase(ToolTipTestData.FullDeclOfDataColumn_Ctor)]
         [TestCase(ToolTipTestData.VarDeclOfIntHashSet_IntGenericTypeParam)]
-        [TestCase(ToolTipTestData.VarDeclOfDictionaryWithTuples_InitialDecl)]
         [TestCase(ToolTipTestData.VarDeclOfDictionaryWithTuples_TupleGenericTypeParam)]
+        [TestCase(ToolTipTestData.FullDeclOfDataColumn_MemberProperty)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

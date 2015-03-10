@@ -70,5 +70,15 @@ namespace Test
 
             Assert.AreEqual(x.Summary, expected);
         }
+
+        [Test]
+        public void Can_Return_Documentation_For_Property()
+        {
+            var expected = "Gets or sets the default value for the column when you are creating new rows.";
+            var ctorId = "P:System.Data.DataColumn.DefaultValue";
+            var x = _service.GetDocumentation(ctorId);
+
+            Assert.AreEqual(x.Summary, expected);
+        }
     }
 }

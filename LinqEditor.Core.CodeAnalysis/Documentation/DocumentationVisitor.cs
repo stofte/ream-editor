@@ -31,19 +31,20 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
         {
             if (method.Id == _id)
             {
-                var sum = method.Elements.OfType<NuDoq.Summary>().FirstOrDefault();
-                if (sum != null)
-                {
-                    Debug.Assert(!Matched);
-                    Matched = true;
-                    _docs.Summary = string.Join(" ", sum.Elements.Select(x => x is NuDoq.See ? 
-                        _symbolStore.TranslateCref(((NuDoq.See)x).Cref).Trim() : x.ToText().Trim()));
-                    _docs.MethodExceptions = method.Elements.OfType<NuDoq.Exception>()
-                        .Select(x => _symbolStore.TranslateCref(x.Cref));
-                    _docs.MethodParameters = method.Elements.OfType<NuDoq.Param>()
-                        .Select(x => Tuple.Create(x.Name, x.ToText().Trim()));
-                }
-            }            
+                Debug.Assert(!Matched);
+                Matched = true;
+                _docs = GetDocs(method.Elements);
+            }
+        }
+
+        public override void VisitProperty(NuDoq.Property property)
+        {
+            if (property.Id == _id)
+            {
+                Debug.Assert(!Matched);
+                Matched = true;
+                _docs = GetDocs(property.Elements);
+            }
         }
 
         public override void VisitType(NuDoq.TypeDeclaration type)
@@ -51,10 +52,27 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
             if (type.Id == _id)
             {
                 Debug.Assert(!Matched);
-                Matched = true; 
-                var sum = type.Elements.OfType<NuDoq.Summary>().FirstOrDefault();
-                _docs.Summary = sum != null ? sum.ToText().Trim() : string.Empty;
+                Matched = true;
+                _docs = GetDocs(type.Elements);
             }
+        }
+
+        private DocumentationElement GetDocs(IEnumerable<NuDoq.Element> elms)
+        {
+            var summaryNodes = elms.OfType<NuDoq.Summary>().FirstOrDefault();
+            var summary = string.Join("", summaryNodes.Elements.Select(x => x is NuDoq.See ?
+                _symbolStore.TranslateCref(((NuDoq.See)x).Cref) : x.ToText()));
+            var methodExns = elms.OfType<NuDoq.Exception>()
+                .Select(x => _symbolStore.TranslateCref(x.Cref));
+            var methodParams = elms.OfType<NuDoq.Param>()
+                .Select(x => Tuple.Create(x.Name, x.ToText()));
+
+            return new DocumentationElement
+            {
+                MethodExceptions = methodExns,
+                MethodParameters = methodParams,
+                Summary = summary.Trim() // should be no leading/trailing ws here
+            };
         }
     }
 }

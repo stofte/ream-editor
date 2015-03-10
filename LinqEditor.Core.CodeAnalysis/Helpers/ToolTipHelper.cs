@@ -24,72 +24,75 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 
         public ToolTipData GetToolTip(int index)
         {
+            var addendums = new List<string>();
+
             ToolTipData tooltip = new ToolTipData
             {
                 Addendums = new List<string>()
             };
-            var tree = _model.SyntaxTree.GetRoot();
-            var charSpan = new TextSpan(index, 1);
-            var nodes = tree.DescendantNodes(charSpan);
 
-            var varNode = nodes.OfType<VariableDeclarationSyntax>().FirstOrDefault();
-            var preNode = nodes.OfType<PredefinedTypeSyntax>().FirstOrDefault();
-            var idNode = nodes.OfType<IdentifierNameSyntax>().FirstOrDefault();
-            var ctorNode = nodes.OfType<ObjectCreationExpressionSyntax>().FirstOrDefault();
-            var genericNodes = nodes.OfType<GenericNameSyntax>();
-            GenericNameSyntax genericNode = null;
-            foreach (GenericNameSyntax node in nodes.OfType<GenericNameSyntax>())
+            DocumentationElement docElm = null;
+            ITypeSymbol nodeType = null;
+            IPropertySymbol nodeProp = null;
+            SyntaxNode matchedNode = GetIndexNode(index);
+
+            // get initial type of the node
+            if (matchedNode is IdentifierNameSyntax || 
+                matchedNode is ObjectCreationExpressionSyntax)
             {
-                if (node.Span.Start <= index && index <= node.Span.End)
+                // vars, direct references, aliases
+                nodeType = _model.GetTypeInfo(matchedNode).Type;
+            }
+            else if (matchedNode is PredefinedTypeSyntax || 
+                     matchedNode is GenericNameSyntax)
+            {
+                nodeType = _model.GetSymbolInfo(matchedNode).Symbol as ITypeSymbol;
+            }
+            else if (matchedNode is MemberAccessExpressionSyntax)
+            {
+                nodeProp = _model.GetSymbolInfo(matchedNode).Symbol as IPropertySymbol;
+            }
+
+            // return if nothing was found
+            if (nodeType == null && nodeProp == null) return tooltip;
+
+            if (nodeType != null &&
+                (matchedNode is IdentifierNameSyntax || 
+                matchedNode is PredefinedTypeSyntax ||
+                matchedNode is GenericNameSyntax)) // type references
+            {
+                var docId = nodeType.OriginalDefinition != null && nodeType != nodeType.OriginalDefinition ?
+                    nodeType.OriginalDefinition.GetDocumentationCommentId() : nodeType.GetDocumentationCommentId();
+                docElm = _documentationService.GetDocumentation(docId);
+                // use standard display routine
+                var typeParts = TypeDisplayStrings(nodeType);
+                var nameAndTypes = TypeDisplayStrings(nodeType);
+                tooltip.ItemName = nameAndTypes.Item1;
+                addendums.AddRange(nameAndTypes.Item2);
+            }
+            else if (matchedNode is MemberAccessExpressionSyntax && nodeProp != null)
+            {
+                if (nodeProp.Kind == SymbolKind.Property)
                 {
-                    if (genericNode == null)
-                    {
-                        genericNode = node;
-                    }
-                    else if (genericNode.Span.Start <= node.Span.Start && node.Span.End <= genericNode.Span.End)
-                    {
-                        // check if node is more specific (sub span of previous matches, if so, prefer this
-                        genericNode = node;
-                    }
+                    var docId = nodeProp.GetDocumentationCommentId();
+                    docElm = _documentationService.GetDocumentation(docId);
+
+                    tooltip.ItemName = string.Format("{0} {1}.{2}",
+                        nodeProp.Type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+                        nodeProp.ContainingType.Name,
+                        nodeProp.Name);
+                    addendums.AddRange(MapExtras(docElm));
                 }
             }
-
-
-            // check for the types of nods we want to show tooltip for:
-            // a. hovering over a new expression
-            var isConstructor = ctorNode != null;
-            // b. hover over the type decl of an assignment statement
-            var isDeclaration = varNode != null && preNode != null && preNode.Span.Start == varNode.SpanStart ||
-                idNode != null && idNode.SpanStart == varNode.SpanStart;
-
-            var isGeneric = genericNode != null;
-
-            // if hovering over a sub element of a constructor expression (eg over the type specifier)
-            // we show the same style tooltip as for decl nodes
-            if (isDeclaration || isConstructor && preNode != null || isConstructor && isGeneric)
+            else if (matchedNode is ObjectCreationExpressionSyntax && 
+                nodeType is INamedTypeSymbol) // constructor
             {
-                var t = 
-                    isDeclaration ? _model.GetTypeInfo(varNode.Type).Type :
-                    isConstructor && preNode != null ? _model.GetSymbolInfo(preNode).Symbol as ITypeSymbol :
-                    _model.GetSymbolInfo(genericNode).Symbol as ITypeSymbol;
-                 var docMemberId = t.OriginalDefinition != null && t != t.OriginalDefinition ?
-                    t.OriginalDefinition.GetDocumentationCommentId() : t.GetDocumentationCommentId();
-                var docs = _documentationService.GetDocumentation(docMemberId);
-                var nameAndTypes = GetDisplayNameAndSpecializations(t);
-
-                tooltip.ItemName = nameAndTypes.Item1;
-                tooltip.Addendums = nameAndTypes.Item2;
-                tooltip.Description = docs != null ? docs.Summary : string.Empty;
-            }
-            else if (isConstructor)
-            {
-                var symInfo = _model.GetSymbolInfo(ctorNode.Type);
-                // obtains symbols of any passed arguments
+                var ctorNode = matchedNode as ObjectCreationExpressionSyntax;
+                var classType = nodeType as INamedTypeSymbol;
                 var argSymbols = ctorNode.ArgumentList.Arguments.Select(x => _model.GetTypeInfo(x.Expression));
-                // match the ctor based on the arguments
-                var namedSymbol = symInfo.Symbol as INamedTypeSymbol;
-                var calledCtor = namedSymbol
-                    .Constructors
+                // only search for public ctors
+                var calledCtor = classType.Constructors
+                    .Where(x => x.DeclaredAccessibility == Accessibility.Public)
                     .FirstOrDefault(x =>
                         // if the count matches
                         x.Parameters.Count() == argSymbols.Count() &&
@@ -99,50 +102,105 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                             .Select((p, i) =>
                                 p.Type == argSymbols.ElementAt(i).Type ||
                                 argSymbols.ElementAt(i).Type.AllInterfaces.Contains(p.Type))
-                            // all the params must match
                             .All(b => b == true));
 
+                // if we found a matching ctor
                 if (calledCtor != null)
                 {
-                    // resolve the original definition, if the ctor is generic
-                    var t = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ? calledCtor.OriginalDefinition : calledCtor;
-                    var docMemberId = t.GetDocumentationCommentId();
-                    var docs = _documentationService.GetDocumentation(docMemberId);
-
-                    var typeName = calledCtor.ContainingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                    var typeNs = calledCtor.ContainingType.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                    var shortTypeName = typeName.Substring(typeNs.Length + 1);
-                    var className = shortTypeName.IndexOf("<") > -1 ?
-                        shortTypeName.Substring(0, shortTypeName.IndexOf("<")) : shortTypeName;
-                    var argStrings = calledCtor.Parameters.Select((x, i) =>
-                        {
-                        var ns = x.Type.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                        var full = x.Type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                        // suffix parameter name from docs
-                        return string.Format("{0} {1}", full.Substring(ns.Length + 1), docs.MethodParameters.ElementAt(i).Item1);
-                    });
-                    var availableCtors = namedSymbol.Constructors.Where(x => x.DeclaredAccessibility == Accessibility.Public);
-                    var ctorCount = availableCtors.Count() > 1 ? string.Format("(+ {0} overload(s))", availableCtors.Count() - 1) : string.Empty;
-
-                    tooltip.ItemName = string.Format("{0}.{1}({2}){3}{4}", shortTypeName, className, string.Join(", ", argStrings),
-                        !string.IsNullOrWhiteSpace(ctorCount) ? " " : string.Empty, ctorCount);
-                    tooltip.Description = docs != null ? docs.Summary : string.Empty;
-                    var addendums = new List<string>();
-
-                    if (docs.MethodExceptions.Count() > 0)
-                    {
-                        addendums.Add("Exceptions:");
-                        addendums.AddRange(docs.MethodExceptions.Select(x => string.Format("\t{0}", x)));
-                    }
-
-                    tooltip.Addendums = addendums;
+                    var docId = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ?
+                        calledCtor.OriginalDefinition.GetDocumentationCommentId() : calledCtor.GetDocumentationCommentId();
+                    docElm = _documentationService.GetDocumentation(docId);
+                    tooltip.ItemName = MethodDisplayStrings(calledCtor, docElm);
+                    addendums.AddRange(MapExtras(docElm));
                 }
             }
 
+            tooltip.Description = docElm != null ? docElm.Summary : string.Empty;
+            tooltip.Addendums = addendums;
             return tooltip;
         }
 
-        Tuple<string, IEnumerable<string>> GetDisplayNameAndSpecializations(ITypeSymbol t)
+        /// <summary>
+        /// Returns the most relevant syntax node for the given index.
+        /// </summary>
+        SyntaxNode GetIndexNode(int index)
+        {
+            var tree = _model.SyntaxTree.GetRoot();
+            SyntaxNode match = null;
+            foreach (var node in tree.DescendantNodes(new TextSpan(index, 1)))
+            {
+                if (match == null)
+                {
+                    match = node;
+                    continue;
+                }
+
+                // if we already have a member access node, dont replace it with a identifier node, since that the access nodeis more useful
+                if (match is MemberAccessExpressionSyntax && node is IdentifierNameSyntax)
+                {
+                    continue;
+                }
+
+                var withIn = node.SpanStart <= index && index <= node.Span.End && // within span
+                    (match.SpanStart < node.SpanStart || node.Span.End < match.Span.End); // and either index is closer
+
+                if (withIn)
+                {
+                    match = node;
+                }
+            }
+            return match;
+        }
+
+        /// <summary>
+        /// Returns a formatted list of strings of documentation extras (exceptions, etc)
+        /// </summary>
+        IEnumerable<string> MapExtras(DocumentationElement docs)
+        {
+            var l = new List<string>();
+
+            if (docs.MethodExceptions.Count() > 0)
+            {
+                l.Add("Exceptions:");
+                l.AddRange(docs.MethodExceptions.Select(x => string.Format("\t{0}", x)));
+            }
+
+            return l;
+        }
+
+        /// <summary>
+        /// Renders the methodsymbol in a VS style, showing number of overloads available,
+        /// and for regular methods, return types.
+        /// </summary>
+        string MethodDisplayStrings(IMethodSymbol m, DocumentationElement docElm)
+        {
+            if (m.MethodKind == MethodKind.Constructor)
+            {
+                var availableCtors = m.ContainingType.Constructors.Where(x => x.DeclaredAccessibility == Accessibility.Public);
+                var ctorCount = availableCtors.Count() > 1 ? string.Format(" (+ {0} overload(s))", availableCtors.Count() - 1) : string.Empty;
+                var argStrings = m.Parameters.Select((x, i) =>
+                {
+                    var ns = x.Type.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+                    var full = x.Type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+                    // suffix parameter name from docs
+                    return string.Format("{0} {1}", full.Substring(ns.Length + 1), docElm.MethodParameters.ElementAt(i).Item1);
+                });
+
+                var fullNs = m.ContainingNamespace.ToDisplayString();
+                var ctorName = m.ToDisplayString().Substring(fullNs.Length + 1);
+                var ctorNameStub = "." + m.ContainingType.Name + "(";
+                ctorName = ctorName.Substring(0, ctorName.IndexOf(ctorNameStub) + ctorNameStub.Length - 1);
+
+                return string.Format("{0}({1}){2}", ctorName, string.Join(", ", argStrings), ctorCount);
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Renders the typesymbol in a VS style, always showing full name, and any generic type parameters.
+        /// </summary>
+        Tuple<string, IEnumerable<string>> TypeDisplayStrings(ITypeSymbol t)
         {
             //.OriginalDefinition != null && type.Type != type.Type.OriginalDefinition ?
             //type.Type.OriginalDefinition : type.Type;

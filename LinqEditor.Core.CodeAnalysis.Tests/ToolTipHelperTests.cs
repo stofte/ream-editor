@@ -78,6 +78,7 @@ namespace Test
         [TestCase(ToolTipTestData.VarDeclOfIntHashSet_IntGenericTypeParam)]
         [TestCase(ToolTipTestData.VarDeclOfDictionaryWithTuples_TupleGenericTypeParam)]
         [TestCase(ToolTipTestData.FullDeclOfDataColumn_MemberProperty)]
+        [TestCase(ToolTipTestData.ComplexStatementsExample_TupleItem2Property)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

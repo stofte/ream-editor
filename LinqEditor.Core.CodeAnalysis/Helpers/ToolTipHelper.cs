@@ -74,13 +74,10 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             {
                 if (nodeProp.Kind == SymbolKind.Property)
                 {
-                    var docId = nodeProp.GetDocumentationCommentId();
+                    var docId = nodeProp.OriginalDefinition != null && !nodeProp.Equals(nodeProp.OriginalDefinition) ?
+                        nodeProp.OriginalDefinition.GetDocumentationCommentId() : nodeProp.GetDocumentationCommentId();
                     docElm = _documentationService.GetDocumentation(docId);
-
-                    tooltip.ItemName = string.Format("{0} {1}.{2}",
-                        nodeProp.Type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
-                        nodeProp.ContainingType.Name,
-                        nodeProp.Name);
+                    tooltip.ItemName = PropertyDisplayStrings(nodeProp, docElm);
                     addendums.AddRange(MapExtras(docElm));
                 }
             }
@@ -198,6 +195,18 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         }
 
         /// <summary>
+        /// Renders the methodsymbol in a VS style, showing number of overloads available,
+        /// and for regular methods, return types.
+        /// </summary>
+        string PropertyDisplayStrings(IPropertySymbol p, DocumentationElement docElm)
+        {
+            var fullNs = p.ContainingNamespace.ToDisplayString();
+            var propName = p.ToDisplayString().Substring(fullNs.Length + 1);
+            var returnType = p.Type.ToDisplayString();
+            return string.Format("{0} {1}", returnType, propName);
+        }
+
+        /// <summary>
         /// Renders the typesymbol in a VS style, always showing full name, and any generic type parameters.
         /// </summary>
         Tuple<string, IEnumerable<string>> TypeDisplayStrings(ITypeSymbol t)
@@ -234,7 +243,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 if (namedT != null)
                 {
                     varianceStr = string.Format("<{0}>",
-                        string.Join(",", namedT.TypeParameters.Select((x, i) =>
+                        string.Join(", ", namedT.TypeParameters.Select((x, i) =>
                             string.Format("{0}{1}",
                                 x.Variance != VarianceKind.None ? x.Variance.ToString().ToLower() + " " : string.Empty,
                                 x.Name))));

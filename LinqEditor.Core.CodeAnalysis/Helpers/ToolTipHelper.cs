@@ -127,25 +127,27 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             // so we can scan for patterns in the tree, to determine the best node match.
             // by searching the entire node list and listing all matches, the last match
             // should be the desired node.
-            var patterns = new List<Tuple<int, Type[]>>
+
+            // includes: node offset, priority
+            var patterns = new List<Tuple<int, int, Type[]>>
             {
                 // method reference
-                Tuple.Create(0, new Type[]{ typeof(InvocationExpressionSyntax), typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
+                Tuple.Create(0, 1, new Type[]{ typeof(InvocationExpressionSyntax), typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
                 // property/field reference
-                Tuple.Create(0, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
-                Tuple.Create(1, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(PredefinedTypeSyntax) }),
+                Tuple.Create(0, 0, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
+                Tuple.Create(1, 0, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(PredefinedTypeSyntax) }),
 
                 // initial type references ala string/int/float, etc
-                Tuple.Create(1, new Type[]{ typeof(VariableDeclarationSyntax), typeof(PredefinedTypeSyntax) }),
+                Tuple.Create(1, 0, new Type[]{ typeof(VariableDeclarationSyntax), typeof(PredefinedTypeSyntax) }),
                 // initial type references ala Some.Where.Foo (+var)
-                Tuple.Create(1, new Type[]{ typeof(VariableDeclarationSyntax), typeof(IdentifierNameSyntax) }),
+                Tuple.Create(1, 0, new Type[]{ typeof(VariableDeclarationSyntax), typeof(IdentifierNameSyntax) }),
 
                 // generic type params
-                Tuple.Create(1, new Type[]{ typeof(TypeArgumentListSyntax), typeof(PredefinedTypeSyntax) }),
-                Tuple.Create(1, new Type[]{ typeof(TypeArgumentListSyntax), typeof(GenericNameSyntax) }),
+                Tuple.Create(1, 0, new Type[]{ typeof(TypeArgumentListSyntax), typeof(PredefinedTypeSyntax) }),
+                Tuple.Create(1, 0, new Type[]{ typeof(TypeArgumentListSyntax), typeof(GenericNameSyntax) }),
 
                 // object creation
-                Tuple.Create(0, new Type[]{ typeof(ObjectCreationExpressionSyntax) }),
+                Tuple.Create(0, 0, new Type[]{ typeof(ObjectCreationExpressionSyntax) }),
             };
             
             var tree = _model.SyntaxTree.GetRoot();
@@ -158,14 +160,14 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 patIndex = 0;
                 foreach (var pat in patterns)
                 {
-                    if (node.GetType() == pat.Item2[0])
+                    if (node.GetType() == pat.Item3[0])
                     {
                         // check remaining nodes
-                        var matched = pat.Item2.Length == 1;
-                        for (var j = 1; j < pat.Item2.Length &&
-                            allNodes.ElementAt(nodeIndex + j).GetType() == pat.Item2[j]; j++)
+                        var matched = pat.Item3.Length == 1;
+                        for (var j = 1; j < pat.Item3.Length &&
+                            allNodes.ElementAt(nodeIndex + j).GetType() == pat.Item3[j]; j++)
                         {
-                            if (j + 1 >= pat.Item2.Length)
+                            if (j + 1 >= pat.Item3.Length)
                             {
                                 matched = true;
                             }

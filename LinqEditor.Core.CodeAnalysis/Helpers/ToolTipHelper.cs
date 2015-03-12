@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -122,31 +123,70 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         SyntaxNode GetIndexNode(int index)
         {
-            var tree = _model.SyntaxTree.GetRoot();
-            SyntaxNode match = null;
-            foreach (var node in tree.DescendantNodes(new TextSpan(index, 1)))
+            // when getting the nodes for an index, the syntax tree will be flattened,
+            // so we can scan for patterns in the tree, to determine the best node match.
+            // by searching the entire node list and listing all matches, the last match
+            // should be the desired node.
+            var patterns = new List<Tuple<int, Type[]>>
             {
-                if (match == null)
-                {
-                    match = node;
-                    continue;
-                }
+                // method reference
+                Tuple.Create(0, new Type[]{ typeof(InvocationExpressionSyntax), typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
+                // property/field reference
+                Tuple.Create(0, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
+                Tuple.Create(1, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(PredefinedTypeSyntax) }),
 
-                // if we already have a member access node, dont replace it with a identifier node, since that the access nodeis more useful
-                if (match is MemberAccessExpressionSyntax && node is IdentifierNameSyntax)
-                {
-                    continue;
-                }
+                // initial type references ala string/int/float, etc
+                Tuple.Create(1, new Type[]{ typeof(VariableDeclarationSyntax), typeof(PredefinedTypeSyntax) }),
+                // initial type references ala Some.Where.Foo (+var)
+                Tuple.Create(1, new Type[]{ typeof(VariableDeclarationSyntax), typeof(IdentifierNameSyntax) }),
 
-                var withIn = node.SpanStart <= index && index <= node.Span.End && // within span
-                    (match.SpanStart < node.SpanStart || node.Span.End < match.Span.End); // and either index is closer
+                // generic type params
+                Tuple.Create(1, new Type[]{ typeof(TypeArgumentListSyntax), typeof(PredefinedTypeSyntax) }),
+                Tuple.Create(1, new Type[]{ typeof(TypeArgumentListSyntax), typeof(GenericNameSyntax) }),
 
-                if (withIn)
+                // object creation
+                Tuple.Create(0, new Type[]{ typeof(ObjectCreationExpressionSyntax) }),
+            };
+            
+            var tree = _model.SyntaxTree.GetRoot();
+            var allNodes = tree.DescendantNodes(new TextSpan(index, 1));
+            var nodeIndex = 0;
+            var patIndex = 0;
+            var matches = new List<SyntaxNode>();
+            foreach (var node in allNodes)
+            {
+                patIndex = 0;
+                foreach (var pat in patterns)
                 {
-                    match = node;
+                    if (node.GetType() == pat.Item2[0])
+                    {
+                        // check remaining nodes
+                        var matched = pat.Item2.Length == 1;
+                        for (var j = 1; j < pat.Item2.Length &&
+                            allNodes.ElementAt(nodeIndex + j).GetType() == pat.Item2[j]; j++)
+                        {
+                            if (j + 1 >= pat.Item2.Length)
+                            {
+                                matched = true;
+                            }
+                        }
+
+                        if (matched)
+                        {
+                            matches.Add(allNodes.ElementAt(nodeIndex + pat.Item1));
+                        }
+                    }
+                    patIndex++;
                 }
+                nodeIndex++;
             }
-            return match;
+
+            if (matches.Count > 0)
+            {
+                return matches[matches.Count - 1];
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -200,10 +240,9 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         string PropertyDisplayStrings(IPropertySymbol p, DocumentationElement docElm)
         {
-            var fullNs = p.ContainingNamespace.ToDisplayString();
-            var propName = p.ToDisplayString().Substring(fullNs.Length + 1);
-            var returnType = p.Type.ToDisplayString();
-            return string.Format("{0} {1}", returnType, propName);
+            var container = GetBasicName(p.ContainingType, includeNamespaces: false, useAliases: true);
+            var retStr = GetBasicName(p.Type, includeNamespaces: false, useAliases: true);
+            return string.Format("{0} {1}.{2}", retStr, container, p.Name);
         }
 
         /// <summary>
@@ -260,27 +299,43 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             return Tuple.Create(string.Format("{0} {1}", kind, name), specializations.AsEnumerable());
         }
 
-        string GetBasicName(ITypeSymbol t)
+        string GetBasicName(ITypeSymbol t, bool includeNamespaces = true, bool useAliases = false)
         {
-            var nss = new List<string>();
-            nss.Add(t.Name); // todo: generics?
-            var ns = t.ContainingNamespace;
-            do
+            // some types have aliases (lower cased "string" aliases "String", etc), for now, to get this rendering, 
+            // ToDisplayString must be used, instead of manually rendering the type name.
+            var aliasedTypes = new string[] 
+            { 
+                "T:System.Int32",
+                "T:System.Object"
+            };
+            if (useAliases && aliasedTypes.Contains(t.GetDocumentationCommentId()))
             {
-                if (!string.IsNullOrWhiteSpace(ns.Name))
-                {
-                    nss.Add(ns.Name);
-                }
-                ns = ns.ContainingNamespace;
+                return t.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
             }
-            while (ns != null);
-            nss.Reverse();
-            var baseName = string.Join(".", nss);
+            
+            var nameParts = new List<string>();
+            nameParts.Add(t.Name); // todo: generics?
+            if (includeNamespaces)
+            {
+                var ns = t.ContainingNamespace;
+                do
+                {
+                    if (!string.IsNullOrWhiteSpace(ns.Name))
+                    {
+                        nameParts.Add(ns.Name);
+                    }
+                    ns = ns.ContainingNamespace;
+                }
+                while (ns != null);
+            }
+
+            nameParts.Reverse();
+            var baseName = string.Join(".", nameParts);
 
             var namedType = t as INamedTypeSymbol;
             if (namedType != null && namedType.TypeArguments.Count() > 0)
             {
-                baseName += string.Format("<{0}>", string.Join(",", namedType.TypeArguments.Select(x => GetBasicName(x))));
+                baseName += string.Format("<{0}>", string.Join(", ", namedType.TypeArguments.Select(x => GetBasicName(x, includeNamespaces, useAliases))));
             }
             return baseName;
         }

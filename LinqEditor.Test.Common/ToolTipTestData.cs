@@ -18,6 +18,7 @@ namespace LinqEditor.Test.Common
         //     item3: tooltip
         // )
         
+        // VS doesn't include a space in the type param/arg list, but since the ToDisplayString method in roslyn does, it's easier to align with roslyn.
         public static Dictionary<string, Tuple<string, int, ToolTipData>> Data =
             new Dictionary<string, Tuple<string, int, ToolTipData>>
         {
@@ -60,7 +61,7 @@ namespace LinqEditor.Test.Common
                 ItemName = "class System.Collections.Generic.Dictionary<TKey, TValue>",
                 Description = "Represents a collection of keys and values.",
                 // TODO: figure out why there's no space here!
-                Addendums = new List<string> { "TKey is System.String", "TValue is System.Tuple<System.String,System.Collections.Generic.IEnumerable<System.String>>" }
+                Addendums = new List<string> { "TKey is System.String", "TValue is System.Tuple<System.String, System.Collections.Generic.IEnumerable<System.String>>" }
             })},
             {VarDeclOfDictionaryWithTuples_TupleGenericTypeParam, Tuple.Create(SourceCodeFragments.VarDeclOfDictionaryWithTuples, 37, new ToolTipData {
                 ItemName = "class System.Tuple<T1, T2>",
@@ -72,25 +73,50 @@ namespace LinqEditor.Test.Common
                 Description = "Gets or sets the default value for the column when you are creating new rows.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.InvalidCastException" }
             })},
-            {ComplexStatementsExample_TupleItem2Property, Tuple.Create(SourceCodeFragments.ComplexStatementsExample, 340, new ToolTipData {
+            {ComplexStatementsExampleOne_TupleItem2Property, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleOne, 340, new ToolTipData {
                 ItemName = "int Tuple<int, int>.Item2",
                 Description = "Gets the value of the current System.Tuple<T1, T2> object's second component.",
+                Addendums = new List<string> { }
+            })},
+            {ComplexStatementsExampleTwo_TupleItem2Property, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 657, new ToolTipData {
+                ItemName = "IEnumerable<int> Tuple<int, IEnumerable<int>>.Item2",
+                Description = "Gets the value of the current System.Tuple<T1, T2> object's second component.",
+                Addendums = new List<string> { }
+            })},
+            {ComplexStatementsExampleTwo_SecondTupleItem2Property, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 535, new ToolTipData {
+                ItemName = "IEnumerable<int> Tuple<int, IEnumerable<int>>.Item2",
+                Description = "Gets the value of the current System.Tuple<T1, T2> object's second component.",
+                Addendums = new List<string> { }
+            })},
+            {ComplexStatementsExampleTwo_StringTypeReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 609, new ToolTipData {
+                ItemName = "class System.String",
+                Description = "Represents text as a series of Unicode characters.",
+                Addendums = new List<string> { }
+            })},
+            {ComplexStatementsExampleTwo_StringJoinMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 615, new ToolTipData {
+                ItemName = "string string.Join<int>(string seperator, IEnumerable<int> values) (+ 4 overload(s))",
+                Description = "Concatonates the members of a collection, using the specified seperator between each member.",
                 Addendums = new List<string> { }
             })},
         };
 
         static void stub()
         {
-            var from = new List<Tuple<int, int>> 
+            var from = new List<Tuple<int, IEnumerable<int>>> 
             {
-                Tuple.Create(1,2), Tuple.Create(3,4), Tuple.Create(5,6), Tuple.Create(7,8), Tuple.Create(9, 0)
+                Tuple.Create(1, new List<int> { 2, 4, 10 }.AsEnumerable()), 
+                Tuple.Create(3, new List<int> { 2, 4, 16 }.AsEnumerable()), 
+                Tuple.Create(5, new List<int> { 6, 6, 14 }.AsEnumerable()),
+                Tuple.Create(7, new List<int> { 4, 8, 18 }.AsEnumerable()), 
+                Tuple.Create(9, new List<int> { 2, 6, 20 }.AsEnumerable())
             };
-            var x = new List<Tuple<int, int>>(from).AsQueryable();
-            Func<Tuple<int, int>, bool> filter = (t) => 
+
+            var x = new List<Tuple<int, IEnumerable<int>>>(from).AsQueryable();
+            Func<Tuple<int, IEnumerable<int>>, bool> filter = (t) =>
             {
-                return true;
+                return t.Item2.Sum() < 20;
             };
-            var filtered = x.Where(z => filter(z)).Select(z => z.Item1 + z.Item2).TakeWhile(z => z < 10);
+            var filtered = x.Where(z => filter(z)).Select(z => string.Join(", ", new int[]{ z.Item1 }.Concat(z.Item2)));
         }
 
         public const string VarDeclOfInt_InitialDecl = "VarDeclOfInt_InitialDecl"; // initial decl
@@ -104,6 +130,10 @@ namespace LinqEditor.Test.Common
         public const string VarDeclOfDictionaryWithTuples_InitialDecl = "VarDeclOfDictionaryWithTuples_InitialDecl"; // initial decl
         public const string VarDeclOfDictionaryWithTuples_TupleGenericTypeParam = "VarDeclOfDictionaryWithTuples_TupleGenericTypeParam"; // tuple type param
 
-        public const string ComplexStatementsExample_TupleItem2Property = "ComplexStatementsExample_TupleItem2Property";
+        public const string ComplexStatementsExampleOne_TupleItem2Property = "ComplexStatementsExampleOne_TupleItem2Property";
+        public const string ComplexStatementsExampleTwo_TupleItem2Property = "ComplexStatementsExampleTwo_TupleItem2Property";
+        public const string ComplexStatementsExampleTwo_SecondTupleItem2Property = "ComplexStatementsExampleTwo_SecondTupleItem2Property";
+        public const string ComplexStatementsExampleTwo_StringTypeReference = "ComplexStatementsExampleTwo_StringTypeReference";
+        public const string ComplexStatementsExampleTwo_StringJoinMethod = "ComplexStatementsExampleTwo_StringJoinMethod";
     }
 }

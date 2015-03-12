@@ -78,7 +78,11 @@ namespace Test
         [TestCase(ToolTipTestData.VarDeclOfIntHashSet_IntGenericTypeParam)]
         [TestCase(ToolTipTestData.VarDeclOfDictionaryWithTuples_TupleGenericTypeParam)]
         [TestCase(ToolTipTestData.FullDeclOfDataColumn_MemberProperty)]
-        [TestCase(ToolTipTestData.ComplexStatementsExample_TupleItem2Property)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleOne_TupleItem2Property)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_TupleItem2Property)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SecondTupleItem2Property)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringTypeReference)]
+        //[TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringJoinMethod)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

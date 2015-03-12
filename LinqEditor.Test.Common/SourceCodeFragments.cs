@@ -30,7 +30,7 @@ var x = new List<int>(from).AsQueryable();
         public const string FullDeclOfMultipleInts = @"int x1 = 10, x2 = 20, x3 = 42;";
         public const string VarDeclOfIntList = @"var x = new List<int>();";
 
-        public const string ComplexStatementsExample = @"
+        public const string ComplexStatementsExampleOne = @"
 var from = new List<Tuple<int, int>> 
 {
     Tuple.Create(1,2), Tuple.Create(3,4), Tuple.Create(5,6), Tuple.Create(7,8), Tuple.Create(9, 0)
@@ -43,5 +43,22 @@ Func<Tuple<int, int>, bool> filter = (t) =>
 var filtered = x.Where(z => filter(z)).Select(z => z.Item1 + z.Item2).TakeWhile(z => z < 10);
 ";
 
+        public const string ComplexStatementsExampleTwo = @"
+var from = new List<Tuple<int, IEnumerable<int>>> 
+{
+    Tuple.Create(1, new List<int> { 2, 4, 10 }.AsEnumerable()), 
+    Tuple.Create(3, new List<int> { 2, 4, 16 }.AsEnumerable()), 
+    Tuple.Create(5, new List<int> { 6, 6, 14 }.AsEnumerable()),
+    Tuple.Create(7, new List<int> { 4, 8, 18 }.AsEnumerable()), 
+    Tuple.Create(9, new List<int> { 2, 6, 20 }.AsEnumerable())
+};
+
+var x = new List<Tuple<int, IEnumerable<int>>>(from).AsQueryable();
+Func<Tuple<int, IEnumerable<int>>, bool> filter = (t) =>
+{
+    return t.Item2.Sum() < 20;
+};
+var filtered = x.Where(z => filter(z)).Select(z => string.Join("", "", new int[]{ z.Item1 }.Concat(z.Item2)));
+";
     }
 }

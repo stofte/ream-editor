@@ -82,7 +82,9 @@ namespace Test
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_TupleItem2Property)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SecondTupleItem2Property)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringTypeReference)]
-        //[TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringJoinMethod)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringJoinMethod)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SumExtensionMethod)]
+        //[TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SelectExtensionMethod)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

@@ -14,6 +14,16 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 {
     public class ToolTipHelper : IToolTipHelper
     {
+        /// <summary>
+        /// Defines the list of types that Roslyn renders as aliases when using ToDisplayString()
+        /// </summary>
+        IEnumerable<string> AliasedTypes = new[] 
+        {
+            "T:System.Int32",
+            "T:System.Object",
+            "T:System.String"        
+        };
+
         SemanticModel _model;
         IDocumentationService _documentationService;
 
@@ -35,6 +45,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             DocumentationElement docElm = null;
             ITypeSymbol nodeType = null;
             IPropertySymbol nodeProp = null;
+            IMethodSymbol nodeMethod = null;
             SyntaxNode matchedNode = GetIndexNode(index);
 
             // get initial type of the node
@@ -51,11 +62,20 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             }
             else if (matchedNode is MemberAccessExpressionSyntax)
             {
-                nodeProp = _model.GetSymbolInfo(matchedNode).Symbol as IPropertySymbol;
+                var memberAccessSymbol = _model.GetSymbolInfo(matchedNode).Symbol;
+
+                if (memberAccessSymbol is IPropertySymbol)
+                {
+                    nodeProp = memberAccessSymbol as IPropertySymbol;
+                }
+                else if (memberAccessSymbol is IMethodSymbol)
+                {
+                    nodeMethod = memberAccessSymbol as IMethodSymbol;
+                }
             }
 
             // return if nothing was found
-            if (nodeType == null && nodeProp == null) return tooltip;
+            if (nodeType == null && nodeProp == null && nodeMethod == null) return tooltip;
 
             if (nodeType != null &&
                 (matchedNode is IdentifierNameSyntax || 
@@ -71,14 +91,23 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 tooltip.ItemName = nameAndTypes.Item1;
                 addendums.AddRange(nameAndTypes.Item2);
             }
-            else if (matchedNode is MemberAccessExpressionSyntax && nodeProp != null)
+            else if (matchedNode is MemberAccessExpressionSyntax && (nodeProp != null || nodeMethod != null))
             {
-                if (nodeProp.Kind == SymbolKind.Property)
+                if (nodeProp != null)
                 {
                     var docId = nodeProp.OriginalDefinition != null && !nodeProp.Equals(nodeProp.OriginalDefinition) ?
                         nodeProp.OriginalDefinition.GetDocumentationCommentId() : nodeProp.GetDocumentationCommentId();
                     docElm = _documentationService.GetDocumentation(docId);
                     tooltip.ItemName = PropertyDisplayStrings(nodeProp, docElm);
+                    addendums.AddRange(MapExtras(docElm));
+                }
+                else 
+                {
+                    var docId = nodeMethod.IsExtensionMethod ? nodeMethod.ReducedFrom.GetDocumentationCommentId() :
+                        nodeMethod.OriginalDefinition != null && !nodeMethod.Equals(nodeMethod.OriginalDefinition) ?
+                        nodeMethod.OriginalDefinition.GetDocumentationCommentId() : nodeMethod.GetDocumentationCommentId();
+                    docElm = _documentationService.GetDocumentation(docId);
+                    tooltip.ItemName = MethodDisplayStrings(nodeMethod, docElm);
                     addendums.AddRange(MapExtras(docElm));
                 }
             }
@@ -208,30 +237,153 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         }
 
         /// <summary>
-        /// Renders the methodsymbol in a VS style, showing number of overloads available,
+        /// Renders the methodsymbol in a VS style, with any arguments, showing number of overloads available,
         /// and for regular methods, return types.
         /// </summary>
         string MethodDisplayStrings(IMethodSymbol m, DocumentationElement docElm)
         {
+            var fullNs = m.ContainingNamespace.ToDisplayString();
+            var typeArgStrings = m.TypeArguments.Select((x, i) => GetTypeName(x));
+            var genericStr = typeArgStrings.Count() == 0 ? string.Empty :
+                    string.Format("<{0}>", string.Join(", ", typeArgStrings));
+            var isExtension = m.MethodKind == MethodKind.ReducedExtension;
+            var argStrings = m.Parameters.Select((x, i) =>
+            {
+                var name = GetTypeName(x.Type);
+                // suffix parameter name from docs
+                return string.Format("{0} {1}", name, 
+                    docElm.MethodParameters.ElementAt(i + (isExtension ? 1 : 0)).Item1);
+            });
+
             if (m.MethodKind == MethodKind.Constructor)
             {
-                var availableCtors = m.ContainingType.Constructors.Where(x => x.DeclaredAccessibility == Accessibility.Public);
-                var ctorCount = availableCtors.Count() > 1 ? string.Format(" (+ {0} overload(s))", availableCtors.Count() - 1) : string.Empty;
-                var argStrings = m.Parameters.Select((x, i) =>
-                {
-                    var ns = x.Type.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                    var full = x.Type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                    // suffix parameter name from docs
-                    return string.Format("{0} {1}", full.Substring(ns.Length + 1), docElm.MethodParameters.ElementAt(i).Item1);
-                });
-
-                var fullNs = m.ContainingNamespace.ToDisplayString();
+                var availableCtors = m.ContainingType.Constructors
+                    .Where(x => x.DeclaredAccessibility == Accessibility.Public);
+                var ctorCount = availableCtors.Count() == 0 ? string.Empty : 
+                    string.Format(" (+ {0} overload(s))", availableCtors.Count() - 1);
+                
                 var ctorName = m.ToDisplayString().Substring(fullNs.Length + 1);
                 var ctorNameStub = "." + m.ContainingType.Name + "(";
                 ctorName = ctorName.Substring(0, ctorName.IndexOf(ctorNameStub) + ctorNameStub.Length - 1);
 
                 return string.Format("{0}({1}){2}", ctorName, string.Join(", ", argStrings), ctorCount);
             }
+            else if (m.MethodKind == MethodKind.Ordinary)
+            {
+                var overloads = m.ContainingType.GetMembers()
+                        .Where(x => x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public);
+                var overloadCount = overloads.Count() == 0 ? string.Empty :
+                    string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
+                var container = GetTypeName(m.ContainingType);
+                var retType = GetTypeName(m.ReturnType);
+                var arguments = string.Join(", ", argStrings);
+
+                return string.Format("{0} {1}.{2}{3}({4}){5}", retType, container, m.Name, genericStr, arguments, overloadCount);
+            }
+            else if (m.MethodKind == MethodKind.ReducedExtension)
+            {
+                var thisType = m.ReducedFrom.Parameters.First().Type;
+                var overloads = m.ReducedFrom.ContainingType.GetMembers()
+                    .Where(x =>
+                    {
+                        var isCandidate = x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol;
+                        if (isCandidate)
+                        {
+                            var extM = x as IMethodSymbol;
+                            // must either have same this param, or the method must be generic
+                            return extM.Parameters.First().Type.Equals(thisType) || extM.TypeParameters.Count() > 0;
+                        }
+                        return false;
+                    });
+                var overloadCount = overloads.Count() == 0 ? string.Empty :
+                    string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
+                var retType = GetTypeName(m.ReturnType);
+                var arguments = string.Join(", ", argStrings);
+
+                // rendering reducedfrom may include unresolved generic parameters. 
+                // if the method has type parameters, we want to replace the paramater with the concrete type instance
+                var baseTypeName = GetTypeName(m.ReducedFrom.Parameters.First().Type);
+
+                if (m.TypeArguments.Count() > 0)
+                {
+                    var firstTypeName = GetTypeName(m.TypeArguments.First());
+                    baseTypeName = string.Format("{0}<{1}>", baseTypeName.Substring(0, baseTypeName.IndexOf("<")), firstTypeName);
+                }
+
+                return string.Format("(extension) {0} {1}.{2}{3}({4}){5}", retType, baseTypeName, m.Name, genericStr, arguments, overloadCount);
+
+                //IEnumerable<ISymbol> overloads = null;
+
+                //if (m.MethodKind == MethodKind.Ordinary)
+                //{
+                //    overloads = m.ContainingType.GetMembers()
+                //        .Where(x => x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public);
+                //}
+                //else
+                //{
+                //    var thisType = m.ReducedFrom.Parameters.First().Type;
+                //    overloads = m.ReducedFrom.ContainingType.GetMembers()
+                //        .Where(x =>
+                //        {
+                //            var isCandidate = x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol;
+                //            if (isCandidate)
+                //            {
+                //                var extM = x as IMethodSymbol;
+                //                // must either have same this param, or the method must be generic
+                //                return extM.Parameters.First().Type.Equals(thisType) || extM.TypeParameters.Count() > 0;
+                //            }
+                //            return false;
+                //        });
+                //}
+                //var containerType = m.MethodKind == MethodKind.Ordinary ? m.ContainingType :
+                //    m.ReducedFrom.Parameters.First().Type;
+
+                //var overloadCount = overloads.Count() == 0 ? string.Empty : 
+                //    string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
+                //var genericStr = typeArgStrings.Count() == 0 ? string.Empty : 
+                //    string.Format("<{0}>", string.Join(", ", typeArgStrings));
+
+                //var containerTypeName = GetTypeName(m.ContainingType);
+                //if (m.MethodKind == MethodKind.ReducedExtension)
+                //{
+                //    var baseTypeName = GetTypeName(m.ReducedFrom.Parameters.First().Type);
+                //    var firstParamTypeName = GetTypeName(m.TypeArguments.First());
+                //    containerTypeName = string.Format("{0}<{1}>", baseTypeName.Substring(0, baseTypeName.IndexOf("<")), firstParamTypeName);
+                //}
+                
+                //// VS seems to show the interface name
+                //var retType = GetTypeName(m.ReturnType);
+                //var arguments = string.Join(", ", argStrings);
+                //var isExtensionStr = m.MethodKind != MethodKind.ReducedExtension ? string.Empty : "(extension) ";
+
+                //return string.Format("{0}{1} {2}.{3}{4}({5}){6}", isExtensionStr, retType, containerTypeName, m.Name, genericStr, arguments, overloadCount);
+            }
+            //else if (m.MethodKind == MethodKind.ReducedExtension)
+            //{
+            //    // overloads must also filter by the "this" parameter, as well as by generics 
+            //    var extMethod = m.ReducedFrom;
+            //    var thisType = extMethod.Parameters.First().Type;
+            //    var overloads = m.ReducedFrom.ContainingType.GetMembers()
+            //        .Where(x => {
+            //            var isCandidate = x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol;
+            //            if (isCandidate)
+            //            {
+            //                var extM = x as IMethodSymbol;
+            //                // must either have same this param, or the method must be generic
+            //                return extM.Parameters.First().Type.Equals(thisType) || extM.TypeParameters.Count() > 0;
+            //            }
+            //            return false;
+            //        });
+
+            //    var overloadCount = overloads.Count() == 0 ? string.Empty :
+            //        string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
+
+            //    var genericStr = typeArgStrings.Count() == 0 ? string.Empty :
+            //        string.Format("<{0}>", string.Join(", ", typeArgStrings));
+            //    var container = GetTypeName(m.ContainingType);
+            //    var retType = GetTypeName(m.ReturnType);
+            //    var arguments = string.Join(", ", argStrings);
+            //}
 
             return string.Empty;
         }
@@ -242,13 +394,13 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         string PropertyDisplayStrings(IPropertySymbol p, DocumentationElement docElm)
         {
-            var container = GetBasicName(p.ContainingType, includeNamespaces: false, useAliases: true);
-            var retStr = GetBasicName(p.Type, includeNamespaces: false, useAliases: true);
+            var container = GetTypeName(p.ContainingType);
+            var retStr = GetTypeName(p.Type);
             return string.Format("{0} {1}.{2}", retStr, container, p.Name);
         }
 
         /// <summary>
-        /// Renders the typesymbol in a VS style, always showing full name, and any generic type parameters.
+        /// Renders the typesymbol in a VS style, always showing full path and original name, and any generic type parameters.
         /// </summary>
         Tuple<string, IEnumerable<string>> TypeDisplayStrings(ITypeSymbol t)
         {
@@ -268,7 +420,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             {
                 // for type aliases ToDisplay returns the alias name
                 // for tooltips, we want the original full type name
-                name = GetBasicName(t);
+                name = GetTypeName(t, includeNamespaces: true, useAliases: false);
             }
 
             // if the type is generic, assume it's a namedtype
@@ -277,7 +429,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 var namedT = t as INamedTypeSymbol;
 
                 // this assumes the collections are sorted in the same order
-                specializations.AddRange(namedT.TypeParameters.Select((x, i) => string.Format("{0} is {1}", x, GetBasicName(namedT.TypeArguments[i]))));
+                specializations.AddRange(namedT.TypeParameters.Select((x, i) => 
+                    string.Format("{0} is {1}", x, GetTypeName(namedT.TypeArguments[i], includeNamespaces: true, useAliases: false))));
 
                 // attempt to construct a new generic string with specific variance, eg "<out T>"
                 string varianceStr = string.Empty;
@@ -301,15 +454,24 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             return Tuple.Create(string.Format("{0} {1}", kind, name), specializations.AsEnumerable());
         }
 
-        string GetBasicName(ITypeSymbol t, bool includeNamespaces = true, bool useAliases = false)
+        // default settings is the most common usecase since it uses the least space
+        /// <summary>
+        /// Returns a rendering of the type similarly to VS
+        /// </summary>
+        /// <param name="t">The type to render</param>
+        /// <param name="includeNamespaces">Include namespaces</param>
+        /// <param name="useAliases">Use default aliases (eg "int" vs "Int32")</param>
+        public static string GetTypeName(ITypeSymbol t, bool includeNamespaces = false, bool useAliases = true)
         {
             // some types have aliases (lower cased "string" aliases "String", etc), for now, to get this rendering, 
             // ToDisplayString must be used, instead of manually rendering the type name.
             var aliasedTypes = new string[] 
             { 
                 "T:System.Int32",
-                "T:System.Object"
+                "T:System.Object",
+                "T:System.String"
             };
+
             if (useAliases && aliasedTypes.Contains(t.GetDocumentationCommentId()))
             {
                 return t.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
@@ -317,7 +479,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             
             var nameParts = new List<string>();
             nameParts.Add(t.Name); // todo: generics?
-            if (includeNamespaces)
+            if (includeNamespaces && t.TypeKind != TypeKind.TypeParameter)
             {
                 var ns = t.ContainingNamespace;
                 do
@@ -337,7 +499,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             var namedType = t as INamedTypeSymbol;
             if (namedType != null && namedType.TypeArguments.Count() > 0)
             {
-                baseName += string.Format("<{0}>", string.Join(", ", namedType.TypeArguments.Select(x => GetBasicName(x, includeNamespaces, useAliases))));
+                baseName += string.Format("<{0}>", string.Join(", ", namedType.TypeArguments.Select(x => GetTypeName(x, includeNamespaces, useAliases))));
             }
             return baseName;
         }

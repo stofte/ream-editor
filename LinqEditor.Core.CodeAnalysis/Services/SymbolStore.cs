@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LinqEditor.Core.CodeAnalysis.Helpers;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         {
             var match = _symbols.FirstOrDefault(s => s.GetDocumentationCommentId() == cref || 
                 s.GetMembers().Any(m => m.GetDocumentationCommentId() == cref));
-            return match != null ? match.ToDisplayString() : null;
+            return match != null ? ToolTipHelper.GetTypeName(match, includeNamespaces: true, useAliases: false) : null;
         }
     }
 }

@@ -58,7 +58,7 @@ Func<Tuple<int, IEnumerable<int>>, bool> filter = (t) =>
 {
     return t.Item2.Sum() < 20;
 };
-var filtered = x.Where(z => filter(z)).Select(z => string.Join("", "", new int[]{ z.Item1 }.Concat(z.Item2)));
+var filtered = x.Where(z => filter(z)).Select(z => String.Join("", "", new int[]{ z.Item1 }.Concat(z.Item2)));
 Func<Tuple<int, IEnumerable<int>>, int> selectFunc = t =>
 {
     return t.Item1;

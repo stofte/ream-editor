@@ -45,107 +45,75 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             };
 
             DocumentationElement docElm = null;
-            ITypeSymbol nodeType = null;
-            IPropertySymbol nodeProp = null;
-            IMethodSymbol nodeMethod = null;
             SyntaxNode matchedNode = GetIndexNode(index);
+            ISymbol symb = _model.GetSymbolInfo(matchedNode).Symbol;
+            ITypeSymbol typeSymb = _model.GetTypeInfo(matchedNode).Type;
 
-            // get initial type of the node
-            if (matchedNode is IdentifierNameSyntax || 
-                matchedNode is ObjectCreationExpressionSyntax)
-            {
-                // vars, direct references, aliases
-                nodeType = _model.GetTypeInfo(matchedNode).Type;
-            }
-            else if (matchedNode is PredefinedTypeSyntax || 
-                     matchedNode is GenericNameSyntax)
-            {
-                nodeType = _model.GetSymbolInfo(matchedNode).Symbol as ITypeSymbol;
-            }
-            else if (matchedNode is MemberAccessExpressionSyntax)
-            {
-                var accessNode = matchedNode as MemberAccessExpressionSyntax;
-                var memberAccessSymbol = _model.GetSymbolInfo(accessNode).Symbol;
+            IMethodSymbol methodSymb = symb as IMethodSymbol;
+            IPropertySymbol propertySymb = symb as IPropertySymbol;
+            var memberAccessNode = matchedNode as MemberAccessExpressionSyntax;
+            var ctorNode = matchedNode as ObjectCreationExpressionSyntax;
 
-
-                if (memberAccessSymbol is IPropertySymbol)
+            if (methodSymb != null)
+            {
+                if (memberAccessNode != null)
                 {
-                    nodeProp = memberAccessSymbol as IPropertySymbol;
+                    typeSymb = _model.GetTypeInfo(memberAccessNode.Expression).Type;
+
+                    var docId = methodSymb.IsExtensionMethod ? methodSymb.ReducedFrom.GetDocumentationCommentId() :
+                        methodSymb.OriginalDefinition != null && !methodSymb.Equals(methodSymb.OriginalDefinition) ?
+                        methodSymb.OriginalDefinition.GetDocumentationCommentId() : methodSymb.GetDocumentationCommentId();
+                    docElm = _documentationService.GetDocumentation(docId);
+                    tooltip.ItemName = MethodDisplayStrings(methodSymb, typeSymb, docElm);
+                    addendums.AddRange(MapExtras(docElm));
                 }
-                else if (memberAccessSymbol is IMethodSymbol)
+                else if (ctorNode != null && typeSymb is INamedTypeSymbol)
                 {
-                    nodeMethod = memberAccessSymbol as IMethodSymbol;
-                    nodeType = _model.GetTypeInfo(accessNode.Expression).Type;
+                    var classType = typeSymb as INamedTypeSymbol;
+                    var argSymbols = ctorNode.ArgumentList.Arguments.Select(x => _model.GetTypeInfo(x.Expression));
+                    // only search for public ctors
+                    var calledCtor = classType.Constructors
+                        .Where(x => x.DeclaredAccessibility == Accessibility.Public)
+                        .FirstOrDefault(x =>
+                            // if the count matches
+                            x.Parameters.Count() == argSymbols.Count() &&
+                            x.Parameters
+                                // select into the passed args and check that either the type is a 
+                                // direct match, or that it implements the required interface
+                                .Select((p, i) =>
+                                    p.Type == argSymbols.ElementAt(i).Type ||
+                                    argSymbols.ElementAt(i).Type.AllInterfaces.Contains(p.Type))
+                                .All(b => b == true));
+
+                    // if we found a matching ctor
+                    if (calledCtor != null)
+                    {
+                        var docId = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ?
+                            calledCtor.OriginalDefinition.GetDocumentationCommentId() : calledCtor.GetDocumentationCommentId();
+                        docElm = _documentationService.GetDocumentation(docId);
+                        tooltip.ItemName = MethodDisplayStrings(calledCtor, null, docElm);
+                        addendums.AddRange(MapExtras(docElm));
+                    }
                 }
+
             }
-
-            // return if nothing was found
-            if (nodeType == null && nodeProp == null && nodeMethod == null) return tooltip;
-
-            if (nodeType != null &&
-                (matchedNode is IdentifierNameSyntax || 
-                matchedNode is PredefinedTypeSyntax ||
-                matchedNode is GenericNameSyntax)) // type references
+            else if (propertySymb != null)
             {
-                var docId = nodeType.OriginalDefinition != null && nodeType != nodeType.OriginalDefinition ?
-                    nodeType.OriginalDefinition.GetDocumentationCommentId() : nodeType.GetDocumentationCommentId();
+                var docId = propertySymb.OriginalDefinition != null && !propertySymb.Equals(propertySymb.OriginalDefinition) ?
+                    propertySymb.OriginalDefinition.GetDocumentationCommentId() : propertySymb.GetDocumentationCommentId();
+                docElm = _documentationService.GetDocumentation(docId);
+                tooltip.ItemName = PropertyDisplayStrings(propertySymb, docElm);
+                addendums.AddRange(MapExtras(docElm));
+            }
+            else if (typeSymb != null)
+            {
+                var docId = typeSymb.OriginalDefinition != null && typeSymb != typeSymb.OriginalDefinition ?
+                    typeSymb.OriginalDefinition.GetDocumentationCommentId() : typeSymb.GetDocumentationCommentId();
                 docElm = _documentationService.GetDocumentation(docId);
                 // use standard display routine
-                var typeParts = TypeDisplayStrings(nodeType);
-                var nameAndTypes = TypeDisplayStrings(nodeType);
+                var nameAndTypes = TypeDisplayStrings(typeSymb);
                 tooltip.ItemName = nameAndTypes.Item1;
                 addendums.AddRange(nameAndTypes.Item2);
-            }
-            else if (matchedNode is MemberAccessExpressionSyntax)
-            {
-                if (nodeMethod == null) 
-                {
-                    // must be a property
-                    var docId = nodeProp.OriginalDefinition != null && !nodeProp.Equals(nodeProp.OriginalDefinition) ?
-                        nodeProp.OriginalDefinition.GetDocumentationCommentId() : nodeProp.GetDocumentationCommentId();
-                    docElm = _documentationService.GetDocumentation(docId);
-                    tooltip.ItemName = PropertyDisplayStrings(nodeProp, docElm);
-                    addendums.AddRange(MapExtras(docElm));
-                }
-                else 
-                {
-                    var docId = nodeMethod.IsExtensionMethod ? nodeMethod.ReducedFrom.GetDocumentationCommentId() :
-                        nodeMethod.OriginalDefinition != null && !nodeMethod.Equals(nodeMethod.OriginalDefinition) ?
-                        nodeMethod.OriginalDefinition.GetDocumentationCommentId() : nodeMethod.GetDocumentationCommentId();
-                    docElm = _documentationService.GetDocumentation(docId);
-                    tooltip.ItemName = MethodDisplayStrings(nodeMethod, nodeType, docElm);
-                    addendums.AddRange(MapExtras(docElm));
-                }
-            }
-            else if (matchedNode is ObjectCreationExpressionSyntax && 
-                nodeType is INamedTypeSymbol) // constructor
-            {
-                var ctorNode = matchedNode as ObjectCreationExpressionSyntax;
-                var classType = nodeType as INamedTypeSymbol;
-                var argSymbols = ctorNode.ArgumentList.Arguments.Select(x => _model.GetTypeInfo(x.Expression));
-                // only search for public ctors
-                var calledCtor = classType.Constructors
-                    .Where(x => x.DeclaredAccessibility == Accessibility.Public)
-                    .FirstOrDefault(x =>
-                        // if the count matches
-                        x.Parameters.Count() == argSymbols.Count() &&
-                        x.Parameters
-                            // select into the passed args and check that either the type is a 
-                            // direct match, or that it implements the required interface
-                            .Select((p, i) =>
-                                p.Type == argSymbols.ElementAt(i).Type ||
-                                argSymbols.ElementAt(i).Type.AllInterfaces.Contains(p.Type))
-                            .All(b => b == true));
-
-                // if we found a matching ctor
-                if (calledCtor != null)
-                {
-                    var docId = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ?
-                        calledCtor.OriginalDefinition.GetDocumentationCommentId() : calledCtor.GetDocumentationCommentId();
-                    docElm = _documentationService.GetDocumentation(docId);
-                    tooltip.ItemName = MethodDisplayStrings(calledCtor, null, docElm);
-                    addendums.AddRange(MapExtras(docElm));
-                }
             }
 
             tooltip.Description = docElm != null ? docElm.Summary : string.Empty;
@@ -158,72 +126,25 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// </summary>
         SyntaxNode GetIndexNode(int index)
         {
-            // when getting the nodes for an index, the syntax tree will be flattened,
-            // so we can scan for patterns in the tree, to determine the best node match.
-            // by searching the entire node list and listing all matches, the last match
-            // should be the desired node.
-
-            // includes: node offset, priority
-            var patterns = new List<Tuple<int, int, Type[]>>
-            {
-                // method reference
-                Tuple.Create(0, 1, new Type[]{ typeof(InvocationExpressionSyntax), typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
-                // property/field reference
-                Tuple.Create(0, 0, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(IdentifierNameSyntax) }),
-                Tuple.Create(1, 0, new Type[]{ typeof(MemberAccessExpressionSyntax), typeof(PredefinedTypeSyntax) }),
-
-                // initial type references ala string/int/float, etc
-                Tuple.Create(1, 0, new Type[]{ typeof(VariableDeclarationSyntax), typeof(PredefinedTypeSyntax) }),
-                // initial type references ala Some.Where.Foo (+var)
-                Tuple.Create(1, 0, new Type[]{ typeof(VariableDeclarationSyntax), typeof(IdentifierNameSyntax) }),
-
-                // generic type params
-                Tuple.Create(1, 0, new Type[]{ typeof(TypeArgumentListSyntax), typeof(PredefinedTypeSyntax) }),
-                Tuple.Create(1, 0, new Type[]{ typeof(TypeArgumentListSyntax), typeof(GenericNameSyntax) }),
-
-                // object creation
-                Tuple.Create(0, 0, new Type[]{ typeof(ObjectCreationExpressionSyntax) }),
-            };
-            
             var tree = _model.SyntaxTree.GetRoot();
-            var allNodes = tree.DescendantNodes(new TextSpan(index, 1));
-            var nodeIndex = 0;
-            var patIndex = 0;
-            var matches = new List<SyntaxNode>();
-            foreach (var node in allNodes)
+            var allNodes = tree.DescendantNodes(new TextSpan(index, 1)).Reverse();
+            SyntaxNode matched = null;
+            matched = allNodes.First();
+            if (matched is IdentifierNameSyntax && allNodes.Count() > 1 && 
+                allNodes.ElementAt(1) is MemberAccessExpressionSyntax)
             {
-                patIndex = 0;
-                foreach (var pat in patterns)
+                var m = matched as IdentifierNameSyntax;
+                var ma = allNodes.ElementAt(1) as MemberAccessExpressionSyntax;
+                var mv = m.Identifier.ValueText;
+                var mav = ma.Name.Identifier.ValueText;
+                // if the identifiers match, the interesting node is actually a member reference
+                // in which case the memberacess node is returned.
+                if (m.Identifier.ValueText == ma.Name.Identifier.ValueText)
                 {
-                    if (node.GetType() == pat.Item3[0])
-                    {
-                        // check remaining nodes
-                        var matched = pat.Item3.Length == 1;
-                        for (var j = 1; j < pat.Item3.Length &&
-                            allNodes.ElementAt(nodeIndex + j).GetType() == pat.Item3[j]; j++)
-                        {
-                            if (j + 1 >= pat.Item3.Length)
-                            {
-                                matched = true;
-                            }
-                        }
-
-                        if (matched)
-                        {
-                            matches.Add(allNodes.ElementAt(nodeIndex + pat.Item1));
-                        }
-                    }
-                    patIndex++;
+                    matched = ma;
                 }
-                nodeIndex++;
             }
-
-            if (matches.Count > 0)
-            {
-                return matches[matches.Count - 1];
-            }
-
-            return null;
+            return matched;
         }
 
         /// <summary>

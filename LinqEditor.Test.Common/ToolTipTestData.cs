@@ -128,6 +128,11 @@ namespace LinqEditor.Test.Common
                 Description = "",
                 Addendums = new List<string> { }
             })},
+            {ComplexStatementsExampleTwo_SelectIndexParameterReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 605, new ToolTipData {
+                ItemName = "(parameter) int i",
+                Description = "",
+                Addendums = new List<string> { }
+            })},
         };
 
         static void stub()
@@ -176,5 +181,6 @@ var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
         public const string ComplexStatementsExampleTwo_OtherSelectExtensionMethod = "ComplexStatementsExampleTwo_OtherSelectExtensionMethod";
         public const string ComplexStatementsExampleTwo_FirstZParameterReference = "ComplexStatementsExampleTwo_FirstZParameterReference";
         public const string ComplexStatementsExampleTwo_SecondZParameterReference = "ComplexStatementsExampleTwo_SecondZParameterReference";
+        public const string ComplexStatementsExampleTwo_SelectIndexParameterReference = "ComplexStatementsExampleTwo_SelectIndexParameterReference";
     }
 }

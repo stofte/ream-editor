@@ -89,6 +89,7 @@ namespace Test
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_ConcatExtensionMethod)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_FirstZParameterReference)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SecondZParameterReference)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SelectIndexParameterReference)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

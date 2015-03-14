@@ -60,6 +60,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             // takes special handling
             if (paramNode != null)
             {
+                var parenLambdaNode = matchedNodes.ElementAt(1) as ParenthesizedLambdaExpressionSyntax;
+                var simpleLambdaNode = matchedNodes.ElementAt(1) as SimpleLambdaExpressionSyntax;
                 var namedType = _model.GetTypeInfo(matchedNodes.ElementAt(1)).ConvertedType as INamedTypeSymbol;
                 // should be either expression or func
                 var docId = namedType.OriginalDefinition != null && !namedType.Equals(namedType.OriginalDefinition) ?
@@ -68,10 +70,28 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 if (docId == @"T:System.Linq.Expressions.Expression`1" &&
                     namedType.TypeArguments[0] is INamedTypeSymbol)
                 {
-                    var typeArg = namedType.TypeArguments[0] as INamedTypeSymbol;
-                    if (typeArg.TypeArguments.Count() == 2)
+                    // determine current argument
+                    var idx = -1;
+                    if (parenLambdaNode != null)
                     {
-                        tooltip.ItemName = string.Format("(parameter) {0} {1}", GetTypeName(typeArg.TypeArguments[0]), paramNode.Identifier.ValueText);
+                        foreach (var p in parenLambdaNode.ParameterList.Parameters)
+                        {
+                            idx++;
+                            if (p.Identifier.ValueText == paramNode.Identifier.ValueText)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        idx = 0; // simple expression always has one arg?
+                    }
+                    // select the corrosponding type in the expression's func type
+                    var typeArg = namedType.TypeArguments[0] as INamedTypeSymbol;
+                    if (typeArg.TypeArguments.Count() >= idx)
+                    {
+                        tooltip.ItemName = string.Format("(parameter) {0} {1}", GetTypeName(typeArg.TypeArguments[idx]), paramNode.Identifier.ValueText);
                     }
                 }
             }
@@ -177,7 +197,9 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             else if (match is ParameterSyntax)
             {
                 matched.Add(match);
-                matched.Add(allNodes.OfType<SimpleLambdaExpressionSyntax>().First());
+                var lambdaNode = allNodes.OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault() as SyntaxNode ??
+                    allNodes.OfType<ParenthesizedLambdaExpressionSyntax>().FirstOrDefault() as SyntaxNode;
+                matched.Add(lambdaNode);
             }
             else
             {

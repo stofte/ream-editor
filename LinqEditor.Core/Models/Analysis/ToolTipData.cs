@@ -23,7 +23,7 @@ namespace LinqEditor.Core.Models.Analysis
                 /*1*/ !string.IsNullOrWhiteSpace(Description) ? "\n" : string.Empty,
                 /*2*/ !string.IsNullOrWhiteSpace(Description) ? Description : string.Empty,
                 /*3*/ Addendums != null && Addendums.Count() > 0 ? "\n\n" : string.Empty,
-                /*4*/ Addendums != null && Addendums.Count() > 0 ? string.Join("\n", Addendums) : string.Empty
+                /*4*/ Addendums != null && Addendums.Count() > 0 ? string.Join("\n", Addendums.Select(x => x.Replace("\t", "    "))) : string.Empty
             );
         }
     }

@@ -42,6 +42,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         protected IEnumerable<Error> _errors;
         protected SyntaxNode _currentTree;
         protected SemanticModel _currentModel;
+        protected IToolTipHelper _tooltipHelper;
 
 
         public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService, ISymbolStore symbolStore, IToolTipHelperFactory tooltipFactory)
@@ -197,7 +198,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             }
             else
             {
-                //tooltip = CodeAnalysisHelper.GetToolTip(nodes, _currentModel, _documentationService);
+                tooltip = _tooltipHelper.GetToolTip(IndexOffset + updateIndex);
                 if (!string.IsNullOrWhiteSpace(tooltip.ItemName))
                 {
                     ctx = UserContext.ToolTip;
@@ -226,6 +227,13 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _warnings = result.Item2;
             _errors = result.Item3;
             _currentTree = tree.GetRoot();
+
+            if (_tooltipHelper != null)
+            {
+                _tooltipFactory.Release(_tooltipHelper);
+            }
+
+            _tooltipHelper = _tooltipFactory.Create(_currentModel, _extensionMethods);
         }
 
 

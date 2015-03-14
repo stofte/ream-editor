@@ -16,8 +16,11 @@ namespace LinqEditor.Core.CodeAnalysis.Tests
     public class TemplateCodeAnalysisTests
     {
         ISymbolStore _mockSymbolStore;
+        ISymbolStore _realSymbolStore;
         IDocumentationService _mockDocumentationService;
         IDocumentationService _realDocumentationService;
+        IDocumentationService _realDocumentationServiceWithRealSymbols;
+
         IToolTipHelperFactory _mockTooltipFactory;
         ITemplateService _templateService;
         string _simpleProgram = @"
@@ -106,6 +109,9 @@ namespace Another.Generated
             var mockTooltipFactory = new Mock<IToolTipHelperFactory>();
             _mockTooltipFactory = mockTooltipFactory.Object;
             mockTooltipFactory.Setup(x => x.Create(It.IsAny<SemanticModel>(), It.IsAny<ExtensionMethodCollection>())).Returns(mockTTHelper.Object);
+
+            _realSymbolStore = new SymbolStore();
+            _realDocumentationServiceWithRealSymbols = new DocumentationService(_realSymbolStore);
         }
 
         // "." is last char
@@ -116,9 +122,6 @@ namespace Another.Generated
         [TestCase("var s = new MyStruct { Bar = 22 }; s.", 1, UserContext.MemberCompletion, Description = "instance struct")]
         [TestCase("MyStruct.", 1, UserContext.MemberCompletion, Description = "static struct")]
         [TestCase("this.", 1, UserContext.MemberCompletion, Description = "this")]
-        // not member completions
-        [TestCase("var x = new List<int>();", 1, UserContext.Unknown, Description = "statement terminator")]
-        [TestCase("3423", 1, UserContext.Unknown, Description = "illegal token?")]
         public void Returns_Correct_Context_For_Analyze(string src, int offset, UserContext editContex)
         {
 
@@ -260,6 +263,64 @@ namespace Another.Generated
                 var byLineColumn = err.Location.GetText(sourceFragment);
 
                 Assert.AreEqual(byIndex, byLineColumn);
+            }
+        }
+
+        // replaces castle's auto generated factory
+        class ToolTipFac : IToolTipHelperFactory
+        {
+            IDocumentationService _docs;
+            public ToolTipFac(IDocumentationService docService)
+            {
+                _docs = docService;
+            }
+
+            public IToolTipHelper Create(SemanticModel model, ExtensionMethodCollection extensionMethods)
+            {
+                return new ToolTipHelper(model, extensionMethods, _docs);
+            }
+
+            public void Release(IToolTipHelper instance)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [TestCase(ToolTipTestData.ComplexStatementsExampleOne_TupleItem2Property)]
+        [TestCase(
+            ToolTipTestData.ComplexStatementsExampleTwo_TupleItem2Property,
+            ToolTipTestData.ComplexStatementsExampleTwo_SecondTupleItem2Property,
+            ToolTipTestData.ComplexStatementsExampleTwo_StringTypeReference,
+            ToolTipTestData.ComplexStatementsExampleTwo_StringJoinMethod,
+            ToolTipTestData.ComplexStatementsExampleTwo_SumExtensionMethod,
+            ToolTipTestData.ComplexStatementsExampleTwo_SelectExtensionMethod,
+            ToolTipTestData.ComplexStatementsExampleTwo_OtherSelectExtensionMethod
+            )]
+        public void Returns_Expected_ToolTips_For_Complex_Statements(params string[] testKeys)
+        {
+            var m = new Mock<ITemplateService>();
+            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
+            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
+
+            var ttFac = new ToolTipFac(_realDocumentationServiceWithRealSymbols);
+
+            var editor = new TemplateCodeAnalysis(m.Object, _realDocumentationServiceWithRealSymbols, _realSymbolStore, ttFac);
+            editor.Initialize();
+
+            var testCases = testKeys.Select(x => ToolTipTestData.Data[x]);
+            var srcStb = testCases.First().Item1;
+            var offsets = testCases.Select(x => x.Item2);
+            var exptectedTTs = testCases.Select(x => x.Item3).ToArray();
+
+            var i = 0;
+            foreach (var offset in offsets)
+            {
+                var results = editor.Analyze(srcStb, offset);
+                Assert.IsNotNull(results);
+                Assert.AreEqual(exptectedTTs[i].ItemName, results.ToolTip.ItemName);
+                Assert.AreEqual(exptectedTTs[i].Description, results.ToolTip.Description);
+                Assert.AreEqual(exptectedTTs[i].Addendums, results.ToolTip.Addendums);
+                i++;
             }
         }
     }

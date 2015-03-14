@@ -233,7 +233,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         {
             var l = new List<string>();
 
-            if (docs.MethodExceptions.Count() > 0)
+            if (docs != null && docs.MethodExceptions.Count() > 0)
             {
                 l.Add("Exceptions:");
                 l.AddRange(docs.MethodExceptions.Select(x => string.Format("\t{0}", x)));
@@ -303,7 +303,14 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 if (m.TypeArguments.Count() > 0)
                 {
                     var firstTypeName = GetTypeName(m.TypeArguments.First());
-                    baseTypeName = string.Format("{0}<{1}>", baseTypeName.Substring(0, baseTypeName.IndexOf("<")), firstTypeName);
+                    if (m.ReducedFrom.Parameters.First().Type.TypeKind == TypeKind.TypeParameter)
+                    {
+                        baseTypeName = firstTypeName;
+                    }
+                    else
+                    {
+                        baseTypeName = string.Format("{0}<{1}>", baseTypeName.Substring(0, baseTypeName.IndexOf("<")), firstTypeName);
+                    }
                 }
 
                 return string.Format("(extension) {0} {1}.{2}{3}({4}){5}", retType, baseTypeName, m.Name, genericStr, arguments, overloadCount);

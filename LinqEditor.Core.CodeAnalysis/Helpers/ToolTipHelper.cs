@@ -45,16 +45,37 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             };
 
             DocumentationElement docElm = null;
-            SyntaxNode matchedNode = GetIndexNode(index);
+            var matchedNodes = GetIndexNode(index);
+            SyntaxNode matchedNode = matchedNodes.First();
+            MemberAccessExpressionSyntax memberAccessNode = matchedNode as MemberAccessExpressionSyntax;
+            ObjectCreationExpressionSyntax ctorNode = matchedNode as ObjectCreationExpressionSyntax;
+            ParameterSyntax paramNode = matchedNode as ParameterSyntax;
+
             ISymbol symb = _model.GetSymbolInfo(matchedNode).Symbol;
             ITypeSymbol typeSymb = _model.GetTypeInfo(matchedNode).Type;
-
             IMethodSymbol methodSymb = symb as IMethodSymbol;
             IPropertySymbol propertySymb = symb as IPropertySymbol;
-            var memberAccessNode = matchedNode as MemberAccessExpressionSyntax;
-            var ctorNode = matchedNode as ObjectCreationExpressionSyntax;
+            IParameterSymbol paramSymb = symb as IParameterSymbol;
 
-            if (methodSymb != null)
+            // takes special handling
+            if (paramNode != null)
+            {
+                var namedType = _model.GetTypeInfo(matchedNodes.ElementAt(1)).ConvertedType as INamedTypeSymbol;
+                // should be either expression or func
+                var docId = namedType.OriginalDefinition != null && !namedType.Equals(namedType.OriginalDefinition) ?
+                    namedType.OriginalDefinition.GetDocumentationCommentId() : namedType.GetDocumentationCommentId();
+
+                if (docId == @"T:System.Linq.Expressions.Expression`1" &&
+                    namedType.TypeArguments[0] is INamedTypeSymbol)
+                {
+                    var typeArg = namedType.TypeArguments[0] as INamedTypeSymbol;
+                    if (typeArg.TypeArguments.Count() == 2)
+                    {
+                        tooltip.ItemName = string.Format("(parameter) {0} {1}", GetTypeName(typeArg.TypeArguments[0]), paramNode.Identifier.ValueText);
+                    }
+                }
+            }
+            else if (methodSymb != null)
             {
                 if (memberAccessNode != null)
                 {
@@ -105,6 +126,10 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 tooltip.ItemName = PropertyDisplayStrings(propertySymb, docElm);
                 addendums.AddRange(MapExtras(docElm));
             }
+            else if (paramSymb != null)
+            {
+                tooltip.ItemName = ParameterDisplayStrings(paramSymb);
+            }
             else if (typeSymb != null)
             {
                 var docId = typeSymb.OriginalDefinition != null && typeSymb != typeSymb.OriginalDefinition ?
@@ -124,16 +149,17 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
         /// <summary>
         /// Returns the most relevant syntax node for the given index.
         /// </summary>
-        SyntaxNode GetIndexNode(int index)
+        IEnumerable<SyntaxNode> GetIndexNode(int index)
         {
             var tree = _model.SyntaxTree.GetRoot();
             var allNodes = tree.DescendantNodes(new TextSpan(index, 1)).Reverse();
-            SyntaxNode matched = null;
-            matched = allNodes.First();
-            if (matched is IdentifierNameSyntax && allNodes.Count() > 1 && 
+            var matched = new List<SyntaxNode>();
+            var match = allNodes.First();
+            
+            if (match is IdentifierNameSyntax && allNodes.Count() > 1 && 
                 allNodes.ElementAt(1) is MemberAccessExpressionSyntax)
             {
-                var m = matched as IdentifierNameSyntax;
+                var m = match as IdentifierNameSyntax;
                 var ma = allNodes.ElementAt(1) as MemberAccessExpressionSyntax;
                 var mv = m.Identifier.ValueText;
                 var mav = ma.Name.Identifier.ValueText;
@@ -141,9 +167,23 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 // in which case the memberacess node is returned.
                 if (m.Identifier.ValueText == ma.Name.Identifier.ValueText)
                 {
-                    matched = ma;
+                    matched.Add(ma);
+                }
+                else
+                {
+                    matched.Add(match);
                 }
             }
+            else if (match is ParameterSyntax)
+            {
+                matched.Add(match);
+                matched.Add(allNodes.OfType<SimpleLambdaExpressionSyntax>().First());
+            }
+            else
+            {
+                matched.Add(match);
+            }
+
             return matched;
         }
 
@@ -161,6 +201,15 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             }
 
             return l;
+        }
+    
+        /// <summary>
+        /// Renders the parameter symbol in a VS style
+        /// </summary>
+        string ParameterDisplayStrings(IParameterSymbol paramSymb)
+        {
+            var typeStr = GetTypeName(paramSymb.Type);
+            return string.Format("(parameter) {0} {1}", typeStr, paramSymb.Name);
         }
 
         /// <summary>

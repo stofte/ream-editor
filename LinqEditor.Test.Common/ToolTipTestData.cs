@@ -78,7 +78,7 @@ namespace LinqEditor.Test.Common
                 Description = "Gets the value of the current System.Tuple<T1, T2> object's second component.",
                 Addendums = new List<string> { }
             })},
-            {ComplexStatementsExampleTwo_TupleItem2Property, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 657, new ToolTipData {
+            {ComplexStatementsExampleTwo_TupleItem2Property, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 660, new ToolTipData {
                 ItemName = "IEnumerable<int> Tuple<int, IEnumerable<int>>.Item2",
                 Description = "Gets the value of the current System.Tuple<T1, T2> object's second component.",
                 Addendums = new List<string> { }
@@ -88,12 +88,12 @@ namespace LinqEditor.Test.Common
                 Description = "Gets the value of the current System.Tuple<T1, T2> object's second component.",
                 Addendums = new List<string> { }
             })},
-            {ComplexStatementsExampleTwo_StringTypeReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 609, new ToolTipData {
+            {ComplexStatementsExampleTwo_StringTypeReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 612, new ToolTipData {
                 ItemName = "class System.String",
                 Description = "Represents text as a series of Unicode characters.",
                 Addendums = new List<string> { }
             })},
-            {ComplexStatementsExampleTwo_StringJoinMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 615, new ToolTipData {
+            {ComplexStatementsExampleTwo_StringJoinMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 618, new ToolTipData {
                 ItemName = "string string.Join<int>(string separator, IEnumerable<int> values) (+ 4 overload(s))",
                 Description = "Concatenates the members of a collection, using the specified separator between each member.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
@@ -103,20 +103,30 @@ namespace LinqEditor.Test.Common
                 Description = "Computes the sum of a sequence of System.Int32 values.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException", "\tSystem.OverflowException" }
             })},
-            {ComplexStatementsExampleTwo_SelectExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 599, new ToolTipData {
-                ItemName = "(extension) IQueryable<string> IQueryable<Tuple<int, IEnumerable<int>>>.Select<Tuple<int, IEnumerable<int>>, string>(Expression<Func<Tuple<int, IEnumerable<int>>, string>> selector) (+ 3 overload(s))",
-                Description = "Projects each element of a sequence into a new form.",
+            {ComplexStatementsExampleTwo_SelectExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 598, new ToolTipData {
+                ItemName = "(extension) IQueryable<string> IQueryable<Tuple<int, IEnumerable<int>>>.Select<Tuple<int, IEnumerable<int>>, string>(Expression<Func<Tuple<int, IEnumerable<int>>, int, string>> selector) (+ 3 overload(s))",
+                Description = "Projects each element of a sequence into a new form by incorporating the element's index.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
             })},
-            {ComplexStatementsExampleTwo_OtherSelectExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 795, new ToolTipData {
+            {ComplexStatementsExampleTwo_OtherSelectExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 798, new ToolTipData {
                 ItemName = "(extension) IEnumerable<int> IEnumerable<Tuple<int, IEnumerable<int>>>.Select<Tuple<int, IEnumerable<int>>, int>(Func<Tuple<int, IEnumerable<int>>, int> selector) (+ 3 overload(s))",
                 Description = "Projects each element of a sequence into a new form.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
             })},
-            {ComplexStatementsExampleTwo_ConcatExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 648, new ToolTipData {
+            {ComplexStatementsExampleTwo_ConcatExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 651, new ToolTipData {
                 ItemName = "(extension) IEnumerable<int> IEnumerable<int>.Concat<int>(IEnumerable<int> second)",
                 Description = "Concatenates two sequences.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
+            })},
+            {ComplexStatementsExampleTwo_FirstZParameterReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 579, new ToolTipData {
+                ItemName = "(parameter) Tuple<int, IEnumerable<int>> z",
+                Description = "",
+                Addendums = new List<string> { }
+            })},
+            {ComplexStatementsExampleTwo_SecondZParameterReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 591, new ToolTipData {
+                ItemName = "(parameter) Tuple<int, IEnumerable<int>> z",
+                Description = "",
+                Addendums = new List<string> { }
             })},
         };
 
@@ -136,7 +146,7 @@ Func<Tuple<int, IEnumerable<int>>, bool> filter = (t) =>
 {
     return t.Item2.Sum() < 20;
 };
-var filtered = x.Where(z => filter(z)).Select(z => string.Join("", "", new int[]{ z.Item1 }.Concat(z.Item2)));
+var filtered = x.Where(z => filter(z)).Select((z,i) => string.Join("", "", new int[]{ z.Item1 }.Concat(z.Item2)));
 Func<Tuple<int, IEnumerable<int>>, int> selectFunc = t =>
 {
     return t.Item1;
@@ -164,5 +174,7 @@ var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
         public const string ComplexStatementsExampleTwo_SelectExtensionMethod = "ComplexStatementsExampleTwo_SelectExtensionMethod";
         public const string ComplexStatementsExampleTwo_ConcatExtensionMethod = "ComplexStatementsExampleTwo_ConcatExtensionMethod";
         public const string ComplexStatementsExampleTwo_OtherSelectExtensionMethod = "ComplexStatementsExampleTwo_OtherSelectExtensionMethod";
+        public const string ComplexStatementsExampleTwo_FirstZParameterReference = "ComplexStatementsExampleTwo_FirstZParameterReference";
+        public const string ComplexStatementsExampleTwo_SecondZParameterReference = "ComplexStatementsExampleTwo_SecondZParameterReference";
     }
 }

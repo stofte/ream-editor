@@ -113,6 +113,11 @@ namespace LinqEditor.Test.Common
                 Description = "Projects each element of a sequence into a new form.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
             })},
+            {ComplexStatementsExampleTwo_ConcatExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 648, new ToolTipData {
+                ItemName = "(extension) IEnumerable<int> IEnumerable<int>.Concat<int>(IEnumerable<int> second)",
+                Description = "Concatenates two sequences.",
+                Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
+            })},
         };
 
         static void stub()
@@ -157,6 +162,7 @@ var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
         public const string ComplexStatementsExampleTwo_StringJoinMethod = "ComplexStatementsExampleTwo_StringJoinMethod";
         public const string ComplexStatementsExampleTwo_SumExtensionMethod = "ComplexStatementsExampleTwo_SumExtensionMethod";
         public const string ComplexStatementsExampleTwo_SelectExtensionMethod = "ComplexStatementsExampleTwo_SelectExtensionMethod";
+        public const string ComplexStatementsExampleTwo_ConcatExtensionMethod = "ComplexStatementsExampleTwo_ConcatExtensionMethod";
         public const string ComplexStatementsExampleTwo_OtherSelectExtensionMethod = "ComplexStatementsExampleTwo_OtherSelectExtensionMethod";
     }
 }

@@ -91,7 +91,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 .Concat(new string[] { 
                     typeSymbol.OriginalDefinition.GetDocumentationCommentId(),
                     typeSymbol.GetDocumentationCommentId()
-                });
+                }.Where(x => x != null));
 
             // extensionmethods matching interfaces
             var possibleExtensions = interfaceNames

@@ -86,6 +86,7 @@ namespace Test
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SumExtensionMethod)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SelectExtensionMethod)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_OtherSelectExtensionMethod)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_ConcatExtensionMethod)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

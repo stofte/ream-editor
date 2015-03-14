@@ -215,7 +215,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 var extOverloads = allExtensions.Where(x => x.Name == m.Name);
                 var overloads = c.GetMembers().Where(x => x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol);
                 var cnt = extOverloads.Count() + overloads.Count();
-                var overloadCount = cnt == 0 ? string.Empty : string.Format(" (+ {0} overload(s))", cnt - 1);
+                var overloadCount = cnt == 1 ? string.Empty : string.Format(" (+ {0} overload(s))", cnt - 1);
                 var retType = GetTypeName(m.ReturnType);
                 var arguments = string.Join(", ", argStrings);
                 // rendering reducedfrom may include unresolved generic parameters. 

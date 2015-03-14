@@ -181,30 +181,6 @@ namespace Another.Generated
         // Item4 = Description
         // Item5 = Specializations
         // Item6 = DocumentationId
-        // todo: disabled while redoing stuff into tooltiphelper
-        //[TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclOfDataColumnAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtZero)]
-        //[TestCase(VSDocumentationTestData.FullDeclOfMultipleIntsAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfIntListAtZero)]
-        //[TestCase(VSDocumentationTestData.VarDeclOfQueryableAtTen)]
-        public void Returns_ToolTip_UserContext_For(string testDataKey)
-        {
-            var m = new Mock<ITemplateService>();
-            m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
-            m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_simpleProgramWithAllUsings);
-
-            var editor = new TemplateCodeAnalysis(m.Object, _mockDocumentationService, _mockSymbolStore, _mockTooltipFactory);
-            editor.Initialize();
-            var testData = VSDocumentationTestData.Data[testDataKey];
-
-            var result = editor.Analyze(testData.Item1, testData.Item2);
-            
-            Assert.AreEqual(UserContext.ToolTip, result.Context);
-        }
-
         [TestCase(VSDocumentationTestData.VarDeclOfIntAtZero)]
         [TestCase(VSDocumentationTestData.FullDeclerationOfIntAtZero)]
         [TestCase(VSDocumentationTestData.VarDeclOfIntHashSetAtZero)]
@@ -294,7 +270,8 @@ namespace Another.Generated
             ToolTipTestData.ComplexStatementsExampleTwo_StringJoinMethod,
             ToolTipTestData.ComplexStatementsExampleTwo_SumExtensionMethod,
             ToolTipTestData.ComplexStatementsExampleTwo_SelectExtensionMethod,
-            ToolTipTestData.ComplexStatementsExampleTwo_OtherSelectExtensionMethod
+            ToolTipTestData.ComplexStatementsExampleTwo_OtherSelectExtensionMethod,
+            ToolTipTestData.ComplexStatementsExampleTwo_ConcatExtensionMethod
             )]
         public void Returns_Expected_ToolTips_For_Complex_Statements(params string[] testKeys)
         {

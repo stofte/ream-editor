@@ -26,11 +26,13 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 
         SemanticModel _model;
         IDocumentationService _documentationService;
+        ExtensionMethodCollection _extensionMethods;
 
-        public ToolTipHelper(SemanticModel model, IDocumentationService documentationService)
+        public ToolTipHelper(SemanticModel model, ExtensionMethodCollection extensionMethods, IDocumentationService documentationService)
         {
             _model = model;
             _documentationService = documentationService;
+            _extensionMethods = extensionMethods;
         }
 
         public ToolTipData GetToolTip(int index)
@@ -62,7 +64,9 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             }
             else if (matchedNode is MemberAccessExpressionSyntax)
             {
-                var memberAccessSymbol = _model.GetSymbolInfo(matchedNode).Symbol;
+                var accessNode = matchedNode as MemberAccessExpressionSyntax;
+                var memberAccessSymbol = _model.GetSymbolInfo(accessNode).Symbol;
+
 
                 if (memberAccessSymbol is IPropertySymbol)
                 {
@@ -71,6 +75,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 else if (memberAccessSymbol is IMethodSymbol)
                 {
                     nodeMethod = memberAccessSymbol as IMethodSymbol;
+                    nodeType = _model.GetTypeInfo(accessNode.Expression).Type;
                 }
             }
 
@@ -91,10 +96,11 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 tooltip.ItemName = nameAndTypes.Item1;
                 addendums.AddRange(nameAndTypes.Item2);
             }
-            else if (matchedNode is MemberAccessExpressionSyntax && (nodeProp != null || nodeMethod != null))
+            else if (matchedNode is MemberAccessExpressionSyntax)
             {
-                if (nodeProp != null)
+                if (nodeMethod == null) 
                 {
+                    // must be a property
                     var docId = nodeProp.OriginalDefinition != null && !nodeProp.Equals(nodeProp.OriginalDefinition) ?
                         nodeProp.OriginalDefinition.GetDocumentationCommentId() : nodeProp.GetDocumentationCommentId();
                     docElm = _documentationService.GetDocumentation(docId);
@@ -107,7 +113,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                         nodeMethod.OriginalDefinition != null && !nodeMethod.Equals(nodeMethod.OriginalDefinition) ?
                         nodeMethod.OriginalDefinition.GetDocumentationCommentId() : nodeMethod.GetDocumentationCommentId();
                     docElm = _documentationService.GetDocumentation(docId);
-                    tooltip.ItemName = MethodDisplayStrings(nodeMethod, docElm);
+                    tooltip.ItemName = MethodDisplayStrings(nodeMethod, nodeType, docElm);
                     addendums.AddRange(MapExtras(docElm));
                 }
             }
@@ -137,7 +143,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     var docId = calledCtor.OriginalDefinition != null && calledCtor != calledCtor.OriginalDefinition ?
                         calledCtor.OriginalDefinition.GetDocumentationCommentId() : calledCtor.GetDocumentationCommentId();
                     docElm = _documentationService.GetDocumentation(docId);
-                    tooltip.ItemName = MethodDisplayStrings(calledCtor, docElm);
+                    tooltip.ItemName = MethodDisplayStrings(calledCtor, null, docElm);
                     addendums.AddRange(MapExtras(docElm));
                 }
             }
@@ -238,9 +244,10 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
 
         /// <summary>
         /// Renders the methodsymbol in a VS style, with any arguments, showing number of overloads available,
-        /// and for regular methods, return types.
+        /// and for regular methods, return types. The associated type must be passed seperatly, since extension
+        /// methods will not map back to the type that was actually used.
         /// </summary>
-        string MethodDisplayStrings(IMethodSymbol m, DocumentationElement docElm)
+        string MethodDisplayStrings(IMethodSymbol m, ITypeSymbol c, DocumentationElement docElm)
         {
             var fullNs = m.ContainingNamespace.ToDisplayString();
             var typeArgStrings = m.TypeArguments.Select((x, i) => GetTypeName(x));
@@ -282,28 +289,17 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             }
             else if (m.MethodKind == MethodKind.ReducedExtension)
             {
-                var thisType = m.ReducedFrom.Parameters.First().Type;
-                var overloads = m.ReducedFrom.ContainingType.GetMembers()
-                    .Where(x =>
-                    {
-                        var isCandidate = x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol;
-                        if (isCandidate)
-                        {
-                            var extM = x as IMethodSymbol;
-                            // must either have same this param, or the method must be generic
-                            return extM.Parameters.First().Type.Equals(thisType) || extM.TypeParameters.Count() > 0;
-                        }
-                        return false;
-                    });
-                var overloadCount = overloads.Count() == 0 ? string.Empty :
-                    string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
+                // check any extensions available, and then add whatever may be available on the type itself also
+                var allExtensions = CodeAnalysisHelper.GetTypeExtensionMethods(c, _extensionMethods);
+                var extOverloads = allExtensions.Where(x => x.Name == m.Name);
+                var overloads = c.GetMembers().Where(x => x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol);
+                var cnt = extOverloads.Count() + overloads.Count();
+                var overloadCount = cnt == 0 ? string.Empty : string.Format(" (+ {0} overload(s))", cnt - 1);
                 var retType = GetTypeName(m.ReturnType);
                 var arguments = string.Join(", ", argStrings);
-
                 // rendering reducedfrom may include unresolved generic parameters. 
                 // if the method has type parameters, we want to replace the paramater with the concrete type instance
                 var baseTypeName = GetTypeName(m.ReducedFrom.Parameters.First().Type);
-
                 if (m.TypeArguments.Count() > 0)
                 {
                     var firstTypeName = GetTypeName(m.TypeArguments.First());
@@ -311,86 +307,13 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 }
 
                 return string.Format("(extension) {0} {1}.{2}{3}({4}){5}", retType, baseTypeName, m.Name, genericStr, arguments, overloadCount);
-
-                //IEnumerable<ISymbol> overloads = null;
-
-                //if (m.MethodKind == MethodKind.Ordinary)
-                //{
-                //    overloads = m.ContainingType.GetMembers()
-                //        .Where(x => x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public);
-                //}
-                //else
-                //{
-                //    var thisType = m.ReducedFrom.Parameters.First().Type;
-                //    overloads = m.ReducedFrom.ContainingType.GetMembers()
-                //        .Where(x =>
-                //        {
-                //            var isCandidate = x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol;
-                //            if (isCandidate)
-                //            {
-                //                var extM = x as IMethodSymbol;
-                //                // must either have same this param, or the method must be generic
-                //                return extM.Parameters.First().Type.Equals(thisType) || extM.TypeParameters.Count() > 0;
-                //            }
-                //            return false;
-                //        });
-                //}
-                //var containerType = m.MethodKind == MethodKind.Ordinary ? m.ContainingType :
-                //    m.ReducedFrom.Parameters.First().Type;
-
-                //var overloadCount = overloads.Count() == 0 ? string.Empty : 
-                //    string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
-                //var genericStr = typeArgStrings.Count() == 0 ? string.Empty : 
-                //    string.Format("<{0}>", string.Join(", ", typeArgStrings));
-
-                //var containerTypeName = GetTypeName(m.ContainingType);
-                //if (m.MethodKind == MethodKind.ReducedExtension)
-                //{
-                //    var baseTypeName = GetTypeName(m.ReducedFrom.Parameters.First().Type);
-                //    var firstParamTypeName = GetTypeName(m.TypeArguments.First());
-                //    containerTypeName = string.Format("{0}<{1}>", baseTypeName.Substring(0, baseTypeName.IndexOf("<")), firstParamTypeName);
-                //}
-                
-                //// VS seems to show the interface name
-                //var retType = GetTypeName(m.ReturnType);
-                //var arguments = string.Join(", ", argStrings);
-                //var isExtensionStr = m.MethodKind != MethodKind.ReducedExtension ? string.Empty : "(extension) ";
-
-                //return string.Format("{0}{1} {2}.{3}{4}({5}){6}", isExtensionStr, retType, containerTypeName, m.Name, genericStr, arguments, overloadCount);
             }
-            //else if (m.MethodKind == MethodKind.ReducedExtension)
-            //{
-            //    // overloads must also filter by the "this" parameter, as well as by generics 
-            //    var extMethod = m.ReducedFrom;
-            //    var thisType = extMethod.Parameters.First().Type;
-            //    var overloads = m.ReducedFrom.ContainingType.GetMembers()
-            //        .Where(x => {
-            //            var isCandidate = x.Name == m.Name && x.DeclaredAccessibility == Accessibility.Public && x is IMethodSymbol;
-            //            if (isCandidate)
-            //            {
-            //                var extM = x as IMethodSymbol;
-            //                // must either have same this param, or the method must be generic
-            //                return extM.Parameters.First().Type.Equals(thisType) || extM.TypeParameters.Count() > 0;
-            //            }
-            //            return false;
-            //        });
-
-            //    var overloadCount = overloads.Count() == 0 ? string.Empty :
-            //        string.Format(" (+ {0} overload(s))", overloads.Count() - 1);
-
-            //    var genericStr = typeArgStrings.Count() == 0 ? string.Empty :
-            //        string.Format("<{0}>", string.Join(", ", typeArgStrings));
-            //    var container = GetTypeName(m.ContainingType);
-            //    var retType = GetTypeName(m.ReturnType);
-            //    var arguments = string.Join(", ", argStrings);
-            //}
 
             return string.Empty;
         }
 
         /// <summary>
-        /// Renders the methodsymbol in a VS style, showing number of overloads available,
-        /// and for regular methods, return types.
+        /// Renders the propertysymbol in a VS style
         /// </summary>
         string PropertyDisplayStrings(IPropertySymbol p, DocumentationElement docElm)
         {
@@ -454,7 +377,6 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             return Tuple.Create(string.Format("{0} {1}", kind, name), specializations.AsEnumerable());
         }
 
-        // default settings is the most common usecase since it uses the least space
         /// <summary>
         /// Returns a rendering of the type similarly to VS
         /// </summary>

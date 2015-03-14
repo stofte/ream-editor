@@ -84,7 +84,8 @@ namespace Test
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringTypeReference)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_StringJoinMethod)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SumExtensionMethod)]
-        //[TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SelectExtensionMethod)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SelectExtensionMethod)]
+        [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_OtherSelectExtensionMethod)]
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];
@@ -99,8 +100,9 @@ namespace Test
                             .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             var model = compilation.GetSemanticModel(tree);
+            var extMethods = CodeAnalysisHelper.GetExtensionMethods(model);
             var factory = _container.Resolve<IToolTipHelperFactory>();
-            var helper = factory.Create(model);
+            var helper = factory.Create(model, extMethods);
 
             var expected = testData.Item3;
             var actual = helper.GetToolTip(testData.Item2 + offset);

@@ -168,7 +168,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                     // should be ok to work with symbols
                     ctx = UserContext.MemberCompletion;
                     // get all applicable extensions
-                    var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo, _extensionMethods);
+                    var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo.Type, _extensionMethods);
                     TypeInformation mainType = CodeAnalysisHelper.GetTypeInformation(typeInfo.Type as INamedTypeSymbol, entryClass, _schemaNamespace);
                     TypeInformation subType = null;
                     var isStatic = symInfo.Symbol.IsStatic || symInfo.Symbol.Kind == SymbolKind.NamedType;

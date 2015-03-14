@@ -161,7 +161,7 @@ namespace Test
             var methods = CodeAnalysisHelper.GetExtensionMethods(_model1);
 
             // map extensions to specific type
-            var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo, methods);
+            var extensions = CodeAnalysisHelper.GetTypeExtensionMethods(typeInfo.Type, methods);
 
             Assert.AreEqual(extensions.Count(), 1);
             Assert.AreEqual(extensions.Single().Name, "Dump");

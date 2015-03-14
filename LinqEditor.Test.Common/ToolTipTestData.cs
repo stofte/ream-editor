@@ -108,25 +108,35 @@ namespace LinqEditor.Test.Common
                 Description = "Projects each element of a sequence into a new form.",
                 Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
             })},
+            {ComplexStatementsExampleTwo_OtherSelectExtensionMethod, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 795, new ToolTipData {
+                ItemName = "(extension) IEnumerable<int> IEnumerable<Tuple<int, IEnumerable<int>>>.Select<Tuple<int, IEnumerable<int>>, int>(Func<Tuple<int, IEnumerable<int>>, int> selector) (+ 3 overload(s))",
+                Description = "Projects each element of a sequence into a new form.",
+                Addendums = new List<string> { "Exceptions:", "\tSystem.ArgumentNullException" }
+            })},
         };
 
         static void stub()
         {
-            var from = new List<Tuple<int, IEnumerable<int>>> 
-            {
-                Tuple.Create(1, new List<int> { 2, 4, 10 }.AsEnumerable()), 
-                Tuple.Create(3, new List<int> { 2, 4, 16 }.AsEnumerable()), 
-                Tuple.Create(5, new List<int> { 6, 6, 14 }.AsEnumerable()),
-                Tuple.Create(7, new List<int> { 4, 8, 18 }.AsEnumerable()), 
-                Tuple.Create(9, new List<int> { 2, 6, 20 }.AsEnumerable())
-            };
+var from = new List<Tuple<int, IEnumerable<int>>> 
+{
+    Tuple.Create(1, new List<int> { 2, 4, 10 }.AsEnumerable()), 
+    Tuple.Create(3, new List<int> { 2, 4, 16 }.AsEnumerable()), 
+    Tuple.Create(5, new List<int> { 6, 6, 14 }.AsEnumerable()),
+    Tuple.Create(7, new List<int> { 4, 8, 18 }.AsEnumerable()), 
+    Tuple.Create(9, new List<int> { 2, 6, 20 }.AsEnumerable())
+};
 
-            var x = new List<Tuple<int, IEnumerable<int>>>(from).AsQueryable();
-            Func<Tuple<int, IEnumerable<int>>, bool> filter = (t) =>
-            {
-                return t.Item2.Sum() < 20;
-            };
-            var filtered = x.Where(z => filter(z)).Select(z => string.Join(", ", new int[]{ z.Item1 }.Concat(z.Item2)));
+var x = new List<Tuple<int, IEnumerable<int>>>(from).AsQueryable();
+Func<Tuple<int, IEnumerable<int>>, bool> filter = (t) =>
+{
+    return t.Item2.Sum() < 20;
+};
+var filtered = x.Where(z => filter(z)).Select(z => string.Join("", "", new int[]{ z.Item1 }.Concat(z.Item2)));
+Func<Tuple<int, IEnumerable<int>>, int> selectFunc = t =>
+{
+    return t.Item1;
+};
+var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
         }
 
         public const string VarDeclOfInt_InitialDecl = "VarDeclOfInt_InitialDecl"; // initial decl
@@ -147,5 +157,6 @@ namespace LinqEditor.Test.Common
         public const string ComplexStatementsExampleTwo_StringJoinMethod = "ComplexStatementsExampleTwo_StringJoinMethod";
         public const string ComplexStatementsExampleTwo_SumExtensionMethod = "ComplexStatementsExampleTwo_SumExtensionMethod";
         public const string ComplexStatementsExampleTwo_SelectExtensionMethod = "ComplexStatementsExampleTwo_SelectExtensionMethod";
+        public const string ComplexStatementsExampleTwo_OtherSelectExtensionMethod = "ComplexStatementsExampleTwo_OtherSelectExtensionMethod";
     }
 }

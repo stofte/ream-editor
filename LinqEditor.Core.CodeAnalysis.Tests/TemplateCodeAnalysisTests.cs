@@ -105,7 +105,7 @@ namespace Another.Generated
             mockTTHelper.Setup(x => x.GetToolTip(It.IsAny<int>())).Returns(new ToolTipData { ItemName = "foo" });
             var mockTooltipFactory = new Mock<IToolTipHelperFactory>();
             _mockTooltipFactory = mockTooltipFactory.Object;
-            mockTooltipFactory.Setup(x => x.Create(It.IsAny<SemanticModel>())).Returns(mockTTHelper.Object);
+            mockTooltipFactory.Setup(x => x.Create(It.IsAny<SemanticModel>(), It.IsAny<ExtensionMethodCollection>())).Returns(mockTTHelper.Object);
         }
 
         // "." is last char

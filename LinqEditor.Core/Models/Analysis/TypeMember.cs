@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Microsoft.CodeAnalysis;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace LinqEditor.Core.Models.Analysis
@@ -9,5 +10,7 @@ namespace LinqEditor.Core.Models.Analysis
         public string Name { get; set; }
         public AccessibilityModifier Accessibility { get; set; }
         public MemberKind Kind { get; set; }
+        public ISymbol Symbol { get; set; }
+        public string DocumentationId { get; set; }
     }
 }

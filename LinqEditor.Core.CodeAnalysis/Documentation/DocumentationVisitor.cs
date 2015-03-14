@@ -69,6 +69,7 @@ namespace LinqEditor.Core.CodeAnalysis.Documentation
 
             return new DocumentationElement
             {
+                Id = _id,
                 MethodExceptions = methodExns,
                 MethodParameters = methodParams,
                 Summary = summary.Trim() // should be no leading/trailing ws here

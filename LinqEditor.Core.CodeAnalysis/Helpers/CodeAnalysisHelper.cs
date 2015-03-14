@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace LinqEditor.Core.CodeAnalysis.Helpers
@@ -80,13 +81,17 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             });
         }
 
-        public static IEnumerable<TypeMember> GetTypeExtensionMethods(TypeInfo typeInfo, ExtensionMethodCollection extensionMethods)
+        public static IEnumerable<TypeMember> GetTypeExtensionMethods(ITypeSymbol typeSymbol, ExtensionMethodCollection extensionMethods)
         {
             // fqn of interfaces the type implements
-            var interfaceNames = typeInfo.Type.AllInterfaces.Select(x =>
+            var interfaceNames = typeSymbol.AllInterfaces.Select(x =>
                 x.ConstructedFrom != null && x.ConstructedFrom != x ?
-                x.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) :
-                x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                x.ConstructedFrom.GetDocumentationCommentId() :
+                x.GetDocumentationCommentId())
+                .Concat(new string[] { 
+                    typeSymbol.OriginalDefinition.GetDocumentationCommentId(),
+                    typeSymbol.GetDocumentationCommentId()
+                });
 
             // extensionmethods matching interfaces
             var possibleExtensions = interfaceNames
@@ -185,7 +190,6 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 .Where(x => x.CanBeReferencedByName && x.IsStatic && !x.IsAbstract);
 
             var foo = availableTypes.Where(x => x.Name == "Dumper");
-
             var foox = foo.FirstOrDefault();
 
             // lookup extension methods on available types
@@ -203,11 +207,27 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             foreach (var m in availableExtensionMethods)
             {
                 var t = m.Parameters.First().Type;
-
-                var key = t.TypeKind == TypeKind.TypeParameter ? UniversalTypeKey :
-                    t.OriginalDefinition != null && t.OriginalDefinition != t ?
-                    t.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) :
-                    t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                string key = null;
+                if (t.TypeKind == TypeKind.TypeParameter)
+                {
+                    key = UniversalTypeKey;
+                }
+                else if (t is INamedTypeSymbol)
+                {
+                    var namedT = t as INamedTypeSymbol;
+                    if (namedT.TypeArguments.Count() > 0 && namedT.TypeArguments.First().TypeKind != TypeKind.TypeParameter)
+                    {
+                        key = t.GetDocumentationCommentId();
+                    }
+                    else
+                    {
+                        key = t.OriginalDefinition.GetDocumentationCommentId();
+                    }
+                }
+                else
+                {
+                    throw new Exception("unknown node");
+                }
 
                 if (!dict.ContainsKey(key))
                 {
@@ -218,7 +238,9 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                     Accessibility = AccessibilityModifier.Public,
                     IsStatic = true,
                     Kind = MemberKind.ExtensionMethod,
-                    Name = m.Name
+                    Name = m.Name,
+                    DocumentationId = m.GetDocumentationCommentId(),
+                    Symbol = m
                 });
             }
 

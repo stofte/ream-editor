@@ -49,6 +49,7 @@ namespace LinqEditor.Core.Session.Tests
             var querySource1 = templateService.GenerateQuery(_queryId1, "Foo.Dump();", _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix));
             var querySource2 = templateService.GenerateQuery(_queryId2, "Foo.Dump();", _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix));
             var querySource3 = templateService.GenerateQuery(_queryId3, "TypeTestTable.Take(1).Dump();", _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix));
+            var querySource4 = templateService.GenerateQuery(_queryId3, "TypeTestTable.Take(1)", _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix));
 
             var file1Result = CSharpCompiler.CompileToFile(querySource1, _queryId1.ToIdentifierWithPrefix(SchemaConstants.QueryPrefix), PathUtility.TempPath, _schemaAssemblyPath);
             _query1AssemblyPath = file1Result.AssemblyPath;
@@ -139,6 +140,18 @@ namespace LinqEditor.Core.Session.Tests
                 Assert.AreEqual(vsEntries[i].Item1, suggestions[i].Value);
                 Assert.AreEqual(vsEntries[i].Item2, suggestions[i].Kind);
             }
+        }
+
+        [Test]
+        public async void AutoCompletes_Missing_Elements()
+        {
+            var factory = _container.Resolve<IAsyncSessionFactory>();
+            var id = Guid.NewGuid();
+            var session = factory.Create(id);
+            await session.InitializeAsync(_connectionId);
+            await session.LoadAppDomainAsync();
+            var result = await session.ExecuteAsync("Foo");
+            Assert.IsTrue(result.Success);
         }
     }
 }

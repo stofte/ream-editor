@@ -13,6 +13,7 @@ using LinqEditor.Test.Common;
 using System.Text;
 using LinqEditor.Core.CodeAnalysis.Services;
 using Moq;
+using System.Collections.Generic;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
@@ -65,6 +66,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using LinqEditor.Core.Generated;
 
 namespace Test
 {
@@ -190,6 +192,25 @@ namespace Test
 
                 Assert.AreEqual(byIndex, byLineColumn);
             }
+        }
+
+        [Test]
+        public void Can_Complete_Source_Code_With_Missing_Statement_Terminators()
+        {
+            var src = @"
+var fooList = new List<int> { 1, 2, 3 }
+fooList
+";
+            var source = _source4.Replace(SchemaConstants.Marker, src);
+            var tree = CSharpSyntaxTree.ParseText(source);
+            string newSourceFragment = null;
+            var canComplete = CodeAnalysisHelper.CanCompleteTree(tree, out newSourceFragment);
+
+            var newSource = @"var fooList = new List<int> { 1, 2, 3 };
+fooList.Dump();";
+
+            Assert.IsTrue(canComplete);
+            Assert.AreEqual(newSource, newSourceFragment);
         }
     }
 }

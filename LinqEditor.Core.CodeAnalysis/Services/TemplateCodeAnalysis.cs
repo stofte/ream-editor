@@ -44,7 +44,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         protected SemanticModel _currentModel;
         protected IToolTipHelper _tooltipHelper;
 
-
         public TemplateCodeAnalysis(ITemplateService templateService, IDocumentationService documentationService, ISymbolStore symbolStore, IToolTipHelperFactory tooltipFactory)
         {
             DebugLogger.Log(GetHashCode());
@@ -128,7 +127,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 Context = UserContext.Unknown
             };
         }
-
 
         public AnalysisResult Analyze(string sourceFragment, int updateIndex)
         {

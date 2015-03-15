@@ -2,12 +2,15 @@
 using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Models.Database;
 using Microsoft.CodeAnalysis;
+using LinqEditor.Core.Helpers;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using LinqEditor.Core.CodeAnalysis.Compiler;
 
 namespace LinqEditor.Core.CodeAnalysis.Helpers
 {
@@ -245,6 +248,61 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             }
 
             return dict;
+        }
+
+        public static bool CanCompleteTree(SyntaxTree tree, out string sourceFragment)
+        {
+            var replacements = new Dictionary<SyntaxNode, SyntaxNode>();
+            var nodes = tree.GetRoot().DescendantNodes().OfType<StatementSyntax>().Where(x => !(x is BlockSyntax));
+            foreach (var node in nodes)
+            {
+                var nodeStr = node.ToString();
+                var suffix = nodeStr.Substring(nodeStr.TrimEnd().Length);
+                string newStatement = null;
+                var localNode = node as LocalDeclarationStatementSyntax;
+                var exprNode = node as ExpressionStatementSyntax;
+                if (localNode != null && localNode.SemicolonToken.IsMissing)
+                {
+                    newStatement = string.Format("{0};{1}", nodeStr.TrimEnd(), suffix);
+                }
+                else if (exprNode != null && exprNode.SemicolonToken.IsMissing)
+                {
+                    var newNodeStr = nodeStr.TrimEnd();
+                    var dumpMethod = ".Dump()";
+                    if (newNodeStr.LastIndexOf(dumpMethod) != newNodeStr.Length - dumpMethod.Length)
+                    {
+                        newNodeStr += dumpMethod;
+                    }
+                    newStatement = string.Format("{0};{1}", newNodeStr, suffix);
+                }
+
+                if (!string.IsNullOrWhiteSpace(newStatement))
+                {
+                    var newNode = SyntaxFactory.ParseStatement(newStatement);
+                    replacements.Add(node, newNode);
+                }
+            }
+
+            // check if new tree is error free
+            var newRoot = tree.GetRoot().ReplaceNodes(replacements.Keys, (n1, n2) => replacements[n1]);
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
+                .WithOptions(new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug))
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                .AddSyntaxTrees(new SyntaxTree[] { newRoot.SyntaxTree });
+
+            var model = compilation.GetSemanticModel(newRoot.SyntaxTree);
+            var noErrors = GetErrors(model.GetDiagnostics()).Count() == 0;
+            if (noErrors)
+            {
+                var block = newRoot.DescendantNodes().OfType<BlockSyntax>().LastOrDefault();
+                sourceFragment = string.Join(Environment.NewLine, block.DescendantNodes().OfType<StatementSyntax>().Select(x => x.ToString()));
+            }
+            else
+            {
+                sourceFragment = string.Empty;
+            }
+
+            return noErrors;
         }
     }
 }

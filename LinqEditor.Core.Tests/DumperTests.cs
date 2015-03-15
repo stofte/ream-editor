@@ -65,5 +65,18 @@ namespace LinqEditor.Core.Tests
             var dump = Dumper.FlushDumps();
             Assert.AreEqual("Anonymous 1", dump.First().TableName);
         }
+
+        [Test]
+        public void Dumps_List_Of_Select_Projected_Strings()
+        {
+            "foo".Dump();
+            Repository.Select(x => x.Value).Dump().Dump();
+
+            var dump = Dumper.FlushDumps();
+            var tbl = dump.Last();
+            Assert.AreEqual(3, dump.Count());
+            Assert.AreEqual("String 3", tbl.TableName);
+            Assert.AreEqual(1, tbl.Columns.Count);
+        }
     }
 }

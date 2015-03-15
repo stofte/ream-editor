@@ -17,13 +17,15 @@ namespace LinqEditor.Core.Generated
         private class TypeMap
         {
             public IEnumerable<Column> Columns;
+            public bool IsSingular { get { return Columns.Count() == 1 && Columns.First().Kind == ColumnType.Object; } }
             public int TypeCount = 1; // for display purposes only
         }
 
         private enum ColumnType
         {
             Field,
-            Property
+            Property,
+            Object
         }
 
         private class Column
@@ -34,11 +36,14 @@ namespace LinqEditor.Core.Generated
             public ColumnType Kind;
         }
 
-        private static List<DataTable> _dumps = new List<DataTable>();
-        private static IDictionary<string, TypeMap> _typeMaps = new Dictionary<string, TypeMap>();
+        static List<DataTable> _dumps = new List<DataTable>();
+        static IDictionary<string, TypeMap> _typeMaps = new Dictionary<string, TypeMap>();
+        static IDictionary<string, int> _dumpCounts = new Dictionary<string, int>();
+        static object _lock = new object();
 
         public static IDictionary<string, IDictionary<string, int>> SqlColumns { get; set; }
         
+
 
         public static IEnumerable<DataTable> FlushDumps()
         {
@@ -71,7 +76,9 @@ namespace LinqEditor.Core.Generated
 
                 if (IsSingular(objectType)) // string, int, etc
                 {
-                    table.Columns.Add(new DataColumn("Value", objectType));
+                    objectMap = MapType(objectType);
+                    dumpCount = objectMap.TypeCount++;
+                    table.Columns.AddRange(MapColumns(objectMap));
                     table.Rows.Add(o);
                 }
                 else // will have more then one column
@@ -97,12 +104,20 @@ namespace LinqEditor.Core.Generated
                                 table.Columns.AddRange(MapColumns(objectMap));
                             }
 
-                            table.Rows.Add(MapRow(objectMap, item));
+                            if (objectMap.IsSingular)
+                            {
+                                table.Rows.Add(item);
+                            }
+                            else
+                            {
+                                table.Rows.Add(MapRow(objectMap, item));
+                            }
                         }
                     }
                 }
 
-                table.TableName = string.Format("{0} {1}", GetTypeDisplayName(objectType), dumpCount);
+                var name = GetTypeDisplayName(objectType);
+                table.TableName = string.Format("{0} {1}", name, dumpCount);
                 _dumps.Add(table);
             }
 
@@ -163,6 +178,16 @@ namespace LinqEditor.Core.Generated
         {
             if (_typeMaps.ContainsKey(type.AssemblyQualifiedName))
             {
+                return _typeMaps[type.AssemblyQualifiedName];
+            }
+
+            if (IsSingular(type))
+            {
+                _typeMaps[type.AssemblyQualifiedName] = new TypeMap
+                {
+                    Columns = new Column[] { new Column { Index = 0, Kind = ColumnType.Object, Name = "Value", Type = type } }
+                };
+
                 return _typeMaps[type.AssemblyQualifiedName];
             }
 

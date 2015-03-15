@@ -156,6 +156,7 @@ namespace LinqEditor.UI.WinForm.Controls
                 }
                 var tab = _tabControl.TabPages[2 + index++];
                 var tabGrid = tab.Controls[0] as DataGridView;
+                tab.Text = table.TableName;
                 tabGrid.DataSource = table;
             }
             for (var i = index; i < prevCount; i++)

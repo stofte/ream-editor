@@ -64,6 +64,8 @@ Func<Tuple<int, IEnumerable<int>>, int> selectFunc = t =>
     return t.Item1;
 };
 var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
+var myVar = x.Max(z => z.Item1); var myComplexVar = x;
+var filtered3 = x.Max(z => z.Item1 + myVar + myComplexVar.Max(y => y.Item1));
 ";
     }
 }

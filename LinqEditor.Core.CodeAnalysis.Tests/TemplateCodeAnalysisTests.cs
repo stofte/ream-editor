@@ -273,7 +273,9 @@ namespace Another.Generated
             ToolTipTestData.ComplexStatementsExampleTwo_OtherSelectExtensionMethod,
             ToolTipTestData.ComplexStatementsExampleTwo_ConcatExtensionMethod,
             ToolTipTestData.ComplexStatementsExampleTwo_FirstZParameterReference,
-            ToolTipTestData.ComplexStatementsExampleTwo_SecondZParameterReference
+            ToolTipTestData.ComplexStatementsExampleTwo_SecondZParameterReference,
+            ToolTipTestData.ComplexStatementsExampleTwo_SelectIndexParameterReference,
+            ToolTipTestData.ComplexStatementsExampleTwo_MyVarLocalVariableReference
             )]
         public void Returns_Expected_ToolTips_For_Complex_Statements(params string[] testKeys)
         {

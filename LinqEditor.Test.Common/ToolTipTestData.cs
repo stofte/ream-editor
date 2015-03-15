@@ -133,6 +133,11 @@ namespace LinqEditor.Test.Common
                 Description = "",
                 Addendums = new List<string> { }
             })},
+            {ComplexStatementsExampleTwo_MyVarLocalVariableReference, Tuple.Create(SourceCodeFragments.ComplexStatementsExampleTwo, 913, new ToolTipData {
+                ItemName = "(local variable) int myVar",
+                Description = "",
+                Addendums = new List<string> { }
+            })},
         };
 
         static void stub()
@@ -157,6 +162,8 @@ Func<Tuple<int, IEnumerable<int>>, int> selectFunc = t =>
     return t.Item1;
 };
 var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
+var myVar = x.Max(z => z.Item1); var myComplexVar = x;
+var filtered3 = x.Max(z => z.Item1 + myVar + myComplexVar.Max(y => y.Item1));
         }
 
         public const string VarDeclOfInt_InitialDecl = "VarDeclOfInt_InitialDecl"; // initial decl
@@ -182,5 +189,6 @@ var filtered2 = x.Where(z => filter(z)).Select(selectFunc);
         public const string ComplexStatementsExampleTwo_FirstZParameterReference = "ComplexStatementsExampleTwo_FirstZParameterReference";
         public const string ComplexStatementsExampleTwo_SecondZParameterReference = "ComplexStatementsExampleTwo_SecondZParameterReference";
         public const string ComplexStatementsExampleTwo_SelectIndexParameterReference = "ComplexStatementsExampleTwo_SelectIndexParameterReference";
+        public const string ComplexStatementsExampleTwo_MyVarLocalVariableReference = "ComplexStatementsExampleTwo_MyVarLocalVariableReference";
     }
 }

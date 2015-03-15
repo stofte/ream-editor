@@ -56,6 +56,7 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             IMethodSymbol methodSymb = symb as IMethodSymbol;
             IPropertySymbol propertySymb = symb as IPropertySymbol;
             IParameterSymbol paramSymb = symb as IParameterSymbol;
+            ILocalSymbol localSymb = symb as ILocalSymbol;
 
             // takes special handling
             if (paramNode != null)
@@ -94,6 +95,10 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                         tooltip.ItemName = string.Format("(parameter) {0} {1}", GetTypeName(typeArg.TypeArguments[idx]), paramNode.Identifier.ValueText);
                     }
                 }
+            }
+            else if (matchedNode is IdentifierNameSyntax && localSymb != null)
+            {
+                tooltip.ItemName = string.Format("(local variable) {0} {1}", GetTypeName(localSymb.Type), localSymb.Name);
             }
             else if (methodSymb != null)
             {

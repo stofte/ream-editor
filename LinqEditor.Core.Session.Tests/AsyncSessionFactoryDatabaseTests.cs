@@ -87,6 +87,13 @@ namespace LinqEditor.Core.Session.Tests
                                         .IsDefault());
         }
 
+
+        [SetUp]
+        public void Setup()
+        {
+            _database.RecreateTestData();
+        }
+
         [Test]
         public void Can_Initialize_Second_BackgroundSession_After_Initialization()
         {
@@ -150,7 +157,7 @@ namespace LinqEditor.Core.Session.Tests
             var session = factory.Create(id);
             await session.InitializeAsync(_connectionId);
             await session.LoadAppDomainAsync();
-            var result = await session.ExecuteAsync("TypeTestTable.Take(1).Dump();");
+            var result = await session.ExecuteAsync("Foo");
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.Tables.Count());
             Assert.AreEqual(4, result.Tables.First().Rows.Count);

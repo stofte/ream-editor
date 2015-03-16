@@ -150,7 +150,7 @@ namespace LinqEditor.Core.Session.Tests
         }
 
         [Test]
-        public async void AutoCompletes_Missing_Elements()
+        public async void Auto_Completes_Missing_Source_Code_Elements()
         {
             var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
@@ -158,6 +158,26 @@ namespace LinqEditor.Core.Session.Tests
             await session.InitializeAsync(_connectionId);
             await session.LoadAppDomainAsync();
             var result = await session.ExecuteAsync("Foo");
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.Tables.Count());
+            Assert.AreEqual(4, result.Tables.First().Rows.Count);
+        }
+
+        [TestCase("Foo.Dump()")]
+        [TestCase("Foo.   Dump( )  ")]
+        [TestCase("Foo. Dump  (   ) ")]
+        [TestCase(@"Foo. 
+Dump
+(   
+                                    ) ")]
+        public async void Detects_Dump_Method_When_Auto_Completing_Source(string query)
+        {
+            var factory = _container.Resolve<IAsyncSessionFactory>();
+            var id = Guid.NewGuid();
+            var session = factory.Create(id);
+            await session.InitializeAsync(_connectionId);
+            await session.LoadAppDomainAsync();
+            var result = await session.ExecuteAsync(query);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.Tables.Count());
             Assert.AreEqual(4, result.Tables.First().Rows.Count);

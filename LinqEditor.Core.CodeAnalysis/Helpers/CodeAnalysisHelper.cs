@@ -11,6 +11,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using LinqEditor.Core.CodeAnalysis.Compiler;
+using System.Text.RegularExpressions;
 
 namespace LinqEditor.Core.CodeAnalysis.Helpers
 {
@@ -271,10 +272,11 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                 else if (exprNode != null && exprNode.SemicolonToken.IsMissing)
                 {
                     var newNodeStr = nodeStr.TrimEnd();
-                    var dumpMethod = ".Dump()";
-                    if (newNodeStr.LastIndexOf(dumpMethod) != newNodeStr.Length - dumpMethod.Length)
+                    var dumpRegex = new Regex(@"\.\W*Dump\W*(\W*)\W*$", RegexOptions.Multiline);
+                    var m = dumpRegex.Match(newNodeStr);
+                    if (!m.Success)
                     {
-                        newNodeStr += dumpMethod;
+                        newNodeStr += ".Dump()";
                     }
                     newStatement = string.Format("{0};{1}", newNodeStr, suffix);
                 }

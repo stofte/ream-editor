@@ -223,7 +223,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var result = GetModelAndDiagnostics(tree);
             _currentModel = result.Item1;
             _warnings = result.Item2;
-            _errors = result.Item3;
+            _errors = result.Item3.Where(x => x.Code != "CS1002"); // filter out "; expected"
             _currentTree = tree.GetRoot();
 
             if (_tooltipHelper != null)
@@ -248,13 +248,14 @@ namespace LinqEditor.Core.CodeAnalysis.Services
                 .Select(x => new Warning 
                 { 
                     Location = x.Location.Offset(-IndexOffset, -LineOffset), 
-                    Message = x.Message 
+                    Message = x.Message
                 });
             var errors = CodeAnalysisHelper.GetErrors(diag)
                 .Select(x => new Error 
                 { 
                     Location = x.Location.Offset(-IndexOffset, -LineOffset), 
-                    Message = x.Message 
+                    Message = x.Message,
+                    Code = x.Code
                 });
             return Tuple.Create(comp.GetSemanticModel(tree), warnings, errors);
             //return comp.GetSemanticModel(tree);

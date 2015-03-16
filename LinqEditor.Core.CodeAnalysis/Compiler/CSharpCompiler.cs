@@ -136,6 +136,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 .AddReferences(references)
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
+            // this probably belonds elsewhere, but this is rather convinient
             if (completeSource)
             {
                 var errs = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());

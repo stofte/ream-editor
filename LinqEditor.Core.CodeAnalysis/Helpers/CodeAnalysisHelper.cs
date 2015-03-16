@@ -79,7 +79,8 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
                         EndLine = loc.End.Line + 1,
                         EndColumn = loc.End.Character + 1
                     },
-                    Message = x.GetMessage()
+                    Message = x.GetMessage(),
+                    Code = x.Id
                 };
             });
         }
@@ -250,8 +251,10 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             return dict;
         }
 
-        public static bool CanCompleteTree(SyntaxTree tree, out string sourceFragment)
+        public static string CanCompleteTree(string sourceProgram, IEnumerable<MetadataReference> references)
         {
+            string sourceFragment = null;
+            var tree = CSharpSyntaxTree.ParseText(sourceProgram);
             var replacements = new Dictionary<SyntaxNode, SyntaxNode>();
             var nodes = tree.GetRoot().DescendantNodes().OfType<StatementSyntax>().Where(x => !(x is BlockSyntax));
             foreach (var node in nodes)
@@ -287,22 +290,22 @@ namespace LinqEditor.Core.CodeAnalysis.Helpers
             var newRoot = tree.GetRoot().ReplaceNodes(replacements.Keys, (n1, n2) => replacements[n1]);
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
                 .WithOptions(new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Debug))
-                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                .AddReferences(references)
                 .AddSyntaxTrees(new SyntaxTree[] { newRoot.SyntaxTree });
 
             var model = compilation.GetSemanticModel(newRoot.SyntaxTree);
             var noErrors = GetErrors(model.GetDiagnostics()).Count() == 0;
+
             if (noErrors)
             {
-                var block = newRoot.DescendantNodes().OfType<BlockSyntax>().LastOrDefault();
-                sourceFragment = string.Join(Environment.NewLine, block.DescendantNodes().OfType<StatementSyntax>().Select(x => x.ToString()));
+                sourceFragment = newRoot.ToString();
             }
             else
             {
                 sourceFragment = string.Empty;
             }
 
-            return noErrors;
+            return sourceFragment;
         }
     }
 }

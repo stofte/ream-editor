@@ -5,5 +5,6 @@ namespace LinqEditor.Core.Models.Analysis
     {
         public string Message { get; set; }
         public LocationSpan Location { get; set; }
+        public string Code { get; set; }
     }
 }

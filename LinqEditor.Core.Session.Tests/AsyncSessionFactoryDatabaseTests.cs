@@ -150,8 +150,10 @@ namespace LinqEditor.Core.Session.Tests
             var session = factory.Create(id);
             await session.InitializeAsync(_connectionId);
             await session.LoadAppDomainAsync();
-            var result = await session.ExecuteAsync("Foo");
+            var result = await session.ExecuteAsync("TypeTestTable.Take(1).Dump();");
             Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.Tables.Count());
+            Assert.AreEqual(4, result.Tables.First().Rows.Count);
         }
     }
 }

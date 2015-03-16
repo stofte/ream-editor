@@ -203,14 +203,49 @@ fooList
 ";
             var source = _source4.Replace(SchemaConstants.Marker, src);
             var tree = CSharpSyntaxTree.ParseText(source);
-            string newSourceFragment = null;
-            var canComplete = CodeAnalysisHelper.CanCompleteTree(tree, out newSourceFragment);
+            var completedSource = CodeAnalysisHelper.CanCompleteTree(source, CSharpCompiler.GetStandardReferences(includeDocumentation: false));
 
-            var newSource = @"var fooList = new List<int> { 1, 2, 3 };
-fooList.Dump();";
+            var newSource = @"using System;
+using System.Data;
+using System.Linq;
+using System.Collections.Generic;
+using LinqEditor.Core.Generated;
 
-            Assert.IsTrue(canComplete);
-            Assert.AreEqual(newSource, newSourceFragment);
+namespace Test
+{
+    public class Program
+    {
+        public void Query() 
+        {
+var fooList = new List<int> { 1, 2, 3 };
+fooList.Dump();
+
+        }
+    }
+}
+";
+
+            Assert.AreEqual(newSource, completedSource);
+        }
+
+        [TestCase(SourceCodeFragments.ErrorExample1, "CS1002")] // "; expected"
+        [TestCase(SourceCodeFragments.ErrorExample2, "CS1061")]
+        public void Errors_Are_Are_Returned_With_Ids(string sourceStub, string expectedId)
+        {
+            var source = _source4.Replace(SchemaConstants.Marker, sourceStub);
+            var tree = CSharpSyntaxTree.ParseText(source);
+
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))
+                .WithOptions(_compilerOptions)
+                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                .AddSyntaxTrees(new SyntaxTree[] { tree });
+
+            var semanticModel = compilation.GetSemanticModel(tree);
+
+            var errors = CodeAnalysisHelper.GetErrors(compilation.GetDiagnostics());
+            var firstCode = errors.First().Code;
+
+            Assert.AreEqual(expectedId, errors.First().Code);
         }
     }
 }

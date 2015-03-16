@@ -1,4 +1,5 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
+using LinqEditor.Core.CodeAnalysis.Helpers;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Containers;
 using LinqEditor.Core.Helpers;
@@ -89,12 +90,18 @@ namespace LinqEditor.Core.Session
         public ExecuteResult Execute(string sourceFragment, CancellationToken ct)
         {
             _watch.Restart();
+
+            // check if source can be completed
+            
+
+
             var programId = Guid.NewGuid();
             var programSource = _codeSession ? _generator.GenerateCodeStatements(programId, sourceFragment) :
                                                _generator.GenerateQuery(programId, sourceFragment, _connection.CachedSchemaNamespace );
+
             var references = _codeSession ? new string[] { } : new string[] { _connection.CachedSchemaFileName };
             var prefix = _codeSession ? SchemaConstants.CodePrefix : SchemaConstants.QueryPrefix;
-            var result = CSharpCompiler.CompileToBytes(programSource, programId.ToIdentifierWithPrefix(prefix), references);
+            var result = CSharpCompiler.CompileToBytes(programSource, true, programId.ToIdentifierWithPrefix(prefix), references);
 
             // map line info to sourceFragment offset
             result.Errors = result.Errors.Select(x => new Error 

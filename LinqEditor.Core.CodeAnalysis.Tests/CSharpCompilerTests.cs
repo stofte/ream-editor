@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests

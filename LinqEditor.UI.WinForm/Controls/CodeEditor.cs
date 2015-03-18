@@ -9,6 +9,9 @@ using System.Linq;
 using System.Windows.Forms;
 using LinqEditor.Core.Helpers;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Collections;
 
 // Margin width auto adjustable (line numbs)
 // https://scintillanet.codeplex.com/discussions/267720
@@ -17,7 +20,6 @@ namespace LinqEditor.UI.WinForm.Controls
 {
     public class CodeEditor : UserControl, IDisposable
     {
-        const string Zws = "\u200B";
         const int TimerTickMs = 100;
         const int AnalyzeTickMs = 1000;
         const int UpdateTimeoutMs = 1500;
@@ -36,12 +38,9 @@ namespace LinqEditor.UI.WinForm.Controls
         int _textLineHeight;
         Timer _analyzeTimer;
         Stopwatch _updatedTimer;
+        Timer _autocompleteTimer;
 
-        public string SourceCode { get {
-
-            return _editor.Text.Replace(Zws, "");
-        }
-        }
+        public string SourceCode { get { return _editor.Text; } }
 
         public CodeEditor(IAsyncSessionFactory sessionFactory, ToolTip2 tooltip)
         {
@@ -159,6 +158,9 @@ namespace LinqEditor.UI.WinForm.Controls
                     _editor.Styles[key.Value].Font = EditorFont;
                     _editor.Styles[key.Value].FontName = EditorFont.Name;
                 }
+
+                _autocompleteTimer.Interval = 1000;
+                _autocompleteTimer.Start();
             };
 
             // timer handles reading changes to the currently hovered word (defined by scintilla.)
@@ -179,7 +181,74 @@ namespace LinqEditor.UI.WinForm.Controls
                 }
                 _analyzeTimer.Start();
             };
+
+            _autocompleteTimer = new Timer();
+            _autocompleteTimer.Tick += delegate
+            {
+                _autocompleteTimer.Stop();
+                if (_editor.AutoComplete.IsActive)
+                {
+                    // scan all top level windows to find the scintilla dropdown 
+                    var handles = GetWindows();
+                    IntPtr lbHndl = IntPtr.Zero;
+                    foreach (IntPtr child in handles)
+                    {
+                        var className = new StringBuilder(256);
+                        if (GetClassName(child, className, className.Capacity) != 0)
+                        {
+                            var str = className.ToString();
+                            if (str.StartsWith("ListBoxX")) // ListBoxX_ClassName
+                            {
+                                lbHndl = child;
+                                break;
+                            }
+                        }
+                    }
+                    // ListBoxX has the ListBox under control id 2 (from winspy)
+                    var dlgItem3 = GetDlgItem(lbHndl, 2);
+                    // query the listbox for the currently selected index
+                    var cnt = SendMessage(dlgItem3, LB_GETCURSEL, 0, 0);
+                    RECT itemRect = new RECT();
+                    // gets the rectangle of the selected item
+                    var res = SendMessageWithRect(dlgItem3, LB_GETITEMRECT, cnt, ref itemRect);
+                    Debug.WriteLine("CB " + cnt + "," + itemRect.Top + "," + itemRect.Width + "," + itemRect.Height);
+                }
+                _autocompleteTimer.Start();
+            };
         }
+
+        const int LB_GETITEMRECT = 0x0198;
+        const int LB_GETCURSEL = 0x0188;
+
+        delegate bool EnumedWindow(IntPtr handleWindow, ArrayList handles);
+
+        static ArrayList GetWindows()
+        {
+            ArrayList windowHandles = new ArrayList();
+            EnumedWindow callBackPtr = delegate(IntPtr h, ArrayList whs)
+            {
+                whs.Add(h);
+                return true;
+            };
+            EnumWindows(callBackPtr, windowHandles);
+
+            return windowHandles;
+        }
+
+        [DllImport("user32.dll")]
+        static extern bool EnumWindows(EnumedWindow lpEnumFunc, ArrayList lParam);
+
+        [DllImport("user32.dll")]
+        static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
+
+        [DllImport("user32.dll")]
+        static extern int SendMessage(IntPtr hwnd, int msg, int wParam, int lParam);
+
+        [DllImport("user32.dll", EntryPoint = "SendMessage")]
+        static extern IntPtr SendMessageWithRect(IntPtr hWnd, UInt32 msg, int wParam, ref RECT lParam);
 
         void DrawErrors(IEnumerable<Error> errors)
         {
@@ -206,6 +275,7 @@ namespace LinqEditor.UI.WinForm.Controls
                 {
                     _editor.AutoComplete.FillUpCharacters = "";
                     _editor.AutoComplete.List = GetAutoCompleteList(result.MemberCompletions);
+                    
                     _editor.AutoComplete.Show();
                 }
             }

@@ -75,6 +75,7 @@
     <Compile Include="Controls\OutputPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\RECT.cs" />
     <Compile Include="Controls\TabControl2.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using NuDoq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Xml.Linq;
 
 namespace LinqEditor.Core.CodeAnalysis.Services
@@ -20,8 +21,10 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             var list = new List<DocumentMembers>();
             foreach (var assembly in CSharpCompiler.GetCoreAssemblies())
             {
-                var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(assembly);
-                list.Add(NuDoq.DocReader.Read(path));
+                var n = assembly.GetName().Name;
+                var filePath = string.Format("{1}{0}.xml", assembly.GetName().Name, PathUtility.ApplicationDirectory);
+                //var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(assembly);
+                list.Add(NuDoq.DocReader.Read(filePath));
             }
             _documents = list;
         }

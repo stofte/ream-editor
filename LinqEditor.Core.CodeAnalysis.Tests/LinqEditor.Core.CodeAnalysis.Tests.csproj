@@ -114,7 +114,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CSharpCompilerTests.cs" />
-    <Compile Include="CustomDocumentationProviderTests.cs" />
     <Compile Include="DocumentationServiceTests.cs" />
     <Compile Include="SymbolStoreTests.cs" />
     <Compile Include="TemplateCodeAnalysisTests.cs" />

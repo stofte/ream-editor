@@ -13,7 +13,7 @@ namespace LinqEditor.Test.Common.SqlServer
             {
                 if (Environment.GetEnvironmentVariable("CI") == "True")
                 {
-                    return @"Server=(local)\SQL2014;Initial Catalog=master;User ID=sa;Password=Password12!";
+                    return @"Server=(local)\SQL2014;Initial Catalog=master;Integrated Security=True";
                 }
                 return @"Data Source=(LocalDB)\v11.0;Initial Catalog=master;Integrated Security=True"; 
             } 

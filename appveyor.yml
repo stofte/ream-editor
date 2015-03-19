@@ -1,4 +1,6 @@
 before_build:
   - nuget restore
-services:
-  - mssql2014
+test:
+  categories:
+    except:
+      - Database

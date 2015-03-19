@@ -7,7 +7,17 @@ namespace LinqEditor.Test.Common.SqlServer
 {
     public class Database : IDisposable
     {
-        private const string LocalDbMaster = "Data Source=(LocalDB)\\v11.0;Initial Catalog=master;Integrated Security=True";
+        private string LocalDbMaster 
+        { 
+            get 
+            {
+                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True")
+                {
+                    return @"Server=(local)\SQL2014;Initial Catalog=master;User ID=sa;Password=Password12!";
+                }
+                return @"Data Source=(LocalDB)\v11.0;Initial Catalog=master;Integrated Security=True"; 
+            } 
+        }
 
         private readonly string _databaseName;
         private readonly string _fileName;

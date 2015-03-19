@@ -1,2 +1,7 @@
 before_build:
   - nuget restore
+
+test:
+  categories:
+    except:
+      - Database

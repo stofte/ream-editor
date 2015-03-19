@@ -23,7 +23,6 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             {
                 var n = assembly.GetName().Name;
                 var filePath = string.Format("{1}{0}.xml", assembly.GetName().Name, PathUtility.ApplicationDirectory);
-                //var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(assembly);
                 list.Add(NuDoq.DocReader.Read(filePath));
             }
             _documents = list;

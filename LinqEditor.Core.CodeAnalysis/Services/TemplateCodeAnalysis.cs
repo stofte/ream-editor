@@ -84,7 +84,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _errors = result.Item3;
             _extensionMethods = CodeAnalysisHelper.GetExtensionMethods(semanticModel);
             // assumes marker is at column 0
-            var lines = _initialSource.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = _initialSource.Split(new[] { Environment.NewLine, "\n" }, StringSplitOptions.None);
             for (var i = 0; i < lines.Length; i++) 
             {
                 if (lines[i].StartsWith(SchemaConstants.Marker))

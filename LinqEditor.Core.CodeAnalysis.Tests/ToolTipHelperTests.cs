@@ -91,7 +91,6 @@ namespace Test
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SecondZParameterReference)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_SelectIndexParameterReference)]
         [TestCase(ToolTipTestData.ComplexStatementsExampleTwo_MyVarLocalVariableReference)]
-        
         public void Formats_Expected_ToolTip(string testDataKey)
         {
             var testData = ToolTipTestData.Data[testDataKey];

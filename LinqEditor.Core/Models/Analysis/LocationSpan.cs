@@ -43,7 +43,7 @@ namespace LinqEditor.Core.Models.Analysis
 
         public string GetText(string sourceCode)
         {
-            var lines = sourceCode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = sourceCode.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None);
             var sb = new StringBuilder();
             for (var i = 0; i < lines.Length; i++)
             {

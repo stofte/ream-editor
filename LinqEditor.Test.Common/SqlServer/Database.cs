@@ -11,7 +11,7 @@ namespace LinqEditor.Test.Common.SqlServer
         { 
             get 
             {
-                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True")
+                if (Environment.GetEnvironmentVariable("CI") == "True")
                 {
                     return @"Server=(local)\SQL2014;Initial Catalog=master;User ID=sa;Password=Password12!";
                 }

@@ -20,19 +20,19 @@ namespace LinqEditor.Test.Common
             {ThisAccessInDb, 
                 Tuple.Create("this.", 4,
                     new Tuple<string, MemberKind>[] {
-                        T.Create("Foo", MemberKind.DatabaseTable),
-                        T.Create("TypeTestTable", MemberKind.DatabaseTable)
+                        T.Create("Foo", MemberKind.Property),
+                        T.Create("TypeTestTable", MemberKind.Property)
                     }.AsEnumerable())
             },
             {FooColumnAccessInDb, 
                 Tuple.Create("Foo.Select(x => x.", 17,
                     new Tuple<string, MemberKind>[] {
-                        T.Create("Description", MemberKind.TableColumn),
+                        T.Create("Description", MemberKind.Property),
                         T.Create("Dump", MemberKind.ExtensionMethod),
                         T.Create("Equals", MemberKind.Method),
                         T.Create("GetHashCode", MemberKind.Method),
                         T.Create("GetType", MemberKind.Method),
-                        T.Create("Id", MemberKind.TableColumn),
+                        T.Create("Id", MemberKind.Property),
                         T.Create("ToString", MemberKind.Method),
                     }.AsEnumerable())
             },

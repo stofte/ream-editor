@@ -1,4 +1,4 @@
 before_build:
   - nuget restore
 services:
-  - mssql2014
+  - mssql2012sp1

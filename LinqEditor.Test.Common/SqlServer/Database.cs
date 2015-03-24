@@ -8,19 +8,11 @@ namespace LinqEditor.Test.Common.SqlServer
 {
     public class Database : IDisposable
     {
-        private bool ContinousIntegrationEnvironment
-        {
-            get
-            {
-                return Environment.GetEnvironmentVariable("CI") == "True";
-            }
-        }
-
         public string DataSource
         {
             get
             {
-                return ContinousIntegrationEnvironment ? @"Data Source=(local)\SQL2012SP1;" : @"Data Source=(LocalDB)\v11.0";
+                return Environment.GetEnvironmentVariable("CI") == "True" ? @"Data Source=(local)\SQL2012SP1;" : @"Data Source=(LocalDB)\v11.0";
             }
         }
 
@@ -36,7 +28,7 @@ namespace LinqEditor.Test.Common.SqlServer
         {
             get 
             {
-                return string.Format(@"Initial Catalog={0};Integrated Security=True;MultipleActiveResultSets=True;AttachDBFilename={1}.mdf;", _databaseName, _fileName) + DataSource;
+                return string.Format(@"Initial Catalog={0};Integrated Security=True;MultipleActiveResultSets=True;AttachDBFilename={1}.mdf;{2}", _databaseName, _fileName, DataSource);
             }
         }
 

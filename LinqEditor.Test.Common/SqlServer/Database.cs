@@ -8,16 +8,36 @@ namespace LinqEditor.Test.Common.SqlServer
 {
     public class Database : IDisposable
     {
+        private bool ContinousIntegrationEnvironment
+        {
+            get
+            {
+                return Environment.GetEnvironmentVariable("CI") == "True";
+            }
+        }
+
+        public string DataSource
+        {
+            get
+            {
+                return ContinousIntegrationEnvironment ? @"Data Source=(local)\SQL2012SP1;" : @"Data Source=(LocalDB)\v11.0";
+            }
+        }
+
         private string LocalDbMaster 
         { 
             get 
             {
-                if (Environment.GetEnvironmentVariable("CI") == "True")
-                {
-                    return @"Server=(local)\SQL2012SP1;Initial Catalog=master;Integrated Security=True";
-                }
-                return @"Data Source=(LocalDB)\v11.0;Initial Catalog=master;Integrated Security=True"; 
-            } 
+                return @"Initial Catalog=master;Integrated Security=True;" + DataSource; 
+            }
+        }
+
+        private string TestConnectionString
+        {
+            get 
+            {
+                return string.Format(@"Initial Catalog={0};Integrated Security=True;MultipleActiveResultSets=True;AttachDBFilename={1}.mdf;", _databaseName, _fileName) + DataSource;
+            }
         }
 
         private readonly string _databaseName;
@@ -32,8 +52,7 @@ namespace LinqEditor.Test.Common.SqlServer
             _fileName = Path.GetFullPath(databaseName);
             _schema = schema ?? DefaultSchema();
             _script = script ?? DefaultScript();
-            ConnectionString = string.Format("Data Source=(LocalDB)\\v11.0;Initial Catalog={0};Integrated Security=True;" +
-                "MultipleActiveResultSets=True;AttachDBFilename={1}.mdf", _databaseName, _fileName);
+            ConnectionString = TestConnectionString;
             CreateDatabase();
         }
 

@@ -54,6 +54,10 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="ScintillaNET, Version=2.6.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -221,10 +225,6 @@
     <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
       <Name>LinqEditor.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ScintillaNET\ScintillaNET.csproj">
-      <Project>{f9b6dabd-bbc1-4638-8ce6-a5c9506bfdcb}</Project>
-      <Name>ScintillaNET</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -38,8 +38,6 @@ namespace Test
 }
 ";
 
-        IToolTipHelperFactory _factory;
-
         [TestFixtureSetUp]
         public void Initialize()
         {

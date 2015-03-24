@@ -29,9 +29,6 @@ namespace LinqEditor.UI.WinForm.Forms
         Point _start;
         Point _end;
 
-        // used to get the screen the main form is active on
-        Main _mainForm;
-
         // text data
         string _type;
         string _desc;

@@ -66,11 +66,7 @@ namespace LinqEditor.Test.Common
 
         static void Foo()
         {
-            int x1 = 10;
-            DataColumn col = new DataColumn();
-            var x = new List<int>();
-            var xx = new List<int>(10).AsQueryable();
-            var set = new HashSet<int>();
+            
         }
 
         public static Dictionary<string, Tuple<string, int, Tuple<string, string, IEnumerable<string>, string>>> Data = 

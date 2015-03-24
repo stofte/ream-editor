@@ -65,7 +65,7 @@ namespace Test
         {
             var expected = "Initializes a new instance of the System.Collections.Generic.List<T> class that is empty and has the specified initial capacity.";
             var ctorId = "M:System.Collections.Generic.List`1.#ctor(System.Int32)";
-            var ctorId2 = "M:System.Collections.Generic.List`1.#ctor(System.Collections.Generic.IEnumerable{`0})";
+            // M:System.Collections.Generic.List`1.#ctor(System.Collections.Generic.IEnumerable{`0})
             var x = _service.GetDocumentation(ctorId);
 
             Assert.AreEqual(x.Summary, expected);

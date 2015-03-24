@@ -1,6 +1,7 @@
 ﻿using LinqEditor.Core;
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 
 namespace LinqEditor.Test.Common.SqlServer
@@ -98,6 +99,8 @@ namespace LinqEditor.Test.Common.SqlServer
             }
 
             ExecuteQuery(_schema);
+            Debug.Assert(File.Exists(_fileName + ".mdf"));
+            Debug.Assert(File.Exists(_fileName + "_log.ldf"));
         }
 
         // looks for script in output folder

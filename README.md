@@ -7,4 +7,4 @@ Execute C#/LINQ queries against SQL Server databases with autocompletion.
 
 TODO
 ----
-- Scopes need to be disposed
+- Session scopes need to be disposed

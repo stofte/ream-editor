@@ -15,7 +15,7 @@ namespace LinqEditor.Core.Session
     // http://blogs.msdn.com/b/pfxteam/archive/2012/04/12/10293335.aspx?Redirected=true
     public class AsyncSession : Session, IAsyncSession
     {
-        public AsyncSession(Guid id, ISqlSchemaProvider schemaProvider, ITemplateService generator, 
+        public AsyncSession(Guid id, ISchemaProvider schemaProvider, ITemplateService generator, 
             IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory, 
             IConnectionStore connectionStore, ITemplateCodeAnalysis codeAnalysis) :
             base(id, schemaProvider, generator, codeContainerFactory, databaseContainerFactory, connectionStore, codeAnalysis) { }

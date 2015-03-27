@@ -4,9 +4,9 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 
-namespace LinqEditor.Test.Common.SqlServer
+namespace LinqEditor.Test.Common.MSSQLServer
 {
-    public class SqlServerTestDb : IDisposable
+    public class MSSQLServerTestDb : IDisposable
     {
         public string DataSource
         {
@@ -38,7 +38,7 @@ namespace LinqEditor.Test.Common.SqlServer
         private readonly string _script;
         public readonly string ConnectionString;
 
-        public SqlServerTestDb(string databaseName, string schema = null, string script = null)
+        public MSSQLServerTestDb(string databaseName, string schema = null, string script = null)
         {
             _databaseName = databaseName;
             _fileName = Path.GetFullPath(databaseName);
@@ -117,13 +117,13 @@ namespace LinqEditor.Test.Common.SqlServer
         // looks for script in output folder
         private static string DefaultSchema()
         {
-            var file = PathUtility.CurrentPath + @"SqlServer\schema.sql";
+            var file = PathUtility.CurrentPath + @"MSSQLServer\schema.sql";
             return File.ReadAllText(file);
         }
 
         private static string DefaultScript()
         {
-            var file = PathUtility.CurrentPath + @"SqlServer\script.sql";
+            var file = PathUtility.CurrentPath + @"MSSQLServer\script.sql";
             return File.ReadAllText(file);
         }
     }

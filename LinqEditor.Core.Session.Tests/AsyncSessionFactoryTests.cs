@@ -28,7 +28,7 @@ namespace LinqEditor.Core.Session.Tests
             _container.Install(FromAssembly.Containing<IConnectionStore>()); // core
             _container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
             _container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
-            _container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
+            _container.Install(FromAssembly.Containing<ISchemaProvider>()); // core.schema
             _container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
         }
 

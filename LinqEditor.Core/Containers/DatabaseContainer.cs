@@ -52,7 +52,7 @@ namespace LinqEditor.Core.Containers
                     _baseAssembly = Assembly.Load(assemblyImage);
                 }
 
-                _runnerType = ProgramType.Database;
+                _runnerType = ProgramType.MSSQLServer;
                 _dbType = string.Format("{0}.Schema.DatabaseWithAttributes", _baseAssembly.GetName().Name);
                 // warm up connection
                 var warmupType = _baseAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _baseAssembly.GetName().Name));

@@ -32,7 +32,7 @@ namespace LinqEditor.Core.Session
         int _prevHash;
         string _prevSrc;
 
-        private ISqlSchemaProvider _schemaProvider;
+        private ISchemaProvider _schemaProvider;
         private ITemplateService _generator;
 
         private Stopwatch _watch;
@@ -47,7 +47,7 @@ namespace LinqEditor.Core.Session
 
         public Guid Id { get { return _id; } }
 
-        public Session(Guid contextId, ISqlSchemaProvider schemaProvider, ITemplateService generator,
+        public Session(Guid contextId, ISchemaProvider schemaProvider, ITemplateService generator,
             IIsolatedCodeContainerFactory codeContainerFactory, IIsolatedDatabaseContainerFactory databaseContainerFactory,
             IConnectionStore connectionStore, ITemplateCodeAnalysis codeAnalysis)
         {
@@ -154,7 +154,7 @@ namespace LinqEditor.Core.Session
                     return new ExecuteResult
                     {
                         Success = false,
-                        Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
+                        Kind = _codeSession ? ProgramType.Code : ProgramType.MSSQLServer,
                         Cancelled = true,
                         DurationMs = _watch.ElapsedMilliseconds,
                     };
@@ -172,7 +172,7 @@ namespace LinqEditor.Core.Session
                     Errors = result.Errors,
                     DurationMs = _watch.ElapsedMilliseconds,
                     CodeOutput = containerResult.CodeOutput,
-                    Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
+                    Kind = _codeSession ? ProgramType.Code : ProgramType.MSSQLServer,
                 };
             }
 
@@ -182,7 +182,7 @@ namespace LinqEditor.Core.Session
                 Errors = result.Errors,
                 Warnings = result.Warnings,
                 DurationMs = _watch.ElapsedMilliseconds,
-                Kind = _codeSession ? ProgramType.Code : ProgramType.Database,
+                Kind = _codeSession ? ProgramType.Code : ProgramType.MSSQLServer,
             };
         }
 
@@ -266,7 +266,7 @@ namespace LinqEditor.Core.Session
                 DatabaseSchema sqlSchema = null;
                 try
                 {
-                    sqlSchema = _schemaProvider.GetSchema(_connection.ConnectionString);
+                    sqlSchema = _schemaProvider.GetSchema(_connection);
                 }
                 catch(SqlException exn)
                 {

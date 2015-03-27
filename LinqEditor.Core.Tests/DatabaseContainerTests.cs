@@ -11,13 +11,14 @@ using System.Threading.Tasks;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using System.IO;
 using LinqEditor.Core.Containers;
+using LinqEditor.Core.Settings;
 
 namespace LinqEditor.Core.Tests
 {
     [TestFixture(Category = "Database")]
     public class DatabaseContainerTests
     {
-        LinqEditor.Test.Common.SqlServer.SqlServerTestDb _database;
+        LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb _database;
         string _schemaAssemblyPath;
         string _query1AssemblyPath;
         byte[] _query2AssemblyBytes;
@@ -31,10 +32,11 @@ namespace LinqEditor.Core.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("DatabaseContainerTests");
-            var schemaProvider = new SqlSchemaProvider();
+            _database = new LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb("DatabaseContainerTests");
+            var schemaProvider = new MSSQLServerSchemaProvider();
             var templateService = new TemplateService();
-            _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);
+            var conn = new Connection { Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString, Kind = Models.Editor.ProgramType.MSSQLServer };
+            _schemaModel = schemaProvider.GetSchema(conn);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
             var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix), PathUtility.TempPath);
             _schemaAssemblyPath = schemaResult.AssemblyPath;

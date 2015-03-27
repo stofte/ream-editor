@@ -9,7 +9,7 @@ namespace LinqEditor.Core.Schema.Installer
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<ISqlSchemaProvider>().ImplementedBy<SqlSchemaProvider>());
+            container.Register(Component.For<ISchemaProvider>().ImplementedBy<MSSQLServerSchemaProvider>());
         }
     }
 }

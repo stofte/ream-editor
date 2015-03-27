@@ -22,7 +22,7 @@ namespace LinqEditor.Core.Session.Tests
     [TestFixture(Category="Database")]
     public class AsyncSessionFactoryDatabaseTests
     {
-        LinqEditor.Test.Common.SqlServer.SqlServerTestDb _database;
+        LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb _database;
         string _schemaAssemblyPath;
         string _query1AssemblyPath;
         byte[] _query2AssemblyBytes;
@@ -39,10 +39,11 @@ namespace LinqEditor.Core.Session.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("AsyncSessionFactoryDatabaseTests");
-            var schemaProvider = new SqlSchemaProvider();
+            _database = new LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb("AsyncSessionFactoryDatabaseTests");
+            var schemaProvider = new MSSQLServerSchemaProvider();
             var templateService = new TemplateService();
-            _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);
+            var conn = new Connection { Kind = Models.Editor.ProgramType.MSSQLServer, Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString };
+            _schemaModel = schemaProvider.GetSchema(conn);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
             var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix), PathUtility.TempPath);
             _schemaAssemblyPath = schemaResult.AssemblyPath;
@@ -78,7 +79,7 @@ namespace LinqEditor.Core.Session.Tests
             _container.Install(FromAssembly.Containing<IConnectionStore>()); // core
             _container.Install(FromAssembly.Containing<ITemplateService>()); // core.templates
             _container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
-            _container.Install(FromAssembly.Containing<ISqlSchemaProvider>()); // core.schema
+            _container.Install(FromAssembly.Containing<ISchemaProvider>()); // core.schema
             _container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
 
             _container.Register(Component.For<IConnectionStore>()

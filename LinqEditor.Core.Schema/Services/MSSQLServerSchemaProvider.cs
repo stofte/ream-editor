@@ -1,17 +1,18 @@
 ﻿using LinqEditor.Core.Models.Database;
+using LinqEditor.Core.Settings;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace LinqEditor.Core.Schema.Services
 {
-    public class SqlSchemaProvider : ISqlSchemaProvider
+    public class MSSQLServerSchemaProvider : ISqlServerSchemaProvider
     {
-        public DatabaseSchema GetSchema(string connectionString)
+        public DatabaseSchema GetSchema(Connection connection)
         {
             var tables = new List<TableSchema>();
 
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(connection.ConnectionString))
             {
                 conn.Open();
 
@@ -52,7 +53,7 @@ namespace LinqEditor.Core.Schema.Services
 
             return new DatabaseSchema
             {
-                ConnectionString = connectionString,
+                ConnectionString = connection.ConnectionString,
                 Tables = tables
             };
         }

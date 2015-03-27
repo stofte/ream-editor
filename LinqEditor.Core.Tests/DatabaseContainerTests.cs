@@ -17,7 +17,7 @@ namespace LinqEditor.Core.Tests
     [TestFixture(Category = "Database")]
     public class DatabaseContainerTests
     {
-        LinqEditor.Test.Common.SqlServer.Database _database;
+        LinqEditor.Test.Common.SqlServer.SqlServerTestDb _database;
         string _schemaAssemblyPath;
         string _query1AssemblyPath;
         byte[] _query2AssemblyBytes;
@@ -31,7 +31,7 @@ namespace LinqEditor.Core.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.SqlServer.Database("DatabaseContainerTests");
+            _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("DatabaseContainerTests");
             var schemaProvider = new SqlSchemaProvider();
             var templateService = new TemplateService();
             _schemaModel = schemaProvider.GetSchema(_database.ConnectionString);

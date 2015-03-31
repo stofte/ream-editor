@@ -2,3 +2,8 @@ before_build:
   - nuget restore
 services:
   - mssql2012sp1
+
+assembly_info:
+  patch: true
+  file: AssemblyInfo.cs
+  assembly_version: $(appveyor_build_version)

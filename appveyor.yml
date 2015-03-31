@@ -2,7 +2,8 @@ before_build:
   - nuget restore
 services:
   - mssql2012sp1
-
+configuration:
+  - Release
 assembly_info:
   patch: true
   file: AssemblyInfo.cs

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LinqEditor.Schema")]
+[assembly: AssemblyTitle("LinqEditor.Core.Schema")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LinqEditor.Schema")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyProduct("LinqEditor.Core.Schema")]
+[assembly: AssemblyCopyright("Copyright © 2015, Svend Ezaki Tofte")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

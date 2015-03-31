@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LinqEditor")]
+[assembly: AssemblyTitle("LinqEditor.UI.WinForm")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LinqEditor")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyProduct("LinqEditor.UI.WinForm")]
+[assembly: AssemblyCopyright("Copyright © 2015, Svend Ezaki Tofte")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

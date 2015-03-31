@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("LinqEditor.Core.Tests")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Copyright © 2015, Svend Ezaki Tofte")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

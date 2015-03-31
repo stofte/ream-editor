@@ -63,6 +63,7 @@
       <DependentUpon>Statements.tt</DependentUpon>
     </Compile>
     <Compile Include="Installers\Installer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaConstants.cs" />
     <Compile Include="Schema\SqlServer.cs">
       <AutoGen>True</AutoGen>

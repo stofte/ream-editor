@@ -117,13 +117,13 @@ namespace LinqEditor.Test.Common.SqlServer
         // looks for script in output folder
         private static string DefaultSchema()
         {
-            var file = PathUtility.CurrentPath + @"MSSQLServer\schema.sql";
+            var file = PathUtility.CurrentPath + @"SqlServer\schema.sql";
             return File.ReadAllText(file);
         }
 
         private static string DefaultScript()
         {
-            var file = PathUtility.CurrentPath + @"MSSQLServer\script.sql";
+            var file = PathUtility.CurrentPath + @"SqlServer\script.sql";
             return File.ReadAllText(file);
         }
     }

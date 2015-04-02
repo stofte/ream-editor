@@ -64,6 +64,11 @@
     </Compile>
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\SqlServer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SqlServer.tt</DependentUpon>
+    </Compile>
     <Compile Include="SchemaConstants.cs" />
     <Compile Include="Schema\SqlServer.cs">
       <AutoGen>True</AutoGen>
@@ -71,11 +76,6 @@
       <DependentUpon>SqlServer.tt</DependentUpon>
     </Compile>
     <Compile Include="Schema\SqlServer.partial.cs">
-      <DependentUpon>SqlServer.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Query\SqlServer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>SqlServer.tt</DependentUpon>
     </Compile>
     <Compile Include="Query\SqlServer.partial.cs">

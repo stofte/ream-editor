@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 
 namespace LinqEditor.Core.Schema.Services
 {
-    public class MSSQLServerSchemaProvider : ISqlServerSchemaProvider
+    public class SqlServerSchemaProvider : ISqlServerSchemaProvider
     {
         public DatabaseSchema GetSchema(Connection connection)
         {

@@ -14,7 +14,7 @@ namespace LinqEditor.Core.Settings
 
         public Connection()
         {
-            Kind = ProgramType.MSSQLServer;
+            Kind = ProgramType.SqlServer;
             _connectionString = string.Empty;
         }
 
@@ -46,7 +46,7 @@ namespace LinqEditor.Core.Settings
         {
             get
             {
-                if (Kind == ProgramType.MSSQLServer && !string.IsNullOrWhiteSpace(ConnectionString))
+                if (Kind == ProgramType.SqlServer && !string.IsNullOrWhiteSpace(ConnectionString))
                 {
                     var s = new List<int>();
                     var part = ParseConnectionStringPart(@"(integrated security|trusted_connection)=([^;]*)");
@@ -62,7 +62,7 @@ namespace LinqEditor.Core.Settings
             get
             {
                 string val = string.Empty;
-                if (Kind == ProgramType.MSSQLServer && !string.IsNullOrWhiteSpace(ConnectionString))
+                if (Kind == ProgramType.SqlServer && !string.IsNullOrWhiteSpace(ConnectionString))
                 {
                     if (UsingIntegratedSecurity)
                     {
@@ -98,7 +98,7 @@ namespace LinqEditor.Core.Settings
         private string ParseConnectionStringPart(string regexInput)
         {
             string val = string.Empty;
-            if (Kind == ProgramType.MSSQLServer && !string.IsNullOrWhiteSpace(ConnectionString))
+            if (Kind == ProgramType.SqlServer && !string.IsNullOrWhiteSpace(ConnectionString))
             {
                 var regex = new Regex(regexInput, RegexOptions.IgnoreCase);
                 var m = regex.Match(ConnectionString);
@@ -126,7 +126,7 @@ namespace LinqEditor.Core.Settings
         {
             string val = DisplayName ?? string.Empty;
 
-            if (Kind == ProgramType.MSSQLServer) 
+            if (Kind == ProgramType.SqlServer) 
             {
                 if (IsValidConnectionString)
                 {

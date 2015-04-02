@@ -154,7 +154,7 @@ namespace LinqEditor.Core.Session
                     return new ExecuteResult
                     {
                         Success = false,
-                        Kind = _codeSession ? ProgramType.Code : ProgramType.MSSQLServer,
+                        Kind = _codeSession ? ProgramType.Code : ProgramType.SqlServer,
                         Cancelled = true,
                         DurationMs = _watch.ElapsedMilliseconds,
                     };
@@ -172,7 +172,7 @@ namespace LinqEditor.Core.Session
                     Errors = result.Errors,
                     DurationMs = _watch.ElapsedMilliseconds,
                     CodeOutput = containerResult.CodeOutput,
-                    Kind = _codeSession ? ProgramType.Code : ProgramType.MSSQLServer,
+                    Kind = _codeSession ? ProgramType.Code : ProgramType.SqlServer,
                 };
             }
 
@@ -182,7 +182,7 @@ namespace LinqEditor.Core.Session
                 Errors = result.Errors,
                 Warnings = result.Warnings,
                 DurationMs = _watch.ElapsedMilliseconds,
-                Kind = _codeSession ? ProgramType.Code : ProgramType.MSSQLServer,
+                Kind = _codeSession ? ProgramType.Code : ProgramType.SqlServer,
             };
         }
 

@@ -125,7 +125,7 @@ namespace LinqEditor.UI.WinForm.Forms
                 editSelector.Items.Clear();
                 foreach (var conn in _connectionStore.Connections)
                 {
-                    if (conn.Kind == Core.Models.Editor.ProgramType.MSSQLServer)
+                    if (conn.Kind == Core.Models.Editor.ProgramType.SqlServer)
                     {
                         editSelector.Items.Add(conn);
                     }

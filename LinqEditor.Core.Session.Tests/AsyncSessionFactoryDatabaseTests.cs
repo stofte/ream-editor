@@ -22,7 +22,7 @@ namespace LinqEditor.Core.Session.Tests
     [TestFixture(Category="Database")]
     public class AsyncSessionFactoryDatabaseTests
     {
-        LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb _database;
+        LinqEditor.Test.Common.SqlServer.SqlServerTestDb _database;
         string _schemaAssemblyPath;
         string _query1AssemblyPath;
         byte[] _query2AssemblyBytes;
@@ -39,10 +39,10 @@ namespace LinqEditor.Core.Session.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb("AsyncSessionFactoryDatabaseTests");
-            var schemaProvider = new MSSQLServerSchemaProvider();
+            _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("AsyncSessionFactoryDatabaseTests");
+            var schemaProvider = new SqlServerSchemaProvider();
             var templateService = new TemplateService();
-            var conn = new Connection { Kind = Models.Editor.ProgramType.MSSQLServer, Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString };
+            var conn = new Connection { Kind = Models.Editor.ProgramType.SqlServer, Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString };
             _schemaModel = schemaProvider.GetSchema(conn);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
             var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix), PathUtility.TempPath);

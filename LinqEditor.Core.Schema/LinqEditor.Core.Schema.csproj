@@ -50,7 +50,7 @@
     <Compile Include="Services\SchemaProvider.cs" />
     <Compile Include="Services\SQLiteSchemaProvider.cs" />
     <Compile Include="Services\ISchemaProvider.cs" />
-    <Compile Include="Services\MSSQLServerSchemaProvider.cs" />
+    <Compile Include="Services\SqlServerSchemaProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

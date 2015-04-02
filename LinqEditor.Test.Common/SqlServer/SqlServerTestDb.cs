@@ -4,9 +4,9 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 
-namespace LinqEditor.Test.Common.MSSQLServer
+namespace LinqEditor.Test.Common.SqlServer
 {
-    public class MSSQLServerTestDb : IDisposable
+    public class SqlServerTestDb : IDisposable
     {
         public string DataSource
         {
@@ -38,7 +38,7 @@ namespace LinqEditor.Test.Common.MSSQLServer
         private readonly string _script;
         public readonly string ConnectionString;
 
-        public MSSQLServerTestDb(string databaseName, string schema = null, string script = null)
+        public SqlServerTestDb(string databaseName, string schema = null, string script = null)
         {
             _databaseName = databaseName;
             _fileName = Path.GetFullPath(databaseName);

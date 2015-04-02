@@ -18,7 +18,7 @@ namespace LinqEditor.Core.Tests
     [TestFixture(Category="Database")]
     public class WindsorContainerDatabaseTests
     {
-        LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb _database;
+        LinqEditor.Test.Common.SqlServer.SqlServerTestDb _database;
         string _schemaAssemblyPath;
         string _query1AssemblyPath;
         byte[] _query2AssemblyBytes;
@@ -32,10 +32,10 @@ namespace LinqEditor.Core.Tests
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _database = new LinqEditor.Test.Common.MSSQLServer.MSSQLServerTestDb("WindsorContainerDatabaseTests");
-            var schemaProvider = new MSSQLServerSchemaProvider();
+            _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("WindsorContainerDatabaseTests");
+            var schemaProvider = new SqlServerSchemaProvider();
             var templateService = new TemplateService();
-            var conn = new Connection { Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString, Kind = Models.Editor.ProgramType.MSSQLServer };
+            var conn = new Connection { Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString, Kind = Models.Editor.ProgramType.SqlServer };
             _schemaModel = schemaProvider.GetSchema(conn);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
             var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix), PathUtility.TempPath);

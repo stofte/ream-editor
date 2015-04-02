@@ -50,7 +50,7 @@
     <Compile Include="DatabaseTestData.cs" />
     <Compile Include="SourceCodeFragments.cs" />
     <Compile Include="SQLite\SQLiteTestDb.cs" />
-    <Compile Include="MSSQLServer\MSSQLServerTestDb.cs" />
+    <Compile Include="SqlServer\SqlServerTestDb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToolTipTestData.cs" />
     <Compile Include="VSCompletionTestData.cs" />
@@ -85,10 +85,10 @@
     <Content Include="SQLite\script.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="MSSQLServer\schema.sql">
+    <Content Include="SqlServer\schema.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="MSSQLServer\script.sql">
+    <Content Include="SqlServer\script.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

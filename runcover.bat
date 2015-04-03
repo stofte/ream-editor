@@ -11,6 +11,3 @@ if "True" == "%CI%" goto :skipdisplay
 .\packages\ReportGenerator.2.1.4.0\reportgenerator.exe -reports:.\%folder%\TestCoverage.xml -targetdir:%folder%
 start .\%folder%\index.htm
 :skipdisplay
-if "_" == "%CI%_" goto :skipupload
-.\packages\coveralls.io.1.3.4\tools\coveralls.net.exe %folder%\TestCoverage.xml
-:skipupload

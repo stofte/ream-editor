@@ -21,3 +21,4 @@ assembly_info:
 
 after_test:
   - .\runcover.bat
+  - .\uploadcover.bat

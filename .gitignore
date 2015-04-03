@@ -8,3 +8,7 @@ packages/*
 *.psess
 TestCoverage
 TestResult.xml
+# if these are included, appveyor gets confused, better to regen
+LinqEditor.Core.Templates\Schema\SqlServer.cs
+LinqEditor.Core.Templates\Query\SqlServer.cs
+LinqEditor.Core.Templates\Code\Statements.cs

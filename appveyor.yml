@@ -1,12 +1,23 @@
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: irQMjb5YkoBrSl1u1ayE+MqGUpvDDnOPmFVe3L+Tgvse71DfQhFU4iL5XHPOtpxd
+
 before_build:
   - nuget restore
+
 services:
   - mssql2012sp1
+
 configuration:
   - Release
+
 build:
   project: linq-editor.sln
+
 assembly_info:
   patch: true
   file: AssemblyInfo.cs
   assembly_version: $(appveyor_build_version)
+
+after_test:
+  - .\runcover.bat

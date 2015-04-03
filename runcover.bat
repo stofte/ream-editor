@@ -12,5 +12,5 @@ if "True" == "%CI%" goto :skipdisplay
 start .\%folder%\index.htm
 :skipdisplay
 if "_" == "%CI%_" goto :skipupload
-.\packages\coveralls.io.1.3.4\tools\coveralls.net.exe -opencover %folder%\TestCoverage.xml
+.\packages\coveralls.io.1.3.4\tools\coveralls.net.exe %folder%\TestCoverage.xml
 :skipupload

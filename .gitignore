@@ -1,9 +1,10 @@
 *.suo
 */**/bin
 */**/obj
-TestResults
 */**/*.csproj.user
 packages/*
 *.gpState
 *.vsp
 *.psess
+TestCoverage
+TestResult.xml

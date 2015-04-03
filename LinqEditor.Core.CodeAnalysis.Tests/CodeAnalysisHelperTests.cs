@@ -173,7 +173,7 @@ namespace Test
         [TestCase(SourceCodeFragments.ErrorExample2)]
         public void Errors_Are_Returned_With_Line_Column_And_Index_Indicators(string sourceStub)
         {
-            var source = _source4.Replace(SchemaConstants.Marker, sourceStub);
+            var source = _source4.Replace(SchemaConstants.Marker, sourceStub).NormalizeLines();
             var tree = CSharpSyntaxTree.ParseText(source);
 
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToIdentifierWithPrefix("test"))

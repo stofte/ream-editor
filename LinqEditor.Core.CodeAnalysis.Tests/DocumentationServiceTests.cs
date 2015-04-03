@@ -1,16 +1,11 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Services;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Core.Templates;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
@@ -44,6 +39,7 @@ namespace Test
         [TestFixtureSetUp]
         public void Initialize()
         {
+            _source1 = _source1.NormalizeLines();
             var mockStore = new Mock<ISymbolStore>();
 
             var tree = CSharpSyntaxTree.ParseText(_source1);

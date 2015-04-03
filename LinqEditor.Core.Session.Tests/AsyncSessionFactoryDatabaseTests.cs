@@ -171,8 +171,9 @@ namespace LinqEditor.Core.Session.Tests
 Dump
 (   
                                     ) ")]
-        public async void Detects_Dump_Method_When_Auto_Completing_Source(string query)
+        public async void Detects_Dump_Method_When_Auto_Completing_Source(string rawQuery)
         {
+            var query = rawQuery.NormalizeLines();
             var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();
             var session = factory.Create(id);

@@ -2,6 +2,7 @@
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Templates;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Test.Common;
 using Microsoft.CodeAnalysis;
 using Moq;
@@ -92,6 +93,10 @@ namespace Another.Generated
         [TestFixtureSetUp]
         public void Initialize()
         {
+            _simpleProgram = _simpleProgram.NormalizeLines();
+            _simpleProgramWithAllUsings = _simpleProgramWithAllUsings.NormalizeLines();
+            _advancedProgram = _advancedProgram.NormalizeLines();
+
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
@@ -223,8 +228,9 @@ namespace Another.Generated
 
         [TestCase(SourceCodeFragments.ErrorExample1)]
         [TestCase(SourceCodeFragments.ErrorExample2)]
-        public void Errors_Locations_Are_Mapped_To_Stub_Fragment(string sourceFragment)
+        public void Errors_Locations_Are_Mapped_To_Stub_Fragment(string rawSourceFragment)
         {
+            var sourceFragment = rawSourceFragment.NormalizeLines();
             var m = new Mock<ITemplateService>();
             m.Setup(s => s.GenerateQuery(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(_advancedProgram);
             m.Setup(s => s.GenerateCodeStatements(It.IsAny<Guid>(), It.IsAny<string>())).Returns(_advancedProgram);
@@ -289,7 +295,7 @@ namespace Another.Generated
             editor.Initialize();
 
             var testCases = testKeys.Select(x => ToolTipTestData.Data[x]);
-            var srcStb = testCases.First().Item1;
+            var srcStb = testCases.First().Item1.NormalizeLines();
             var offsets = testCases.Select(x => x.Item2);
             var exptectedTTs = testCases.Select(x => x.Item3).ToArray();
 

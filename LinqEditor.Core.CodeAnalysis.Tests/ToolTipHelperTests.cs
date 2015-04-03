@@ -5,10 +5,12 @@ using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Helpers;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Templates;
+using LinqEditor.Core.Helpers;
 using LinqEditor.Test.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
+using System;
 
 namespace LinqEditor.Core.CodeAnalysis.Tests
 {
@@ -41,6 +43,7 @@ namespace Test
         [TestFixtureSetUp]
         public void Initialize()
         {
+            _source1 = _source1.NormalizeLines();
             // full template
             _offset1 = _source1.IndexOf(SchemaConstants.Marker);
             var tree1 = CSharpSyntaxTree.ParseText(_source1);
@@ -93,7 +96,7 @@ namespace Test
         {
             var testData = ToolTipTestData.Data[testDataKey];
             // full template
-            var src = _source1.Replace(SchemaConstants.Marker, testData.Item1);
+            var src = _source1.Replace(SchemaConstants.Marker, testData.Item1).NormalizeLines();
             var offset = _source1.IndexOf(SchemaConstants.Marker);
             var tree = CSharpSyntaxTree.ParseText(src);
             // need to compile to get symbol list

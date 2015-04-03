@@ -20,5 +20,10 @@ assembly_info:
   file: AssemblyInfo.cs
   assembly_version: $(appveyor_build_version)
 
-after_test:
+# we'll just upload the output from the OpenCover run, instead of running the tests twice
+test: off
+
+after_build:
   - .\runcover.bat
+  - ps:$wc = New-Object 'System.Net.WebClient'
+  - ps:$wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $($env:COVER_FOLDER)))

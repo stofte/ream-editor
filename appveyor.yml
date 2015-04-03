@@ -1,5 +1,8 @@
 before_build:
   - nuget restore
+build:
+  project: .\linq-editor.sln
+  verbosity: minimal
 services:
   - mssql2012sp1
 configuration:

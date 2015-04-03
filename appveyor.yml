@@ -4,6 +4,8 @@ services:
   - mssql2012sp1
 configuration:
   - Release
+build:
+  project: linq-editor.sln
 assembly_info:
   patch: true
   file: AssemblyInfo.cs

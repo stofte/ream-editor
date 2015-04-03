@@ -1,9 +1,8 @@
 set COVER_FOLDER=TestCoverage
 if "True" == "%CI%" goto :ci
-set configuration=Debug
+set CONFIGURATION=Debug
 goto :run
 :ci
-set configuration=Release
 mkdir %COVER_FOLDER%
 :run
 .\packages\OpenCover.4.5.3723\OpenCover.Console.exe -target:runtests.bat -register:user -filter:"+[LinqEditor.Core*]* -[*Tests]*" -output:.\%COVER_FOLDER%\TestCoverage.xml

@@ -26,6 +26,8 @@ after_build: 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER
 test_script:
   - .\runcover.bat
   - ps: >-
+      $url = "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)"
+      Write-Host $url
       $wc = New-Object 'System.Net.WebClient'
-      $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestResult.xml))
+      $wc.UploadFile($url, (Resolve-Path .\TestResult.xml))
 

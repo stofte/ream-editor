@@ -22,7 +22,7 @@ assembly_info:
 before_build: nuget restore
 
 after_build: 
-  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug\*
+  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug\**\*
 
 test_script:
   - .\runcover.bat

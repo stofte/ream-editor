@@ -31,5 +31,5 @@ build:
 
 assembly_info:
   patch: true
-  file: LinqCore*\**\AssemblyInfo.cs
+  file: AssemblyInfo.cs
   assembly_version: $(APPVEYOR_BUILD_VERSION)

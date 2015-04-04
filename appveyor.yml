@@ -12,7 +12,7 @@ environment:
 
 artifacts:
   - path: LinqEditor.$(APPVEYOR_BUILD_VERSION).zip
-    name: LinqEditor
+    name: LinqEditor $(CONFIGURATION)
 
 assembly_info:
   patch: true

@@ -2,9 +2,9 @@ build:
   project: linq-editor.sln
 configuration: Debug
 platform: Any CPU
-version: 0.1.0.{build}
-
 services: mssql2012sp1
+# version = build id
+version: 0.1.0.{build} 
 
 environment:
   COVER_FOLDER: TestCoverage
@@ -18,7 +18,7 @@ artifacts:
 assembly_info:
   patch: true
   file: AssemblyInfo.cs
-  assembly_version: '0.1.0.0'
+  assembly_version: '{version}'
   assembly_file_version: '{version}'
 
 before_build: nuget restore

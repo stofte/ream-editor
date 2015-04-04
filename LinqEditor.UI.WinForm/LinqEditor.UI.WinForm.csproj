@@ -58,7 +58,7 @@
     </Reference>
     <Reference Include="ScintillaNET, Version=2.6.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ScintillaNET.dll</HintPath>
+      <HintPath>..\lib\scintilla\ScintillaNET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -152,14 +152,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\lib\SciLexer.dll">
+    <Content Include="..\lib\scintilla\SciLexer.dll">
       <Link>SciLexer.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\lib\SciLexer64.dll">
+    </Content>
+    <Content Include="..\lib\scintilla\SciLexer64.dll">
       <Link>SciLexer64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <Content Include="..\resources\action_add_16xMD.png">
       <Link>Resources\ToolStripIcons\action_add_16xMD.png</Link>
     </Content>

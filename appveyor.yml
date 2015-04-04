@@ -24,9 +24,8 @@ assembly_info:
 before_build: nuget restore
 
 after_build: 
-  - >-
-      set D=%APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
-      7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %D%\*.config %D%\*.exe %D%\*.dll %D%\mscorlib.dll %D%\System.Core.xml %D%\System.Data.xml %D%\System.xml %D%\System.Xml.xml
+  - set D=%APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
+  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %D%\*.config %D%\*.exe %D%\*.dll %D%\mscorlib.dll %D%\System.Core.xml %D%\System.Data.xml %D%\System.xml %D%\System.Xml.xml
 
 test_script:
   - .\runcover.bat

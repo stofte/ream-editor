@@ -7,12 +7,13 @@ services: mssql2012sp1
 version: 0.1.0.{build}
 
 environment:
+  APPLICATION_ZIP: LinqEditor-%APPVEYOR_BUILD_VERSION%.zip
   COVER_FOLDER: TestCoverage
   COVERALLS_REPO_TOKEN:
     secure: irQMjb5YkoBrSl1u1ayE+MqGUpvDDnOPmFVe3L+Tgvse71DfQhFU4iL5XHPOtpxd
 
 artifacts:
-  - path: LinqEditor-$(APPVEYOR_BUILD_VERSION).zip
+  - path: '$($env:APPLICATION_ZIP)'
     name: LinqEditor
 
 assembly_info:
@@ -25,7 +26,7 @@ before_build: nuget restore
 
 after_build: 
   - cd %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
-  - 7z a %APPVEYOR_BUILD_FOLDER%\LinqEditor.%APPVEYOR_BUILD_VERSION%.zip *.config *.exe *.dll mscorlib.xml System.Core.xml System.Data.xml System.xml System.Xml.xml
+  - 7z a %APPVEYOR_BUILD_FOLDER%\%APPLICATION_ZIP% *.config *.exe *.dll mscorlib.xml System.Core.xml System.Data.xml System.xml System.Xml.xml
   - cd %APPVEYOR_BUILD_FOLDER%
 
 test_script:

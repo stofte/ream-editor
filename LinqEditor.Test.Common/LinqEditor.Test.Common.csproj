@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="DatabaseTestData.cs" />
     <Compile Include="SourceCodeFragments.cs" />
     <Compile Include="SQLite\SQLiteTestDb.cs" />

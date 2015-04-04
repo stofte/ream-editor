@@ -119,6 +119,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Containers\CodeContainer.cs" />
     <Compile Include="Containers\DatabaseContainer.cs" />
     <Compile Include="Containers\ExecutionContainer.cs" />

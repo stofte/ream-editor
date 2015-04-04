@@ -12,12 +12,12 @@ environment:
     secure: irQMjb5YkoBrSl1u1ayE+MqGUpvDDnOPmFVe3L+Tgvse71DfQhFU4iL5XHPOtpxd
 
 artifacts:
-  - path: LinqEditor.$(APPVEYOR_BUILD_VERSION).zip
+  - path: LinqEditor-$(APPVEYOR_BUILD_VERSION).zip
     name: LinqEditor
 
 assembly_info:
   patch: true
-  file: AssemblyInfo.cs
+  file: SharedAssemblyInfo.cs
   assembly_version: '{version}'
   assembly_file_version: '{version}'
 
@@ -25,7 +25,7 @@ before_build: nuget restore
 
 after_build: 
   - set D=%APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
-  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %D%\*.config %D%\*.exe %D%\*.dll %D%\mscorlib.dll %D%\System.Core.xml %D%\System.Data.xml %D%\System.xml %D%\System.Xml.xml
+  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %D%\*.config %D%\*.exe %D%\*.dll %D%\mscorlib.xml %D%\System.Core.xml %D%\System.Data.xml %D%\System.xml %D%\System.Xml.xml
 
 test_script:
   - .\runcover.bat

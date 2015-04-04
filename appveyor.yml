@@ -7,20 +7,18 @@ before_build:
   - nuget restore
 
 after_build:
-  - 7z a LinqEditor.$(appveyor_build_version).zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug
+  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug
 
 artifacts:
-  - path: LinqEditor.$(appveyor_build_version).zip
+  - path: LinqEditor.$(APPVEYOR_BUILD_VERSION).zip
     name: LinqEditor
 
 test_script:
   - .\runcover.bat
   - ps: >-
+      Write-Host "FOOBAR"
       Write-Host "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)"
       Write-Host (Resolve-Path .\TestResult.xml)
-      $wc = New-Object 'System.Net.WebClient'
-      Write-Host $wc
-      $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestResult.xml))
 
 services:
   - mssql2012sp1
@@ -33,5 +31,5 @@ build:
 
 assembly_info:
   patch: true
-  file: AssemblyInfo.cs
-  assembly_version: $(appveyor_build_version)
+  file: LinqCore*\**\AssemblyInfo.cs
+  assembly_version: $(APPVEYOR_BUILD_VERSION)

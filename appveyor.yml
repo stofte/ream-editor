@@ -4,7 +4,7 @@ configuration: Release
 platform: Any CPU
 services: mssql2012sp1
 # version = build id
-version: 0.1.0.{build} 
+version: 0.1.0.{build}
 
 environment:
   COVER_FOLDER: TestCoverage
@@ -24,9 +24,9 @@ assembly_info:
 before_build: nuget restore
 
 after_build: 
-  - pushd %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
-  - 7z a %APPVEYOR_BUILD_FOLDER%\LinqEditor.%APPVEYOR_BUILD_VERSION%.zip *.config *.exe *.dll mscorlib.xml System.Core.xml System.Data.xml System.xml System.Xml.xml
-  - popd
+  - >-
+    cd %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%;
+    7z a %APPVEYOR_BUILD_FOLDER%\LinqEditor.%APPVEYOR_BUILD_VERSION%.zip *.config *.exe *.dll mscorlib.xml System.Core.xml System.Data.xml System.xml System.Xml.xml
 
 test_script:
   - .\runcover.bat

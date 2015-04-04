@@ -21,13 +21,15 @@ assembly_info:
 
 before_build: nuget restore
 
-after_build: 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug
+after_build: 
+  - ren %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug .\LinqEditor.UI.WinForm\bin\LinqEditor
+  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\LinqEditor
 
 test_script:
   - .\runcover.bat
   - ps: >-
-      $url = "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)"
-      Write-Host $url
-      $wc = New-Object 'System.Net.WebClient'
-      $wc.UploadFile($url, (Resolve-Path .\TestResult.xml))
+      $url = "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)";
+      Write-Host $url;
+      $wc = New-Object 'System.Net.WebClient';
+      $wc.UploadFile($url, (Resolve-Path .\TestResult.xml));
 

@@ -1,6 +1,6 @@
 build:
   project: linq-editor.sln
-configuration: Debug
+configuration: Release
 platform: Any CPU
 services: mssql2012sp1
 # version = build id
@@ -24,7 +24,9 @@ assembly_info:
 before_build: nuget restore
 
 after_build: 
-  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug\*
+  - >-
+      set D=%APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
+      7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %D%\*.config %D%\*.exe %D%\*.dll %D%\mscorlib.dll %D%\System.Core.xml %D%\System.Data.xml %D%\System.xml %D%\System.Xml.xml
 
 test_script:
   - .\runcover.bat

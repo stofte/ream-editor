@@ -2,6 +2,7 @@ build:
   project: linq-editor.sln
 configuration: Debug
 platform: Any CPU
+version: 0.1.0+{build}
 
 services: mssql2012sp1
 

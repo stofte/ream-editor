@@ -13,7 +13,7 @@ environment:
 
 artifacts:
   - path: LinqEditor.$(APPVEYOR_BUILD_VERSION).zip
-    name: LinqEditor $(CONFIGURATION)
+    name: LinqEditor
 
 assembly_info:
   patch: true
@@ -24,9 +24,7 @@ assembly_info:
 before_build: nuget restore
 
 after_build: 
-  - >-
-      set z=%APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug
-      7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %z%\* %z%\x64\* %z%\x86\*
+  - 7z a LinqEditor.%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\Debug\*
 
 test_script:
   - .\runcover.bat

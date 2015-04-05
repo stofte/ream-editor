@@ -11,7 +11,7 @@ namespace LinqEditor.Core.Templates
             {
                 NamespaceId = schemaId,
                 Tables = sqlSchema.Tables,
-                ConnectionString = sqlSchema.ConnectionString
+                ConnectionString = sqlSchema.Connection.ConnectionString
             };
 
             return gen.TransformText();

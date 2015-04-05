@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4D19D2DF-EF0E-4B28-8918-49430229EBBA}</ProjectGuid>
+    <ProjectGuid>{11ADA22E-E214-4F00-B23E-71CAEE35EC75}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LinqEditor.Core.Session.Tests</RootNamespace>
-    <AssemblyName>LinqEditor.Core.Session.Tests</AssemblyName>
+    <RootNamespace>LinqEditor.DataAccess</RootNamespace>
+    <AssemblyName>LinqEditor.DataAccess</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -36,12 +36,6 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="Moq">
-      <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,41 +48,18 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AsyncSessionFactoryDatabaseTests.cs" />
-    <Compile Include="AsyncSessionFactoryTests.cs" />
+    <Compile Include="ISchemaAssemblyService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LinqEditor.Core.Session\LinqEditor.Core.Session.csproj">
-      <Project>{9d6c745c-4e54-48c0-8d46-cae2bb29be29}</Project>
-      <Name>LinqEditor.Core.Session</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Core.CodeAnalysis\LinqEditor.Core.CodeAnalysis.csproj">
-      <Project>{a9a7b56d-772c-4475-ace4-2b4b495794dd}</Project>
-      <Name>LinqEditor.Core.CodeAnalysis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Core.Schema\LinqEditor.Core.Schema.csproj">
-      <Project>{2bea4dec-069d-4c2c-a022-f9696c268e64}</Project>
-      <Name>LinqEditor.Core.Schema</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Core.Templates\LinqEditor.Core.Templates.csproj">
-      <Project>{800d694f-1037-4d5f-a860-dbd724ddce5e}</Project>
-      <Name>LinqEditor.Core.Templates</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
-      <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
-      <Name>LinqEditor.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LinqEditor.Test.Common\LinqEditor.Test.Common.csproj">
-      <Project>{9ec90760-15fe-40ed-aaa4-fa63a79cd050}</Project>
-      <Name>LinqEditor.Test.Common</Name>
-    </ProjectReference>
+    <Compile Include="SchemaAssemblyProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\LinqEditor.Core\LinqEditor.Core.csproj">
+      <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
+      <Name>LinqEditor.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

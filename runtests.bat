@@ -6,4 +6,5 @@ LinqEditor.Core.CodeAnalysis.Tests\bin\%CONFIGURATION%\LinqEditor.Core.CodeAnaly
 LinqEditor.Core.Session.Tests\bin\%CONFIGURATION%\LinqEditor.Core.Session.Tests.dll ^
 LinqEditor.Core.Templates.Tests\bin\%CONFIGURATION%\LinqEditor.Core.Templates.Tests.dll ^
 LinqEditor.Core.Tests\bin\%CONFIGURATION%\LinqEditor.Core.Tests.dll ^
+LinqEditor.DataAccess.Tests\bin\%CONFIGURATION%\LinqEditor.DataAccess.Tests.dll ^
 /noshadow

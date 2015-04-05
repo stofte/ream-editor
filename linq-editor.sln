@@ -33,6 +33,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.Core.Session.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Data.SQLite", "IQToolkit.Data.SQLite\IQToolkit.Data.SQLite.csproj", "{E008624B-2344-420A-A514-4B2AD89906EC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F8D0B62F-67A3-45D3-B1EE-1A84564F9190}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.DataAccess", "LinqEditor.DataAccess\LinqEditor.DataAccess.csproj", "{11ADA22E-E214-4F00-B23E-71CAEE35EC75}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{077049EB-8754-4C32-8EA6-2EBE01BBC8DB}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
@@ -42,10 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F8D0B62F-67A3-45D3-B1EE-1A84564F9190}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqEditor.DataAccess.Tests", "LinqEditor.DataAccess.Tests\LinqEditor.DataAccess.Tests.csproj", "{22F03105-65C3-4521-BA4D-0E5E7D4843A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +117,14 @@ Global
 		{E008624B-2344-420A-A514-4B2AD89906EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E008624B-2344-420A-A514-4B2AD89906EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E008624B-2344-420A-A514-4B2AD89906EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11ADA22E-E214-4F00-B23E-71CAEE35EC75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11ADA22E-E214-4F00-B23E-71CAEE35EC75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11ADA22E-E214-4F00-B23E-71CAEE35EC75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11ADA22E-E214-4F00-B23E-71CAEE35EC75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22F03105-65C3-4521-BA4D-0E5E7D4843A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22F03105-65C3-4521-BA4D-0E5E7D4843A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22F03105-65C3-4521-BA4D-0E5E7D4843A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22F03105-65C3-4521-BA4D-0E5E7D4843A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

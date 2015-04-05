@@ -36,7 +36,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="Code\Statements.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>Statements.cs</LastGenOutput>

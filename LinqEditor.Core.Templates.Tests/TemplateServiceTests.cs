@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LinqEditor.Core.Settings;
 
 namespace LinqEditor.Core.Templates.Tests
 {
@@ -25,7 +26,7 @@ namespace LinqEditor.Core.Templates.Tests
 
             _schemaModel = new DatabaseSchema
             {
-                ConnectionString = "bogus-connection-string",
+                Connection = new Connection(),
                 Tables = new List<TableSchema>
                 {
                     new TableSchema 

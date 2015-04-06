@@ -133,6 +133,7 @@
     <Compile Include="Containers\Isolated.cs" />
     <Compile Include="Containers\IsolatedCodeContainer.cs" />
     <Compile Include="Containers\IsolatedDatabaseContainer.cs" />
+    <Compile Include="FileSystem.cs" />
     <Compile Include="Generated\Dumper.cs" />
     <Compile Include="Generated\ICodeProgram.cs" />
     <Compile Include="Helpers\DebugLogger.cs" />

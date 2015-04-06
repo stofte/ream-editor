@@ -188,10 +188,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             if (!string.IsNullOrWhiteSpace(filename))
             {
                 // this works, but VS complains the file doesn't match somehow
-                using (var file = File.CreateText(filename + ".cs"))
-                {
-                    file.Write(source);
-                }
+                File.WriteAllText(filename + ".cs", source);
                 return SyntaxFactory.ParseSyntaxTree(source, path: filename + ".cs", options: CSharpParseOptions.Default, encoding: Encoding.Default);
             }
             else

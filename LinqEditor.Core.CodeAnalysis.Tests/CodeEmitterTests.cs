@@ -156,5 +156,22 @@ namespace Test {
 
             Assert.GreaterOrEqual(res.Warnings.Count(), 1);
         }
+
+        [Test]
+        public void Cancelled_Token_Returns_No_Output()
+        {
+            var emitter = new CodeEmitter();
+            var stream = new MemoryStream();
+            var cts = new CancellationTokenSource();
+            cts.Cancel();
+            CompilerResult result = null;
+
+            Assert.Throws<OperationCanceledException>(() =>
+            {
+                result = emitter.EmitLibrary(source: _source, assemblyName: "test", dllOutput: stream, references: _stdRefs, cancellationToken: cts.Token);
+            });
+
+            Assert.AreEqual(0, stream.Length);
+        }
     }
 }

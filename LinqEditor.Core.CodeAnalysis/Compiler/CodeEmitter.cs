@@ -18,7 +18,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             Stream dllOutput = null,
             Stream pdbOutput = null,
             MetadataReference[] references = null,
-            CancellationToken ct = default(CancellationToken)
+            CancellationToken cancellationToken = default(CancellationToken)
         )
         {
             if (dllOutput == null) throw new ArgumentNullException("dllOutput");
@@ -35,7 +35,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
                 .AddReferences(references)
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
-            var emitResult = compilation.Emit(peStream: dllOutput, pdbStream: pdbOutput);
+            var emitResult = compilation.Emit(peStream: dllOutput, pdbStream: pdbOutput, cancellationToken: cancellationToken);
 
             dllOutput.Position = 0;
             if (pdbOutput != null)

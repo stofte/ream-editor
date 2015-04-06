@@ -63,7 +63,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SchemaAssemblyProviderTests.cs" />
+    <Compile Include="AssemblyFileProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -76,6 +76,10 @@
     <ProjectReference Include="..\LinqEditor.DataAccess\LinqEditor.DataAccess.csproj">
       <Project>{11ada22e-e214-4f00-b23e-71caee35ec75}</Project>
       <Name>LinqEditor.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Test.Common\LinqEditor.Test.Common.csproj">
+      <Project>{9ec90760-15fe-40ed-aaa4-fa63a79cd050}</Project>
+      <Name>LinqEditor.Test.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

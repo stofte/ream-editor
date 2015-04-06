@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.DataAccess
 {
-    public interface ISchemaAssemblyProvider
+    public interface IAssemblyFileProvider
     {
-        Task<DatabaseSchema> Load(Connection connection);
+        Task<string> GetSchemaPath(Connection connection);
     }
 }

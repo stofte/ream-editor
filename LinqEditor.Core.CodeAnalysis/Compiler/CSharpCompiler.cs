@@ -15,83 +15,6 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
 {
     public static class CSharpCompiler
     {
-        public static Assembly[] GetCoreAssemblies()
-        {
-            return new Assembly[] 
-            {
-                typeof(System.Object).Assembly,// mscorlib.dll
-                typeof(System.ComponentModel.Component).Assembly, // System.Core.dll 4.0
-                typeof(System.Data.DataColumn).Assembly, // System.Data.dll
-                typeof(System.Xml.XmlDocument).Assembly, // System.Xml.dll
-                typeof(System.Linq.Enumerable).Assembly, // System.Core.dll 3.5 for some reason also needed?
-            };
-        }
-
-        public static Assembly[] GetCustomAssemblies()
-        {
-            return new Assembly[]
-            {
-                typeof(IQToolkit.QueryProvider).Assembly,  // IQToolkit.dll
-                typeof(IQToolkit.Data.DbEntityProvider).Assembly,  // IQToolkit.Data.dll
-                typeof(IQToolkit.Data.SqlClient.TSqlLanguage).Assembly, // IQToolkit.Data.SqlClient.dll
-                typeof(LinqEditor.Core.Generated.Dumper).Assembly, // LinqEditor.Core.dll
-            };
-        }
-
-        private static DocumentationProvider GetDocumentationService(Assembly targetAssembly)
-        {
-            // this doesn't work either ...
-            var asm = typeof(Microsoft.CodeAnalysis.Workspace).Assembly;
-            Type providerType = null;
-            DocumentationProvider providerInstance = null;
-            try
-            {
-                var count = asm.DefinedTypes.Count();
-            }
-            // some types cannot be loaded, but the one we need can be resolved
-            catch (ReflectionTypeLoadException exn)
-            {
-                providerType = exn.Types.FirstOrDefault(x => x != null &&
-                    // the provider is a nested private sealed class
-                    x.FullName == "Microsoft.CodeAnalysis.XmlDocumentationProvider+ContentBasedXmlDocumentationProvider");
-            }
-            var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(targetAssembly);
-
-            if (providerType != null && !string.IsNullOrWhiteSpace(path))
-            {
-                var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance;
-                providerInstance = Activator.CreateInstance(providerType, flags, null, new object[] { File.ReadAllBytes(path) }, null) 
-                    as DocumentationProvider;
-            }
-
-            return providerInstance;
-        }
-
-        public static IEnumerable<MetadataReference> GetStandardReferencesWithIncludes(string[] references)
-        {
-            return GetStandardReferences(includeDocumentation: false)
-                .Concat(references.Select(x => MetadataReference.CreateFromFile(x)))
-                .ToArray();
-        }
-
-        public static MetadataReference[] GetStandardReferences(bool includeDocumentation = true)
-        {
-            //var path = CustomDocumentationProvider.GetAssemblyDocmentationPath(GetCoreAssemblies().First());
-            //var docReader = NuDoq.DocReader.Read(path);
-            //var visitor = docReader.Accept(new DocumentationVisitor());
-            var assems = new List<MetadataReference>();
-            // todo: supposedly passing in CustomDocumentationProvider here would
-            // cause the api to return the docs through the api (GetDocumentationCommentXml)
-            // but that doesn't seem to do anything. so a workaround is to just serve the comments
-            // from a custom service (DocumentationService), which builds a list of 
-            // CustomDocumentationProvider by using the above GetAssemblies methods.
-            return assems
-                .Concat(GetCoreAssemblies().Select(x => !includeDocumentation ? MetadataReference.CreateFromAssembly(x) :
-                    MetadataReference.CreateFromAssembly(x, MetadataReferenceProperties.Assembly, new CustomDocumentationProvider(x))))
-                .Concat(GetCustomAssemblies().Select(x => MetadataReference.CreateFromAssembly(x)))
-                .ToArray();
-        }
-
         public static CompilerResult CompileToFile(string src, string assemblyName, string outputFolder, params object[] references)
         {
             return CompileToFile(src, false, assemblyName, outputFolder, references);
@@ -105,7 +28,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             }
             var refs = references.Select(x => x is string ?
                 MetadataReference.CreateFromFile(x as string) : MetadataReference.CreateFromImage(x as byte[]));
-            return Compile(src, assemblyName, outputFolder, completeSource, GetStandardReferences(includeDocumentation: false).Concat(refs));
+            return Compile(src, assemblyName, outputFolder, completeSource, CompilerReferences.GetStandardReferences(includeDocumentation: false).Concat(refs));
         }
 
         public static CompilerResult CompileToBytes(string src, string assemblyName, params object[] references)
@@ -121,7 +44,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             }
             var refs = references.Select(x => x is string ? 
                 MetadataReference.CreateFromFile(x as string) : MetadataReference.CreateFromImage(x as byte[]));
-            return Compile(src, assemblyName, null, completeSource, GetStandardReferences(includeDocumentation: false).Concat(refs));
+            return Compile(src, assemblyName, null, completeSource, CompilerReferences.GetStandardReferences(includeDocumentation: false).Concat(refs));
         }
 
         private static CompilerResult Compile(string src, string assemblyName, string outputFolder, bool completeSource, IEnumerable<MetadataReference> references)

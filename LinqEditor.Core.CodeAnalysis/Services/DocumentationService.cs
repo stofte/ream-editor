@@ -19,7 +19,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
         {
             _symbolStore = symbolStore;
             var list = new List<DocumentMembers>();
-            foreach (var assembly in CSharpCompiler.GetCoreAssemblies())
+            foreach (var assembly in CompilerReferences.GetCoreAssemblies())
             {
                 var n = assembly.GetName().Name;
                 var filePath = string.Format("{1}{0}.xml", assembly.GetName().Name, PathUtility.ApplicationDirectory);

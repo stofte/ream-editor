@@ -122,8 +122,11 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Compiler\CodeEmitter.cs" />
+    <Compile Include="Compiler\CompilerReferences.cs" />
     <Compile Include="Compiler\CompilerResults.cs" />
     <Compile Include="Compiler\CSharpCompiler.cs" />
+    <Compile Include="Compiler\ICodeEmitter.cs" />
     <Compile Include="Documentation\DocumentationVisitor.cs" />
     <Compile Include="Helpers\CodeAnalysisHelper.cs" />
     <Compile Include="Helpers\IToolTipHelper.cs" />

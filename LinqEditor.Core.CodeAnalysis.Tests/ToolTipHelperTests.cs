@@ -50,7 +50,7 @@ namespace Test
             // need to compile to get symbol list
             var compilation1 = CSharpCompilation.Create("comp1")
                             .WithOptions(_compilerOptions)
-                            .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                            .AddReferences(CompilerReferences.GetStandardReferences())
                             .AddSyntaxTrees(new SyntaxTree[] { tree1 });
 
             var symbolStore = new SymbolStore();
@@ -102,7 +102,7 @@ namespace Test
             // need to compile to get symbol list
             var compilation = CSharpCompilation.Create("formatcomp")
                             .WithOptions(_compilerOptions)
-                            .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                            .AddReferences(CompilerReferences.GetStandardReferences())
                             .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             var model = compilation.GetSemanticModel(tree);

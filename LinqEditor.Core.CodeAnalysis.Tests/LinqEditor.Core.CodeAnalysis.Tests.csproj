@@ -141,6 +141,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CodeEmitterTests.cs" />
     <Compile Include="CSharpCompilerTests.cs" />
     <Compile Include="DocumentationServiceTests.cs" />
     <Compile Include="SymbolStoreTests.cs" />

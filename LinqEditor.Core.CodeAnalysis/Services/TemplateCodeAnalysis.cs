@@ -52,7 +52,7 @@ namespace LinqEditor.Core.CodeAnalysis.Services
             _documentationService = documentationService;
             _symbolStore = symbolStore;
             _tooltipFactory = tooltipFactory;
-            _references = CSharpCompiler.GetStandardReferences(includeDocumentation: false);
+            _references = CompilerReferences.GetStandardReferences(includeDocumentation: false);
         }
 
         public void Initialize(string assemblyPath = null)

@@ -45,7 +45,7 @@ namespace Test
             var tree = CSharpSyntaxTree.ParseText(_source1);
             var compilation = CSharpCompilation.Create("test")
                 .WithOptions(_compilerOptions)
-                .AddReferences(CSharpCompiler.GetStandardReferences(includeDocumentation: false))
+                .AddReferences(CompilerReferences.GetStandardReferences(includeDocumentation: false))
                 .AddSyntaxTrees(new SyntaxTree[] { tree });
 
             _model1 = compilation.GetSemanticModel(tree);

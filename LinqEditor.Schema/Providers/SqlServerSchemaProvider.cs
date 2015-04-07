@@ -1,45 +1,23 @@
 ﻿using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Settings;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LinqEditor.Schema.Providers
 {
-    public class SqlServerSchemaProvider : ISchemaProvider
+    public class SqlServerSchemaProvider : ISqlServerSchemaProvider
     {
         static IEnumerable<string> SystemDatabases = new [] {"master", "tempdb", "model", "msdb"};
-
-        public async Task<ServerSchema> GetSchema(Connection connection)
+        
+        public async Task<ServerSchema> GetServerSchema(Connection connection)
         {
             if (connection == null) throw new ArgumentNullException("connection");
 
-            var hasCatalog = !string.IsNullOrWhiteSpace(connection.InitialCatalog);
-            ServerSchema result = null;
-            var databases = new List<DatabaseSchema>();
-
-            if (hasCatalog)
-            {
-                databases.Add(await GetDatabaseSchema(connection));
-                result = new ServerSchema
-                {
-                    Databases = databases
-                };
-            }
-            else
-            {
-                result = await GetServerSchema(connection);
-            }
-
-            return result;
-        }
-
-        async Task<ServerSchema> GetServerSchema(Connection connection)
-        {
             var result = new List<DatabaseSchema>();
             using (var conn = new SqlConnection(connection.ConnectionString))
             {
@@ -69,7 +47,7 @@ namespace LinqEditor.Schema.Providers
             };
         }
 
-        async Task<DatabaseSchema> GetDatabaseSchema(Connection connection)
+        public async Task<DatabaseSchema> GetDatabaseSchema(Connection connection)
         {
             var tables = new List<TableSchema>();
             string dbName = string.Empty;

@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Schema
 {
-    public class SchemaProvider 
+    public interface IDatabaseSchemaProvider
     {
+        Task<DatabaseSchema> GetDatabaseSchema(Connection connection);
     }
 }

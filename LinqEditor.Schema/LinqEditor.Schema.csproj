@@ -48,8 +48,12 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="ISchemaProvider.cs" />
+    <Compile Include="IDatabaseSchemaProvider.cs" />
+    <Compile Include="IServerSchemaProvider.cs" />
+    <Compile Include="ISQLiteSchemaProvider.cs" />
+    <Compile Include="ISqlServerSchemaProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\SQLiteSchemaProvider.cs" />
     <Compile Include="Providers\SqlServerSchemaProvider.cs" />
     <Compile Include="SchemaProvider.cs" />
   </ItemGroup>

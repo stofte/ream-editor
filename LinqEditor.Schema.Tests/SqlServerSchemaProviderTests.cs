@@ -47,7 +47,7 @@ namespace LinqEditor.Schema.Tests
             var provider = new SqlServerSchemaProvider();
             Assert.Throws<ArgumentNullException>(async () =>
             {
-                await provider.GetSchema(null);
+                await provider.GetServerSchema(null);
             });
         }
 
@@ -56,7 +56,7 @@ namespace LinqEditor.Schema.Tests
         {
             var provider = new SqlServerSchemaProvider();
 
-            var schema = await provider.GetSchema(_connection);
+            var schema = await provider.GetServerSchema(_connection);
 
             Assert.AreEqual(2, schema.Databases.Single().Tables.Count());
         }
@@ -66,7 +66,7 @@ namespace LinqEditor.Schema.Tests
         {
             var provider = new SqlServerSchemaProvider();
 
-            var schema = await provider.GetSchema(_connection);
+            var schema = await provider.GetServerSchema(_connection);
             var tbl = schema.Databases.Single().Tables.Single(x => x.Name == "TypeTestTable");
             
             Assert.AreEqual(typeof(long?), tbl.Columns.Single(x => x.Name == "bigintcol").Type);

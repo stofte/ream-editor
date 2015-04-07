@@ -79,8 +79,8 @@ insert into Bar(Id,Value) values(3, '2001-01-04');
         public async void Loads_Multiple_Database_Schemas_When_Using_Connection_String_Without_Database()
         {
             var provider = new SqlServerSchemaProvider();
-            
-            var schema = await provider.GetSchema(_connection);
+
+            var schema = await provider.GetServerSchema(_connection);
             var db1 = schema.Databases.Single(x => x.Name == "DB1");
             var db2 = schema.Databases.Single(x => x.Name == "DB2");
 

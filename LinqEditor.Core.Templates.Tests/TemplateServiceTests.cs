@@ -36,9 +36,9 @@ namespace LinqEditor.Core.Templates.Tests
                         Name = "table",
                         Columns = new List<ColumnSchema> 
                         {
-                            new ColumnSchema { Index = 0, Name = "PK_ID", Type = "int" },
-                            new ColumnSchema { Index = 1, Name = "Description", Type = "string" },
-                            new ColumnSchema { Index = 2, Name = "Name", Type = "string" }
+                            new ColumnSchema { Index = 0, Name = "PK_ID", TypeName = "int" },
+                            new ColumnSchema { Index = 1, Name = "Description", TypeName = "string" },
+                            new ColumnSchema { Index = 2, Name = "Name", TypeName = "string" }
                         }
                     }
                 }

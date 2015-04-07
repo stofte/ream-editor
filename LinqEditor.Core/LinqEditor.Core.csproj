@@ -157,6 +157,7 @@
     <Compile Include="Models\Analysis\Warning.cs" />
     <Compile Include="Models\Database\ColumnSchema.cs" />
     <Compile Include="Models\Database\DatabaseSchema.cs" />
+    <Compile Include="Models\Database\ServerSchema.cs" />
     <Compile Include="Models\Database\TableSchema.cs" />
     <Compile Include="Models\Editor\ExecuteResult.cs" />
     <Compile Include="Models\Editor\InitializeResult.cs" />

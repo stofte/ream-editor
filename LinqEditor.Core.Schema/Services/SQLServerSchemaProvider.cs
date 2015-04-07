@@ -42,7 +42,7 @@ namespace LinqEditor.Core.Schema.Services
                             columns.Add(new ColumnSchema
                             {
                                 Name = row["COLUMN_NAME"].ToString(),
-                                Type = SqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
+                                TypeName = SqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
                                 Index = index++
                             });
                         }

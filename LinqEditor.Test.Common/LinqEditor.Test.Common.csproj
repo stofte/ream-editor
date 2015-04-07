@@ -52,7 +52,9 @@
     </Compile>
     <Compile Include="DatabaseTestData.cs" />
     <Compile Include="SourceCodeFragments.cs" />
+    <Compile Include="SQLite\Scripts.cs" />
     <Compile Include="SQLite\SQLiteTestDb.cs" />
+    <Compile Include="SqlServer\Scripts.cs" />
     <Compile Include="SqlServer\SqlServerTestDb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToolTipTestData.cs" />
@@ -81,18 +83,6 @@
     <Content Include="..\lib\sqlite\x86\SQLite.Interop.pdb">
       <Link>x86\SQLite.Interop.pdb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SQLite\schema.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SQLite\script.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServer\schema.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServer\script.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

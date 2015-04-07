@@ -8,7 +8,7 @@ namespace LinqEditor.Test.Common.SqlServer
 {
     public class SqlServerTestDb : IDisposable
     {
-        public string DataSource
+        public static string DataSource
         {
             get
             {
@@ -16,11 +16,19 @@ namespace LinqEditor.Test.Common.SqlServer
             }
         }
 
-        private string LocalDbMaster 
+        public static string LocalDb
+        {
+            get
+            {
+                return @"Integrated Security=True;" + DataSource;
+            }
+        }
+
+        public static string LocalDbMaster 
         { 
             get 
             {
-                return @"Initial Catalog=master;Integrated Security=True;" + DataSource; 
+                return @"Initial Catalog=master;" + LocalDb; 
             }
         }
 
@@ -58,7 +66,10 @@ namespace LinqEditor.Test.Common.SqlServer
 
         public void RecreateTestData()
         {
-            ExecuteQuery(_script);
+            if (!string.IsNullOrWhiteSpace(_script))
+            {
+                ExecuteQuery(_script);
+            }
         }
 
         public void ExecuteQuery(string script)
@@ -76,6 +87,7 @@ namespace LinqEditor.Test.Common.SqlServer
         {
             try
             {
+                // todo: this seems to leave dbs in localdb anyway
                 using (var connection = new SqlConnection(LocalDbMaster))
                 {
                     connection.Open();
@@ -114,17 +126,14 @@ namespace LinqEditor.Test.Common.SqlServer
             Debug.Assert(File.Exists(_fileName + "_log.ldf"));
         }
 
-        // looks for script in output folder
         private static string DefaultSchema()
         {
-            var file = PathUtility.CurrentPath + @"SqlServer\schema.sql";
-            return File.ReadAllText(file);
+            return Scripts.Schema;
         }
 
         private static string DefaultScript()
         {
-            var file = PathUtility.CurrentPath + @"SqlServer\script.sql";
-            return File.ReadAllText(file);
+            return Scripts.Data;
         }
     }
 }

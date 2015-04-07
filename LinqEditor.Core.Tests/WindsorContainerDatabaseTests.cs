@@ -52,6 +52,12 @@ namespace LinqEditor.Core.Tests
             _query3AssemblyBytes = bytes3Result.AssemblyBytes;
         }
 
+        [TestFixtureTearDown]
+        public void Cleanup()
+        {
+            _database.Dispose();
+        }
+
         [Test]
         public void Can_Load_Different_DatabaseContainer_Instances()
         {

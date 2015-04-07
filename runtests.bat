@@ -7,4 +7,5 @@ LinqEditor.Core.Session.Tests\bin\%CONFIGURATION%\LinqEditor.Core.Session.Tests.
 LinqEditor.Core.Templates.Tests\bin\%CONFIGURATION%\LinqEditor.Core.Templates.Tests.dll ^
 LinqEditor.Core.Tests\bin\%CONFIGURATION%\LinqEditor.Core.Tests.dll ^
 LinqEditor.DataAccess.Tests\bin\%CONFIGURATION%\LinqEditor.DataAccess.Tests.dll ^
+LinqEditor.Schema.Tests\bin\%CONFIGURATION%\LinqEditor.Schema.Tests.dll ^
 /noshadow

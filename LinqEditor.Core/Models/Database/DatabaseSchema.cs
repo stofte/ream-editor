@@ -7,6 +7,7 @@ namespace LinqEditor.Core.Models.Database
     [Serializable]
     public class DatabaseSchema
     {
+        public string Name { get; set; }
         public string AssemblyPath { get; set; }
         public Connection Connection { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }

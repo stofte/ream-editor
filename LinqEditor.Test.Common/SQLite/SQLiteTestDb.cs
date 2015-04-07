@@ -56,14 +56,12 @@ namespace LinqEditor.Test.Common.SQLite
         // looks for script in output folder
         private static string DefaultSchema()
         {
-            var file = PathUtility.CurrentPath + @"SQLite\schema.sql";
-            return File.ReadAllText(file);
+            return Scripts.Schema;
         }
 
         private static string DefaultScript()
         {
-            var file = PathUtility.CurrentPath + @"SQLite\script.sql";
-            return File.ReadAllText(file);
+            return Scripts.Data;
         }
 
         public void Dispose()

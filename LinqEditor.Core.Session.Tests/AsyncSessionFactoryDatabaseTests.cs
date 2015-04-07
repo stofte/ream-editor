@@ -88,6 +88,12 @@ namespace LinqEditor.Core.Session.Tests
                                         .IsDefault());
         }
 
+        [TestFixtureTearDown]
+        public void Cleanup()
+        {
+            _database.Dispose();
+        }
+
 
         [SetUp]
         public void Setup()

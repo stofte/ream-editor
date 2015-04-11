@@ -138,7 +138,6 @@
     <Compile Include="Generated\ICodeProgram.cs" />
     <Compile Include="Helpers\DebugLogger.cs" />
     <Compile Include="Helpers\GuidHelper.cs" />
-    <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Generated\IDatabaseProgram.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Installers\Installer.cs" />

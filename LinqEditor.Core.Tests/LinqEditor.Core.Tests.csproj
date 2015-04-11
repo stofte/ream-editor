@@ -73,6 +73,7 @@
     </Compile>
     <Compile Include="ApplicationSettingsTests.cs" />
     <Compile Include="CodeContainerTests.cs" />
+    <Compile Include="FileSystemTests.cs" />
     <Compile Include="SqlServerConnectionTests.cs" />
     <Compile Include="SettingsStoreTests.cs" />
     <Compile Include="SQLiteTests.cs" />

@@ -12,6 +12,7 @@ using LinqEditor.Core.CodeAnalysis.Compiler;
 using System.IO;
 using LinqEditor.Core.Containers;
 using LinqEditor.Core.Settings;
+using LinqEditor.Core.Models;
 
 namespace LinqEditor.Core.Tests
 {
@@ -35,7 +36,7 @@ namespace LinqEditor.Core.Tests
             _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("DatabaseContainerTests");
             var schemaProvider = new SqlServerSchemaProvider();
             var templateService = new TemplateService();
-            var conn = new Connection { Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString, Kind = Models.Editor.ProgramType.SqlServer };
+            var conn = new SqlServerConnection { Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString };
             _schemaModel = schemaProvider.GetSchema(conn);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
             var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix), PathUtility.TempPath);

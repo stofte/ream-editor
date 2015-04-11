@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Models.Editor;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Settings;
 using LinqEditor.Schema.Providers;
 using LinqEditor.Test.Common.SqlServer;
@@ -52,7 +53,7 @@ insert into Bar(Id,Value) values(3, '2001-01-04');
         [TestFixtureSetUp]
         public void Initialize()
         {
-            _connection = new Connection
+            _connection = new SqlServerConnection
             {
                 ConnectionString = SqlServerTestDb.LocalDb
             };

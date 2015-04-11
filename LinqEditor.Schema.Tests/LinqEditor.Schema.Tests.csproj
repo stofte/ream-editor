@@ -64,6 +64,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SQLiteSchemaProviderTests.cs" />
     <Compile Include="SqlServerSchemaProviderMultipleDatabaseTests.cs" />
     <Compile Include="SqlServerSchemaProviderTests.cs" />
   </ItemGroup>

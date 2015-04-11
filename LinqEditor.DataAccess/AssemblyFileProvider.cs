@@ -1,4 +1,4 @@
-﻿using LinqEditor.Core.Models.Database;
+﻿using LinqEditor.Core.Models;
 using LinqEditor.Core.Settings;
 using System;
 using System.Threading.Tasks;
@@ -26,7 +26,9 @@ namespace LinqEditor.DataAccess
                 throw new ArgumentNullException("connection");
             }
 
-            if (!connection.IsValidConnectionString)
+            var sqlServer = connection as SqlServerConnection;
+
+            if (!sqlServer.IsValidConnectionString)
             {
                 throw new ArgumentException("connection must contain valid connection string");
             }

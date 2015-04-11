@@ -5,6 +5,7 @@ using Castle.Windsor.Installer;
 using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models;
 using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Schema.Services;
@@ -42,7 +43,7 @@ namespace LinqEditor.Core.Session.Tests
             _database = new LinqEditor.Test.Common.SqlServer.SqlServerTestDb("AsyncSessionFactoryDatabaseTests");
             var schemaProvider = new SqlServerSchemaProvider();
             var templateService = new TemplateService();
-            var conn = new Connection { Kind = Models.Editor.ProgramType.SqlServer, Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString };
+            var conn = new SqlServerConnection { Id = Guid.NewGuid(), ConnectionString = _database.ConnectionString };
             _schemaModel = schemaProvider.GetSchema(conn);
             var schemaSource = templateService.GenerateSchema(_schemaId, _schemaModel);
             var schemaResult = CSharpCompiler.CompileToFile(schemaSource, _schemaId.ToIdentifierWithPrefix(SchemaConstants.SchemaPrefix), PathUtility.TempPath);
@@ -63,7 +64,7 @@ namespace LinqEditor.Core.Session.Tests
             var mockConnections = new Mock<IConnectionStore>();
             mockConnections.Setup(x => x.Connections).Returns(new Connection[]
             {
-                new Connection 
+                new SqlServerConnection 
                 { 
                     ConnectionString = _database.ConnectionString, 
                     Id = _connectionId, 

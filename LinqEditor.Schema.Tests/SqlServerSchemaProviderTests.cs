@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Models.Editor;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Models.Editor;
 using LinqEditor.Core.Settings;
 using LinqEditor.Schema.Providers;
 using LinqEditor.Test.Common.SqlServer;
@@ -21,11 +22,10 @@ namespace LinqEditor.Schema.Tests
         public void Initialize()
         {
             _database = new SqlServerTestDb("SqlServerSchemaProviderTests", Scripts.Schema, string.Empty);
-            _connection = new Connection
+            _connection = new SqlServerConnection
             {
                 ConnectionString = _database.ConnectionString,
-                Id = Guid.NewGuid(),
-                Kind = ProgramType.SqlServer
+                Id = Guid.NewGuid()
             };
         }
 

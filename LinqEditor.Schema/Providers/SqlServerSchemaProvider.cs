@@ -1,5 +1,5 @@
-﻿using LinqEditor.Core.Models.Database;
-using LinqEditor.Core.Settings;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Models.Database;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -32,7 +32,7 @@ namespace LinqEditor.Schema.Providers
                             continue;
                         }
 
-                        var dbConn = new Connection
+                        var dbConn = new SqlServerConnection
                         {
                             ConnectionString = connection.ConnectionString + ";database=" + dbName
                         };

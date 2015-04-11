@@ -1,5 +1,5 @@
-﻿using LinqEditor.Core.Models.Database;
-using LinqEditor.Core.Settings;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Models.Database;
 using System;
 using System.Threading.Tasks;
 

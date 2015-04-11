@@ -155,14 +155,17 @@
     <Compile Include="Models\Analysis\TypeMember.cs" />
     <Compile Include="Models\Analysis\UserContext.cs" />
     <Compile Include="Models\Analysis\Warning.cs" />
+    <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\Database\ColumnSchema.cs" />
     <Compile Include="Models\Database\DatabaseSchema.cs" />
     <Compile Include="Models\Database\ServerSchema.cs" />
     <Compile Include="Models\Database\TableSchema.cs" />
+    <Compile Include="Models\CodeConnection.cs" />
     <Compile Include="Models\Editor\ExecuteResult.cs" />
     <Compile Include="Models\Editor\InitializeResult.cs" />
     <Compile Include="Models\Editor\LoadAppDomainResult.cs" />
     <Compile Include="Models\Editor\ProgramType.cs" />
+    <Compile Include="Models\SqlServerConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scopes\IdScopeAccessor.cs" />
     <Compile Include="Scopes\ThreadSafeDefaultLifetimeScope.cs" />

@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Settings;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Settings;
 using LinqEditor.Test.Common;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -36,7 +37,7 @@ namespace LinqEditor.Core.Tests
         public void Persisting_Connections_Will_Create_File()
         {
             var app = ConnectionStore.Instance;
-            app.Add(new Connection { Id = Guid.NewGuid(), ConnectionString = DatabaseTestData.Connstr1, CachedSchemaFileName = "bar" });
+            app.Add(new SqlServerConnection { Id = Guid.NewGuid(), ConnectionString = DatabaseTestData.Connstr1, CachedSchemaFileName = "bar" });
             Assert.IsTrue(File.Exists(connStorePath));
         }
 
@@ -45,7 +46,7 @@ namespace LinqEditor.Core.Tests
         public void Adding_Connection_With_No_Guid_Throws() 
         {
             var app = ConnectionStore.Instance;
-            app.Add(new Connection { ConnectionString = DatabaseTestData.Connstr1 });
+            app.Add(new SqlServerConnection { ConnectionString = DatabaseTestData.Connstr1 });
         }
 
         [Test]
@@ -60,14 +61,14 @@ namespace LinqEditor.Core.Tests
         {
             var app = ConnectionStore.Instance;
             var deleteGuid = Guid.NewGuid();
-            app.Add(new Connection { Id = Guid.NewGuid(), ConnectionString = DatabaseTestData.Connstr1, CachedSchemaFileName = "bar" });
-            app.Add(new Connection { Id = deleteGuid, ConnectionString = DatabaseTestData.Connstr2, CachedSchemaFileName = "baz" });
+            app.Add(new SqlServerConnection { Id = Guid.NewGuid(), ConnectionString = DatabaseTestData.Connstr1, CachedSchemaFileName = "bar" });
+            app.Add(new SqlServerConnection { Id = deleteGuid, ConnectionString = DatabaseTestData.Connstr2, CachedSchemaFileName = "baz" });
             app.Delete(app.Connections.Where(x => x.Id == deleteGuid).Single()); // delete the instance with deleteGuid 
 
             var fileData = File.ReadAllText(connStorePath);
             var instance = JsonConvert.DeserializeObject<ConnectionStore>(fileData);
             // reflect value out
-            var reflectedValue = instance.GetType().GetField("_connections", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(instance) as IList<Connection>;
+            var reflectedValue = instance.GetType().GetField("_sqlServerConnections", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(instance) as IList<SqlServerConnection>;
             Assert.AreEqual(1, reflectedValue.Count);
             Assert.AreEqual(DatabaseTestData.Connstr1, reflectedValue[0].ConnectionString);
             Assert.AreEqual("bar", reflectedValue[0].CachedSchemaFileName);

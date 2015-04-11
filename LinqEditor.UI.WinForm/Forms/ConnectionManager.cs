@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Settings;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Settings;
 using LinqEditor.UI.WinForm.Controls;
 using LinqEditor.UI.WinForm.Resources;
 using System;
@@ -125,7 +126,7 @@ namespace LinqEditor.UI.WinForm.Forms
                 editSelector.Items.Clear();
                 foreach (var conn in _connectionStore.Connections)
                 {
-                    if (conn.Kind == Core.Models.Editor.ProgramType.SqlServer)
+                    if (conn is SqlServerConnection)
                     {
                         editSelector.Items.Add(conn);
                     }
@@ -195,7 +196,7 @@ namespace LinqEditor.UI.WinForm.Forms
                 try
                 {
                     // connection throws 
-                    _connectionStore.Add(new Connection { Id = id, ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
+                    _connectionStore.Add(new SqlServerConnection { Id = id, ConnectionString = addConnStr.Text, DisplayName = addTitle.Text });
                     addConnStr.Text = string.Empty;
                     addTitle.Text = string.Empty;
                     addButton.Enabled = false;

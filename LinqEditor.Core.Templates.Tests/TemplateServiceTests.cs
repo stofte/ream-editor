@@ -1,14 +1,13 @@
-﻿using LinqEditor.Core;
-using LinqEditor.Core.CodeAnalysis.Compiler;
+﻿using LinqEditor.Core.CodeAnalysis.Compiler;
 using LinqEditor.Core.Helpers;
-using LinqEditor.Core.Models.Editor;
+using LinqEditor.Core.Models;
 using LinqEditor.Core.Models.Database;
+using LinqEditor.Test.Common;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LinqEditor.Core.Settings;
 
 namespace LinqEditor.Core.Templates.Tests
 {
@@ -26,7 +25,10 @@ namespace LinqEditor.Core.Templates.Tests
 
             _schemaModel = new DatabaseSchema
             {
-                Connection = new Connection(),
+                Connection = new SqlServerConnection
+                {
+                    ConnectionString = DatabaseTestData.Connstr1
+                },
                 Tables = new List<TableSchema>
                 {
                     new TableSchema 

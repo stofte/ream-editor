@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Models.Database;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Settings;
 using LinqEditor.Test.Common;
 using Moq;
@@ -20,8 +21,9 @@ namespace LinqEditor.DataAccess.Tests
         [TestFixtureSetUp]
         public void Setup()
         {
-            _sqlServerConn = new Connection
+            _sqlServerConn = new SqlServerConnection
             {
+                Id = Guid.NewGuid(),
                 ConnectionString = DatabaseTestData.Connstr1
             };
 
@@ -58,7 +60,7 @@ namespace LinqEditor.DataAccess.Tests
         public async void Passing_Empty_Connection_Throws()
         {
             var provider = new AssemblyFileProvider(_connectionStore);
-            var conn = new Connection();
+            var conn = new SqlServerConnection();
             string path = await provider.GetSchemaPath(conn);
         }
     }

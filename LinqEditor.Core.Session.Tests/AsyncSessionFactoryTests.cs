@@ -3,6 +3,7 @@ using Castle.Windsor;
 using Castle.Windsor.Installer;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models;
 using LinqEditor.Core.Schema.Services;
 using LinqEditor.Core.Settings;
 using LinqEditor.Core.Templates;
@@ -10,6 +11,7 @@ using LinqEditor.Test.Common;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 
 namespace LinqEditor.Core.Session.Tests
@@ -30,6 +32,15 @@ namespace LinqEditor.Core.Session.Tests
             _container.Install(FromAssembly.Containing<IAsyncSessionFactory>()); // core.backend
             _container.Install(FromAssembly.Containing<ISchemaProvider>()); // core.schema
             _container.Install(FromAssembly.Containing<ITemplateCodeAnalysis>()); // core.codeanalysis
+        }
+
+        [TestFixtureTearDown]
+        public void Cleanup()
+        {
+            var p1 = ApplicationSettings.FileName(typeof(ConnectionStore));
+            var p2 = ApplicationSettings.FileName(typeof(SettingsStore));
+            if (File.Exists(p1)) File.Delete(p1);
+            if (File.Exists(p2)) File.Delete(p2);
         }
 
         [Test]
@@ -105,7 +116,7 @@ namespace LinqEditor.Core.Session.Tests
         {
             var store = _container.Resolve<IConnectionStore>();
             var connId = Guid.NewGuid();
-            store.Add(new Connection { Id = connId, ConnectionString = DatabaseTestData.NonExistingServerConnStr });
+            store.Add(new SqlServerConnection { Id = connId, ConnectionString = DatabaseTestData.NonExistingServerConnStr });
 
             var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();

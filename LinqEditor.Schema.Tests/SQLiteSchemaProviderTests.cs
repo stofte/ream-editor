@@ -17,7 +17,7 @@ namespace LinqEditor.Schema.Tests
         [TestFixtureSetUp]
         public void Init()
         {
-            _database = new SQLiteTestDb("test");
+            _database = new SQLiteTestDb("test.sqlite");
         }
 
         [TestFixtureTearDown]

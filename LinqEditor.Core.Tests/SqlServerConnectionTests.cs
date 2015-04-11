@@ -1,4 +1,5 @@
-﻿using LinqEditor.Core.Settings;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Core.Settings;
 using LinqEditor.Test.Common;
 using NUnit.Framework;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace LinqEditor.Core.Tests
 {
     [TestFixture]
-    public class ConnectionTests
+    public class SqlServerConnectionTests
     {
         [TestCase(
             "",
@@ -24,7 +25,7 @@ namespace LinqEditor.Core.Tests
             Description = "with catalog + display")]
         public void ToString_Parses_Valid_ConnectionString(string displayName, string connStr, string toStringed)
         {
-            var conn = new Connection { ConnectionString = connStr, DisplayName = displayName, Kind = Models.Editor.ProgramType.SqlServer };
+            var conn = new SqlServerConnection { ConnectionString = connStr, DisplayName = displayName };
 
             var str = conn.ToString();
 
@@ -35,14 +36,14 @@ namespace LinqEditor.Core.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void Setting_ConnectionString_Throws_If_Value_Has_Invalid_Format(string connStr)
         {
-            new Connection { ConnectionString = connStr };
+            new SqlServerConnection { ConnectionString = connStr };
         }
 
         [TestCase(DatabaseTestData.Connstr1, true)]
         [TestCase(DatabaseTestData.Connstr2, false)]
         public void Connection_Detects_Integrated_Security(string connStr, bool usingIntegratedSecurity)
         {
-            var conn = new Connection { ConnectionString = connStr, Kind = Models.Editor.ProgramType.SqlServer };
+            var conn = new SqlServerConnection { ConnectionString = connStr };
 
             Assert.AreEqual(conn.UsingIntegratedSecurity, usingIntegratedSecurity);
         }
@@ -52,7 +53,7 @@ namespace LinqEditor.Core.Tests
         [TestCase(DatabaseTestData.Connstr2, "mydbname")]
         public void Parses_Initial_Catalog(string connStr, string initCat)
         {
-            var conn = new Connection { ConnectionString = connStr, Kind = Models.Editor.ProgramType.SqlServer };
+            var conn = new SqlServerConnection { ConnectionString = connStr };
 
             Assert.AreEqual(conn.InitialCatalog, initCat);
         }
@@ -61,7 +62,7 @@ namespace LinqEditor.Core.Tests
         [TestCase(DatabaseTestData.Connstr2, "sql.somewhere,1437")]
         public void Parses_Server(string connStr, string server)
         {
-            var conn = new Connection { ConnectionString = connStr, Kind = Models.Editor.ProgramType.SqlServer };
+            var conn = new SqlServerConnection { ConnectionString = connStr };
 
             Assert.AreEqual(conn.DatabaseServer, server);
         }
@@ -69,7 +70,7 @@ namespace LinqEditor.Core.Tests
         [TestCase(DatabaseTestData.Connstr2, "yyy")]
         public void Parses_DatabaseSecurity(string connStr, string sec)
         {
-            var conn = new Connection { ConnectionString = connStr, Kind = Models.Editor.ProgramType.SqlServer };
+            var conn = new SqlServerConnection { ConnectionString = connStr };
 
             Assert.AreEqual(conn.DatabaseSecurity, sec);
         }

@@ -1,8 +1,8 @@
 ﻿using LinqEditor.Core.CodeAnalysis.Compiler;
-using LinqEditor.Core.CodeAnalysis.Helpers;
 using LinqEditor.Core.CodeAnalysis.Services;
 using LinqEditor.Core.Containers;
 using LinqEditor.Core.Helpers;
+using LinqEditor.Core.Models;
 using LinqEditor.Core.Models.Analysis;
 using LinqEditor.Core.Models.Database;
 using LinqEditor.Core.Models.Editor;

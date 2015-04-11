@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using LinqEditor.Core.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace LinqEditor.Core.Settings
 
                 if (connStore == null)
                 {
-                    connStore = new ConnectionStore() { _connections = new List<Connection>() };
+                    connStore = new ConnectionStore() { _sqlServerConnections = new List<SqlServerConnection>() };
 
                     if (exn != null)
                     {
@@ -42,16 +43,16 @@ namespace LinqEditor.Core.Settings
         public event Action ConnectionsUpdated;
         
         [JsonProperty]
-        private IList<Connection> _connections; // ignore naming for json rendering
+        private IList<SqlServerConnection> _sqlServerConnections;
 
         public void Add(Connection conn)
         {
             if (conn.Id == Guid.Empty) throw new ArgumentException("connection must have id");
             if (conn.Id == CodeId) throw new ArgumentException("connection cannot use code id");
 
-            if (_connections.Where(x => x.Id == conn.Id).Count() == 0)
+            if (conn is SqlServerConnection && _sqlServerConnections.Where(x => x.Id == conn.Id).Count() == 0)
             {
-                _connections.Add(conn);
+                _sqlServerConnections.Add(conn as SqlServerConnection);
                 Save();
 
                 if (ConnectionsUpdated != null)
@@ -70,7 +71,7 @@ namespace LinqEditor.Core.Settings
             if (conn == null) throw new ArgumentNullException("Connection cannot be null");
             if (conn.Id == CodeId) throw new ArgumentException("Cannot update code connection");
 
-            foreach (var c in _connections)
+            foreach (var c in _sqlServerConnections)
             {
                 if (c.Id == conn.Id)
                 {
@@ -97,7 +98,7 @@ namespace LinqEditor.Core.Settings
             if (conn == null) throw new ArgumentNullException("Connection cannot be null");
             if (conn.Id == CodeId) throw new ArgumentException("Cannot delete code connection");
 
-                        _connections = _connections.Where(x => x.Id != conn.Id).ToList();
+            _sqlServerConnections = _sqlServerConnections.Where(x => x.Id != conn.Id).ToList();
             Save();
             if (ConnectionsUpdated != null)
             {
@@ -109,14 +110,13 @@ namespace LinqEditor.Core.Settings
         public IEnumerable<Connection> Connections
         {
             get {
-                return (new Connection[] { new Connection 
+                return (new Connection[] { new CodeConnection 
                     {
                         Id = CodeId,
-                        DisplayName = "Code",
-                        Kind = Models.Editor.ProgramType.Code,
+                        DisplayName = "Code"
                     }})
-                    .Concat(_connections.Where(x => x.Id != CodeId).OrderBy(x => x.DisplayName)
-                    .Select(x => new Connection
+                    .Concat(_sqlServerConnections.Where(x => x.Id != CodeId).OrderBy(x => x.DisplayName)
+                    .Select(x => new SqlServerConnection
                     {
                         Id = x.Id,
                         DisplayName = x.DisplayName,

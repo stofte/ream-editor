@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqEditor.Core.Models;
+using System;
 using System.Collections.Generic;
 
 namespace LinqEditor.Core.Settings

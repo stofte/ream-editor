@@ -53,10 +53,9 @@ namespace LinqEditor.Schema.Tests
         }
 
         [Test]
-        public async void Connection_String_With_Database_Returns_Single_Table()
+        public async void Connection_String_With_Database_Returns_Single_Database()
         {
             var provider = new SqlServerSchemaProvider();
-            Debug.WriteLine(_connection.ConnectionString);
             var schema = await provider.GetServerSchema(_connection);
 
             Assert.AreEqual(2, schema.Databases.Single().Tables.Count());

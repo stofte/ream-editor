@@ -18,6 +18,7 @@ namespace LinqEditor.Schema.Providers
         {
             if (dbConnection == null) throw new ArgumentNullException("dbConnection");
             var connection = dbConnection as SqlServerConnection;
+            var hasInitialCatalog = !string.IsNullOrWhiteSpace(connection.InitialCatalog);
 
             var result = new List<DatabaseSchema>();
             using (var conn = new SqlConnection(connection.ConnectionString))
@@ -29,7 +30,8 @@ namespace LinqEditor.Schema.Providers
                     foreach(DataRow row in dbs.Rows) 
                     {
                         var dbName = row.ItemArray[0] as string;
-                        if (!SystemDatabases.Contains(dbName))
+                        if (!hasInitialCatalog && !SystemDatabases.Contains(dbName) ||
+                            hasInitialCatalog && (connection.InitialCatalog.ToLower() == dbName.ToLower()))
                         {
                             dbNames.Add(dbName);
                         }

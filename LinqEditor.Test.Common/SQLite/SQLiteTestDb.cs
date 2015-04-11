@@ -66,10 +66,11 @@ namespace LinqEditor.Test.Common.SQLite
 
         public void Dispose()
         {
-            if (File.Exists(_fileName))
-            {
-                File.Delete(_fileName);
-            }
+            // something is keeping a lock on the file?
+            //if (File.Exists(_fileName))
+            //{
+            //    File.Delete(_fileName);
+            //}
         }
     }
 }

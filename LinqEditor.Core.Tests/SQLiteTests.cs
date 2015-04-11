@@ -13,30 +13,22 @@ namespace LinqEditor.Core.Tests
     [TestFixture]
     public class SQLiteTests
     {
-        // vshost is holding the file somehow
-        //[TestFixtureTearDown]
-        public void Cleanup()
-        {
-            if (File.Exists("test.sqlite"))
-            {
-                File.Delete("test.sqlite");
-            }
-        }
-
         [Test]
         public void Can_Create_Database_With_Test_Data()
         {
             long rowcount;
 
-            var db = new SQLiteTestDb("test.sqlite");
-            db.RecreateTestData();
-
-            // verify using sqlite's api that the db contains something
-            using (var conn = new SQLiteConnection(db.ConnectionString))
+            using (var db = new SQLiteTestDb("test.sqlite"))
             {
-                conn.Open();
-                var cmd = new SQLiteCommand("select count(*) from Foo", conn);
-                rowcount = (long)cmd.ExecuteScalar();
+                db.RecreateTestData();
+
+                // verify using sqlite's api that the db contains something
+                using (var conn = new SQLiteConnection(db.ConnectionString))
+                {
+                    conn.Open();
+                    var cmd = new SQLiteCommand("select count(*) from Foo", conn);
+                    rowcount = (long)cmd.ExecuteScalar();
+                }
             }
 
             Assert.AreEqual(4, rowcount);

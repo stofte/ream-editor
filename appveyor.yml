@@ -23,12 +23,12 @@ assembly_info:
 
 before_build: nuget restore
 
-after_build: 
-  - cd %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
-  - 7z a %APPVEYOR_BUILD_FOLDER%\LinqEditor-%APPVEYOR_BUILD_VERSION%.zip *.config *.exe *.dll mscorlib.xml System.Core.xml System.Data.xml System.xml System.Xml.xml
-  - cd %APPVEYOR_BUILD_FOLDER%
-
 test_script:
   - if not exist %COVER_FOLDER% ( mkdir %COVER_FOLDER% )
   - .\packages\OpenCover.4.5.3723\OpenCover.Console.exe -target:runtests.bat -register:user -filter:"+[LinqEditor*]* -[*Test*]* -[*UI.WinForm]* -[*Templates]*Base" -output:.\%COVER_FOLDER%\TestCoverage.xml -returntargetcode
   - .\packages\coveralls.io.1.3.4\tools\coveralls.net.exe %APPVEYOR_BUILD_FOLDER%\%COVER_FOLDER%\TestCoverage.xml
+
+after_test: 
+  - cd %APPVEYOR_BUILD_FOLDER%\LinqEditor.UI.WinForm\bin\%CONFIGURATION%
+  - 7z a %APPVEYOR_BUILD_FOLDER%\LinqEditor-%APPVEYOR_BUILD_VERSION%.zip *.config *.exe *.dll mscorlib.xml System.Core.xml System.Data.xml System.xml System.Xml.xml
+  - cd %APPVEYOR_BUILD_FOLDER%

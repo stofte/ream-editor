@@ -6,6 +6,7 @@ using LinqEditor.Test.Common.SqlServer;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace LinqEditor.Schema.Tests
         }
 
         [Test]
-        public async void Throws_If_Null_Connection_Is_Passed()
+        public void Throws_If_Null_Connection_Is_Passed()
         {
             var provider = new SqlServerSchemaProvider();
             Assert.Throws<ArgumentNullException>(async () =>
@@ -55,7 +56,7 @@ namespace LinqEditor.Schema.Tests
         public async void Connection_String_With_Database_Returns_Single_Table()
         {
             var provider = new SqlServerSchemaProvider();
-
+            Debug.WriteLine(_connection.ConnectionString);
             var schema = await provider.GetServerSchema(_connection);
 
             Assert.AreEqual(2, schema.Databases.Single().Tables.Count());

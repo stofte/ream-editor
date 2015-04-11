@@ -168,9 +168,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scopes\IdScopeAccessor.cs" />
     <Compile Include="Scopes\ThreadSafeDefaultLifetimeScope.cs" />
-    <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="Settings\ApplicationSettings.cs" />
-    <Compile Include="Settings\Connection.cs" />
     <Compile Include="Settings\ConnectionStore.cs" />
     <Compile Include="Settings\IConnectionStore.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />

@@ -64,6 +64,19 @@ namespace LinqEditor.Core.Models
         }
 
         [JsonIgnore]
+        public string DatabasePassword
+        {
+            get
+            {
+                if (!UsingIntegratedSecurity)
+                {
+                    return ParseConnectionStringPart(@"(password|pwd)=([^;]*)");
+                }   
+                return string.Empty;
+            }
+        }
+
+        [JsonIgnore]
         public string DatabaseServer
         {
             get
@@ -91,6 +104,29 @@ namespace LinqEditor.Core.Models
                     (UsingIntegratedSecurity ||
                     !UsingIntegratedSecurity && DatabaseSecurity.Length > 0);
             }
+        }
+
+        /// <summary>
+        /// Returns suitable connection strings for the current connection, modified for the passed database names.
+        /// </summary>
+        public IEnumerable<string> GetConnectionStringWithDatabases(IEnumerable<string> databaseNames)
+        {
+            var conn = new List<string>();
+            foreach(var name in databaseNames) 
+            {
+                var connStr = string.Format("server={0};database={1};", DatabaseServer, name);
+                if (UsingIntegratedSecurity)
+                {
+                    connStr += "integrated security=sspi;";
+                }
+                else
+                {
+                    connStr += string.Format("user id={0};pwd={1};", DatabaseSecurity, DatabasePassword);
+                }
+
+                conn.Add(connStr);
+            }
+            return conn;
         }
 
         public override string ToString()

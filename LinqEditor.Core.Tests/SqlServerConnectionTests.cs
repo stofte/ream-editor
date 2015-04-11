@@ -48,7 +48,6 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual(conn.UsingIntegratedSecurity, usingIntegratedSecurity);
         }
 
-
         [TestCase(DatabaseTestData.Connstr1, "Opera56100DB")]
         [TestCase(DatabaseTestData.Connstr2, "mydbname")]
         public void Parses_Initial_Catalog(string connStr, string initCat)
@@ -73,6 +72,17 @@ namespace LinqEditor.Core.Tests
             var conn = new SqlServerConnection { ConnectionString = connStr };
 
             Assert.AreEqual(conn.DatabaseSecurity, sec);
+        }
+
+        [Test]
+        public void GetConnectionStringWithDatabases_Generates_Valid_Connection_Strings()
+        {
+            var conn = new SqlServerConnection { ConnectionString = DatabaseTestData.Connstr1 };
+            var conns = conn.GetConnectionStringWithDatabases(new[] { "foo", "bar" }).Select(x => new SqlServerConnection { ConnectionString = x });
+
+            Assert.IsNotNull(conns.Single(x => x.InitialCatalog == "foo"));
+            Assert.IsNotNull(conns.Single(x => x.InitialCatalog == "bar"));
+            Assert.IsTrue(conns.All(x => x.DatabaseServer == conn.DatabaseServer));
         }
     }
 }

@@ -14,9 +14,10 @@ namespace LinqEditor.Schema.Providers
     {
         static IEnumerable<string> SystemDatabases = new [] {"master", "tempdb", "model", "msdb"};
         
-        public async Task<ServerSchema> GetServerSchema(Connection connection)
+        public async Task<ServerSchema> GetServerSchema(Connection dbConnection)
         {
-            if (connection == null) throw new ArgumentNullException("connection");
+            if (dbConnection == null) throw new ArgumentNullException("dbConnection");
+            var connection = dbConnection as SqlServerConnection;
 
             var result = new List<DatabaseSchema>();
             using (var conn = new SqlConnection(connection.ConnectionString))
@@ -24,18 +25,18 @@ namespace LinqEditor.Schema.Providers
                 await conn.OpenAsync();
                 using (var dbs = conn.GetSchema(SqlClientMetaDataCollectionNames.Databases))
                 {
+                    var dbNames = new List<string>();
                     foreach(DataRow row in dbs.Rows) 
                     {
                         var dbName = row.ItemArray[0] as string;
-                        if (SystemDatabases.Contains(dbName))
+                        if (!SystemDatabases.Contains(dbName))
                         {
-                            continue;
+                            dbNames.Add(dbName);
                         }
-
-                        var dbConn = new SqlServerConnection
-                        {
-                            ConnectionString = connection.ConnectionString + ";database=" + dbName
-                        };
+                    }
+                    var dbConns = connection.GetConnectionStringWithDatabases(dbNames).Select(x => new SqlServerConnection { ConnectionString = x });
+                    foreach (var dbConn in dbConns)
+                    {
                         result.Add(await GetDatabaseSchema(dbConn));
                     }
                 }

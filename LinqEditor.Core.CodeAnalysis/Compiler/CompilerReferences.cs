@@ -50,8 +50,7 @@ namespace LinqEditor.Core.CodeAnalysis.Compiler
             // from a custom service (DocumentationService), which builds a list of 
             // CustomDocumentationProvider by using the above GetAssemblies methods.
             return assems
-                .Concat(GetCoreAssemblies().Select(x => !includeDocumentation ? MetadataReference.CreateFromAssembly(x) :
-                    MetadataReference.CreateFromAssembly(x, MetadataReferenceProperties.Assembly, new CustomDocumentationProvider(x))))
+                .Concat(GetCoreAssemblies().Select(x => MetadataReference.CreateFromAssembly(x)))
                 .Concat(GetCustomAssemblies().Select(x => MetadataReference.CreateFromAssembly(x)))
                 .ToArray();
         }

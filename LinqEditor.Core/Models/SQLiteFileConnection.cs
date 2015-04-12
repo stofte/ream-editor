@@ -26,14 +26,33 @@ namespace LinqEditor.Core.Models
             get { return _connectionString != null; } // dont bother validating file paths
         }
 
+        public string FileName
+        {
+            get
+            {
+                return ParseConnectionStringPart(@"(data source)=([^;]*)");
+            }
+        }
+
+        public string DatabaseName
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(FileName))
+                {
+                    return string.Empty;
+                }
+                return Path.GetFileName(FileName);
+            }
+        }
+
         public override string ToString()
         {
             string val = _connectionString ?? string.Empty;
-            var fileName = Path.GetFileName(_connectionString);
-            var dirName = Path.GetDirectoryName(_connectionString);
-            if (!string.IsNullOrWhiteSpace(fileName) && !string.IsNullOrWhiteSpace(dirName))
+            if (!string.IsNullOrWhiteSpace(DatabaseName))
             {
-                val = string.Format("{0} ({1})", fileName, dirName);
+                var dirName = Path.GetDirectoryName(FileName);
+                val = string.Format("{0} ({1})", DatabaseName, dirName);
             }
             return val;
         }

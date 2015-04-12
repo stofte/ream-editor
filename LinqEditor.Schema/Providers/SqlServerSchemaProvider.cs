@@ -89,7 +89,7 @@ namespace LinqEditor.Schema.Providers
                             {
                                 Name = row["COLUMN_NAME"].ToString(),
                                 TypeName = "",
-                                Type = SqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
+                                Type = MapSqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
                                 Index = index++
                             });
                         }
@@ -104,7 +104,7 @@ namespace LinqEditor.Schema.Providers
             };
         }
 
-        private Type SqlTypeToDotNetType(string type, string nullable)
+        private Type MapSqlTypeToDotNetType(string type, string nullable)
         {
             var isNullable = nullable == "YES";
             var nullableSuffix = nullable == "YES" ? "?" : string.Empty;

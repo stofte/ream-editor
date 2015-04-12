@@ -1,4 +1,5 @@
-﻿using LinqEditor.Schema.Providers;
+﻿using LinqEditor.Core.Models;
+using LinqEditor.Schema.Providers;
 using LinqEditor.Test.Common.SQLite;
 using NUnit.Framework;
 using System;
@@ -9,16 +10,20 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Schema.Tests
 {
-    [TestFixture]
+    [TestFixture(Category="FileSystem")]
     public class SQLiteSchemaProviderTests
     {
         SQLiteTestDb _database;
-        LinqEditor.Core.Models.SQLiteFileConnection _connection;
+        SQLiteFileConnection _connection;
 
         [TestFixtureSetUp]
         public void Init()
         {
             _database = new SQLiteTestDb("test.sqlite");
+            _connection = new SQLiteFileConnection
+            {
+                ConnectionString = _database.ConnectionString
+            };
         }
 
         [TestFixtureTearDown]
@@ -28,9 +33,17 @@ namespace LinqEditor.Schema.Tests
         }
 
         [Test]
-        public async void Can_Load_Schema_For_Simple_Schema()
+        public async void Can_Load_Simple_Schema()
         {
             var provider = new SQLiteSchemaProvider();
+            var schema = await provider.GetDatabaseSchema(_connection);
+            
+            Assert.AreEqual("test.sqlite", schema.Name);
+            var tblSchema = schema.Tables.Single();
+            Assert.AreEqual("test.sqlite", tblSchema.Catalog);
+            Assert.AreEqual(2, tblSchema.Columns.Count());
+            Assert.AreEqual(typeof(int), tblSchema.Columns.Single(x => x.Name == "Id").Type);
+            Assert.AreEqual(typeof(string), tblSchema.Columns.Single(x => x.Name == "Description").Type);
         }
     }
 }

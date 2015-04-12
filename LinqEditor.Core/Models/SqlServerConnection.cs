@@ -144,20 +144,5 @@ namespace LinqEditor.Core.Models
             
             return val;
         }
-
-        private string ParseConnectionStringPart(string regexInput)
-        {
-            string val = string.Empty;
-            if (!string.IsNullOrWhiteSpace(ConnectionString))
-            {
-                var regex = new Regex(regexInput, RegexOptions.IgnoreCase);
-                var m = regex.Match(ConnectionString);
-                if (m.Success)
-                {
-                    val = m.Groups[2].Value.Trim();
-                }
-            }
-            return val;
-        }
     }
 }

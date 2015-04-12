@@ -78,5 +78,13 @@ namespace LinqEditor.Core
             get { return _currentPathProvider; }
             set { _currentPathProvider = value; }
         }
+
+        public static void Reset()
+        {
+            _cachePathProvider = _defaultCachePathProvider;
+            _tempPathProvider = _defaultTempPathProvider;
+            _applicationDirectoryProvider = _defaultApplicationDirectoryProvider;
+            _currentPathProvider = _defaultCurrentPathProvider;
+        }
     }
 }

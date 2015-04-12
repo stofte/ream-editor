@@ -40,10 +40,16 @@ namespace LinqEditor.Core.Tests
         }
 
         [Test]
+        public void Reading_Non_Existant_File_Throws()
+        {
+            Assert.Throws<FileNotFoundException>(() => FileSystem.ReadAllBytes("not.here.txt"));
+        }
+
+        [Test]
         public void Can_Read_Binary_File()
         {
             var data = new byte[] { 0x2a };
-            File.WriteAllBytes(_file2, data);
+            FileSystem.WriteAllBytes(_file2, data);
 
             var read = FileSystem.ReadAllBytes(_file2);
 
@@ -66,6 +72,18 @@ namespace LinqEditor.Core.Tests
         public void ReadAllText_File_Path_Is_Mandatory()
         {
             Assert.Throws<ArgumentNullException>(() => FileSystem.ReadAllText(null));
+        }
+
+        [Test]
+        public void WriteAllBytes_File_Path_Is_Mandatory()
+        {
+            Assert.Throws<ArgumentNullException>(() => FileSystem.WriteAllBytes(null, new byte[]{ 0x2a }));
+        }
+
+        [Test]
+        public void WriteAllBytes_Contents_Is_Mandatory()
+        {
+            Assert.Throws<ArgumentNullException>(() => FileSystem.WriteAllBytes(_file1, null));
         }
 
         [Test]

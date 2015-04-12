@@ -10,6 +10,12 @@ namespace LinqEditor.Core.Tests
     [TestFixture]
     public class PathUtilityTests
     {
+        [TestFixtureTearDown]
+        public void Cleanup()
+        {
+            PathUtility.Reset();
+        }
+
         [Test]
         public void CachePath_Is_Not_Null()
         {

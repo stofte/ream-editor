@@ -16,30 +16,29 @@ namespace LinqEditor.Core.Tests
     [TestFixture]
     public class ApplicationSettingsTests
     {
-        string connStorePath = ConnectionStore.FileName(typeof(ConnectionStore));
-        string settingsPath = SettingsStore.FileName(typeof(SettingsStore));
-        bool _writeAllTextCalled = false;
+        string _connStorePath = null;
+        string _settingsPath = null;
 
         [TestFixtureSetUp]
         public void Init()
         {
-            Func<string, bool> existsProvider = (string p) => p == connStorePath;
-            Action<string, string> writeAllTextProvider = (string path, string contents) => _writeAllTextCalled = true;
+            PathUtility.ApplicationDirectoryProvider = () => @"C:\app\dir\";
+            _connStorePath = ConnectionStore.FileName(typeof(ConnectionStore));
+            _settingsPath = SettingsStore.FileName(typeof(SettingsStore));
+            FileSystem.Mode(enableStub: true);
         }
 
-        [TestFixtureTearDown, SetUp]
-        public void InitializeAndCleanup()
+        [TestFixtureTearDown]
+        public void Cleanup()
         {
-            _writeAllTextCalled = false;
-            // delete any previous test file, before and after all and any tests
-            if (File.Exists(connStorePath))
-            {
-                File.Delete(connStorePath);
-            }
-            if (File.Exists(settingsPath))
-            {
-                File.Delete(settingsPath);
-            }
+            PathUtility.Reset();
+            FileSystem.Mode(enableStub: false);
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            FileSystem.Clear();
         }
 
         [Test]
@@ -47,7 +46,7 @@ namespace LinqEditor.Core.Tests
         {
             var app = ConnectionStore.Instance;
             app.Add(new SqlServerConnection { Id = Guid.NewGuid(), ConnectionString = SqlServerTestData.Connstr1, CachedSchemaFileName = "bar" });
-            Assert.IsTrue(File.Exists(connStorePath));
+            Assert.IsTrue(FileSystem.Exists(_connStorePath));
         }
         
         [Test]
@@ -74,7 +73,7 @@ namespace LinqEditor.Core.Tests
             app.Add(new SqlServerConnection { Id = deleteGuid, ConnectionString = SqlServerTestData.Connstr2, CachedSchemaFileName = "baz" });
             app.Delete(app.Connections.Where(x => x.Id == deleteGuid).Single()); // delete the instance with deleteGuid 
 
-            var fileData = File.ReadAllText(connStorePath);
+            var fileData = FileSystem.ReadAllText(_connStorePath);
             var instance = JsonConvert.DeserializeObject<ConnectionStore>(fileData);
             // reflect value out
             var reflectedValue = instance.GetType().GetField("_sqlServerConnections", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(instance) as IList<SqlServerConnection>;
@@ -86,11 +85,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void Detects_Error_Loading_File()
         {
-            using (var file = File.CreateText(connStorePath))
-            {
-                file.Write(0x2a);
-            }
-
+            FileSystem.WriteAllBytes(_connStorePath, new byte[]{ 0x2a });
             var app = ConnectionStore.Instance;
 
             Assert.IsTrue(app.LoadingError);
@@ -104,7 +99,7 @@ namespace LinqEditor.Core.Tests
                 
             }
             
-            Assert.IsTrue(File.Exists(connStorePath));
+            Assert.IsTrue(FileSystem.Exists(_connStorePath));
         }
     }
 }

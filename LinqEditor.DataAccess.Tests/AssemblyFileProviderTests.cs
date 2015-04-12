@@ -24,7 +24,7 @@ namespace LinqEditor.DataAccess.Tests
             _sqlServerConn = new SqlServerConnection
             {
                 Id = Guid.NewGuid(),
-                ConnectionString = DatabaseTestData.Connstr1
+                ConnectionString = SqlServerTestData.Connstr1
             };
 
             var connStore = new Mock<IConnectionStore>();

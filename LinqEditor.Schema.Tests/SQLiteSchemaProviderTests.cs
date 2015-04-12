@@ -13,6 +13,7 @@ namespace LinqEditor.Schema.Tests
     public class SQLiteSchemaProviderTests
     {
         SQLiteTestDb _database;
+        LinqEditor.Core.Models.SQLiteFileConnection _connection;
 
         [TestFixtureSetUp]
         public void Init()

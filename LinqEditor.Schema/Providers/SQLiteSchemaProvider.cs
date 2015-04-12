@@ -7,7 +7,7 @@ namespace LinqEditor.Schema.Providers
 {
     public class SQLiteSchemaProvider : ISQLiteSchemaProvider
     {
-        public Task<DatabaseSchema> GetDatabaseSchema(SQLiteConnection connection)
+        public Task<DatabaseSchema> GetDatabaseSchema(SQLiteFileConnection connection)
         {
             throw new NotImplementedException();
         }

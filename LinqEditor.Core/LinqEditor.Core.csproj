@@ -164,7 +164,7 @@
     <Compile Include="Models\Editor\InitializeResult.cs" />
     <Compile Include="Models\Editor\LoadAppDomainResult.cs" />
     <Compile Include="Models\Editor\ProgramType.cs" />
-    <Compile Include="Models\SQLiteConnection.cs" />
+    <Compile Include="Models\SQLiteFileConnection.cs" />
     <Compile Include="Models\SqlServerConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scopes\IdScopeAccessor.cs" />

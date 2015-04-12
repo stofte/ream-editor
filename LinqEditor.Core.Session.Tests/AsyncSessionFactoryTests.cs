@@ -116,7 +116,7 @@ namespace LinqEditor.Core.Session.Tests
         {
             var store = _container.Resolve<IConnectionStore>();
             var connId = Guid.NewGuid();
-            store.Add(new SqlServerConnection { Id = connId, ConnectionString = DatabaseTestData.NonExistingServerConnStr });
+            store.Add(new SqlServerConnection { Id = connId, ConnectionString = SqlServerTestData.NonExistingServerConnStr });
 
             var factory = _container.Resolve<IAsyncSessionFactory>();
             var id = Guid.NewGuid();

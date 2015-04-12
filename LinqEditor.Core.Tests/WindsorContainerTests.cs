@@ -45,7 +45,7 @@ namespace LinqEditor.Core.Tests
             // this generates the file on disc
             var id = Guid.NewGuid();
             var app = ConnectionStore.Instance;
-            app.Add(new SqlServerConnection { Id = id, ConnectionString = DatabaseTestData.Connstr1, CachedSchemaFileName = "bar" });
+            app.Add(new SqlServerConnection { Id = id, ConnectionString = SqlServerTestData.Connstr1, CachedSchemaFileName = "bar" });
 
             // hook up castle  registration
             var container = new WindsorContainer();

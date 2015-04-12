@@ -15,12 +15,12 @@ namespace LinqEditor.Core.Tests
     {
         [TestCase(
             "",
-            DatabaseTestData.Connstr1,
+            SqlServerTestData.Connstr1,
             @".\sqlexpress.Opera56100DB (Integrated Security)", 
             Description = "with catalog")]
         [TestCase(
             "MyName",
-            DatabaseTestData.Connstr1,
+            SqlServerTestData.Connstr1,
             @"MyName .\sqlexpress.Opera56100DB (Integrated Security)",
             Description = "with catalog + display")]
         public void ToString_Parses_Valid_ConnectionString(string displayName, string connStr, string toStringed)
@@ -32,15 +32,15 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual(toStringed, str);
         }
 
-        [TestCase(DatabaseTestData.Invalid1)]
+        [TestCase(SqlServerTestData.Invalid1)]
         [ExpectedException(typeof(ArgumentException))]
         public void Setting_ConnectionString_Throws_If_Value_Has_Invalid_Format(string connStr)
         {
             new SqlServerConnection { ConnectionString = connStr };
         }
 
-        [TestCase(DatabaseTestData.Connstr1, true)]
-        [TestCase(DatabaseTestData.Connstr2, false)]
+        [TestCase(SqlServerTestData.Connstr1, true)]
+        [TestCase(SqlServerTestData.Connstr2, false)]
         public void Connection_Detects_Integrated_Security(string connStr, bool usingIntegratedSecurity)
         {
             var conn = new SqlServerConnection { ConnectionString = connStr };
@@ -48,8 +48,8 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual(conn.UsingIntegratedSecurity, usingIntegratedSecurity);
         }
 
-        [TestCase(DatabaseTestData.Connstr1, "Opera56100DB")]
-        [TestCase(DatabaseTestData.Connstr2, "mydbname")]
+        [TestCase(SqlServerTestData.Connstr1, "Opera56100DB")]
+        [TestCase(SqlServerTestData.Connstr2, "mydbname")]
         public void Parses_Initial_Catalog(string connStr, string initCat)
         {
             var conn = new SqlServerConnection { ConnectionString = connStr };
@@ -57,8 +57,8 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual(conn.InitialCatalog, initCat);
         }
 
-        [TestCase(DatabaseTestData.Connstr1, @".\sqlexpress")]
-        [TestCase(DatabaseTestData.Connstr2, "sql.somewhere,1437")]
+        [TestCase(SqlServerTestData.Connstr1, @".\sqlexpress")]
+        [TestCase(SqlServerTestData.Connstr2, "sql.somewhere,1437")]
         public void Parses_Server(string connStr, string server)
         {
             var conn = new SqlServerConnection { ConnectionString = connStr };
@@ -66,7 +66,7 @@ namespace LinqEditor.Core.Tests
             Assert.AreEqual(conn.DatabaseServer, server);
         }
 
-        [TestCase(DatabaseTestData.Connstr2, "yyy")]
+        [TestCase(SqlServerTestData.Connstr2, "yyy")]
         public void Parses_DatabaseSecurity(string connStr, string sec)
         {
             var conn = new SqlServerConnection { ConnectionString = connStr };
@@ -77,7 +77,7 @@ namespace LinqEditor.Core.Tests
         [Test]
         public void GetConnectionStringWithDatabases_Generates_Valid_Connection_Strings()
         {
-            var conn = new SqlServerConnection { ConnectionString = DatabaseTestData.Connstr1 };
+            var conn = new SqlServerConnection { ConnectionString = SqlServerTestData.Connstr1 };
             var conns = conn.GetConnectionStringWithDatabases(new[] { "foo", "bar" }).Select(x => new SqlServerConnection { ConnectionString = x });
 
             Assert.IsNotNull(conns.Single(x => x.InitialCatalog == "foo"));

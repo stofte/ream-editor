@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Test.Common
 {
-    public class DatabaseTestData
+    public class SqlServerTestData
     {
         public const string Connstr1 = @"Data Source=.\sqlexpress;Integrated Security=True;Initial Catalog=Opera56100DB";
         

@@ -2,5 +2,5 @@
 
 namespace LinqEditor.Schema
 {
-    public interface ISQLiteSchemaProvider : IDatabaseSchemaProvider<SQLiteConnection> { }
+    public interface ISQLiteSchemaProvider : IDatabaseSchemaProvider<SQLiteFileConnection> { }
 }

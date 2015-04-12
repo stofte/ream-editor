@@ -27,7 +27,7 @@ namespace LinqEditor.Core.Templates.Tests
             {
                 Connection = new SqlServerConnection
                 {
-                    ConnectionString = DatabaseTestData.Connstr1
+                    ConnectionString = SqlServerTestData.Connstr1
                 },
                 Tables = new List<TableSchema>
                 {

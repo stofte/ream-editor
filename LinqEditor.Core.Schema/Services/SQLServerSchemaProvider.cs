@@ -1,5 +1,6 @@
 ﻿using LinqEditor.Core.Models;
 using LinqEditor.Core.Models.Database;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -42,7 +43,7 @@ namespace LinqEditor.Core.Schema.Services
                             columns.Add(new ColumnSchema
                             {
                                 Name = row["COLUMN_NAME"].ToString(),
-                                TypeName = SqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
+                                Type = MapSqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
                                 Index = index++
                             });
                         }
@@ -58,8 +59,9 @@ namespace LinqEditor.Core.Schema.Services
             };
         }
 
-        private string SqlTypeToDotNetType(string type, string nullable)
+        private Type MapSqlTypeToDotNetType(string type, string nullable)
         {
+            var isNullable = nullable == "YES";
             var nullableSuffix = nullable == "YES" ? "?" : string.Empty;
             switch (type)
             {
@@ -67,26 +69,37 @@ namespace LinqEditor.Core.Schema.Services
                 case "smalldatetime":
                 case "datetime":
                 case "datetime2":
-                    return "DateTime" + nullableSuffix;
+                    return isNullable ? typeof(DateTime?) : typeof(DateTime);
                 case "datetimeoffset":
-                    return "DateTimeOffset" + nullableSuffix;
+                    return isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset);
                 case "time":
-                    return "TimeSpan" + nullableSuffix;
+                    return isNullable ? typeof(TimeSpan?) : typeof(TimeSpan);
+                case "bit":
+                    return isNullable ? typeof(bool?) : typeof(bool);
+                case "decimal":
+                case "money":
+                case "smallmoney":
+                    return isNullable ? typeof(decimal?) : typeof(decimal);
+                case "bigint":
+                case "numeric":
+                    return isNullable ? typeof(long?) : typeof(long);
                 case "int":
-                    return "int" + nullableSuffix;
+                case "smallint":
+                case "tinyint":
+                    return isNullable ? typeof(int?) : typeof(int);
                 case "real":
                 case "float":
-                    return "double" + nullableSuffix;
+                    return isNullable ? typeof(double?) : typeof(double);
                 case "timestamp":
                 case "rowversion":
                 case "binary":
                 case "varbinary":
-                    return "byte[]";
+                    return typeof(byte[]);
                 case "uniqueidentifier":
-                    return "Guid" + nullableSuffix;
+                    return isNullable ? typeof(Guid?) : typeof(Guid);
                 case "text":
                 default:
-                    return "string";
+                    return typeof(string);
                 //default:
                 //    throw new ArgumentException("Unsupported type");
             }

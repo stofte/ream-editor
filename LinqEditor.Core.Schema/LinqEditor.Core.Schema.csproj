@@ -50,8 +50,6 @@
     </Compile>
     <Compile Include="Installer\Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\SchemaProvider.cs" />
-    <Compile Include="Services\SQLiteSchemaProvider.cs" />
     <Compile Include="Services\ISchemaProvider.cs" />
     <Compile Include="Services\SqlServerSchemaProvider.cs" />
   </ItemGroup>

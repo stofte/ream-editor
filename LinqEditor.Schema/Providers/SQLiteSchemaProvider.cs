@@ -41,8 +41,7 @@ namespace LinqEditor.Schema.Providers
                         {
                             Index = colIndex,
                             Name = colName,
-                            Type = dotnetType,
-                            TypeName = dotnetType.Name
+                            Type = dotnetType
                         });
                     }
 

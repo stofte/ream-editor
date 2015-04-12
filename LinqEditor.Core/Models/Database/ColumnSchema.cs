@@ -6,7 +6,6 @@ namespace LinqEditor.Core.Models.Database
     public class ColumnSchema
     {
         public string Name;
-        public string TypeName;
         public Type Type;
         public int Index;
     }

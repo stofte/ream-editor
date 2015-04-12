@@ -83,7 +83,7 @@ namespace LinqEditor.Schema.Tests
             Assert.AreEqual(typeof(DateTime?), tbl.Columns.Single(x => x.Name == "datecol").Type);
             Assert.AreEqual(typeof(DateTime?), tbl.Columns.Single(x => x.Name == "datetime2col").Type);
             Assert.AreEqual(typeof(DateTime?), tbl.Columns.Single(x => x.Name == "datetimecol").Type);
-            Assert.AreEqual(typeof(DateTime?), tbl.Columns.Single(x => x.Name == "datetimeoffsetcol").Type);
+            Assert.AreEqual(typeof(DateTimeOffset?), tbl.Columns.Single(x => x.Name == "datetimeoffsetcol").Type);
             Assert.AreEqual(typeof(DateTime?), tbl.Columns.Single(x => x.Name == "smalldatetimecol").Type);
             Assert.AreEqual(typeof(TimeSpan?), tbl.Columns.Single(x => x.Name == "timecol").Type);
             Assert.AreEqual(typeof(string), tbl.Columns.Single(x => x.Name == "charcol").Type);

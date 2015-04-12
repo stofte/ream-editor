@@ -88,7 +88,6 @@ namespace LinqEditor.Schema.Providers
                             columns.Add(new ColumnSchema
                             {
                                 Name = row["COLUMN_NAME"].ToString(),
-                                TypeName = "",
                                 Type = MapSqlTypeToDotNetType(row["DATA_TYPE"].ToString(), row["IS_NULLABLE"].ToString()),
                                 Index = index++
                             });
@@ -114,8 +113,9 @@ namespace LinqEditor.Schema.Providers
                 case "smalldatetime":
                 case "datetime":
                 case "datetime2":
-                case "datetimeoffset":
                     return isNullable ? typeof(DateTime?) : typeof(DateTime);
+                case "datetimeoffset":
+                    return isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset);
                 case "time":
                     return isNullable ? typeof(TimeSpan?) : typeof(TimeSpan);
                 case "bit":

@@ -40,7 +40,7 @@ foreach(var table in Tables) {
     foreach(var column in table.Columns) {
 
             this.Write("        public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(column.TypeName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(column.Type)));
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(column.Name));
             this.Write(" { get; set; }\r\n");

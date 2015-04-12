@@ -23,7 +23,7 @@ foreach(var table in Tables) {
 <#
     foreach(var column in table.Columns) {
 #>
-        public <#=column.Type#> <#=column.Name#> { get; set; }
+        public <#=TypeName(column.Type)#> <#=column.Name#> { get; set; }
 <#
     }
 #>

@@ -122,7 +122,7 @@ namespace LinqEditor.Core.Tests
             var rows = executeResult.Tables.First();
             Assert.IsNull(executeResult.Exception);
             Assert.AreEqual(1, executeResult.Tables.First().Rows.Count);
-            Assert.AreEqual(2147483647, (int)executeResult.Tables.First().Rows[0]["intcol"]);
+            Assert.AreEqual(2147483647, (Int32)executeResult.Tables.First().Rows[0]["intcol"]);
         }
     }
 }

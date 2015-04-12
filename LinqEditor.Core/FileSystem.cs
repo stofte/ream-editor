@@ -12,10 +12,30 @@ namespace LinqEditor.Core
     /// </summary>
     public static class FileSystem
     {
-        static Func<string, bool> _existsProvider = (path) => File.Exists(path);
-        static Func<string, byte[]> _readAllBytesProvider = (path) => File.ReadAllBytes(path);
-        static Func<string, string> _readAllTextProvider = (path) => File.ReadAllText(path);
-        static Action<string, string> _writeAllTextProvider = (path, contents) => File.WriteAllText(path, contents);
+        // test store
+        static IDictionary<string, string> _stringFiles = new Dictionary<string, string>();
+        static IDictionary<string, byte[]> _binaryFiles = new Dictionary<string, byte[]>();
+
+        static Func<string, bool> _defaultExistsProvider = (path) => File.Exists(path);
+        static Func<string, byte[]> _defaultReadAllBytesProvider = (path) => File.ReadAllBytes(path);
+        static Func<string, string> _defaultReadAllTextProvider = (path) => File.ReadAllText(path);
+        static Action<string, string> _defaultWriteAllTextProvider = (path, contents) => File.WriteAllText(path, contents);
+
+        static Func<string, bool> _stubExistsProvider = (path) =>
+        {
+            return _stringFiles.ContainsKey(path) || _binaryFiles.ContainsKey(path);
+        };
+        static Func<string, byte[]> _stubReadAllBytesProvider = (path) => _binaryFiles.ContainsKey(path) ? _binaryFiles[path] : null;
+        static Func<string, string> _stubReadAllTextProvider = (path) => _stringFiles.ContainsKey(path) ? _stringFiles[path] : null;
+        static Action<string, string> _stubWriteAllTextProvider = (path, contents) =>
+        {
+            _stringFiles[path] = contents;
+        };
+
+        static Func<string, bool> _existsProvider = _defaultExistsProvider;
+        static Func<string, byte[]> _readAllBytesProvider = _defaultReadAllBytesProvider;
+        static Func<string, string> _readAllTextProvider = _defaultReadAllTextProvider;
+        static Action<string, string> _writeAllTextProvider = _defaultWriteAllTextProvider;
 
         public static bool Exists(string filePath)
         {
@@ -59,6 +79,24 @@ namespace LinqEditor.Core
         {
             get { return _writeAllTextProvider; }
             set { _writeAllTextProvider = value; }
+        }
+
+        public static void Mode(bool enableStub)
+        {
+            if (enableStub)
+            {
+                ExistsProvider = _stubExistsProvider;
+                ReadAllBytesProvider = _stubReadAllBytesProvider;
+                ReadAllTextProvider = _stubReadAllTextProvider;
+                WriteAllTextProvider = _stubWriteAllTextProvider;
+            }
+            else
+            {
+                ExistsProvider = _defaultExistsProvider;
+                ReadAllBytesProvider = _defaultReadAllBytesProvider;
+                ReadAllTextProvider = _defaultReadAllTextProvider;
+                WriteAllTextProvider = _defaultWriteAllTextProvider;
+            }
         }
     }
 }

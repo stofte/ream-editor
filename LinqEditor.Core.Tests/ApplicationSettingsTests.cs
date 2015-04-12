@@ -18,10 +18,19 @@ namespace LinqEditor.Core.Tests
     {
         string connStorePath = ConnectionStore.FileName(typeof(ConnectionStore));
         string settingsPath = SettingsStore.FileName(typeof(SettingsStore));
+        bool _writeAllTextCalled = false;
 
-        [TestFixtureSetUp, TestFixtureTearDown, SetUp]
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            Func<string, bool> existsProvider = (string p) => p == connStorePath;
+            Action<string, string> writeAllTextProvider = (string path, string contents) => _writeAllTextCalled = true;
+        }
+
+        [TestFixtureTearDown, SetUp]
         public void InitializeAndCleanup()
         {
+            _writeAllTextCalled = false;
             // delete any previous test file, before and after all and any tests
             if (File.Exists(connStorePath))
             {
@@ -40,7 +49,7 @@ namespace LinqEditor.Core.Tests
             app.Add(new SqlServerConnection { Id = Guid.NewGuid(), ConnectionString = SqlServerTestData.Connstr1, CachedSchemaFileName = "bar" });
             Assert.IsTrue(File.Exists(connStorePath));
         }
-
+        
         [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void Adding_Connection_With_No_Guid_Throws() 
@@ -85,6 +94,17 @@ namespace LinqEditor.Core.Tests
             var app = ConnectionStore.Instance;
 
             Assert.IsTrue(app.LoadingError);
+        }
+
+        [Test]
+        public void Persists_Changes_On_Dispose()
+        {
+            using (var app = ConnectionStore.Instance)
+            {
+                
+            }
+            
+            Assert.IsTrue(File.Exists(connStorePath));
         }
     }
 }

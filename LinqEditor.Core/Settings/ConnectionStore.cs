@@ -29,13 +29,21 @@ namespace LinqEditor.Core.Settings
 
                 if (connStore == null)
                 {
-                    connStore = new ConnectionStore() { _sqlServerConnections = new List<SqlServerConnection>() };
-
-                    if (exn != null)
-                    {
-                        connStore._errorLoading = true;
-                    }
+                    connStore = new ConnectionStore();
                 }
+
+                connStore._errorLoading = exn != null;
+
+                if (connStore._sqlServerConnections == null)
+                {
+                    connStore._sqlServerConnections = new List<SqlServerConnection>();
+                }
+
+                if (connStore._sqliteFileConnections == null)
+                {
+                    connStore._sqliteFileConnections = new List<SQLiteFileConnection>();
+                }
+
                 return connStore;
             }
         }
@@ -45,24 +53,34 @@ namespace LinqEditor.Core.Settings
         [JsonProperty]
         private IList<SqlServerConnection> _sqlServerConnections;
 
+        [JsonProperty]
+        private IList<SQLiteFileConnection> _sqliteFileConnections;
+
         public void Add(Connection conn)
         {
             if (conn.Id == Guid.Empty) throw new ArgumentException("connection must have id");
             if (conn.Id == CodeId) throw new ArgumentException("connection cannot use code id");
 
-            if (conn is SqlServerConnection && _sqlServerConnections.Where(x => x.Id == conn.Id).Count() == 0)
-            {
-                _sqlServerConnections.Add(conn as SqlServerConnection);
-                Save();
-
-                if (ConnectionsUpdated != null)
-                {
-                    ConnectionsUpdated();
-                }
-            }
-            else
+            // id mustn't be present in any collection
+            if (_sqlServerConnections.Where(x => x.Id == conn.Id).Count() > 0 ||
+                _sqliteFileConnections.Where(x => x.Id == conn.Id).Count() > 0)
             {
                 throw new ArgumentException("Connection id already added");
+            }
+
+            if (conn is SqlServerConnection)
+            {
+                _sqlServerConnections.Add(conn as SqlServerConnection);
+            }
+            else if (conn is SQLiteFileConnection)
+            {
+                _sqliteFileConnections.Add(conn as SQLiteFileConnection);
+            }
+
+            Save();
+            if (ConnectionsUpdated != null)
+            {
+                ConnectionsUpdated();
             }
         }
 
@@ -71,7 +89,7 @@ namespace LinqEditor.Core.Settings
             if (conn == null) throw new ArgumentNullException("Connection cannot be null");
             if (conn.Id == CodeId) throw new ArgumentException("Cannot update code connection");
 
-            foreach (var c in _sqlServerConnections)
+            foreach (Connection c in _sqlServerConnections)
             {
                 if (c.Id == conn.Id)
                 {

@@ -8,7 +8,7 @@ namespace LinqEditor.Core.Settings
     /// JSON backed settings class that easily works with rich objects
     /// </summary>
     [Serializable]
-    public abstract class ApplicationSettings
+    public abstract class ApplicationSettings : IDisposable
     {
         protected ApplicationSettings _storedInstance;
         protected bool _errorLoading;
@@ -19,9 +19,9 @@ namespace LinqEditor.Core.Settings
         protected static T Read<T>()
         {
             var path = FileName(typeof(T));
-            if (File.Exists(path))
+            if (FileSystem.Exists(path))
             {
-                var fileData = File.ReadAllText(path);
+                var fileData = FileSystem.ReadAllText(path);
                 return JsonConvert.DeserializeObject<T>(fileData);
             }
             return default(T);
@@ -31,12 +31,17 @@ namespace LinqEditor.Core.Settings
         {
             var path = FileName(GetType());
             var str = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(path, str);
+            FileSystem.WriteAllText(path, str);
         }
 
         public static string FileName(Type t)
         {
             return PathUtility.ApplicationDirectory + t.Name + ".json";
+        }
+
+        public void Dispose()
+        {
+            Save();
         }
     }
 }

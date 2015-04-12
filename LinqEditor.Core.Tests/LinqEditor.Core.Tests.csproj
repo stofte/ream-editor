@@ -74,6 +74,8 @@
     <Compile Include="ApplicationSettingsTests.cs" />
     <Compile Include="CodeContainerTests.cs" />
     <Compile Include="FileSystemTests.cs" />
+    <Compile Include="MockedFileSystemTests.cs" />
+    <Compile Include="PathUtilityTests.cs" />
     <Compile Include="SQLiteFileConnectionTests.cs" />
     <Compile Include="SqlServerConnectionTests.cs" />
     <Compile Include="SettingsStoreTests.cs" />
@@ -108,6 +110,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

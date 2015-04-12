@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Schema
 {
-    public interface IServerSchemaProvider : IDatabaseSchemaProvider
+    public interface IServerSchemaProvider<T> : IDatabaseSchemaProvider<T>
     {
-        Task<ServerSchema> GetServerSchema(Connection connection);
+        Task<ServerSchema> GetServerSchema(T connection);
     }
 }

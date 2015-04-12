@@ -30,7 +30,6 @@ namespace LinqEditor.Schema.Tests
         public async void Can_Load_Schema_For_Simple_Schema()
         {
             var provider = new SQLiteSchemaProvider();
-
         }
     }
 }

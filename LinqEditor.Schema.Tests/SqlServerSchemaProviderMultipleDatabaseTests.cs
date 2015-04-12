@@ -19,7 +19,7 @@ namespace LinqEditor.Schema.Tests
     {
         SqlServerTestDb _db1;
         SqlServerTestDb _db2;
-        Connection _connection;
+        SqlServerConnection _connection;
 
         string _schema1 = @"
 create table Foo (

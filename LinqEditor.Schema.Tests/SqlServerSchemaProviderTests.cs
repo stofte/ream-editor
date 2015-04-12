@@ -17,7 +17,7 @@ namespace LinqEditor.Schema.Tests
     public class SqlServerSchemaProviderTests
     {
         SqlServerTestDb _database;
-        Connection _connection;
+        SqlServerConnection _connection;
 
         [TestFixtureSetUp]
         public void Initialize()

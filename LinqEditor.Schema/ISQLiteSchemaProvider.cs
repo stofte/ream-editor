@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LinqEditor.Core.Models;
 
 namespace LinqEditor.Schema
 {
-    public interface ISQLiteSchemaProvider : IDatabaseSchemaProvider { }
+    public interface ISQLiteSchemaProvider : IDatabaseSchemaProvider<SQLiteConnection> { }
 }

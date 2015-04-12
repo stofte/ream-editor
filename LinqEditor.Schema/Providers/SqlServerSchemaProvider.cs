@@ -13,11 +13,10 @@ namespace LinqEditor.Schema.Providers
     public class SqlServerSchemaProvider : ISqlServerSchemaProvider
     {
         static IEnumerable<string> SystemDatabases = new [] {"master", "tempdb", "model", "msdb"};
-        
-        public async Task<ServerSchema> GetServerSchema(Connection dbConnection)
+
+        public async Task<ServerSchema> GetServerSchema(SqlServerConnection connection)
         {
-            if (dbConnection == null) throw new ArgumentNullException("dbConnection");
-            var connection = dbConnection as SqlServerConnection;
+            if (connection == null) throw new ArgumentNullException("connection");
             var hasInitialCatalog = !string.IsNullOrWhiteSpace(connection.InitialCatalog);
 
             var result = new List<DatabaseSchema>();
@@ -50,7 +49,7 @@ namespace LinqEditor.Schema.Providers
             };
         }
 
-        public async Task<DatabaseSchema> GetDatabaseSchema(Connection connection)
+        public async Task<DatabaseSchema> GetDatabaseSchema(SqlServerConnection connection)
         {
             var tables = new List<TableSchema>();
             string dbName = string.Empty;

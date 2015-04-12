@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Schema
 {
-    public interface IDatabaseSchemaProvider
+    public interface IDatabaseSchemaProvider<T>
     {
-        Task<DatabaseSchema> GetDatabaseSchema(Connection connection);
+        Task<DatabaseSchema> GetDatabaseSchema(T connection);
     }
 }

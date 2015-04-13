@@ -57,6 +57,7 @@
     <Compile Include="ISQLiteSchemaProvider.cs" />
     <Compile Include="ISqlServerSchemaProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ISchemaProvider.cs" />
     <Compile Include="Providers\SQLiteSchemaProvider.cs" />
     <Compile Include="Providers\SqlServerSchemaProvider.cs" />
     <Compile Include="SchemaProvider.cs" />

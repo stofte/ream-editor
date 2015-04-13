@@ -1,0 +1,10 @@
+*.suo
+*/**/bin
+*/**/obj
+*/**/*.csproj.user
+packages/*
+*.gpState
+*.vsp
+*.psess
+TestCoverage
+TestResult.xml

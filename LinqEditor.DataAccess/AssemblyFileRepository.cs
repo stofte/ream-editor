@@ -7,6 +7,11 @@ namespace LinqEditor.DataAccess
 {
     public class AssemblyFileRepository : IAssemblyFileRepository
     {
+        public AssemblyFileRepository()
+        {
+
+        }
+
         public async Task<string> GetAssemblyFilePath(Connection connection)
         {
             if (connection == null)

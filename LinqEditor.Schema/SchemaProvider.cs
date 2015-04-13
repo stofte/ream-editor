@@ -18,29 +18,23 @@ namespace LinqEditor.Schema
             _sqlServerProvider = sqlServerProvider;
         }
 
-        public async Task<ServerSchema> GetServerSchema(Connection connection)
+        public async Task<ServerSchema> GetServerSchema(SqlServerConnection connection)
         {
-            var sqlServer = connection as SqlServerConnection;
-            if (sqlServer != null)
-            {
-                return await _sqlServerProvider.GetServerSchema(sqlServer);
-            }
-            return null;
+            if (connection == null) throw new ArgumentNullException("connection");
+
+            return await _sqlServerProvider.GetServerSchema(connection);
         }
 
-        public async Task<DatabaseSchema> GetDatabaseSchema(Connection connection)
+        public async Task<DatabaseSchema> GetDatabaseSchema(SqlServerConnection connection)
         {
-            var sqlServer = connection as SqlServerConnection;
-            var sqlite = connection as SQLiteFileConnection;
-            if (sqlServer != null)
-            {
-                return await _sqlServerProvider.GetDatabaseSchema(sqlServer);
-            }
-            else if (sqlite != null)
-            {
-                return await _sqliteProvider.GetDatabaseSchema(sqlite);
-            }
-            return null;
+            if (connection == null) throw new ArgumentNullException("connection");
+            return await _sqlServerProvider.GetDatabaseSchema(connection);
+        }
+
+        public async Task<DatabaseSchema> GetDatabaseSchema(SQLiteFileConnection connection)
+        {
+            if (connection == null) throw new ArgumentNullException("connection");
+            return await _sqliteProvider.GetDatabaseSchema(connection);
         }
     }
 }

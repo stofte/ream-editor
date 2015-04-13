@@ -127,13 +127,5 @@ namespace LinqEditor.Schema.Tests
             var schema = await provider.GetDatabaseSchema(_sqliteConnection);
             Assert.AreSame(_schema1, schema);
         }
-
-        [Test]
-        public async void GetServerSchema_Returns_Null_When_Passing_SQLite_Connection()
-        {
-            var provider = new SchemaProvider(_sqliteProvider, _sqlServerProvider);
-            var schema = await provider.GetServerSchema(_sqliteConnection);
-            Assert.IsNull(schema);
-        }
     }
 }

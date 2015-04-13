@@ -60,6 +60,10 @@
       <Project>{53f0654d-867f-49b8-8443-4c3486fb8309}</Project>
       <Name>LinqEditor.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Schema\LinqEditor.Schema.csproj">
+      <Project>{e31fd72d-c1c2-4d41-9d8f-3919b476a1e6}</Project>
+      <Name>LinqEditor.Schema</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

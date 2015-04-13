@@ -28,6 +28,7 @@ namespace LinqEditor.DataAccess.Tests
         }
 
 
+
         [Test]
         public async void Returns_Non_Null_File_Path()
         {
@@ -37,20 +38,18 @@ namespace LinqEditor.DataAccess.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async void Passing_Null_Connection_Throws()
+        public void Passing_Null_Connection_Throws()
         {
             var provider = new AssemblyFileRepository();
-            string path = await provider.GetAssemblyFilePath(null);
+            Assert.Throws<ArgumentNullException>(async () => await provider.GetAssemblyFilePath(null));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public async void Passing_Empty_Connection_Throws()
+        public void Passing_Empty_Connection_Throws()
         {
             var provider = new AssemblyFileRepository();
             var conn = new SqlServerConnection();
-            string path = await provider.GetAssemblyFilePath(conn);
+            Assert.Throws<ArgumentException>(async () => await provider.GetAssemblyFilePath(conn));
         }
     }
 }

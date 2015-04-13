@@ -13,10 +13,9 @@ using System.Threading.Tasks;
 namespace LinqEditor.DataAccess.Tests
 {
     [TestFixture]
-    public class AssemblyFileProviderTests
+    public class AssemblyFileRepositoryTests
     {
         Connection _sqlServerConn;
-        IConnectionStore _connectionStore;
 
         [TestFixtureSetUp]
         public void Setup()
@@ -26,24 +25,14 @@ namespace LinqEditor.DataAccess.Tests
                 Id = Guid.NewGuid(),
                 ConnectionString = SqlServerTestData.Connstr1
             };
-
-            var connStore = new Mock<IConnectionStore>();
-            connStore.Setup(x => x.Connections).Returns(new Connection[] { _sqlServerConn });
-            _connectionStore = connStore.Object;
         }
 
-        [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void Passing_Null_ConnectionStore_Throws()
-        {
-            new AssemblyFileProvider(null);
-        }
 
         [Test]
         public async void Returns_Non_Null_File_Path()
         {
-            var provider = new AssemblyFileProvider(_connectionStore);
-            string path = await provider.GetSchemaPath(_sqlServerConn);
+            var provider = new AssemblyFileRepository();
+            string path = await provider.GetAssemblyFilePath(_sqlServerConn);
             Assert.IsNotNull(path);
         }
 
@@ -51,17 +40,17 @@ namespace LinqEditor.DataAccess.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public async void Passing_Null_Connection_Throws()
         {
-            var provider = new AssemblyFileProvider(_connectionStore);
-            string path = await provider.GetSchemaPath(null);
+            var provider = new AssemblyFileRepository();
+            string path = await provider.GetAssemblyFilePath(null);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
         public async void Passing_Empty_Connection_Throws()
         {
-            var provider = new AssemblyFileProvider(_connectionStore);
+            var provider = new AssemblyFileRepository();
             var conn = new SqlServerConnection();
-            string path = await provider.GetSchemaPath(conn);
+            string path = await provider.GetAssemblyFilePath(conn);
         }
     }
 }

@@ -5,21 +5,9 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.DataAccess
 {
-    public class AssemblyFileProvider : IAssemblyFileProvider
+    public class AssemblyFileRepository : IAssemblyFileRepository
     {
-        IConnectionStore _connectionStore;
-
-        public AssemblyFileProvider(IConnectionStore connectionStore)
-        {
-            if (connectionStore == null)
-            {
-                throw new ArgumentNullException("connectionStore");
-            }
-
-            _connectionStore = connectionStore;
-        }
-
-        public async Task<string> GetSchemaPath(Connection connection)
+        public async Task<string> GetAssemblyFilePath(Connection connection)
         {
             if (connection == null)
             {

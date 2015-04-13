@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.DataAccess
 {
-    public interface IAssemblyFileProvider
+    public interface IAssemblyFileRepository
     {
-        Task<string> GetSchemaPath(Connection connection);
+        Task<string> GetAssemblyFilePath(Connection connection);
     }
 }

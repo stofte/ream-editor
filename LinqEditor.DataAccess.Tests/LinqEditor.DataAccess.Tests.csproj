@@ -77,6 +77,10 @@
       <Project>{11ada22e-e214-4f00-b23e-71caee35ec75}</Project>
       <Name>LinqEditor.DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LinqEditor.Schema\LinqEditor.Schema.csproj">
+      <Project>{e31fd72d-c1c2-4d41-9d8f-3919b476a1e6}</Project>
+      <Name>LinqEditor.Schema</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LinqEditor.Test.Common\LinqEditor.Test.Common.csproj">
       <Project>{9ec90760-15fe-40ed-aaa4-fa63a79cd050}</Project>
       <Name>LinqEditor.Test.Common</Name>

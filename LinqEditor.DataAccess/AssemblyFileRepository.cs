@@ -1,5 +1,6 @@
 ﻿using LinqEditor.Core.Models;
 using LinqEditor.Core.Settings;
+using LinqEditor.Schema;
 using System;
 using System.Threading.Tasks;
 
@@ -7,9 +8,12 @@ namespace LinqEditor.DataAccess
 {
     public class AssemblyFileRepository : IAssemblyFileRepository
     {
-        public AssemblyFileRepository()
-        {
+        ISchemaProvider _schemaProvider;
 
+        public AssemblyFileRepository(ISchemaProvider schemaProvider)
+        {
+            if (schemaProvider == null) throw new ArgumentNullException("schemaProvider");
+            _schemaProvider = schemaProvider;
         }
 
         public async Task<string> GetAssemblyFilePath(Connection connection)

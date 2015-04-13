@@ -3,9 +3,9 @@ using LinqEditor.Core.Models.Database;
 using System;
 using System.Collections.Generic;
 
-namespace LinqEditor.Core.Templates.Query
+namespace LinqEditor.Core.Templates.Templates
 {
-    public partial class SqlServer 
+    public partial class DatabaseQuery 
     {
         public Guid NamespaceId { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }

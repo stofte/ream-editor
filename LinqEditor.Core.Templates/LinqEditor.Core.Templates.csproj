@@ -36,18 +36,18 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="Code\Statements.tt">
+    <None Include="Templates\CodeStatements.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Statements.cs</LastGenOutput>
+      <LastGenOutput>CodeStatements.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
-    <None Include="Schema\SqlServer.tt">
+    <None Include="Templates\DatabaseSchema.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>SqlServer.cs</LastGenOutput>
+      <LastGenOutput>DatabaseSchema.cs</LastGenOutput>
     </None>
-    <None Include="Query\SqlServer.tt">
+    <None Include="Templates\DatabaseQuery.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>SqlServer.cs</LastGenOutput>
+      <LastGenOutput>DatabaseQuery.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -57,32 +57,29 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Code\Statements.cs">
+    <Compile Include="Templates\CodeStatements.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Statements.tt</DependentUpon>
+      <DependentUpon>CodeStatements.tt</DependentUpon>
     </Compile>
-    <Compile Include="Code\Statements.partial.cs">
-      <DependentUpon>Statements.tt</DependentUpon>
+    <Compile Include="Templates\CodeStatements.partial.cs">
     </Compile>
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query\SqlServer.cs">
+    <Compile Include="Templates\DatabaseQuery.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SqlServer.tt</DependentUpon>
+      <DependentUpon>DatabaseQuery.tt</DependentUpon>
     </Compile>
     <Compile Include="SchemaConstants.cs" />
-    <Compile Include="Schema\SqlServer.cs">
+    <Compile Include="Templates\DatabaseSchema.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SqlServer.tt</DependentUpon>
+      <DependentUpon>DatabaseSchema.tt</DependentUpon>
     </Compile>
-    <Compile Include="Schema\SqlServer.partial.cs">
-      <DependentUpon>SqlServer.tt</DependentUpon>
+    <Compile Include="Templates\DatabaseSchema.partial.cs">
     </Compile>
-    <Compile Include="Query\SqlServer.partial.cs">
-      <DependentUpon>SqlServer.tt</DependentUpon>
+    <Compile Include="Templates\DatabaseQuery.partial.cs">
     </Compile>
     <Compile Include="ITemplateService.cs" />
     <Compile Include="TemplateService.cs" />
@@ -104,6 +101,7 @@
       <Name>LinqEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

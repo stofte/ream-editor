@@ -7,7 +7,7 @@ namespace LinqEditor.Core.Templates
     {
         public string GenerateSchema(Guid schemaId, DatabaseSchema sqlSchema)
         {
-            var gen = new Schema.SqlServer()
+            var gen = new Templates.DatabaseSchema
             {
                 NamespaceId = schemaId,
                 Tables = sqlSchema.Tables,
@@ -20,7 +20,7 @@ namespace LinqEditor.Core.Templates
 
         public string GenerateQuery(Guid queryId, string sourceFragment, string schemaNamespace)
         {
-            var gen = new Query.SqlServer()
+            var gen = new Templates.DatabaseQuery
             {
                 GeneratedSchemaNamespace = schemaNamespace,
                 SourceCode = sourceFragment,
@@ -32,7 +32,7 @@ namespace LinqEditor.Core.Templates
 
         public string GenerateCodeStatements(Guid codeId, string sourceFragment)
         {
-            var gen = new Code.Statements()
+            var gen = new Templates.CodeStatements
             {
                 SourceCode = sourceFragment,
                 NamespaceId = codeId

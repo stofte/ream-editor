@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace LinqEditor.Core.Templates.Schema
+namespace LinqEditor.Core.Templates.Templates
 {
     using System.Linq;
     using System.Text;
@@ -18,7 +18,7 @@ namespace LinqEditor.Core.Templates.Schema
     /// Class to produce the template output
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "12.0.0.0")]
-    public partial class SqlServer : SqlServerBase
+    public partial class DatabaseSchema : DatabaseSchemaBase
     {
         /// <summary>
         /// Create the template output
@@ -174,7 +174,7 @@ foreach(var table in Tables) {
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "12.0.0.0")]
-    public class SqlServerBase
+    public class DatabaseSchemaBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

@@ -1,9 +1,9 @@
 ﻿using LinqEditor.Core.Helpers;
 using System;
 
-namespace LinqEditor.Core.Templates.Code
+namespace LinqEditor.Core.Templates.Templates
 {
-    public partial class Statements
+    public partial class CodeStatements
     {
         public Guid NamespaceId { get; set; }
         public string SourceCode { get; set; }

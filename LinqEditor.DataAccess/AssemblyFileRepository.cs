@@ -14,9 +14,7 @@ namespace LinqEditor.DataAccess
                 throw new ArgumentNullException("connection");
             }
 
-            var sqlServer = connection as SqlServerConnection;
-
-            if (!sqlServer.IsValidConnectionString)
+            if (!connection.IsValidConnectionString)
             {
                 throw new ArgumentException("connection must contain valid connection string");
             }

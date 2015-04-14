@@ -16,6 +16,8 @@ namespace LinqEditor.Core.Models
         public Guid Id { get; set; }
         public string DisplayName { get; set; }
 
+        public string SchemaHash { get; set; }
+
         // todo: this should not be here, mapping should exists inside service itself
         public string CachedSchemaFileName { get; set; }
         public string CachedSchemaNamespace { get; set; }

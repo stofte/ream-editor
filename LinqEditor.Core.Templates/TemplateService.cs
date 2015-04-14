@@ -10,8 +10,7 @@ namespace LinqEditor.Core.Templates
             var gen = new Templates.DatabaseSchema
             {
                 NamespaceId = schemaId,
-                Tables = sqlSchema.Tables,
-                ConnectionString = sqlSchema.Connection.ConnectionString
+                Tables = sqlSchema.Tables
             };
 
             return gen.TransformText();

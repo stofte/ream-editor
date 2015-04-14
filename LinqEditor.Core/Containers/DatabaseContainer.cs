@@ -12,17 +12,17 @@ namespace LinqEditor.Core.Containers
         private string _dbType;
         private string _connectionString;
 
-        public LoadAppDomainResult Initialize(byte[] assembly)
+        public LoadAppDomainResult Initialize(byte[] assembly, params object[] args)
         {
-            return Initialize(assembly, null);
+            return InitializeInternal(assembly, null, args);
         }
 
-        public LoadAppDomainResult Initialize(string assemblyPath)
+        public LoadAppDomainResult Initialize(string assemblyPath, params object[] args)
         {
-            return Initialize(null, assemblyPath);
+            return InitializeInternal(null, assemblyPath, args);
         }
 
-        public LoadAppDomainResult Initialize()
+        public LoadAppDomainResult Initialize(params object[] args)
         {
             throw new NotImplementedException("Cannot initialize DatabaseContainer without schema");
         }
@@ -31,14 +31,20 @@ namespace LinqEditor.Core.Containers
         {
             return ExecuteInternal(assembly, null);
         }
-        
+
         public ExecuteResult Execute(string path)
         {
             return ExecuteInternal(null, path);
         }
 
-        private LoadAppDomainResult Initialize(byte[] assemblyImage, string assemblyPath)
+        private LoadAppDomainResult InitializeInternal(byte[] assemblyImage, string assemblyPath, object[] args)
         {
+            if (args == null || args.Length != 1)
+            {
+                throw new ArgumentException("connectionString missing");
+            }
+            _connectionString = args[0] as string;
+
             // probably want to make this try/catch build dependent?
             Exception exn = null;
             try
@@ -57,7 +63,6 @@ namespace LinqEditor.Core.Containers
                 // warm up connection
                 var warmupType = _baseAssembly.GetType(string.Format("{0}.Schema.WarmUpConnection", _baseAssembly.GetName().Name));
                 var instance = Activator.CreateInstance(warmupType) as IDatabaseProgram;
-                _connectionString = instance.ConnectionString();
                 var res = ExecuteInstance(instance);
                
                 base.InitializeAppDomain();

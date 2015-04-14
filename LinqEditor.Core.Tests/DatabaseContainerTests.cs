@@ -78,7 +78,7 @@ namespace LinqEditor.Core.Tests
         public void Can_Load_Initial_Schema_Assembly()
         {
             var container = new IsolatedDatabaseContainer();
-            var initResult = container.Value.Initialize(_schemaAssemblyPath);
+            var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             container.Dispose();
             Assert.IsNull(initResult.Error);
         }
@@ -87,7 +87,7 @@ namespace LinqEditor.Core.Tests
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only_Using_Byte_Assembly()
         {
             var container = new IsolatedDatabaseContainer();
-            var initResult = container.Value.Initialize(_schemaAssemblyPath);
+            var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             var executeResult = container.Value.Execute(_query2AssemblyBytes);
 
             container.Dispose();
@@ -101,7 +101,7 @@ namespace LinqEditor.Core.Tests
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_Basic_Types_Only_Using_File_Assembly()
         {
             var container = new IsolatedDatabaseContainer();
-            var initResult = container.Value.Initialize(_schemaAssemblyPath);
+            var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             var executeResult = container.Value.Execute(_query1AssemblyPath);
 
             container.Dispose();
@@ -115,7 +115,7 @@ namespace LinqEditor.Core.Tests
         public void Can_Execute_Query_Assembly_And_Fetch_Database_Rows_With_All_DataTypes()
         {
             var container = new IsolatedDatabaseContainer();
-            var initResult = container.Value.Initialize(_schemaAssemblyPath);
+            var initResult = container.Value.Initialize(_schemaAssemblyPath, _database.ConnectionString);
             var executeResult = container.Value.Execute(_query3AssemblyBytes);
 
             container.Dispose();

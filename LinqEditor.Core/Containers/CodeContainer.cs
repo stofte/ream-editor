@@ -7,17 +7,17 @@ namespace LinqEditor.Core.Containers
 {
     public class CodeContainer : ExecutionContainer, IContainer
     {
-        public LoadAppDomainResult Initialize(byte[] assembly)
+        public LoadAppDomainResult Initialize(byte[] assembly, params object[] args)
         {
             throw new NotImplementedException("Cannot initialize CodeContainer with assembly");
         }
 
-        public LoadAppDomainResult Initialize(string assemblyPath)
+        public LoadAppDomainResult Initialize(string assemblyPath, params object[] args)
         {
             throw new NotImplementedException("Cannot initialize CodeContainer with assembly");
         }
 
-        public LoadAppDomainResult Initialize()
+        public LoadAppDomainResult Initialize(params object[] args)
         {
             base.InitializeAppDomain();
             return new LoadAppDomainResult();
@@ -27,7 +27,7 @@ namespace LinqEditor.Core.Containers
         {
             return ExecuteInternal(assembly, null);
         }
-        
+
         public ExecuteResult Execute(string path)
         {
             return ExecuteInternal(null, path);

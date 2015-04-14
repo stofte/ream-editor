@@ -202,7 +202,7 @@ namespace LinqEditor.Core.Session
             else
             {
                 _databaseContainer = _databaseContainerFactory.Create();
-                var res = _databaseContainer.Value.Initialize(_connection.CachedSchemaFileName);
+                var res = _databaseContainer.Value.Initialize(_connection.CachedSchemaFileName, _connection.ConnectionString);
                 exn = res.Error;
                 DebugLogger.Log("created db " + _databaseContainer.Id);
             }

@@ -108,10 +108,7 @@ foreach(var table in Tables) {
 }
 
             this.Write("\r\n    }\r\n\r\n    public abstract class ProgramBase : IDatabaseProgram\r\n    {\r\n     " +
-                    "   private Database _db;\r\n\r\n        public string ConnectionString() { return @\"" +
-                    "");
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConnectionString));
-            this.Write("\"; }\r\n\r\n");
+                    "   private Database _db;\r\n\r\n");
  foreach(var table in Tables) { 
             this.Write("        protected IEntityTable<");
             this.Write(this.ToStringHelper.ToStringWithCulture(table.Name));

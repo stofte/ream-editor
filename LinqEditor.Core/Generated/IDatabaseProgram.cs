@@ -9,7 +9,6 @@ namespace LinqEditor.Core.Generated
     /// </summary>
     public interface IDatabaseProgram
     {
-        string ConnectionString();
         IEnumerable<DataTable> Execute(IEntityProvider entityProvider);
     }
 }

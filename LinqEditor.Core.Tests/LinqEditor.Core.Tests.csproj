@@ -44,6 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -76,6 +79,7 @@
     <Compile Include="FileSystemTests.cs" />
     <Compile Include="MockedFileSystemTests.cs" />
     <Compile Include="PathUtilityTests.cs" />
+    <Compile Include="SchemaHashTests.cs" />
     <Compile Include="SQLiteFileConnectionTests.cs" />
     <Compile Include="SqlServerConnectionTests.cs" />
     <Compile Include="SettingsStoreTests.cs" />

@@ -54,7 +54,6 @@ namespace LinqEditor.Core.Schema.Services
 
             return new DatabaseSchema
             {
-                Connection = connection,
                 Tables = tables
             };
         }

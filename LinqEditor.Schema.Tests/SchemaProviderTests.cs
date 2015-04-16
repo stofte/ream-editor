@@ -1,5 +1,6 @@
 ﻿using LinqEditor.Core.Models;
 using LinqEditor.Core.Models.Database;
+using LinqEditor.Test.Common;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -18,72 +19,15 @@ namespace LinqEditor.Schema.Tests
         SqlServerConnection _sqlServerConnection;
         SQLiteFileConnection _sqliteConnection;
 
-        DatabaseSchema _schema1;
-        ServerSchema _schema2;
-        DatabaseSchema _schema3;
+        DatabaseSchema _schema1 = SchemaTestData.Schema1;
+        ServerSchema _schema2 = SchemaTestData.Schema2;
+        DatabaseSchema _schema3 = SchemaTestData.Schema3;
 
         [TestFixtureSetUp]
         public void Initialize()
         {
             _sqlServerConnection = new SqlServerConnection();
             _sqliteConnection = new SQLiteFileConnection();
-
-            _schema1 = new DatabaseSchema
-            {
-                Name = "sqlite",
-                Tables = new List<TableSchema> 
-                { 
-                    new TableSchema 
-                    { 
-                        Name = "Foo", 
-                        Columns = new List<ColumnSchema> 
-                        { 
-                            new ColumnSchema {Index = 0, Name = "Id", Type = typeof(int)},
-                            new ColumnSchema {Index = 1, Name = "Text", Type = typeof(string)},
-                        } 
-                    } 
-                }
-            };
-
-            _schema2 = new ServerSchema
-            {
-                Databases = new List<DatabaseSchema> 
-                {
-                    new DatabaseSchema
-                    {
-                        Name = "sqlserver",
-                        Tables = new List<TableSchema> 
-                        { 
-                            new TableSchema 
-                            { 
-                                Name = "Bar", 
-                                Columns = new List<ColumnSchema> 
-                                { 
-                                    new ColumnSchema {Index = 0, Name = "Id", Type = typeof(int)},
-                                    new ColumnSchema {Index = 1, Name = "Value", Type = typeof(decimal)},
-                                } 
-                            } 
-                        }
-                    }
-                }
-            };
-
-            _schema3 = new DatabaseSchema
-            {
-                Name = "sqlserver2",
-                Tables = new List<TableSchema> 
-                { 
-                    new TableSchema 
-                    { 
-                        Name = "Baz", 
-                        Columns = new List<ColumnSchema> 
-                        { 
-                            new ColumnSchema {Index = 0, Name = "Id", Type = typeof(int)},
-                            new ColumnSchema {Index = 1, Name = "Test", Type = typeof(string)},
-                        } 
-                    } 
-                }
-            };
 
             var sqliteMock = new Mock<ISQLiteSchemaProvider>();
             var sqlserverMock = new Mock<ISqlServerSchemaProvider>();

@@ -121,9 +121,12 @@ namespace LinqEditor.Core
             set { _writeAllBytesProvider = value; }
         }
 
+        /// <summary>
+        /// Toggles file system mode, and clear stub mode dictionaries
+        /// </summary>
+        /// <param name="enableStub">enables stub mode</param>
         public static void Mode(bool enableStub)
         {
-
             if (enableStub)
             {
                 ExistsProvider = _stubExistsProvider;
@@ -140,8 +143,12 @@ namespace LinqEditor.Core
                 WriteAllTextProvider = _defaultWriteAllTextProvider;
                 WriteAllBytesProvider = _defaultWriteAllBytesProvider;
             }
+            Clear();
         }
 
+        /// <summary>
+        /// Clears internal dictionaries
+        /// </summary>
         public static void Clear()
         {
             _binaryFiles.Clear();

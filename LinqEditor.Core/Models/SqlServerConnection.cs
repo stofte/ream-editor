@@ -100,9 +100,7 @@ namespace LinqEditor.Core.Models
             get
             {
                 return DatabaseServer.Length > 0 &&
-                    InitialCatalog.Length > 0 &&
-                    (UsingIntegratedSecurity ||
-                    !UsingIntegratedSecurity && DatabaseSecurity.Length > 0);
+                    (UsingIntegratedSecurity || !UsingIntegratedSecurity && DatabaseSecurity.Length > 0);
             }
         }
 

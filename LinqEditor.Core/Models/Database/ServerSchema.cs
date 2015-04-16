@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqEditor.Core.Models.Database
 {
+    [Serializable]
     public class ServerSchema
     {
         public IEnumerable<DatabaseSchema> Databases { get; set; }

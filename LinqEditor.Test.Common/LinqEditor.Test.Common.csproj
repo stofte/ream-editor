@@ -50,6 +50,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="SchemaTestData.cs" />
     <Compile Include="SQLiteTestData.cs" />
     <Compile Include="SqlServerTestData.cs" />
     <Compile Include="SourceCodeFragments.cs" />

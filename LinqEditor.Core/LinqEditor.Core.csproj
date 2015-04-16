@@ -139,6 +139,7 @@
     <Compile Include="Helpers\DebugLogger.cs" />
     <Compile Include="Helpers\GuidHelper.cs" />
     <Compile Include="Generated\IDatabaseProgram.cs" />
+    <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Installers\Installer.cs" />
     <Compile Include="Models\Analysis\AccessibilityModifier.cs" />

@@ -80,6 +80,7 @@
     <Compile Include="MockedFileSystemTests.cs" />
     <Compile Include="PathUtilityTests.cs" />
     <Compile Include="SchemaHashTests.cs" />
+    <Compile Include="SerializationHelperTests.cs" />
     <Compile Include="SQLiteFileConnectionTests.cs" />
     <Compile Include="SqlServerConnectionTests.cs" />
     <Compile Include="SettingsStoreTests.cs" />

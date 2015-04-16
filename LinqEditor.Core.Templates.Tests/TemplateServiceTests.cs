@@ -25,10 +25,6 @@ namespace LinqEditor.Core.Templates.Tests
 
             _schemaModel = new DatabaseSchema
             {
-                Connection = new SqlServerConnection
-                {
-                    ConnectionString = SqlServerTestData.Connstr1
-                },
                 Tables = new List<TableSchema>
                 {
                     new TableSchema 

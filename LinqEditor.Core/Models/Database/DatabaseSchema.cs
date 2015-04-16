@@ -9,7 +9,6 @@ namespace LinqEditor.Core.Models.Database
     {
         public string Name { get; set; }
         public string AssemblyPath { get; set; }
-        public Connection Connection { get; set; }
         public IEnumerable<TableSchema> Tables { get; set; }
     }
 }

@@ -32,5 +32,6 @@ build_script:
     - ps: pop-location
     - ps: push-location "shell"
     - npm install
+    - npm run ts-once
     - node build.js
     - ps: pop-location

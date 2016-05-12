@@ -10,6 +10,7 @@
   "scripts": {
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
+    "ts-once": "tsc",
     "lint": "tslint ./app/**/*.ts -t verbose"
   },
   "dependencies": {

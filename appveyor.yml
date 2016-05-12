@@ -24,7 +24,7 @@ install:
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 
 build_script:
-    - ps: push-location query-engine
+    - ps: push-location "query-engine"
     - ps: dotnet restore
     - ps: dotnet build
-    - ps: pop-location query-engine
+    - ps: pop-location

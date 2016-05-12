@@ -1,0 +1,3 @@
+# version = build id
+version: 0.1.0.{build}
+test: off # this turns of AppVeyor automatic searching for test-assemblies

@@ -1,0 +1,1 @@
+{ "ConnectionString": "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=Opera18500DB", "Text": "CodeListItem.Take(10).Select(x => new { MyValue = x.Key + \" - \" + x.Description }).Dump();" }

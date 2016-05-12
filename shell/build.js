@@ -1,7 +1,7 @@
 var path = require("path");
 var Builder = require('systemjs-builder');
 var fs = require('fs');
-var UglifyJS = require("uglify-js2");
+var UglifyJS = require("uglify-js");
 var CleanCSS = require('clean-css');
 
 // optional constructor options

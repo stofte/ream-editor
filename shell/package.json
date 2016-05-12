@@ -45,6 +45,6 @@
     "retyped-lodash-tsd-ambient": "*",
     "systemjs-builder": "^0.15.16",
     "typescript": "^1.8.10",
-    "uglify-js2": "^2.1.11"
+    "uglify-js": "^2.6.2"
   }
 }

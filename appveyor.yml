@@ -10,7 +10,7 @@ cache:
   - '%USERPROFILE%\.nuget\packages -> query-engine\project.json' # project.json cache
 
 environment:
-  CLI_VERSION: 1.0.0-rc2-3002659
+  CLI_VERSION: latest
   CLI_ARCH: x64
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml

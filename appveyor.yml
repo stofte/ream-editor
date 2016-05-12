@@ -3,8 +3,9 @@ version: 0.1.0.{build}
 test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 environment:
-  CLI_VERSION: latest
-  CLI_ARCH: x64
+  win8_x64:
+    - CLI_VERSION: latest
+    - CLI_ARCH: x64
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
   # Download install script to install .NET cli in .dotnet dir

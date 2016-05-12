@@ -28,3 +28,6 @@ build_script:
     - ps: dotnet restore
     - ps: dotnet build
     - ps: pop-location
+    - ps: push-location "shell"
+    - ps: node build.js
+    - ps: pop-location

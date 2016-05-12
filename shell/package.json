@@ -4,8 +4,7 @@
   "scripts": {
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
-    "lint": "tslint ./app/**/*.ts -t verbose",
-    "typings": "typings"
+    "lint": "tslint ./app/**/*.ts -t verbose"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
@@ -27,17 +26,19 @@
     "node-uuid": "^1.4.7",
     "normalizecss": "^3.0.0",
     "reflect-metadata": "^0.1.3",
-    "retyped-angular2-tsd-ambient": "^1.6.2-0",
-    "retyped-codemirror-tsd-ambient": "0.0.0-0",
-    "retyped-es6-shim-tsd-ambient": "^0.31.2-0",
     "rxjs": "5.0.0-beta.6",
     "systemjs": "0.19.27",
     "zone.js": "^0.6.12"
   },
   "devDependencies": {
+    "clean-css": "^3.4.12",
     "electron-prebuilt": "^0.37.8",
+    "retyped-angular2-tsd-ambient": "^1.6.2-0",
+    "retyped-codemirror-tsd-ambient": "0.0.0-0",
+    "retyped-es6-shim-tsd-ambient": "^0.31.2-0",
+    "retyped-lodash-tsd-ambient": "*",
+    "systemjs-builder": "^0.15.16",
     "typescript": "^1.8.10",
-    "retyped-codemirror-tsd-ambient": "*",
-    "retyped-lodash-tsd-ambient": "*"
+    "uglify-js2": "^2.1.11"
   }
 }

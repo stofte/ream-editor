@@ -1,6 +1,12 @@
 {
   "name": "shell",
   "version": "0.1.0",
+  "description": "linq-editor shell",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stofte/linq-editor.git"
+  },
   "scripts": {
     "start": "electron electron-main.js",
     "ts": "start tsc -w",

@@ -3,15 +3,15 @@ version: 0.1.0.{build}
 test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 environment:
-  - CLI_VERSION: 1.0.0-rc2-002659
-  - CLI_VERSION: Latest
+  CLI_VERSION: latest
+  CLI_ARCH: x64
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
   # Download install script to install .NET cli in .dotnet dir
   - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
   - ps: Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1" -OutFile ".\scripts\obtain\install.ps1"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
-  - ps: '& .\scripts\obtain\install.ps1 -Channel "preview" -version "$env:CLI_VERSION" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
+  - ps: '& .\scripts\obtain\install.ps1 -Channel "preview" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   # add dotnet to PATH
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 

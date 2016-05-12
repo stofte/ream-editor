@@ -29,5 +29,6 @@ build_script:
     - ps: dotnet build
     - ps: pop-location
     - ps: push-location "shell"
+    - ps: npm install
     - ps: node build.js
     - ps: pop-location

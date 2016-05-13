@@ -38,7 +38,7 @@ build_script:
   - npm install -g tsdm
   - tsdm rewire
   - npm run ts-once
-  - node build.js %OUTPATH%
+  - npm run bundle
   - npm run package
   # include omnisharp in dist
   - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH\omnisharp%

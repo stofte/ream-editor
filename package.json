@@ -1,7 +1,7 @@
 {
   "name": "shell",
   "version": "0.1.0",
-  "description": "link-editor",
+  "description": "linq-editor",
   "private": true,
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "ts": "start tsc -w",
     "ts-once": "tsc",
     "bundle": "node build-app.js",
-    "package": "electron-packager ./ linq-editor --platform=win32 --arch=x64 --out=%OUTPATH%",
+    "package": "electron-packager ./ --platform=win32 --arch=x64 --out=%OUTPATH% --ignore\"(app|build|query|scripts)\"",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire"
   },

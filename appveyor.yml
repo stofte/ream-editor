@@ -36,14 +36,13 @@ install:
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
 
 build_script:
-  - ps: dotnet restore
-  - ps: dotnet publish --configuration Release --output "$env:OUTPATH\query"
   - npm install
   - npm run ts-once
   - npm run bundle %OUTPATH%
   - npm run package
-  # include omnisharp in dist
-  - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH%\omnisharp
+  - ps: dotnet restore
+  - ps: dotnet publish --configuration Release --output "$env:OUTPATH\query"
+
   # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
   - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" "%OUTPATH%\query\dotnet.exe"
   - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" "%OUTPATH%\query\hostfxr.dll"
@@ -52,7 +51,9 @@ build_script:
   - copy NuGet.Config "%OUTPATH%\query\NuGet.Config"
   - copy project.json "%OUTPATH%\query\project.json"
   - copy project.lock.json "%OUTPATH%\query\project.lock.json"
- 
+  # include omnisharp in dist
+  - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH%\omnisharp
+
 after_build:
   - cd %OUTPATH%
   - dir
@@ -62,4 +63,7 @@ after_build:
   - cd query
   - dir
   - cd %BUILD_BASE%
-  - 7z a linq-editor-build.zip build
+  - 7z a %ELECTRON_OUT%.zip build
+
+artifacts:
+  - path: %ELECTRON_OUT%.zip

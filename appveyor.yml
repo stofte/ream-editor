@@ -10,24 +10,23 @@ environment:
   OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-alpha13/omnisharp-win-x64-netcoreapp1.0.zip
   OMNISHARP_ZIP: v1.9-alpha13-omnisharp-win-x64-netcoreapp1.0.zip
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
+  PACKAGE_BASE: build
   ELECTRON_OUT: linq-editor-win32-x64
-  OUTPATH: build\%ELECTRON_OUT%
 
 cache:
-  - node_modules # local npm modules
+  - 'node_modules -> package.json' # local npm modules
   - '%APPDATA%\npm-cache -> package.json' # npm cache
   - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
   - '%OMNISHARP_ZIP%'
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
-  - echo %OUTPATH%
   - ps: $env:BUILD_BASE=$env:CD
   # upgrades to latest node
   - ps: Install-Product node ''
   # Download install script to install .NET cli in .dotnet dir
   - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
-  - ps: mkdir -Force ".\build" | Out-Null
+  - ps: mkdir -Force $env:PACKAGE_BASE | Out-Null
   - ps: Invoke-WebRequest "$env:DOTNETCLI_URL" -OutFile ".\scripts\obtain\install.ps1"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
@@ -37,25 +36,28 @@ install:
 
 build_script:
   - npm install
-  - npm run ts-once
-  - npm run bundle %OUTPATH%
-  - npm run package
+  - npm run ts-build
+  - npm run bundle %PACKAGE_BASE%
+  # copy other web resources
+  - copy index.html %PACKAGE_BASE%
+  - copy systemjs.config.js %PACKAGE_BASE%
+  # builds query service
   - ps: dotnet restore
-  - ps: dotnet publish --configuration Release --output "$env:OUTPATH\query"
-
+  - ps: dotnet publish --configuration Release --output "$env:PACKAGE_BASE\query"
   # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
-  - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" "%OUTPATH%\query\dotnet.exe"
-  - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" "%OUTPATH%\query\hostfxr.dll"
-  - xcopy "%DOTNET_INSTALL_DIR%\shared" "%OUTPATH%\query\shared\" /y /s
+  - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" %PACKAGE_BASE%\query\dotnet.exe
+  - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" %PACKAGE_BASE%\query\hostfxr.dll
+  - xcopy "%DOTNET_INSTALL_DIR%\shared" "%PACKAGE_BASE%\query\shared\" /y /s
   # need project.json to allow resolving references at runtime
-  - copy NuGet.Config "%OUTPATH%\query\NuGet.Config"
-  - copy project.json "%OUTPATH%\query\project.json"
-  - copy project.lock.json "%OUTPATH%\query\project.lock.json"
+  - copy NuGet.Config %PACKAGE_BASE%\query\NuGet.Config
+  - copy project.json %PACKAGE_BASE%\query\project.json
+  - copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
   # include omnisharp in dist
-  - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH%\omnisharp
-
+  - 7z x %OMNISHARP_ZIP% -y -o%PACKAGE_BASE%\omnisharp
+  # bundle everything in the package folder
+  - npm run electron_package_appveyor
 after_build:
-  - cd %OUTPATH%
+  - cd %PACKAGE_BASE%
   - dir
   - cd omnisharp
   - dir
@@ -63,7 +65,7 @@ after_build:
   - cd query
   - dir
   - cd %BUILD_BASE%
-  - 7z a %ELECTRON_OUT%.zip %OUTPATH%
+  - 7z a %ELECTRON_OUT%.zip %ELECTRON_OUT%
 
 artifacts:
   - path: '%ELECTRON_OUT%.zip'

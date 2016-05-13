@@ -10,9 +10,9 @@
   "scripts": {
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
-    "ts-once": "tsc",
+    "ts-build": "tsc",
     "bundle": "node build-app.js",
-    "package": "electron-packager ./ --platform=win32 --arch=x64 --out=%OUTPATH% --ignore\"(app|build|query|scripts)\"",
+    "electron_package_appveyor": "electron-packager %PACKAGE_BASE% --platform=win32 --arch=x64",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire"
   },

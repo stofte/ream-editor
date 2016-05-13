@@ -35,8 +35,6 @@ build_script:
   - ps: dotnet restore
   - ps: dotnet publish --configuration Release --output "$env:OUTPATH\query"
   - npm install
-  - npm install -g tsdm
-  - tsdm rewire
   - npm run ts-once
   - npm run bundle
   - npm run package
@@ -45,7 +43,7 @@ build_script:
   # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
   - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" "%OUTPATH%\query\dotnet.exe"
   - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" "%OUTPATH%\query\hostfxr.dll"
-  - xcopy "%DOTNET_INSTALL_DIR%\shared" "%OUTPATH%\query\shared" /y /s
+  - xcopy "%DOTNET_INSTALL_DIR%\shared" "%CD%\%OUTPATH%\query\shared" /y /s
   # need project.json to allow resolving references at runtime
   - copy NuGet.Config "%OUTPATH%\query\NuGet.Config"
   - copy project.json "%OUTPATH%\query\project.json"
@@ -54,3 +52,11 @@ build_script:
 after_build:
   - cd %OUTPATH%
   - dir
+  - cd omnisharp
+  - dir
+  - cd ..
+  - cd query
+  - dir
+  - cd ..
+  - cd ..
+  - 7z a linq-editor-build.zip build

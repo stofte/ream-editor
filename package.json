@@ -13,7 +13,8 @@
     "ts-once": "tsc",
     "bundle": "node build-app.js %OUTPATH%",
     "package": "electron-packager ./ linq-editor --platform=win32 --arch=x64 --out=%OUTPATH%",
-    "lint": "tslint ./app/**/*.ts -t verbose"
+    "lint": "tslint ./app/**/*.ts -t verbose",
+    "postinstall": "tsdm rewire"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
@@ -48,6 +49,8 @@
     "retyped-es6-shim-tsd-ambient": "^0.31.2-0",
     "retyped-lodash-tsd-ambient": "*",
     "systemjs-builder": "^0.15.16",
+    "tsdm": "0.1.0-3",
+    "tslint": "^3.10.1",
     "typescript": "^1.8.10",
     "uglify-js": "^2.6.2"
   }

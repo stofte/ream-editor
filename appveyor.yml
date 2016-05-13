@@ -37,4 +37,5 @@ build_script:
     - npm run ts-once -v
     - npm run ts-once
     - node build.js
+    - npm run package
     - ps: pop-location

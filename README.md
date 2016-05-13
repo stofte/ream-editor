@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/s7adk4g4bu8dmh9k?svg=true)](https://ci.appveyor.com/project/stofte/linq-editor)
+
 TODO
 ----
 

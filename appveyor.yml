@@ -30,6 +30,7 @@ build_script:
     - ps: dotnet publish
     - ps: pop-location
     - ps: push-location "shell"
+    - ps: Install-Product node ''
     - npm install
     - npm install -g tsdm
     - tsdm rewire

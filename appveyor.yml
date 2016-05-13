@@ -47,8 +47,9 @@ build_script:
   - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" "%OUTPATH%\query\hostfxr.dll"
   - xcopy "%DOTNET_INSTALL_DIR%\shared" "%OUTPATH%\query\shared" /y /s
   # need project.json to allow resolving references at runtime
-  - copy project.json "%OUTPATH%\project.json"
-  - copy project.lock.json "%OUTPATH%\project.lock.json"
+  - copy NuGet.Config "%OUTPATH%\query\NuGet.Config"
+  - copy project.json "%OUTPATH%\query\project.json"
+  - copy project.lock.json "%OUTPATH%\query\project.lock.json"
  
  after_build:
    - cd %OUTPATH%

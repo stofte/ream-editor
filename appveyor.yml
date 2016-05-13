@@ -42,7 +42,7 @@ build_script:
     - npm run package
     - ps: pop-location
     - ps: push-location build
-    - 7z x omnisharp.zip
+    - 7z x omnisharp.zip 
     - del omnisharp.zip
     - dir
     - xcopy %DOTNET_INSTALL_DIR% query-engine

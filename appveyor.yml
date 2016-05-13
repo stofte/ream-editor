@@ -66,4 +66,4 @@ after_build:
   - 7z a %ELECTRON_OUT%.zip %OUTPATH%
 
 artifacts:
-  - path: %ELECTRON_OUT%.zip
+  - path: '%ELECTRON_OUT%.zip'

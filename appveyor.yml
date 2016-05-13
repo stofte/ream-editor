@@ -11,7 +11,7 @@ environment:
   OMNISHARP_ZIP: v1.9-alpha13-omnisharp-win-x64-netcoreapp1.0.zip
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
   ELECTRON_OUT: linq-editor-win32-x64
-  OUTPATH: build\$env:ELECTRON_OUT
+  OUTPATH: build\%ELECTRON_OUT%
 
 cache:
   - node_modules # local npm modules
@@ -21,6 +21,7 @@ cache:
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
+  - echo %OUTPATH%
   - ps: $env:BUILD_BASE=$env:CD
   # upgrades to latest node
   - ps: Install-Product node ''

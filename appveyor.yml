@@ -34,6 +34,7 @@ build_script:
     - npm install
     - npm install -g tsdm
     - tsdm rewire
-    - npm run ts-once 
+    - npm run ts-once -v
+    - npm run ts-once
     - node build.js
     - ps: pop-location

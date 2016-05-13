@@ -36,26 +36,8 @@ install:
 
 build_script:
   - npm install
-  - npm run ts-build
-  - npm run bundle %PACKAGE_BASE%
-  # copy other web resources
-  - copy index.html %PACKAGE_BASE%
-  - copy systemjs.config.js %PACKAGE_BASE%
-  # builds query service
-  - ps: dotnet restore
-  - ps: dotnet publish --configuration Release --output "$env:PACKAGE_BASE\query"
-  # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
-  - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" %PACKAGE_BASE%\query\dotnet.exe
-  - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" %PACKAGE_BASE%\query\hostfxr.dll
-  - xcopy "%DOTNET_INSTALL_DIR%\shared" "%PACKAGE_BASE%\query\shared\" /y /s
-  # need project.json to allow resolving references at runtime
-  - copy NuGet.Config %PACKAGE_BASE%\query\NuGet.Config
-  - copy project.json %PACKAGE_BASE%\query\project.json
-  - copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
-  # include omnisharp in dist
-  - 7z x %OMNISHARP_ZIP% -y -o%PACKAGE_BASE%\omnisharp
-  # bundle everything in the package folder
-  - npm run electron_package_appveyor
+  - .\build.ps1
+
 after_build:
   - cd %PACKAGE_BASE%
   - dir
@@ -65,7 +47,6 @@ after_build:
   - cd query
   - dir
   - cd %BUILD_BASE%
-  - 7z a %ELECTRON_OUT%.zip %ELECTRON_OUT%
 
 artifacts:
   - path: '%ELECTRON_OUT%.zip'

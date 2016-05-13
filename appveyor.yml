@@ -51,6 +51,6 @@ build_script:
   - copy project.json "%OUTPATH%\query\project.json"
   - copy project.lock.json "%OUTPATH%\query\project.lock.json"
  
- after_build:
-   - cd %OUTPATH%
-   - dir
+after_build:
+  - cd %OUTPATH%
+  - dir

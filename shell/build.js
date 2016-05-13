@@ -3,20 +3,21 @@ var Builder = require('systemjs-builder');
 var fs = require('fs');
 var UglifyJS = require("uglify-js");
 var CleanCSS = require('clean-css');
+var output = process.argv[2] + '/';
 
 // optional constructor options
 // sets the baseURL and loads the configuration file
 var builder = new Builder('./', 'systemjs.config.js');
 var start = new Date().getTime();
 builder
-.bundle('app/main.js', 'bundle.js')
+.bundle('app/main.js', output + 'bundle.js')
 .then(function() {
-	var result = UglifyJS.minify([ 'bundle.js' ], {
-	    outSourceMap: "bundle.js.map"
+	var result = UglifyJS.minify([ output + 'bundle.js' ], {
+	    outSourceMap: output + 'bundle.js.map'
 	});
-	fs.writeFile('bundle.js.map', result.map, (err) => {
+	fs.writeFile(output + 'bundle.js.map', result.map, (err) => {
 		if (err) throw err;
-		fs.writeFile('bundle.js', result.code, (err) => {
+		fs.writeFile(output + 'bundle.js', result.code, (err) => {
 			if (err) throw err;
 			var end = new Date().getTime();
 		  	console.log('JS finished in', ((end - start) / 1000 / 60).toFixed(3), 'minute(s)');
@@ -37,9 +38,9 @@ var css = new CleanCSS().minify([
 	'node_modules/codemirror/addon/hint/show-hint.css',
 	'styles.css'
 ]);
-fs.writeFile('bundle.css.map', css.sourceMap, (err) => {
+fs.writeFile(output + 'bundle.css.map', css.sourceMap, (err) => {
 	if (err) throw err;
-	fs.writeFile('bundle.css', css.styles, (err) => {
+	fs.writeFile(output + 'bundle.css', css.styles, (err) => {
 		if (err) throw err;
 		var end = new Date().getTime();
 	  	console.log('CSS finished in', ((end - start) / 1000 / 60).toFixed(3), 'minute(s)');

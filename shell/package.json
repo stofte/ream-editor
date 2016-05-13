@@ -11,7 +11,7 @@
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
     "ts-once": "tsc",
-    "package": "electron-packager ./ linq-editor --platform=win32 --arch=x64 --out=../build",
+    "package": "electron-packager ./ linq-editor --platform=win32 --arch=x64 --out=%OUTPATH%",
     "lint": "tslint ./app/**/*.ts -t verbose"
   },
   "dependencies": {

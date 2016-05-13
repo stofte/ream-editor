@@ -31,7 +31,8 @@ install:
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-  - ps: Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP"
+  - ps: 'If (Test-Path $env:OMNISHARP_ZIP) { "cached omnisharp" }'
+  - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
 
 build_script:
   - ps: dotnet restore

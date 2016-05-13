@@ -27,7 +27,6 @@ install:
 build_script:
     - ps: push-location "query-engine"
     - ps: dotnet restore
-    - ps: dotnet build
     - ps: dotnet publish
     - ps: pop-location
     - ps: push-location "shell"

@@ -14,16 +14,20 @@ environment:
   CLI_ARCH: x64
   OUTPATH: ../build
   OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-alpha13/omnisharp-win-x64-netcoreapp1.0.zip
+  DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
   # Download install script to install .NET cli in .dotnet dir
   - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
-  - ps: Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1" -OutFile ".\scripts\obtain\install.ps1"
+  - ps: Invoke-WebRequest "$env:DOTNETCLI_URL" -OutFile ".\scripts\obtain\install.ps1"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   # add dotnet to PATH
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: dir .\dotnetcli
+  # download omnisharp
+  - ps: Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile ".\build\omnisharp.zip"
 
 build_script:
     - ps: push-location "query-engine"
@@ -39,7 +43,6 @@ build_script:
     - node build.js %OUTPATH%
     - npm run package
     - ps: pop-location
-    - ps: Invoke-WebRequest $env:OMNISHARP_URL -OutFile ".\build\omnisharp.zip"
     - ps: push-location build
     - 7zip x omnisharp.zip
     - del omnisharp.zip

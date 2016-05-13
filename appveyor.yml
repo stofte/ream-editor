@@ -41,7 +41,7 @@ build_script:
   - npm run bundle
   - npm run package
   # include omnisharp in dist
-  - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH\omnisharp%
+  - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH%\omnisharp
   # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
   - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" "%OUTPATH%\query\dotnet.exe"
   - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" "%OUTPATH%\query\hostfxr.dll"

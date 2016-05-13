@@ -63,7 +63,7 @@ after_build:
   - cd query
   - dir
   - cd %BUILD_BASE%
-  - 7z a %ELECTRON_OUT%.zip build
+  - 7z a %ELECTRON_OUT%.zip %OUTPATH%
 
 artifacts:
   - path: %ELECTRON_OUT%.zip

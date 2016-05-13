@@ -11,7 +11,7 @@
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
     "ts-once": "tsc",
-    "bundle": "node build-app.js %OUTPATH%",
+    "bundle": "node build-app.js",
     "package": "electron-packager ./ linq-editor --platform=win32 --arch=x64 --out=%OUTPATH%",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire"

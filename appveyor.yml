@@ -13,6 +13,7 @@ environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
   OUTPATH: ../build
+  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-alpha13/omnisharp-win-x64-netcoreapp1.0.zip
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
@@ -27,7 +28,7 @@ install:
 build_script:
     - ps: push-location "query-engine"
     - ps: dotnet restore
-    - ps: dotnet publish
+    - ps: dotnet publish --configuration Release --output "$env:OUTPATH"
     - ps: pop-location
     - ps: push-location "shell"
     - ps: Install-Product node ''
@@ -37,4 +38,9 @@ build_script:
     - npm run ts-once
     - node build.js %OUTPATH%
     - npm run package
+    - ps: pop-location
+    - ps: Invoke-WebRequest $env:OMNISHARP_URL -OutFile ".\build\omnisharp.zip"
+    - ps: push-location build
+    - 7zip x omnisharp.zip
+    - del omnisharp.zip
     - ps: pop-location

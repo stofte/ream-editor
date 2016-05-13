@@ -22,7 +22,7 @@ builder
 		fs.writeFile(output + 'bundle.js', result.code, (err) => {
 			if (err) throw err;
 			var end = new Date().getTime();
-		  	console.log('JS finished in', ((end - start) / 1000 / 60).toFixed(3), 'minute(s)');
+		  	console.log('JS finished in', ((end - start) / 1000).toFixed(0), 'seconds');
 		});
 	});
 
@@ -44,7 +44,7 @@ fs.writeFile(output + 'bundle.css.map', css.sourceMap, (err) => {
 	fs.writeFile(output + 'bundle.css', css.styles, (err) => {
 		if (err) throw err;
 		var end = new Date().getTime();
-	  	console.log('CSS finished in', ((end - start) / 1000 / 60).toFixed(3), 'minute(s)');
+	  	console.log('CSS finished in', ((end - start) / 1000).toFixed(0), 'seconds');
 	});
 });
 

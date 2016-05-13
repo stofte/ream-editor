@@ -25,7 +25,7 @@ install:
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   # add dotnet to PATH
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-  - ps: dir .\dotnetcli
+  - ps: dir .\.dotnetcli
   # download omnisharp
   - ps: Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile ".\build\omnisharp.zip"
 

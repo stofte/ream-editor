@@ -1,7 +1,7 @@
 {
   "name": "shell",
   "version": "0.1.0",
-  "description": "linq-editor shell",
+  "description": "link-editor",
   "private": true,
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
     "ts-once": "tsc",
-    "package": "electron-packager . 'Link Editor' --platform=win32 --arch=x64 --out=../out",
+    "package": "electron-packager ./ --platform=win32 --arch=x64 --out=../build",
     "lint": "tslint ./app/**/*.ts -t verbose"
   },
   "dependencies": {

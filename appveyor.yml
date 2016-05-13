@@ -16,7 +16,7 @@ cache:
   - node_modules # local npm modules
   - '%APPDATA%\npm-cache -> package.json' # npm cache
   - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
-  - %OMNISHARP_ZIP%
+  - '%OMNISHARP_ZIP%'
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:

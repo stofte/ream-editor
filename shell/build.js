@@ -30,7 +30,6 @@ builder
 	console.log(err);
 });
 
-
 var css = new CleanCSS().minify([
 	'node_modules/normalizecss/normalize.css',
 	'node_modules/bootstrap/dist/css/bootstrap.css',

@@ -1,3 +1,11 @@
 omnisharp
 artifacts
 build
+typings
+node_modules
+app/**/*.js
+app/**/*.js.map
+bundle.*
+bin
+obj
+project.lock.json

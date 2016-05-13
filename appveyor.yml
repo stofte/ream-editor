@@ -4,20 +4,24 @@ test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 os: Windows Server 2012
 
-cache:
-  - shell\node_modules # local npm modules
-  - '%APPDATA%\npm-cache -> shell\package.json' # npm cache
-  - '%USERPROFILE%\.nuget\packages -> query-engine\project.json' # project.json cache
-
 environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
-  OUTPATH: ../build
+  OUTPATH: build
   OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-alpha13/omnisharp-win-x64-netcoreapp1.0.zip
+  OMNISHARP_ZIP: v1.9-alpha13-omnisharp-win-x64-netcoreapp1.0.zip
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
+
+cache:
+  - node_modules # local npm modules
+  - '%APPDATA%\npm-cache -> package.json' # npm cache
+  - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
+  - %OMNISHARP_ZIP%
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
+  # upgrades to latest node
+  - ps: Install-Product node ''
   # Download install script to install .NET cli in .dotnet dir
   - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
   - ps: mkdir -Force ".\build" | Out-Null
@@ -25,27 +29,24 @@ install:
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-  - ps: Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile ".\build\omnisharp.zip"
+  - ps: Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP"
 
 build_script:
-    - ps: push-location "query-engine"
-    - ps: dotnet restore
-    - ps: dotnet publish --configuration Release --output "$env:OUTPATH"
-    - ps: pop-location
-    - ps: push-location "shell"
-    - ps: Install-Product node ''
-    - npm install
-    - npm install -g tsdm
-    - tsdm rewire
-    - npm run ts-once
-    - node build.js %OUTPATH%
-    - npm run package
-    - ps: pop-location
-    - ps: push-location build
-    - 7z x omnisharp.zip -y
-    - del omnisharp.zip
-    # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
-    - copy "%DOTNET_INSTALL_DIR%/dotnet.exe" "query-engine/dotnet.exe"
-    - copy "%DOTNET_INSTALL_DIR%/hostfxr.dll" "query-engine/hostfxr.dll"
-    - xcopy "%DOTNET_INSTALL_DIR%/shared" "query-engine/shared" /y /s
-    - ps: pop-location
+  - ps: dotnet restore
+  - ps: dotnet publish --configuration Release --output "$env:OUTPATH\query"
+  - npm install
+  - npm install -g tsdm
+  - tsdm rewire
+  - npm run ts-once
+  - node build.js %OUTPATH%
+  - npm run package
+  # include omnisharp in dist
+  - 7z x %OMNISHARP_ZIP% -y -o%OUTPATH\omnisharp%
+  # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
+  - copy "%DOTNET_INSTALL_DIR%\dotnet.exe" "%OUTPATH%\query\dotnet.exe"
+  - copy "%DOTNET_INSTALL_DIR%\hostfxr.dll" "%OUTPATH%\query\hostfxr.dll"
+  - xcopy "%DOTNET_INSTALL_DIR%\shared" "%OUTPATH%\query\shared" /y /s
+ 
+ after_build:
+   - cd %OUTPATH%
+   - dir

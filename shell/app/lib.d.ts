@@ -9,4 +9,5 @@ declare module "node-uuid" {
 declare module CodeMirror {
     var keyMap: any;
     var hint: any;
+    var registerHelper: any;
 }

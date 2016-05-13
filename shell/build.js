@@ -5,6 +5,8 @@ var UglifyJS = require("uglify-js");
 var CleanCSS = require('clean-css');
 var output = process.argv[2] + '/';
 
+fs.mkdirSync(output);
+
 // optional constructor options
 // sets the baseURL and loads the configuration file
 var builder = new Builder('./', 'systemjs.config.js');
@@ -26,7 +28,7 @@ builder
 
 })
 .catch(function(err) {
-	console.log('Build error');
+	console.log('JS build error');
 	console.log(err);
 });
 

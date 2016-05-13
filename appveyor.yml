@@ -45,5 +45,5 @@ build_script:
     - 7z x omnisharp.zip -y
     - del omnisharp.zip
     - dir
-    - xcopy %DOTNET_INSTALL_DIR%/ ./query-engine/ /s /y
+    - xcopy "%DOTNET_INSTALL_DIR%" "query-engine" /s /y
     - ps: pop-location

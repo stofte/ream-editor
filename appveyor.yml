@@ -20,7 +20,7 @@ environment:
 install:
   # Download install script to install .NET cli in .dotnet dir
   - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
-  - ps: mkdir -Force ".\build"" | Out-Null
+  - ps: mkdir -Force ".\build" | Out-Null
   - ps: Invoke-WebRequest "$env:DOTNETCLI_URL" -OutFile ".\scripts\obtain\install.ps1"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'

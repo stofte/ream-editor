@@ -1,7 +1,7 @@
 {
-  "name": "shell",
+  "name": "linq-editor",
   "version": "0.1.0",
-  "description": "linq-editor",
+  "description": "query databases by writing c# and linq",
   "private": true,
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "ts": "start tsc -w",
     "ts-build": "tsc",
     "bundle": "node build-app.js",
-    "electron_package_appveyor": "electron-packager %PACKAGE_BASE% --platform=win32 --arch=x64",
+    "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --out=./",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire"
   },

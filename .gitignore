@@ -9,3 +9,4 @@ bundle.*
 bin
 obj
 project.lock.json
+omnisharp-win-x64-netcoreapp1.0.zip

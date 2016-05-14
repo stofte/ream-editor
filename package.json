@@ -11,7 +11,7 @@
     "start": "electron electron-main.js",
     "ts": "start tsc -w",
     "ts-build": "tsc",
-    "bundle": "node build-app.js",
+    "bundle": "node bundle-app.js",
     "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --out=./",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire"

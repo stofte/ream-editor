@@ -1,3 +1,9 @@
+if (-Not($env:CI)){
+    $env:PACKAGE_BASE="build"
+    $env:ELECTRON_OUT="linq-editor-win32-x64"
+    $env:DOTNET_INSTALL_DIR="C:\Program Files\dotnet"
+    $env:OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.0.zip"
+}
 mkdir -Force $env:PACKAGE_BASE | Out-Null
 remove-item $env:PACKAGE_BASE\* -recurse
 npm install

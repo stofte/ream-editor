@@ -7,7 +7,7 @@ copy electron-main.js $env:PACKAGE_BASE
 npm install
 npm run ts-build
 npm run bundle $env:PACKAGE_BASE
-# dotnet restore
+dotnet restore
 dotnet publish --configuration Release --output $env:PACKAGE_BASE\query
 # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
 copy "$env:DOTNET_INSTALL_DIR\dotnet.exe" $env:PACKAGE_BASE\query\dotnet.exe

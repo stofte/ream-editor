@@ -4,6 +4,7 @@ copy index.html $env:PACKAGE_BASE
 copy package.json $env:PACKAGE_BASE 
 copy systemjs.config.js $env:PACKAGE_BASE
 copy electron-main.js $env:PACKAGE_BASE 
+npm install
 npm run ts-build
 npm run bundle $env:PACKAGE_BASE
 # dotnet restore

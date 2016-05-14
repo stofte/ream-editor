@@ -30,44 +30,10 @@ install:
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-  - ps: 'If (Test-Path $env:OMNISHARP_ZIP) { "cached omnisharp" }'
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
 
 build_script:
-  - ps: mkdir -Force $env:PACKAGE_BASE | Out-Null
-  - npm install
-  - copy index.html %PACKAGE_BASE%
-  - copy package.json %PACKAGE_BASE% 
-  - copy systemjs.config.js %PACKAGE_BASE%
-  - copy electron-main.js %PACKAGE_BASE%
-  - npm run ts-build
-  - npm run bundle %PACKAGE_BASE%
-  - dotnet restore
-  - dotnet publish --configuration Release --output %PACKAGE_BASE%\query
-  # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
-  - copy "$env:DOTNET_INSTALL_DIR\dotnet.exe" %PACKAGE_BASE%\query\dotnet.exe
-  - copy "$env:DOTNET_INSTALL_DIR\hostfxr.dll" %PACKAGE_BASE%\query\hostfxr.dll
-  - xcopy "$env:DOTNET_INSTALL_DIR\shared" "%PACKAGE_BASE%\query\shared\" /y /s
-  # need project.json to allow resolving references at runtime
-  - copy NuGet.Config %PACKAGE_BASE%\query\NuGet.Config
-  - copy project.json %PACKAGE_BASE%\query\project.json
-  - copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
-  # include omnisharp in dist
-  - 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
-  # bundle everything in the package folder
-  - npm run package_electron
-  - 7z a %ELECTRON_OUT%.zip %ELECTRON_OUT%
-
-
-after_build:
-  - cd %PACKAGE_BASE%
-  - dir
-  - cd omnisharp
-  - dir
-  - cd ..
-  - cd query
-  - dir
-  - cd %BUILD_BASE%
+  - ps: .\build.ps1
 
 artifacts:
-  - path: '%ELECTRON_OUT%.zip'
+  - path: app.zip

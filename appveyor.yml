@@ -42,8 +42,8 @@ build_script:
   - copy electron-main.js %PACKAGE_BASE%
   - npm run ts-build
   - npm run bundle %PACKAGE_BASE%
-  # dotnet restore
-  - ps: dotnet publish --configuration Release --output %PACKAGE_BASE%\query
+  - dotnet restore
+  - dotnet publish --configuration Release --output %PACKAGE_BASE%\query
   # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine
   - copy "$env:DOTNET_INSTALL_DIR\dotnet.exe" %PACKAGE_BASE%\query\dotnet.exe
   - copy "$env:DOTNET_INSTALL_DIR\hostfxr.dll" %PACKAGE_BASE%\query\hostfxr.dll

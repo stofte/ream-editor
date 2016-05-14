@@ -1,12 +1,16 @@
 mkdir -Force $env:PACKAGE_BASE | Out-Null
 remove-item $env:PACKAGE_BASE\* -recurse
-copy index.html $env:PACKAGE_BASE
-copy package.json $env:PACKAGE_BASE 
-copy systemjs.config.js $env:PACKAGE_BASE
-copy electron-main.js $env:PACKAGE_BASE 
 npm install
 npm run ts-build
 npm run bundle $env:PACKAGE_BASE
+copy index.static.html $env:PACKAGE_BASE\index.html
+copy electron-main.js $env:PACKAGE_BASE\index.js
+copy systemjs.config.js $env:PACKAGE_BASE\systemjs.config.js
+# other web resources
+copy node_modules\es6-shim\es6-shim.min.js $env:PACKAGE_BASE\es6-shim.min.js
+copy node_modules\zone.js\dist\zone.js $env:PACKAGE_BASE\zone.js
+copy node_modules\reflect-metadata\Reflect.js $env:PACKAGE_BASE\Reflect.js
+copy node_modules\systemjs\dist\system.src.js $env:PACKAGE_BASE\system.src.js
 dotnet restore
 dotnet publish --configuration Release --output $env:PACKAGE_BASE\query
 # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine

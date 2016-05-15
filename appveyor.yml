@@ -3,6 +3,7 @@ version: 0.1.0.{build}
 test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 os: Windows Server 2012
+platform: x64
 
 environment:
   CLI_VERSION: latest

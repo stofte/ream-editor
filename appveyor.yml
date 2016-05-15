@@ -37,4 +37,4 @@ build_script:
   - ps: .\build.ps1
 
 artifacts:
-  - path: $env:APP_FINAL
+  - path: '%APP_FINAL%'

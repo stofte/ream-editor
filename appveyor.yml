@@ -12,7 +12,7 @@ environment:
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
   PACKAGE_BASE: build
   ELECTRON_OUT: linq-editor-win32-x64
-  APP_FINAL: %ELECTRON_OUT%-%APPVEYOR_BUILD_VERSION%.zip
+  APP_FINAL: '%ELECTRON_OUT%-%APPVEYOR_BUILD_VERSION%.zip'
 
 cache:
   - 'node_modules -> package.json' # local npm modules

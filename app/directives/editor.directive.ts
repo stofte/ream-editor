@@ -14,7 +14,7 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/addon/hint/show-hint';
 let onetimeBullshit = false;
 CodeMirror.commands.autocomplete = function(cm) {
-    cm.showHint({ hint: cm.hint.ajax });
+    cm.showHint({ hint: CodeMirror.hint.ajax });
 };
 
 var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;

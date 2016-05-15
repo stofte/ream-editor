@@ -1,9 +1,9 @@
-var path = require("path");
+var path = require('path');
 var Builder = require('systemjs-builder');
 var fs = require('fs');
-var UglifyJS = require("uglify-js");
+var UglifyJS = require('uglify-js');
 var CleanCSS = require('clean-css');
-var output = process.argv[2] + '/';
+var output = (process.argv[2] || 'build') + '/';
 
 try {
 	fs.accessSync(output);
@@ -11,22 +11,31 @@ try {
 	fs.mkdirSync(output);
 }
 
+const jsOutput = output + 'bundle.js';
+const cssOutput = output + 'bundle.css';
+
 // optional constructor options
 // sets the baseURL and loads the configuration file
 var builder = new Builder('./', 'systemjs.config.js');
 var start = new Date().getTime();
 builder
-.bundle('app/main.js', output + 'bundle.js')
+.buildStatic('app/main.js', jsOutput)
 .then(function() {
-	var result = UglifyJS.minify([ output + 'bundle.js' ], {
-	    outSourceMap: output + 'bundle.js.map'
+	// include the other required stuff
+	var result = UglifyJS.minify([ 
+        'node_modules/es6-shim/es6-shim.min.js',
+        'node_modules/zone.js/dist/zone.js',
+        'node_modules/reflect-metadata/Reflect.js',
+		jsOutput 
+	], {
+	    outSourceMap: jsOutput + '.map'
 	});
-	fs.writeFile(output + 'bundle.js.map', result.map, (err) => {
+	fs.writeFile(jsOutput + '.map', result.map, (err) => {
 		if (err) throw err;
-		fs.writeFile(output + 'bundle.js', result.code, (err) => {
+		fs.writeFile(jsOutput, result.code, (err) => {
 			if (err) throw err;
 			var end = new Date().getTime();
-		  	console.log('JS finished in', ((end - start) / 1000).toFixed(0), 'seconds');
+		  	console.log(jsOutput, 'written in', ((end - start) / 1000).toFixed(0), 'seconds');
 		});
 	});
 
@@ -43,12 +52,12 @@ var css = new CleanCSS().minify([
 	'node_modules/codemirror/addon/hint/show-hint.css',
 	'styles.css'
 ]);
-fs.writeFile(output + 'bundle.css.map', css.sourceMap, (err) => {
+fs.writeFile(cssOutput + '.map', css.sourceMap, (err) => {
 	if (err) throw err;
-	fs.writeFile(output + 'bundle.css', css.styles, (err) => {
+	fs.writeFile(cssOutput, css.styles, (err) => {
 		if (err) throw err;
 		var end = new Date().getTime();
-	  	console.log('CSS finished in', ((end - start) / 1000).toFixed(0), 'seconds');
+	  	console.log(cssOutput, 'written in', ((end - start) / 1000).toFixed(0), 'seconds');
 	});
 });
 

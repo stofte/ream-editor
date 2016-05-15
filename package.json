@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "query databases by writing c# and linq",
   "private": true,
+  "main": "electron-main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/stofte/linq-editor.git"

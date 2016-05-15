@@ -10,13 +10,8 @@ npm install
 npm run ts-build
 npm run bundle $env:PACKAGE_BASE
 copy index.static.html $env:PACKAGE_BASE\index.html
-copy electron-main.js $env:PACKAGE_BASE\index.js
-copy systemjs.config.js $env:PACKAGE_BASE\systemjs.config.js
-# other web resources
-copy node_modules\es6-shim\es6-shim.min.js $env:PACKAGE_BASE\es6-shim.min.js
-copy node_modules\zone.js\dist\zone.js $env:PACKAGE_BASE\zone.js
-copy node_modules\reflect-metadata\Reflect.js $env:PACKAGE_BASE\Reflect.js
-copy node_modules\systemjs\dist\system.src.js $env:PACKAGE_BASE\system.src.js
+copy electron-main.js $env:PACKAGE_BASE\electron-main.js
+copy package.json $env:PACKAGE_BASE\package.json
 dotnet restore
 dotnet publish --configuration Release --output $env:PACKAGE_BASE\query
 # windows dotnet cant make exe files, so need to include dotnet.exe for bootstraping query-engine

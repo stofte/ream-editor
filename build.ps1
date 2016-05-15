@@ -4,10 +4,8 @@ if (-Not($env:CI)){
     $env:ELECTRON_OUT="linq-editor-win32-x64"
     $env:DOTNET_INSTALL_DIR="C:\Program Files\dotnet"
     $env:OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.0.zip"
-    $env:APP_FINAL="app.zip"
     remove-item $env:PACKAGE_BASE\* -recurse -Force | Out-Null
     remove-item $env:ELECTRON_OUT -recurse -Force | Out-Null
-    remove-item $env:APP_FINAL | Out-Null
 }
 npm install
 npm run ts-build
@@ -29,4 +27,3 @@ copy project.lock.json $env:PACKAGE_BASE\query\project.lock.json
 7z x $env:OMNISHARP_ZIP -y -o"$env:PACKAGE_BASE\omnisharp"
 # bundle everything in the package folder
 npm run package_electron
-7z a $env:APP_FINAL $env:ELECTRON_OUT\

@@ -37,4 +37,4 @@ build_script:
   - ps: .\build.ps1
 
 artifacts:
-  - path: %APP_FINAL%
+  - path: $(ELECTRON_OUT)

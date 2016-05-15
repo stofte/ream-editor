@@ -5,9 +5,9 @@ if (-Not($env:CI)){
     $env:DOTNET_INSTALL_DIR="C:\Program Files\dotnet"
     $env:OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.0.zip"
     $env:APP_FINAL="app.zip"
-    remove-item $env:PACKAGE_BASE -recurse -y
-    remove-item $env:ELECTRON_OUT -recurse -y
-    remove-item $env:APP_FINAL
+    remove-item $env:PACKAGE_BASE\* -recurse -Force | Out-Null
+    remove-item $env:ELECTRON_OUT -recurse -Force | Out-Null
+    remove-item $env:APP_FINAL | Out-Null
 }
 npm install
 npm run ts-build

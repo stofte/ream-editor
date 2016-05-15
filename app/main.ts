@@ -1,3 +1,9 @@
+import { enableProdMode } from '@angular/core';
+console.log(MODE);
+if (MODE === 'PRODUCTION') {
+    enableProdMode();
+}
+
 import { provide } from '@angular/core';
 import { bootstrap }    from '@angular/platform-browser-dynamic';
 import { HTTP_PROVIDERS } from '@angular/http';

@@ -1,5 +1,6 @@
 declare var electronRequire: any;
 declare var __dirname: string;
+declare var MODE: string;
 
 declare module "node-uuid" {
     export type v4 = () => string;

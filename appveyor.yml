@@ -12,7 +12,6 @@ environment:
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
   PACKAGE_BASE: build
   ELECTRON_OUT: linq-editor-win32-x64
-  APP_FINAL: $env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip'
 
 cache:
   - 'node_modules -> package.json' # local npm modules
@@ -22,6 +21,7 @@ cache:
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
+  - ps: $env:APP_FINAL=$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip
   - echo %APP_FINAL%
   # upgrades to latest node
   - ps: Install-Product node ''

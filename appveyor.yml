@@ -3,7 +3,6 @@ version: 0.1.0.{build}
 test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 os: Windows Server 2012
-platform: x64
 
 environment:
   CLI_VERSION: latest
@@ -22,7 +21,7 @@ cache:
 
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
-  - ps: $env:APP_FINAL=$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip
+  - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"
   - echo %APP_FINAL%
   # upgrades to latest node
   - ps: Install-Product node ''

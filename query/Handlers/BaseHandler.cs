@@ -4,7 +4,6 @@ namespace QueryEngine.Handlers
     using System.IO;
     using System.Text;
     using System.Diagnostics;
-    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;

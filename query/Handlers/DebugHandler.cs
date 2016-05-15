@@ -1,16 +1,8 @@
 namespace QueryEngine.Handlers
 {
-    using System;
-    using System.Reflection;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using System.Runtime.Serialization.Json;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
     using QueryEngine.Services;
     using QueryEngine.Models;
-    using Newtonsoft.Json;
 
     public class DebugHandler : BaseHandler<string, QueryInput>
     {

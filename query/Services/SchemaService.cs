@@ -3,14 +3,10 @@ namespace QueryEngine.Services
     using System;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.Extensions.Logging;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
-    using Microsoft.EntityFrameworkCore.Design;
-    using Microsoft.EntityFrameworkCore.Design.Internal;
-    
+
     public class SchemaService 
     {
         public string GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 

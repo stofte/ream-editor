@@ -1,11 +1,6 @@
 ﻿namespace QueryEngine
 {
-    using System;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.DotNet.ProjectModel.Workspaces;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Hosting;
 
     public class Program

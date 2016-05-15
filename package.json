@@ -9,7 +9,7 @@
     "url": "https://github.com/stofte/linq-editor.git"
   },
   "scripts": {
-    "start": "electron electron-main.js",
+    "start": "electron electron-main.js DEBUG",
     "ts": "start tsc -w",
     "ts-build": "tsc",
     "bundle": "node bundle-app.js",

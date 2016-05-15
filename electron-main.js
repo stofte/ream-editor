@@ -6,6 +6,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
+const MODE = process.argv[2]; // passed by package.json, so absent when running in final build
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -17,7 +18,7 @@ let cleanedUpOmnisharp = false;
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1100, height: 900, title: 'Frank'});
+    mainWindow = new BrowserWindow({width: 1100, height: 900, title: 'Linq Editor'});
     
     var template = [{
             label: 'File',
@@ -54,9 +55,10 @@ app.on('ready', function() {
 
     // and load the index.html of the app.
     mainWindow.loadURL('file://' + __dirname.replace(/\\/g,'/') + '/index.html');
-
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    if (MODE === 'DEBUG') {
+        // Open the DevTools.
+        mainWindow.webContents.openDevTools();        
+    }
 
     // msg app that we're closing and wait for the response
     mainWindow.on('close', function(event) {

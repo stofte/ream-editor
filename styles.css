@@ -17,3 +17,18 @@ body {
 .CodeMirror {
     height: auto;
 }
+
+@keyframes pulse_animation {
+	0% { transform: scale(1); }
+    40% { transform: scale(1.4); }
+    60% { transform: scale(1.4); }
+	100% { transform: scale(1); }
+}
+
+.backend-timer-pulse {
+	animation-name: pulse_animation;
+	animation-duration: 1500ms;
+	transform-origin:50% 50%;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}

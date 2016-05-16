@@ -3,6 +3,7 @@ import { Router, ROUTER_DIRECTIVES } from '@angular/router-deprecated';
 import { Location } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 import { TabService } from '../services/tab.service';
+import { MonitorService } from '../services/monitor.service';
 
 @Component({
     selector: 'f-tab-list',
@@ -11,6 +12,9 @@ import { TabService } from '../services/tab.service';
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid" *ngIf="tabsEnabled">
         <div class="navbar-header">
+            <a class="navbar-brand" href="#">Linq Editor</a>
+        </div>
+        <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li *ngFor="let tab of tabService.tabs"
                      class="{{tabService.active.id === tab.id ? 'active' : ''}}">
@@ -22,17 +26,27 @@ import { TabService } from '../services/tab.service';
                     <a (click)="newTab()" href="javascript:void(0)"><span class="glyphicon glyphicon-plus"></span></a>
                 </li>
             </ul>
+            <ul *ngIf="timerEnabled" class="nav navbar-nav navbar-right">
+                <li class="backend-timer-pulse"><a href="javascript:void(0)"><span class="glyphicon glyphicon-time" title="Backend starting"></span></a></li>
+            </ul>
         </div>
     </div>
 </nav>
 `
 })
 export class TabListComponent {
+    timerEnabled: boolean = true;
     constructor(
         private tabService: TabService,
         private router: Router,
-        private location: Location
+        private location: Location,
+        monitorService: MonitorService
     ) {
+        monitorService.omnisharpReady.then(() => {
+            monitorService.queryReady.then(() => {
+                this.timerEnabled = false;
+            });
+        });
     }
     
     private newTab() {

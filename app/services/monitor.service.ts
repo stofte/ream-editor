@@ -81,7 +81,6 @@ export class MonitorService {
     }
     
     private startProcess(cmd: string, options: any) {
-        console.log('starting process', cmd, options);
         child_process.exec(cmd, options, (error: string, stdout: string, stderr: string) => {
             console.log(`stdout: ${stdout}`);
             console.log(`stderr: ${stderr}`);            

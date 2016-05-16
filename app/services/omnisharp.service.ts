@@ -14,6 +14,10 @@ import { Tab } from '../models/tab';
 import config from '../config';
 const path = electronRequire('path');
 
+const isProduction = MODE !== 'DEVELOPMENT';
+// __dirname doesn't seem to work in bundle mode
+const dirname = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
+
 @Injectable()
 export class OmnisharpService {
     private port: number = config.omnisharpPort;
@@ -26,8 +30,9 @@ export class OmnisharpService {
         private monitorService: MonitorService, 
         private http: Http
     ) {
+        console.log('omnisharpService', dirname)
         // two levels up bla bla ...
-        this.dotnetPath = path.dirname(path.dirname(path.dirname(__dirname))) + '/project';
+        this.dotnetPath = dirname;
         // let timer = Observable.timer(1000);
         // let throttled = editorService.changes
         //     .debounce(() => timer);

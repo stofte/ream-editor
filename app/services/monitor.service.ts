@@ -7,6 +7,10 @@ const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
 
+const isProduction = MODE !== 'DEVELOPMENT';
+// __dirname doesn't seem to work in bundle mode
+const dirname = isProduction ? path.normalize(process.resourcesPath + '/app') : __dirname;
+
 @Injectable()
 export class MonitorService {
     public omnisharpReady: Promise<boolean>;
@@ -95,18 +99,19 @@ export class MonitorService {
     }
     
     private queryCmd(): {dir:string, cmd:string} {
-        let dir = MODE === 'PRODUCTION' ? `${__dirname}/query` :
-            `${path.dirname(path.dirname(__dirname))}`;
-        let cmd = MODE === 'PRODUCTION' ? `${dir}/query/linq-editor.exe` :
+        console.log('queryCmd.path.normalize', process.resourcesPath, process.cwd());
+        let dir = isProduction ? `${dirname}/query` :
+            `${path.dirname(path.dirname(dirname))}`;
+        let cmd = isProduction ? `${dir}/linq-editor.exe` :
             `"${config.dotnetDebugPath}" run`;
         return { dir, cmd };
     }
     
     private omnisharpCmd(): {dir: string, cmd: string} {
         let slnPath = path.normalize(`${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`);
-        let dir = MODE === 'PRODUCTION' ? `${__dirname}/omnisharp` :
-            `${path.dirname(path.dirname(__dirname))}/omnisharp`;
+        let dir = isProduction ? `${dirname}/omnisharp` :
+            `${path.dirname(path.dirname(dirname))}/omnisharp`;
         let cmd = `${dir}/OmniSharp.exe -s ${slnPath} -p ${config.omnisharpPort}`;
-        return { dir: __dirname, cmd };
+        return { dir: dirname, cmd };
     }
 }

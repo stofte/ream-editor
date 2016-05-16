@@ -11,7 +11,7 @@ const omnisharpSetup = require('./omnisharp-setup');
 const path = require('path');
 
 // windows only
-const omnihsharpFolder = path.normalize(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
+const omnihsharpFolder = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
 omnisharpSetup(MODE, omnihsharpFolder);
 
 // Keep a global reference of the window object, if you don't, the window will

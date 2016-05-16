@@ -21,7 +21,7 @@ export class QueryService {
     private data: any = {};
     private cachedTemplate = {};
     constructor(
-        private http : Http,
+        private http: Http,
         private router: Router
     ) {
     }
@@ -33,14 +33,14 @@ export class QueryService {
         });
         const result = new QueryResult();
         const f: (value: any, int: number) => QueryResult = this.extractQueryResult.bind(this);
-        let k ='_p_' + tabId;
+        let k = '_p_' + tabId;
         this.data[k] = []; // dump any previous results
         this.http
             .post(this.action('executequery'), json)
             .map(f)
-            .subscribe(result => {
-                this.data[k].push(result);
-                this.subs[k].next(result);
+            .subscribe(data => {
+                this.data[k].push(data);
+                this.subs[k].next(data);
             });
     }
     
@@ -96,7 +96,7 @@ export class QueryService {
     }
     
     private transformSet(data: any[]): ResultPage {
-        var page = new ResultPage();
+        let page = new ResultPage();
         let cols: string[] = [];
         let rows: any[] = [];
         data.forEach(row => {
@@ -109,7 +109,7 @@ export class QueryService {
         return page;
     }
     
-    private action(name : string) {
+    private action(name: string) {
         return `http://localhost:${this.port}/${name}`;
     }
 }

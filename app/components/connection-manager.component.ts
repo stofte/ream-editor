@@ -34,10 +34,9 @@ import { Connection } from '../models/connection';
 `
 })
 export class ConnectionManagerComponent {
-    private visible : boolean;
-    private newConnectionStringText : string;
+    private newConnectionStringText: string;
     constructor(
-        private overlayUiStateService : OverlayUiStateService,
+        private overlayUiStateService: OverlayUiStateService,
         private connectionService: ConnectionService
     ) {
 

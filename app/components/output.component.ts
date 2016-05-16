@@ -67,11 +67,10 @@ export class OutputComponent {
     constructor(
         private queryService: QueryService,
         private tabService: TabService,
-        private router : Router,
+        private router: Router,
         private routeParams: RouteParams
     ) {
         this.tabId = parseInt(routeParams.get('tab'), 10);
-        console.log('output.tabId', this.tabId);
         this.connectionId = parseInt(routeParams.get('connection'), 10);
         this.outputParam = this.routeParams.get('output');
         this.consoleVisible = this.outputParam === 'console';
@@ -88,7 +87,7 @@ export class OutputComponent {
                 // once results tick in, and user is looking at the console, 
                 // then change tab to first data table
                 if (this.consoleVisible && result.pages.length > 0) {
-                    this.router.navigate(["EditorTab", { tab: this.tabId, connection: this.connectionId, output: 0 }]);
+                    this.router.navigate(['EditorTab', { tab: this.tabId, connection: this.connectionId, output: 0 }]);
                 }
                 this.pages = result.pages.map(mapper);
             });
@@ -96,17 +95,16 @@ export class OutputComponent {
     
     attached() {
         let tab = this.tabService.active;
-        console.log('output.attached', tab.id, this.outputParam);
-        tab.title = "foo";
+        tab.title = 'foo';
         tab.output = this.outputParam;
         this.tabService.updateTab(tab);
     }
         
     showResult(idx: number) {
-        this.router.navigate(["EditorTab", { tab: this.tabId, connection: this.connectionId, output: idx }]);
+        this.router.navigate(['EditorTab', { tab: this.tabId, connection: this.connectionId, output: idx }]);
     }
     
     showConsole()  {
-        this.router.navigate(["EditorTab", { tab: this.tabId, connection: this.connectionId, output: 'console' }]);
+        this.router.navigate(['EditorTab', { tab: this.tabId, connection: this.connectionId, output: 'console' }]);
     }
 }

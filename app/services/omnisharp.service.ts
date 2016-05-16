@@ -30,13 +30,7 @@ export class OmnisharpService {
         private monitorService: MonitorService, 
         private http: Http
     ) {
-        console.log('omnisharpService', dirname)
-        // two levels up bla bla ...
         this.dotnetPath = dirname;
-        // let timer = Observable.timer(1000);
-        // let throttled = editorService.changes
-        //     .debounce(() => timer);
-        // throttled.subscribe(this.handleChange.bind(this));
     }
     
     private handleChange(change: EditorChange) {
@@ -45,7 +39,6 @@ export class OmnisharpService {
                 fileName: change.fileName,
                 changes: [change]
             }; 
-            console.log('handleChange.json', json);
             this.http.post(this.action('updatebuffer'), JSON.stringify(json))
                 .subscribe(result => {
                     console.log('handleChange.updatebuffer', result);
@@ -69,8 +62,7 @@ export class OmnisharpService {
     
     public initializeTab(tab: Tab) {
         
-        if (this.initialized[tab.id] == tab.connection.id) {
-            console.log('already initted connection {0} for tab {1}', tab.connection.id, tab.id);
+        if (this.initialized[tab.id] === tab.connection.id) {
             return;
         }
         
@@ -142,7 +134,7 @@ export class OmnisharpService {
             .value();
     }
     
-    private action(name : string) {
+    private action(name: string) {
         return `http://localhost:${this.port}/${name}`;
     }
 }

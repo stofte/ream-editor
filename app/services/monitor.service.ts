@@ -34,7 +34,7 @@ export class MonitorService {
         });
     }
     
-    private applicationEventHandler(event : any, msg : string) {
+    private applicationEventHandler(event: any, msg: string) {
         if (msg === 'close') {
             let queryCb = () => ipc.send('application-event', 'close-query-engine');
             let omniCb = () => ipc.send('application-event', 'close-omnisharp');
@@ -61,7 +61,7 @@ export class MonitorService {
 
         this.http.get(this.action(config.queryEnginePort, 'checkreadystatus'))
             .subscribe(
-                ok =>{
+                ok => {
                     console.log(`query-engine already running on ${config.queryEnginePort}`);
                     this.queryResolver(true);
                 }, error => {
@@ -71,19 +71,18 @@ export class MonitorService {
             );
     }
     
-    private pollingInternalMs;
     private checkBackends(port: number) {
         this.http.get(this.action(port, 'checkreadystatus'))
             .subscribe(ok => {
-                if (port === config.omnisharpPort) this.omnisharpResolver(true);
-                if (port === config.queryEnginePort) this.queryResolver(true);
+                if (port === config.omnisharpPort) { this.omnisharpResolver(true); }
+                if (port === config.queryEnginePort) { this.queryResolver(true); }
             }, error => {
                 let lbl = port === config.omnisharpPort ? 'omnisharp' : 'query-engine';
                 setTimeout(() => this.checkBackends(port), 250);
             });
     }
     
-    private startProcess(cmd : string, options : any) {
+    private startProcess(cmd: string, options: any) {
         console.log('starting process', cmd, options);
         child_process.exec(cmd, options, (error: string, stdout: string, stderr: string) => {
             console.log(`stdout: ${stdout}`);
@@ -94,11 +93,11 @@ export class MonitorService {
         });
     }
     
-    private action(port : number, name : string) {
+    private action(port: number, name: string) {
         return `http://localhost:${port}/${name}`;
     }
     
-    private queryCmd(): {dir:string, cmd:string} {
+    private queryCmd(): { dir: string, cmd: string } {
         console.log('queryCmd.path.normalize', process.resourcesPath, process.cwd());
         let dir = isProduction ? `${dirname}/query` :
             `${path.dirname(path.dirname(dirname))}`;
@@ -107,7 +106,7 @@ export class MonitorService {
         return { dir, cmd };
     }
     
-    private omnisharpCmd(): {dir: string, cmd: string} {
+    private omnisharpCmd(): { dir: string, cmd: string } {
         let slnPath = path.normalize(`${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`);
         let dir = isProduction ? `${dirname}/omnisharp` :
             `${path.dirname(path.dirname(dirname))}/omnisharp`;

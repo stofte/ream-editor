@@ -19,10 +19,10 @@ import { TabService } from '../services/tab.service';
 })
 export class StartPageComponent {
     constructor(
-        private overlayUiStateService : OverlayUiStateService,
+        private overlayUiStateService: OverlayUiStateService,
         private connectionService: ConnectionService,
         private tabService: TabService,
-        private router : Router
+        private router: Router
     ) {
         
     }

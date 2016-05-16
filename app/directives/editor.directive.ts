@@ -17,8 +17,8 @@ CodeMirror.commands.autocomplete = function(cm) {
     cm.showHint({ hint: CodeMirror.hint.ajax });
 };
 
-var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
-CodeMirror.keyMap.default[(mac ? "Cmd" : "Ctrl") + "-Space"] = "autocomplete";
+const mac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
+CodeMirror.keyMap.default[(mac ? 'Cmd' : 'Ctrl') + '-Space'] = 'autocomplete';
 
 @Directive({
     selector: '[editor]'
@@ -35,9 +35,8 @@ export class EditorDirective implements OnInit {
         private routeParams: RouteParams,
         public element: ElementRef, 
         public renderer: Renderer
-    ){
+    ) {
         const tabId = parseInt(routeParams.get('tab'), 10);
-        console.log('tabId', tabId, '=>', tabService.get(tabId));
         this.current = tabService.get(tabId);
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
         // need the service injected, even if this should be static
@@ -53,12 +52,9 @@ export class EditorDirective implements OnInit {
                 request.column = cur.ch + 1;
                 request.line = cur.line + tab.templateLineOffset;
                 request.buffer = tab.templateHeader + mirror.getValue() + tab.templateFooter;
-                console.log('fragment', fragment);
-                console.log('buffer', request.buffer);
                 omnisharpService
                     .autocomplete(request)
                     .subscribe(list => {
-                        console.log('list', list);
                         if (fragment === '.') {
                             range.anchor.ch = range.head.ch;
                         }
@@ -80,7 +76,7 @@ export class EditorDirective implements OnInit {
         this.editor.on('change', this.codemirrorValueChanged.bind(this));
     }
         
-    private codemirrorValueChanged(doc : any) {
+    private codemirrorValueChanged(doc: any) {
         let newValue = doc.getValue();
         this.editorService.set(this.current, newValue);
     }
@@ -96,6 +92,6 @@ export class EditorDirective implements OnInit {
             viewportMargin: Infinity,
             showCursorWhenSelecting: true,
             mode: 'text/x-csharp'
-        }
+        };
     }
 }

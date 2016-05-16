@@ -15,7 +15,7 @@ export class OverlayUiStateService {
         ipc.on('application-event', this.applicationEventHandler.bind(this));
     }
     
-    private applicationEventHandler(event : any, msg : string) {
+    private applicationEventHandler(event: any, msg: string) {
         if (msg === 'connections-panel') {
             this.ngZone.run(() => this.toggleConnections());
         }
@@ -26,7 +26,7 @@ export class OverlayUiStateService {
         this.connections.next(this.visible);
     }
     
-    public get connectionsVisible() : Observable<boolean> {
+    public get connectionsVisible(): Observable<boolean> {
         return this.connections;
     }
 }

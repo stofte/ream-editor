@@ -1,5 +1,5 @@
-import { provide, Component } from '@angular/core';
-import { RouteConfig, Router, ROUTER_DIRECTIVES, AuxRoute } from '@angular/router-deprecated';
+import { Component } from '@angular/core';
+import { RouteConfig, Router, ROUTER_DIRECTIVES } from '@angular/router-deprecated';
 
 import { MonitorService } from './services/monitor.service';
 import { ConnectionService } from './services/connection.service';
@@ -10,8 +10,6 @@ import { StartPageComponent } from './components/start-page.component';
 import { BufferTabComponent } from './components/buffer-tab.component';
 import { TabListComponent } from './components/tab-list.component';
 import { ConnectionManagerComponent } from './components/connection-manager.component';
-import { OutputComponent } from './components/output.component';
-
 
 @Component({
     selector: 'chat',
@@ -39,11 +37,11 @@ export class AppComponent {
     private connectionsVisible: boolean = false;
     
     constructor(
-        private monitorService : MonitorService, 
+        private monitorService: MonitorService, 
         private connectionService: ConnectionService,
         private overlayUiStateService: OverlayUiStateService,
         private tabService: TabService,
-        private router : Router) {
+        private router: Router) {
         monitorService.start();
         
         // decide where to go

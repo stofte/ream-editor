@@ -30,14 +30,13 @@ import { TabService } from '../services/tab.service';
 export class TabListComponent {
     constructor(
         private tabService: TabService,
-        
-		private router: Router,
+        private router: Router,
         private location: Location
     ) {
     }
     
     private newTab() {
-		const activeConn = this.tabService.active.connection;
+        const activeConn = this.tabService.active.connection;
         this.tabService.newForeground(activeConn);
     }
     

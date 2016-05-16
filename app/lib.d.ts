@@ -1,15 +1,15 @@
-declare var electronRequire: any;
-declare var __dirname: string;
-declare var MODE: string;
-declare var process: any;
+declare const electronRequire: any;
+declare const __dirname: string;
+declare const MODE: string;
+declare const process: any;
 
-declare module "node-uuid" {
+declare module 'node-uuid' {
     export type v4 = () => string;
     export var v4: v4;
 }
 
 declare module CodeMirror {
-    var keyMap: any;
-    var hint: any;
-    var registerHelper: any;
+    const keyMap: any;
+    const hint: any;
+    const registerHelper: any;
 }

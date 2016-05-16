@@ -28,7 +28,6 @@ export class ExecuteQueryComponent {
     }
     
     private run(): void {
-        console.log('execute', this.routeParams.get('tab'), this.routeParams.get('connection'))
         const id = parseInt(this.routeParams.get('tab'), 10);
         const tab = this.tabService.get(id);
         const connId = parseInt(this.routeParams.get('connection'), 10);

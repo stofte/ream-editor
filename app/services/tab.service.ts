@@ -7,7 +7,7 @@ import { Tab } from '../models/tab';
 
 @Injectable()
 export class TabService {
-    private id : number = 0;
+    private id: number = 0;
     public tabs: Tab[] = [];
     
     constructor(
@@ -18,8 +18,8 @@ export class TabService {
         
     }
     
-    public newForeground(connection: Connection, navigate: boolean = true) {
-        var tab = new Tab();
+    public newForeground(connection: Connection, navigate = true) {
+        const tab = new Tab();
         this.queryService
             .queryTemplate(connection)
             .subscribe(template => {
@@ -41,17 +41,17 @@ export class TabService {
         }       
     }
     
-    public updateTabId(tabId: number, connection: Connection, navigate: boolean = true): void{
+    public updateTabId(tabId: number, connection: Connection, navigate = true): void {
         const tab = this.tabs.find(t => t.id === tabId);
         tab.connection = connection;
         this.updateTab(tab, navigate);
     }
     
-    public updateTab(tab: Tab, navigate: boolean = true): void{
+    public updateTab(tab: Tab, navigate = true): void {
         this.tabs.find(t => {
             if (t.id === tab.id) {
                 t.connection = tab.connection;
-                t.output = tab.output 
+                t.output = tab.output; 
                 t.title = tab.title;
                 this.goto(tab);
                 return true;
@@ -77,6 +77,6 @@ export class TabService {
     
     private goto(tab: Tab): void {
         console.log('goto', tab.id);
-        this.router.navigate(["EditorTab", { tab: tab.id, connection: tab.connection.id, output: tab.output }]);
+        this.router.navigate(['EditorTab', { tab: tab.id, connection: tab.connection.id, output: tab.output }]);
     }
 }

@@ -39,10 +39,8 @@ export class OmnisharpService {
                 fileName: change.fileName,
                 changes: [change]
             }; 
-            this.http.post(this.action('updatebuffer'), JSON.stringify(json))
-                .subscribe(result => {
-                    console.log('handleChange.updatebuffer', result);
-                });
+            this.http
+                .post(this.action('updatebuffer'), JSON.stringify(json));
         });
     }
     
@@ -80,7 +78,6 @@ export class OmnisharpService {
                     this.http.post(this.action('updatebuffer'), json)
                         .subscribe(data => {
                             if (data.status === 200) {
-                                console.log('template for tab {0} using conn {1} initialized', tab.id, tab.connection.id);
                                 this.initialized[tab.id] = tab.connection.id;
                             }
                         });
@@ -101,12 +98,7 @@ export class OmnisharpService {
             }]
         });
         this.http
-            .post(this.action('updatebuffer'), json)
-            .subscribe(data => {
-                if (data.status === 200) {
-                    console.log('template for tab {0} using conn {1} updated', tab.id, tab.connection.id);
-                }
-            });
+            .post(this.action('updatebuffer'), json);
     }
     
     private mapToCodeMirror(result: any[]): any[] {

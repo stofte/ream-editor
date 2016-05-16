@@ -50,7 +50,6 @@ export class MonitorService {
         this.http.get(this.action(config.omnisharpPort, 'checkreadystatus'))
             .subscribe(
                 ok => {
-                    console.log(`omnisharp already running on ${config.omnisharpPort}`);
                     this.omnisharpResolver(true);
                 },
                 error => {
@@ -62,7 +61,6 @@ export class MonitorService {
         this.http.get(this.action(config.queryEnginePort, 'checkreadystatus'))
             .subscribe(
                 ok => {
-                    console.log(`query-engine already running on ${config.queryEnginePort}`);
                     this.queryResolver(true);
                 }, error => {
                     this.startProcess(queryParams.cmd, { cwd: queryParams.dir });
@@ -98,7 +96,6 @@ export class MonitorService {
     }
     
     private queryCmd(): { dir: string, cmd: string } {
-        console.log('queryCmd.path.normalize', process.resourcesPath, process.cwd());
         let dir = isProduction ? `${dirname}/query` :
             `${path.dirname(path.dirname(dirname))}`;
         let cmd = isProduction ? `${dir}/linq-editor.exe` :

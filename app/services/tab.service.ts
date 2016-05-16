@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router-deprecated';
 import { OmnisharpService } from '../services/omnisharp.service';
 import { QueryService } from '../services/query.service';
+import { MonitorService } from '../services/monitor.service';
 import { Connection } from '../models/connection';
 import { Tab } from '../models/tab';
 
@@ -13,21 +14,24 @@ export class TabService {
     constructor(
         private router: Router,
         private omnisharpService: OmnisharpService,
-        private queryService: QueryService
+        private queryService: QueryService,
+        private monitorService: MonitorService
     ) {
         
     }
     
     public newForeground(connection: Connection, navigate = true) {
         const tab = new Tab();
-        this.queryService
-            .queryTemplate(connection)
-            .subscribe(template => {
-                // set template when possible
-                tab.templateLineOffset = template.lineOffset;
-                tab.templateHeader = template.header;
-                tab.templateFooter = template.footer;                
-            });
+        this.monitorService.queryReady.then(() => {
+            this.queryService
+                .queryTemplate(connection)
+                .subscribe(template => {
+                    // set template when possible
+                    tab.templateLineOffset = template.lineOffset;
+                    tab.templateHeader = template.header;
+                    tab.templateFooter = template.footer;
+                });
+        });
         tab.id = this.id++;
         tab.output = 'console';
         tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
@@ -61,8 +65,8 @@ export class TabService {
     }
     
     public get(id: number) {
-        console.log('tabservice.get', this.tabs);
-        return this.tabs.find(x => x.id === id); 
+        const tab = this.tabs.find(x => x.id === id);
+        return tab; 
     }
     
     public get active(): Tab {
@@ -76,7 +80,6 @@ export class TabService {
     }
     
     private goto(tab: Tab): void {
-        console.log('goto', tab.id);
         this.router.navigate(['EditorTab', { tab: tab.id, connection: tab.connection.id, output: tab.output }]);
     }
 }

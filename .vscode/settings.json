@@ -7,6 +7,7 @@
 		"app/**/*.js.map": true,
 		"obj": true,
 		"bin": true,
-		"build": true
+		"build": true,
+		"linq-editor-win32-x64": true,
 	}
 }

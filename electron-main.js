@@ -7,6 +7,12 @@ const BrowserWindow = electron.BrowserWindow;  // Module to create native browse
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
 const MODE = process.argv[2]; // passed by package.json, so absent when running in final build
+const omnisharpSetup = require('./omnisharp-setup');
+const path = require('path');
+
+// windows only
+const omnihsharpFolder = path.normalize(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
+omnisharpSetup(MODE, omnihsharpFolder);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

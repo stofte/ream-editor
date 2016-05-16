@@ -1,14 +1,11 @@
 omnisharp
-artifacts
 build
 typings
 node_modules
 app/**/*.js
 app/**/*.js.map
-bundle.*
 bin
 obj
 project.lock.json
 omnisharp-win-x64-netcoreapp1.0.zip
 linq-editor-win32-x64
-app.zip

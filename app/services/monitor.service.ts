@@ -5,6 +5,7 @@ import config from '../config';
 
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
+const path = electronRequire('path');
 
 @Injectable()
 export class MonitorService {
@@ -39,10 +40,8 @@ export class MonitorService {
     }
         
     public start() {
-        let slnPath = 'C:/src/frank/project';
-        let queryCmd = '"C:/Program Files/dotnet/dotnet.exe" run';
-        let omnisharpCmd = `C:/src/frank/omnisharp/Omnisharp.exe -s ${slnPath} -p ${config.omnisharpPort}`;
-        let dotnetCwd = 'C:/src/frank/query-engine';
+        let queryParams = this.queryCmd();
+        let omnisharpCmd = this.omnisharpCmd().cmd;
         
         this.http.get(this.action(config.omnisharpPort, 'checkreadystatus'))
             .subscribe(
@@ -51,8 +50,8 @@ export class MonitorService {
                     this.omnisharpResolver(true);
                 },
                 error => {
-                    this.checkBackends(config.omnisharpPort);
                     this.startProcess(omnisharpCmd, { });
+                    this.checkBackends(config.omnisharpPort);
                 }
             );
 
@@ -62,8 +61,8 @@ export class MonitorService {
                     console.log(`query-engine already running on ${config.queryEnginePort}`);
                     this.queryResolver(true);
                 }, error => {
+                    this.startProcess(queryParams.cmd, { cwd: queryParams.dir });
                     this.checkBackends(config.queryEnginePort);
-                    this.startProcess(queryCmd, { cwd: dotnetCwd });
                 }
             );
     }
@@ -76,14 +75,12 @@ export class MonitorService {
                 if (port === config.queryEnginePort) this.queryResolver(true);
             }, error => {
                 let lbl = port === config.omnisharpPort ? 'omnisharp' : 'query-engine';
-                console.log('checkBackends failed for', lbl);
                 setTimeout(() => this.checkBackends(port), 250);
             });
     }
     
     private startProcess(cmd : string, options : any) {
-        
-        console.log('starting process');
+        console.log('starting process', cmd, options);
         child_process.exec(cmd, options, (error: string, stdout: string, stderr: string) => {
             console.log(`stdout: ${stdout}`);
             console.log(`stderr: ${stderr}`);            
@@ -95,5 +92,21 @@ export class MonitorService {
     
     private action(port : number, name : string) {
         return `http://localhost:${port}/${name}`;
+    }
+    
+    private queryCmd(): {dir:string, cmd:string} {
+        let dir = MODE === 'PRODUCTION' ? `${__dirname}/query` :
+            `${path.dirname(path.dirname(__dirname))}`;
+        let cmd = MODE === 'PRODUCTION' ? `${dir}/query/linq-editor.exe` :
+            `"${config.dotnetDebugPath}" run`;
+        return { dir, cmd };
+    }
+    
+    private omnisharpCmd(): {dir: string, cmd: string} {
+        let slnPath = path.normalize(`${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`);
+        let dir = MODE === 'PRODUCTION' ? `${__dirname}/omnisharp` :
+            `${path.dirname(path.dirname(__dirname))}/omnisharp`;
+        let cmd = `${dir}/OmniSharp.exe -s ${slnPath} -p ${config.omnisharpPort}`;
+        return { dir: __dirname, cmd };
     }
 }

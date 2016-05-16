@@ -44,16 +44,17 @@ export class EditorDirective implements OnInit {
         if (!onetimeBullshit) {
             onetimeBullshit = true;
             CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
-                let tab = mirror._tab;
+                let tab = this.tabService.get(mirror._tab);
                 let cur = mirror.getCursor();
                 let range = mirror.findWordAt(cur);
                 let fragment = mirror.getRange(range.anchor, range.head);
                 let request = new AutocompletionQuery();
-                request.fileName = mirror._tab.fileName;
+                request.fileName = tab.fileName;
                 request.column = cur.ch + 1;
                 request.line = cur.line + tab.templateLineOffset;
                 request.buffer = tab.templateHeader + mirror.getValue() + tab.templateFooter;
                 console.log('fragment', fragment);
+                console.log('buffer', request.buffer);
                 omnisharpService
                     .autocomplete(request)
                     .subscribe(list => {
@@ -71,7 +72,7 @@ export class EditorDirective implements OnInit {
             CodeMirror.hint.ajax.async = true;
         }
         
-        this.editor._tab = this.current;
+        this.editor._tab = this.current.id;
         const contents = editorService.get(this.current);
         this.editor.setValue(contents);
         const domElm = this.editor.getWrapperElement();

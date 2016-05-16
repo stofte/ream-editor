@@ -20,9 +20,9 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
             </li>
         </ul>
     </div>
-    <span class="form-control">
+    <div class="form-control" style="overflow: hidden">
         <span>{{connectionService.get(connId).connectionString}}</span>
-    </span>
+    </div>
 </div>
 `
 })

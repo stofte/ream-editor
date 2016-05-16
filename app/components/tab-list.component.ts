@@ -4,15 +4,16 @@ import { Location } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
+import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 
 @Component({
     selector: 'f-tab-list',
-    directives: [ROUTER_DIRECTIVES],
+    directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     template: `
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid" *ngIf="tabsEnabled">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">Linq Editor</a>
+            <!-- some content for when header is collapsed -->
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">

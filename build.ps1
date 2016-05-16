@@ -1,4 +1,3 @@
-mkdir -Force $env:PACKAGE_BASE | Out-Null
 if (-Not($env:CI)){
     $env:PACKAGE_BASE="build"
     $env:ELECTRON_OUT="linq-editor-win32-x64"
@@ -6,6 +5,7 @@ if (-Not($env:CI)){
     remove-item $env:PACKAGE_BASE -recurse -Force | Out-Null
     remove-item $env:ELECTRON_OUT -recurse -Force | Out-Null
 }
+mkdir -Force $env:PACKAGE_BASE | Out-Null
 npm install
 npm run lint
 npm run ts-build
@@ -14,6 +14,9 @@ copy index.static.html $env:PACKAGE_BASE\index.html
 copy electron-main.js $env:PACKAGE_BASE\electron-main.js
 copy omnisharp-setup.js $env:PACKAGE_BASE\omnisharp-setup.js
 copy package.json $env:PACKAGE_BASE\package.json
+# bootstrap fonts
+mkdir -Force $env:PACKAGE_BASE\node_modules\bootstrap\dist\fonts | Out-Null
+copy node_modules\bootstrap\dist\fonts\*.* $env:PACKAGE_BASE\node_modules\bootstrap\dist\fonts\
 dotnet restore
 dotnet publish --configuration Release --output $env:PACKAGE_BASE\query
 # these files are used by omnisharp to simulate a project structure.

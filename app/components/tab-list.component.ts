@@ -28,7 +28,9 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
                 </li>
             </ul>
             <ul *ngIf="timerEnabled" class="nav navbar-nav navbar-right">
-                <li class="backend-timer-pulse"><a href="javascript:void(0)"><span class="glyphicon glyphicon-time" title="Backend starting"></span></a></li>
+                <li class="backend-timer-pulse"><a href="javascript:void(0)">
+                    <span class="glyphicon glyphicon-time" title="Backend starting"></span></a>
+                </li>
             </ul>
         </div>
     </div>

@@ -7,6 +7,7 @@ if (-Not($env:CI)){
     remove-item $env:ELECTRON_OUT -recurse -Force | Out-Null
 }
 npm install
+npm run lint
 npm run ts-build
 npm run bundle $env:PACKAGE_BASE
 copy index.static.html $env:PACKAGE_BASE\index.html

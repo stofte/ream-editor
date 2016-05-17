@@ -3,7 +3,6 @@ if (-Not($env:CI)){
     $env:ELECTRON_OUT="linq-editor-win32-x64"
     $env:OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.zip"
     remove-item $env:PACKAGE_BASE -recurse -Force | Out-Null
-    remove-item $env:ELECTRON_OUT -recurse -Force | Out-Null
 }
 mkdir -Force $env:PACKAGE_BASE | Out-Null
 npm install

@@ -95,17 +95,17 @@ export class MonitorService {
     }
     
     private queryCmd(): { dir: string, cmd: string } {
-        let dir = isProduction ? `${dirname}/query` :
-            `${path.dirname(path.dirname(dirname))}`;
-        let cmd = isProduction ? `${dir}/linq-editor.exe` :
+        let dir = path.normalize(isProduction ? `${dirname}/query` :
+            `${path.dirname(path.dirname(dirname))}`);
+        let cmd = isProduction ? path.normalize(`${dir}/linq-editor.exe`) :
             `"${config.dotnetDebugPath}" run`;
         return { dir, cmd };
     }
     
     private omnisharpCmd(): { dir: string, cmd: string } {
         let slnPath = path.normalize(`${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`);
-        let dir = isProduction ? `${dirname}/omnisharp` :
-            `${path.dirname(path.dirname(dirname))}/omnisharp`;
+        let dir = path.normalize(isProduction ? `${dirname}/omnisharp` :
+            `${path.dirname(path.dirname(dirname))}/omnisharp`);
         let cmd = `${dir}/OmniSharp.exe -s ${slnPath} -p ${config.omnisharpPort}`;
         return { dir: dirname, cmd };
     }

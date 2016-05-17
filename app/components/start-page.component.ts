@@ -7,9 +7,9 @@ import { TabService } from '../services/tab.service';
 @Component({
     selector: 'f-start-page',
     template: `
-    <div>
+    <div class="int-test-start-page">
         <p *ngIf="!connectionService.defaultConnection">
-            <a (click)="connectionsToggle()">click to open connection manager</a>
+            <a (click)="connectionsToggle()" class="test-open-conn-man">click to open connection manager</a>
         </p>
         <p *ngIf="connectionService.defaultConnection">
             <a (click)="blankTab()">click to open a new tab</a>

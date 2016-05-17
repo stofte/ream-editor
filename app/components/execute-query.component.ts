@@ -10,7 +10,7 @@ import { TabService } from '../services/tab.service';
     selector: 'f-execute-query',
     directives: [BUTTON_DIRECTIVES],
     template: `
-<button class="btn btn-primary form-control" type="button" (click)="run()">
+<button class="btn btn-primary form-control int-test-execute-btn" type="button" (click)="run()">
     <span class="glyphicon glyphicon-play"></span>
 </button>
 `

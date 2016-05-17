@@ -6,7 +6,7 @@ import { Connection } from '../models/connection';
 @Component({
     selector: 'f-connection-manager',
     template: `
-<div class="container">
+<div class="container" class="int-test-conn-man">
     <h1>connection manager</h1>
     <p>
         <label>

@@ -13,7 +13,7 @@
     "ts": "start tsc -w",
     "ts-build": "tsc",
     "bundle": "node bundle-app.js",
-    "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --out=./",
+    "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire",
     "int-test": "node spectron-hack.js && mocha test-app.js"

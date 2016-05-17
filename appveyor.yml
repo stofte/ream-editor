@@ -7,8 +7,8 @@ os: Windows Server 2012
 environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
-  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-alpha13/omnisharp-win-x64-netcoreapp1.0.zip
-  OMNISHARP_ZIP: v1.9-alpha13-omnisharp-win-x64-netcoreapp1.0.zip
+  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta1/omnisharp-win-x64-netcoreapp1.zip
+  OMNISHARP_ZIP: v1.9-beta1-omnisharp-win-x64-netcoreapp1.zip
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1
   PACKAGE_BASE: build
   ELECTRON_OUT: linq-editor-win32-x64
@@ -22,7 +22,6 @@ cache:
 # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
 install:
   - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"
-  - echo %APP_FINAL%
   # upgrades to latest node
   - ps: Install-Product node ''
   # Download install script to install .NET cli in .dotnet dir

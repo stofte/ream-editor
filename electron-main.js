@@ -30,7 +30,7 @@ app.on('ready', function() {
             label: 'File',
             submenu: [{
                     label: 'Connections',
-                    accelerator: 'ctrl+d',
+                    accelerator: 'CmdOrCtrl+D',
                     click: () => 
                         mainWindow.webContents.send('application-event', 'connections-panel'),
                 }, {
@@ -43,12 +43,12 @@ app.on('ready', function() {
             label: 'Debug',
             submenu: [{
                     label: 'Reload',
-                    accelerator: 'ctrl+r',
+                    accelerator: 'CmdOrCtrl+R',
                     click: () => 
                         mainWindow.webContents.executeJavaScript("location.reload();"),
                 },{
                     label: 'DevTools',
-                    accelerator: 'ctrl+shift-i',
+                    accelerator: 'Shift+CmdOrCtrl+I',
                     click: () => 
                         mainWindow.webContents.openDevTools()
                 },

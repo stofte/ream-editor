@@ -1,7 +1,7 @@
 if (-Not($env:CI)){
     $env:PACKAGE_BASE="build"
     $env:ELECTRON_OUT="linq-editor-win32-x64"
-    $env:OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.0.zip"
+    $env:OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.zip"
     remove-item $env:PACKAGE_BASE -recurse -Force | Out-Null
     remove-item $env:ELECTRON_OUT -recurse -Force | Out-Null
 }
@@ -28,3 +28,4 @@ copy project.lock.json $env:PACKAGE_BASE\query\project.lock.json
 7z x $env:OMNISHARP_ZIP -y -o"$env:PACKAGE_BASE\omnisharp"
 # bundle everything in the package folder
 npm run package_electron
+npm run int-test

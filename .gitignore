@@ -7,5 +7,5 @@ app/**/*.js.map
 bin
 obj
 project.lock.json
-omnisharp-win-x64-netcoreapp1.0.zip
+omnisharp-win-x64-netcoreapp1.zip
 linq-editor-win32-x64

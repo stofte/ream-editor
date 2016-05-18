@@ -3,7 +3,9 @@ version: 0.1.0.{build}
 test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 os: Windows Server 2012
-
+services:
+  - mssql2014
+  
 environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
@@ -31,7 +33,14 @@ install:
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
-
+  # setup db
+  - ps: $create_script = [IO.File]::ReadAllText(".\testdb_create.sql")
+  - ps: $insert_script = [IO.File]::ReadAllText(".\testdb_insert.sql")
+  - ps: $sqlInstance = "(local)\SQL2014"
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $create_script
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $insert_script
+        
 build_script:
   - ps: .\build.ps1
 

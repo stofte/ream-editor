@@ -1,195 +1,187 @@
 const Application = require('spectron').Application
 const assert = require('assert')
 const path = require('path');
-
+const chai = require('chai');
+const http = require('http');
 const appPath = path.normalize(`${__dirname}/linq-editor-win32-x64/linq-editor.exe`);
-// double escape!
-const connectionString = 'Data Source=.\\\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
-const queryText = 'Foo.Take(10).Dump();';
+const connectionString = 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
+const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
+const expectedQueryResults = [
+    ['Ident', 'SomeDesc'],
+    ['0', 'Foo 0'],
+    ['1', 'Foo 1'],
+    ['2', 'Foo 2'],
+    ['3', 'Foo 3']
+];
 
-function sendString(app, str) {
-    for(var i = 0; i < str.length; i++) {
-        console.log('char sending:', str[i], '=>', str.charCodeAt(i));
-        app.webContents.sendInputEvent({
-            type: 'keyDown',
-            keyCode: str.charCodeAt(i)
-        });
-        app.webContents.sendInputEvent({
-            type: 'keyUp',
-            keyCode: str.charCodeAt(i)
-        });
-        app.webContents.sendInputEvent({
-            type: 'char',
-            keyCode: str.charCodeAt(i)
-        });
+const expectedAutocompletion = [
+    'Description',
+    'Dump',
+    'Equals',
+    'GetHashCode',
+    'GetType',
+    'Id',
+    'ToString'
+];
+
+const timeTotal = 5 * 60 * 1000; // locally test runs at < 30 secs
+const timeForBackend = 10 * 1000;
+const timeStep = 1 * 1000;
+const timeStepMax = 1.5 * 1000;
+const timeStepMin = 500;
+
+// first create checks for all cell values, ensuring we keep passing the client around, 
+// and return it in the end, so it can be awaited. total bullshit logic ftw
+function checkTable(client, rows, rowIndex, isBody) {
+    if (!rows || rows.length === 0) {
+        return client;
     }
+    let rowIdx = rowIndex || 1;
+    let cellSelector = isBody ? 'td' : 'th';
+    let rowSelector = isBody ? 'tbody' : 'thead';
+    let rowCheckingClient = rows[0].reduce((wrapped, cellValue, idx) => {
+        let selector = `table.table.table-condensed ${isBody ? 'tbody' : 'thead'} 
+            tr:nth-child(${rowIdx}) ${isBody ? 'td' : 'th'}:nth-child(${idx + 1})`;
+        return wrapped
+            .waitForExist(selector, timeForBackend)
+            .catch(function(e) { throw e })
+            .getText(selector)
+            .then(function (val) {
+                val.should.equal(cellValue);
+            });
+    }, client);
+    return checkTable(rowCheckingClient, rows.slice(1), isBody ? rowIdx + 1 : 1, true);
 }
 
-describe('application launch', function () {
-    this.timeout(5 * 60 * 1000);
+function checkHints(client, hints) {
+    if (!hints || hints.length === 0) {
+        return client;
+    }
+    return hints.reduce((wrapped, hint, idx) => {
+        let selector = `ul.CodeMirror-hints li:nth-child(${idx + 1})`;
+        return wrapped
+            .waitForExist(selector, timeForBackend)
+            .catch(function (e) { throw e; })
+            .getText(selector)
+            .then(function(val) {
+                val.should.equal(hint);
+            });
+    }, client);
+}
 
-    before(function (done) {
-        this.timeout(5 * 1000);
+describe('app with no saved db connections', function() {
+    this.timeout(timeTotal);
+    before(function () {
+        chai.should();
         this.app = new Application({
-            path: appPath,
-            requirePath: 'electronRequire'
+            path: appPath
         });
-        this.app.start();
-        setTimeout(function() {
-            done();
-        }, 4 * 1000);
-    });
-
-    
-    it('shows an initial window', function () {
-        return this.app.client.getWindowCount().then(function (count) {
-            assert.equal(count, 1);
-        });
+        return this.app.start();
     });
     
-    it('starts on the start page with link to open connection manager', function () {
-        return this.app.client
-            .waitUntilTextExists('.test-open-conn-man', 'click to open connection manager', 5 * 1000);
+    it('can add a new connection and perform a query and receive data', function () {
+        // waitForX and similar functions will pass to catch if not fulfilled,
+        // to pass the error up to mocha and fail the test, we just rethrow. 
+        let err = function(e) { throw e; };
+        let executingClient = this.app.client
+            // assume timeout applies to all js invocations, individually, not combined
+            .timeoutsAsyncScript(timeStepMax)
+            .waitUntil(function () {
+                return this.getText('.int-test-start-page > p > a')
+                    .then((val) => val.should.equal('click to open connection manager'));
+            })
+            .catch(err)
+            .click('.int-test-start-page > p > a')
+            .waitUntil(function() {
+                return this.getText('.int-test-conn-man > h1')
+                    .then((val) => val.should.equal('connection manager'));
+            })
+            .catch(err)
+            .click('.int-test-conn-man p input')
+            // setValue seems to fail, the output gets messed up (must be some parsing going on)
+            .executeAsync(function(str, done) {
+                document.querySelector('.int-test-conn-man p input').value = str;
+                done(document.querySelector('.int-test-conn-man p input').value);
+            }, connectionString)
+            .then(function(ret) {
+                ret.value.should.equal(connectionString);
+            })
+            .keys('Enter')
+            .pause(timeStepMin)
+            .click('.int-test-conn-man > p > a')
+            .pause(timeStepMin)
+            .click('.int-test-start-page > p > a')
+            .executeAsync(function(query, done) {
+                // codemirror saves a reference to itself in the DOM weee
+                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
+            }, queryText)
+            .waitForVisible('.backend-timer-pulse', timeForBackend, true)
+            .catch(err)
+            .pause(timeStepMin)
+            .click('.int-test-execute-btn');
+        
+        return checkTable(executingClient, expectedQueryResults)
+            .pause(timeStep);
     });
     
-    describe('adding first connection flow', function() {
-        this.timeout(4.5 * 60 * 1000);
-        
-        let testOutput = [];
-        
-        before(function(done) {
-            this.timeout(3 * 1000);
-            this.app.webContents.executeJavaScript(`
-                document.querySelector('.int-test-start-page > p > a').click();
-            `);
-            setTimeout(function() {
-                done();
-            }, 2 * 1000);
-        });
-        
-        it ('1. opens connection manager when clicking the link', function() {
-            this.app.electron.remote.ipcMain.on('application-event', function(event, msg) {
-                console.log('ipc', msg);
-                let msgs = [
-                    'int-test-result-1="1"',
-                    'int-test-result-2="2"',
-                    'int-test-result-3="4"',
-                    'int-test-result-4="4"'
-                ];
-                if (msgs.indexOf(msg) !== -1) {
-                    testOutput.push(msg);
-                }
-            });
-            return this.app.client.waitUntilTextExists('.int-test-conn-man h1', 'connection manager');      
-        });
-        
-        it('2. enters the new connection string value and focuses the field', function(done) {
-            this.timeout(3 * 1000);
-            this.app.webContents.executeJavaScript(`
-                document.querySelector('.int-test-conn-man input').value = "${connectionString}";
-                document.querySelector('.int-test-conn-man input').focus();
-            `);
-            setTimeout(function() {
-                done();
-            }, 2 * 1000);
-        });
-        
-        it('3. receives the enter key to submit new connection string', function(done) {
-            this.timeout(3 * 1000);
-            var code = '\u000d';
-            this.app.webContents.sendInputEvent({
-                type: 'keyDown',
-                keyCode: code
-            });
-            this.app.webContents.sendInputEvent({
-                type: 'char',
-                keyCode: code
-            });
-            this.app.webContents.sendInputEvent({
-                type: 'keyUp',
-                keyCode: code
-            });
-            setTimeout(function() {
-                done();
-            }, 2 * 1000);
-        });
-        
-        it('4. closes the connection manager', function(done) {
-            this.timeout(3 * 1000);
-            this.app.webContents.executeJavaScript(`
-                document.querySelector('.int-test-conn-man > p > a').click();
-            `);
-            setTimeout(function() {
-                done();
-            }, 2 * 1000);
-        });
-        
-        it('5. opens a new tab (should be only visible link now)', function(done) {
-            this.app.webContents.executeJavaScript(`
-                document.querySelector('.int-test-start-page > p > a').click();
-            `);
-            setTimeout(function() {
-                done();
-            }, 2 * 1000);
-        });
-        
-        it('6. updates the editor field', function(done) {
-            this.timeout(3 * 1000);
-            this.app.webContents.executeJavaScript(`
-                document.querySelector('.CodeMirror.form-control').CodeMirror.setValue('${queryText}');
-            `);
-            setTimeout(function() {
-                done();
-            }, 2 * 1000);
-        });
-        
-        it('7. execute the query', function(done) {
-            this.timeout(10 * 1000);
-            this.app.webContents.executeJavaScript(`
-                document.querySelector('.int-test-execute-btn').click();
-            `);
-            setTimeout(function() {
-                done();
-            }, 9 * 1000);
-        });
-        
-        // check for four entries 'Foo n', n = 0 - 3
-        [1,2,3,4].map(i => {
-            it('checks for result nr ' + i, function() {
-                let src = `
-                    (function() {
-                        let ipc = electronRequire('electron').ipcRenderer;
-                        let result = document.querySelector('table.table tbody tr:nth-child(${i}) td:nth-child(2)').innerText;
-                        console.log('int-test-result-${i}="' + result + '"');
-                        console.log(ipc.send('application-event', 'int-test-result-${i}="' + result + '"'));
-                    })();
-                `;
-                return this.app.webContents.executeJavaScript(src);
-            });
-        });
-        
-        it('clears localStorage for next run', function(done) {
-            this.timeout(3 * 1000);
-            this.app.webContents.executeJavaScript(`
+    it('provides the expected member completions for Foo entity', function() {
+        // cursor index, given the query
+        let cursorCol = queryText.indexOf('x.') + 2;
+        let cursorRow = 0;
+        let suggestionClient = this.app.client
+            // setting the cursor by codemirror api alone doesn't seem good enough. 
+            // seems to work if we click in the editor first, using this approach.
+            .moveToObject('.CodeMirror')
+            .click('.CodeMirror')
+            .timeoutsAsyncScript(timeStepMax)
+            .executeAsync(function(row, col, done) {
+                document.querySelector('.CodeMirror').CodeMirror.setCursor(row, col);
+                done(document.querySelector('.CodeMirror').CodeMirror.getCursor());
+            }, cursorRow, cursorCol)
+            .then(function(cursor) {
+                cursor.value.ch.should.equal(cursorCol);
+                cursor.value.line.should.equal(cursorRow);
+            })
+            .pause(timeStepMin)
+            .keys('\uE009') // press down ctrl
+            .keys('\uE00D') // space
+            .keys('\uE000'); // lift modifier (ctrl)
+            
+        return checkHints(suggestionClient, expectedAutocompletion)
+            .pause(timeStep);
+    });
+    
+    // seems tricky to close the window without bypassing the 
+    // close event handler that in turn closes the backend services
+    it('closes the single window', function () {
+        this.timeout(timeStepMax);
+        this.app.client
+            .timeoutsAsyncScript(timeForBackend)
+            .executeAsync(function() {
+                // for debug purposes
                 localStorage.clear();
-            `);
-            setTimeout(function() {
-                done();
-            },2 * 1000); 
-        });
-        
-        it('checks the result output', function(done) {
-            this.timeout(10 * 1000);
-            setTimeout(function() {
-                console.log('testOutput', testOutput);
-                assert(testOutput.length === 4);                
-            }, 9 * 1000);
+                // this sends the close event to the regular shutdown handler.
+                // other ways to close the window seems to fail.
+                const win = electronRequire('electron').remote.getCurrentWindow();
+                win.emit('close');
+            });
+        return new Promise((succ, err) => {
+            setTimeout(succ, timeStep);
         });
     });
     
-    // after(function () {
-    //     if (this.app && this.app.isRunning()) {
-    //         return this.app.stop();
-    //     }
-    // });
-})
+    // check via http if services are still up and going.
+    it('closes omnisharp service', function(done) {
+        this.timeout(timeForBackend);
+        let url = `http://localhost:2000/checkreadystate`;
+        http.get(url, res => { done(new Error('response received')); })
+            .on('error', () => { done(); });
+    });
+    
+    it('closes query service', function(done) {
+        this.timeout(timeForBackend);
+        let url = `http://localhost:8111/checkreadystate`;
+        http.get(url, res => { done(new Error('response received')); })
+            .on('error', () => { done(); });
+    });
+});

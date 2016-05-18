@@ -43,6 +43,7 @@
     "zone.js": "0.6.12"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "clean-css": "3.4.12",
     "electron-packager": "7.0.1",
     "electron-prebuilt": "0.37.8",

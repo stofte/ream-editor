@@ -27,11 +27,12 @@ const expectedAutocompletion = [
     'ToString'
 ];
 
-const timeTotal = 5 * 60 * 1000; // locally test runs at < 30 secs
-const timeForBackend = 10 * 1000;
-const timeStep = 1 * 1000;
-const timeStepMax = 1.5 * 1000;
-const timeStepMin = 500;
+const ciMod = isCI ? 5 : 1;
+const timeTotal = 5 * 60 * 1000 * ciMod; // locally test runs at < 30 secs
+const timeForBackend = 10 * 1000 * ciMod;
+const timeStep = 1 * 1000 * ciMod;
+const timeStepMax = 1.5 * 1000 * ciMod;
+const timeStepMin = 500 * ciMod;
 
 // first create checks for all cell values, ensuring we keep passing the client around, 
 // and return it in the end, so it can be awaited. total bullshit logic ftw

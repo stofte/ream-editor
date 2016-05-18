@@ -46,6 +46,7 @@ build_script:
 test_script:
   - node spectron-hack.js
   - npm run int-test
+  - type C:\projects\linq-editor\node_modules\spectron\lib\api.js
 
 artifacts:
   - path: $(ELECTRON_OUT)

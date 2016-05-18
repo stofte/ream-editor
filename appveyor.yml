@@ -44,7 +44,9 @@ build_script:
   - ps: .\build.ps1
 
 test_script:
+  - type C:\projects\linq-editor\node_modules\spectron\lib\api.js
   - node spectron-hack.js
+  - type C:\projects\linq-editor\node_modules\spectron\lib\api.js
   - npm run int-test
   - type C:\projects\linq-editor\node_modules\spectron\lib\api.js
 

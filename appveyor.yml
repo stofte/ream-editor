@@ -1,6 +1,5 @@
 # version = build id
 version: 0.1.0.{build}
-test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
 services: mssql2014
   

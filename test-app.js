@@ -1,10 +1,13 @@
+const isCI = process.env['CI']; // set by appveyor
 const Application = require('spectron').Application
 const assert = require('assert')
 const path = require('path');
 const chai = require('chai');
 const http = require('http');
 const appPath = path.normalize(`${__dirname}/linq-editor-win32-x64/linq-editor.exe`);
-const connectionString = 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
+const connectionString = 
+    isCI ? 'Data Source=(local)\SQL2014; User=sa; Password=Password12!; Initial Catalog=testdb'  
+         : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
 const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
 const expectedQueryResults = [
     ['Ident', 'SomeDesc'],

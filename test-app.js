@@ -28,7 +28,7 @@ const expectedAutocompletion = [
 ];
 
 const ciMod = isCI ? 5 : 1;
-const timeTotal = 5 * 60 * 1000 * ciMod; // locally test runs at < 30 secs
+const timeTotal = 2 * 60 * 1000 * ciMod; // locally test runs at < 30 secs
 const timeForBackend = 10 * 1000 * ciMod;
 const timeStep = 1 * 1000 * ciMod;
 const timeStepMax = 1.5 * 1000 * ciMod;

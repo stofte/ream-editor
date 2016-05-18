@@ -13,8 +13,6 @@ environment:
   ELECTRON_OUT: linq-editor-win32-x64
 
 cache:
-  - 'node_modules -> package.json' # local npm modules
-  - '%APPDATA%\npm-cache -> package.json' # npm cache
   - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
   - '%OMNISHARP_ZIP%'
 

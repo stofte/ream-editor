@@ -31,12 +31,8 @@ install:
   - ps: '& .\scripts\obtain\install.ps1 -Channel "future" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
-  # should be automatic?
 
 before_build:
-  # - ps: Set-Service SQLBrowser -StartupType Manual
-  # - ps: Start-Service SQLBrowser
-  # - ps: Start-Service "MSSQL`$SQL2014"
   # setup db
   - ps: $sqlInstance = "(local)\SQL2014"
   - ps: $create_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\scripts\testdb_create.sql")
@@ -47,7 +43,11 @@ before_build:
   - ps: sqlcmd -S "(local)\SQL2014" -U "sa" -P "Password12!" -Q $insert_script
         
 build_script:
-  - ps: .\build.ps1
+  - .\build.ps1
+
+test_script:
+  - node spectron-hack.js
+  - npm run int-test
 
 artifacts:
   - path: $(ELECTRON_OUT)

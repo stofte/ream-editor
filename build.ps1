@@ -27,4 +27,4 @@ copy project.lock.json $env:PACKAGE_BASE\query\project.lock.json
 7z x $env:OMNISHARP_ZIP -y -o"$env:PACKAGE_BASE\omnisharp"
 # bundle everything in the package folder
 npm run package_electron
-npm run int-test
+

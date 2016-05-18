@@ -43,7 +43,7 @@ before_build:
   - ps: sqlcmd -S "(local)\SQL2014" -U "sa" -P "Password12!" -Q $insert_script
         
 build_script:
-  - .\build.ps1
+  - ps: .\build.ps1
 
 test_script:
   - node spectron-hack.js

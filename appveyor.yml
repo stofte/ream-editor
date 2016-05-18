@@ -2,7 +2,6 @@
 version: 0.1.0.{build}
 test: off # this turns of AppVeyor automatic searching for test-assemblies
 build: off # no msbuild build
-os: Windows Server 2012
 services:
   - mssql2014
   
@@ -21,11 +20,12 @@ cache:
   - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
   - '%OMNISHARP_ZIP%'
 
-# see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
+
 install:
   - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"
   # upgrades to latest node
   - ps: Install-Product node ''
+  # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
   # Download install script to install .NET cli in .dotnet dir
   - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
   - ps: Invoke-WebRequest "$env:DOTNETCLI_URL" -OutFile ".\scripts\obtain\install.ps1"

@@ -32,11 +32,11 @@ install:
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
   # should be automatic?
-  - ps: $sqlInstance = "(local)\SQL2014"
   - ps: Set-Service SQLBrowser -StartupType Manual
   - ps: Start-Service SQLBrowser
-  - ps: Start-Service "MSSQL`$$sqlInstance"
+  - ps: Start-Service "MSSQL`$SQL2014"
   # setup db
+  - ps: $sqlInstance = "(local)\SQL2014"
   - ps: $create_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\scripts\testdb_create.sql")
   - ps: $insert_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\scripts\testdb_insert.sql")
   - ps: $sqlInstance

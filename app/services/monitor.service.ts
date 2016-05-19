@@ -87,10 +87,10 @@ export class MonitorService {
     
     private startProcess(cmd: string, options: any) {
         child_process.exec(cmd, options, (error: string, stdout: string, stderr: string) => {
-            this.logService.log("stdout", stdout);
-            this.logService.log("stderr", stderr);
+            this.logService.log('stdout', stdout);
+            this.logService.log('stderr', stderr);
             if (error !== null) {
-                this.logService.log("error", error);
+                this.logService.log('error', error);
             }
         });
     }

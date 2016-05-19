@@ -16,7 +16,7 @@
     "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire",
-    "int-test": "node spectron-hack.js && mocha test-app.js"
+    "int-test": "mocha test-app.js"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
@@ -52,7 +52,7 @@
     "retyped-codemirror-tsd-ambient": "0.0.0-0",
     "retyped-es6-shim-tsd-ambient": "0.31.2-0",
     "retyped-lodash-tsd-ambient": "*",
-    "spectron": "3.0.0",
+    "spectron": "3.1.0",
     "systemjs-builder": "0.15.16",
     "tsdm": "0.1.0-3",
     "tslint": "3.10.1",

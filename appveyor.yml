@@ -42,7 +42,7 @@ build_script:
   - ps: .\build.ps1
 
 test_script:
-  - .\build\omnisharp\omnisharp.exe -s "$env:APPVEYOR_BUILD_FOLDER" -p 2000
+  - .\build\omnisharp\omnisharp.exe -s "%APPVEYOR_BUILD_FOLDER%" -p 2000
   - node spectron-hack.js
   - npm run int-test
 

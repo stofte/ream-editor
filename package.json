@@ -16,7 +16,7 @@
     "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "tsdm rewire",
-    "int-test": "mocha test-app.js"
+    "int-test": "mocha test/**/*.int.js"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",

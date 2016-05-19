@@ -6,8 +6,8 @@ Linq Editor is a desktop application that allows you to write C#/LINQ queries ag
 Running locally
 ---------------
 
-- Install the latest `dotnet` from [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries)
-- [Download the latest OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`
+- Install the latest `dotnet` using [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries)
+- Download the latest [OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`
 - `npm install`
 - `npm start`
 

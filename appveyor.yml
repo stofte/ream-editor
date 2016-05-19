@@ -33,14 +33,12 @@ install:
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
 
 before_build:
-  # setup db
   - ps: $sqlInstance = "(local)\SQL2014"
   - ps: $create_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\scripts\testdb_create.sql")
   - ps: $insert_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\scripts\testdb_insert.sql")
-  - ps: $sqlInstance
-  - ps: sqlcmd -S "(local)\SQL2014" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
-  - ps: sqlcmd -S "(local)\SQL2014" -U "sa" -P "Password12!" -Q $create_script
-  - ps: sqlcmd -S "(local)\SQL2014" -U "sa" -P "Password12!" -Q $insert_script
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $create_script
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $insert_script
         
 build_script:
   - ps: .\build.ps1

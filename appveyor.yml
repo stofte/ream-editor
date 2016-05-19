@@ -1,4 +1,3 @@
-# version = build id
 version: 0.1.0.{build}
 services:
   - mssql2014
@@ -17,7 +16,6 @@ cache:
   - '%APPDATA%\npm-cache -> package.json' # npm cache
   - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
   - '%OMNISHARP_ZIP%'
-
 
 install:
   - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"

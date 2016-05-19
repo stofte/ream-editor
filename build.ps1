@@ -17,7 +17,7 @@ copy package.json $env:PACKAGE_BASE\package.json
 mkdir -Force $env:PACKAGE_BASE\node_modules\bootstrap\dist\fonts | Out-Null
 copy node_modules\bootstrap\dist\fonts\*.* $env:PACKAGE_BASE\node_modules\bootstrap\dist\fonts\
 dotnet restore
-dotnet publish --configuration Release --output $env:PACKAGE_BASE\query
+dotnet publish --configuration Release --output $env:PACKAGE_BASE\query --runtime win7-x64 --framework netcoreapp1.0
 # these files are used by omnisharp to simulate a project structure.
 # these will be copied to a folder in APPDATA, which omnisharp is pointed at. 
 copy NuGet.Config $env:PACKAGE_BASE\query\NuGet.Config

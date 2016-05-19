@@ -6,7 +6,7 @@ const chai = require('chai');
 const http = require('http');
 const appPath = path.normalize(`${__dirname}/linq-editor-win32-x64/linq-editor.exe`);
 const connectionString = 
-    isCI ? 'Data Source=(local)\SQL2014; User=sa; Password=Password12!; Initial Catalog=testdb'  
+    isCI ? 'Data Source=(local)\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb'  
          : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
 const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
 const expectedQueryResults = [

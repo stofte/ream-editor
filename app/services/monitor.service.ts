@@ -102,7 +102,7 @@ export class MonitorService {
     private queryCmd(): { dir: string, cmd: string } {
         let dir = path.normalize(isProduction ? `${dirname}/query` :
             `${path.dirname(path.dirname(dirname))}`);
-        let cmd = isProduction ? path.normalize(`${dir}/linq-editor.exe`) :
+        let cmd = isProduction ? this.dotnetWorkaround(path.normalize(`${dir}`)) :
             `"${config.dotnetDebugPath}" run`;
         return { dir, cmd };
     }
@@ -113,5 +113,15 @@ export class MonitorService {
             `${path.dirname(path.dirname(dirname))}/omnisharp`);
         let cmd = `${dir}/OmniSharp.exe -s ${slnPath} -p ${config.omnisharpPort}`;
         return { dir: dirname, cmd };
+    }
+    
+    private dotnetWorkaround(folder): string {
+        let ret = path.join(`${folder}`, 'linq-editor.exe');
+        try {
+            fs.accessPath(ret);
+            return ret;
+        } catch (ex) {
+            return path.join(`${folder}`, 'dotnet.exe linq-editor.dll')
+        }
     }
 }

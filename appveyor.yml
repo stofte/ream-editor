@@ -45,8 +45,7 @@ build_script:
   - ps: .\build.ps1
 
 test_script:
-  - ps: .\test-script.ps1
-  - type %ELECTRON_OUT%\linq-editor.log
+  - ps: .\ci-test-script.ps1
 
 artifacts:
   - path: $(ELECTRON_OUT)

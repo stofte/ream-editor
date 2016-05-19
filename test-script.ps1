@@ -1,1 +1,0 @@
-npm run int-test

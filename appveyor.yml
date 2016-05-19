@@ -39,6 +39,8 @@ before_build:
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $insert_script
         
 build_script:
+  - dotnet --info
+  - dotnet --version
   - ps: .\build.ps1
 
 test_script:

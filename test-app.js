@@ -17,6 +17,9 @@ const expectedQueryResults = [
     ['3', 'Foo 3']
 ];
 
+console.log('connectionString', connectionString);
+console.log('appPath', appPath);
+
 const expectedAutocompletion = [
     'Description',
     'Dump',

@@ -43,6 +43,10 @@ build_script:
 
 test_script:
   - ps: .\test-script.ps1
+  - dir %ELECTRON_OUT%\
+  - dir %ELECTRON_OUT%\resources
+  - dir %ELECTRON_OUT%\resources\app
+  - dir %ELECTRON_OUT%\resources\app\query
   - type %ELECTRON_OUT%\linq-editor.log
 
 artifacts:

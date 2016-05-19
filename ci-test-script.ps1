@@ -1,8 +1,8 @@
-# we dont want to fail right away
-npm run int-test
-$code = $LASTEXITCODE
-if ($code -isnot 0) {
-    # only if we failed
-    type $env:ELECTRON_OUT\linq-editor.log    
+try { 
+    npm run int-test
+    exit 0
 }
-exit $code
+catch {
+    type $env:ELECTRON_OUT\linq-editor.log
+    exit 1
+}

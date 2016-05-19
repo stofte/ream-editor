@@ -19,6 +19,7 @@ omnisharpSetup(MODE, omnihsharpFolder);
 let mainWindow = null;
 let cleanedUpQueryEngine = false;
 let cleanedUpOmnisharp = false;
+let cleanedUpLogs = false;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -68,7 +69,7 @@ app.on('ready', function() {
 
     // msg app that we're closing and wait for the response
     mainWindow.on('close', function(event) {
-        if (!(cleanedUpQueryEngine && cleanedUpOmnisharp)) {
+        if (!(cleanedUpQueryEngine && cleanedUpOmnisharp && cleanedUpLogs)) {
             mainWindow.webContents.send('application-event', 'close');
             mainWindow.hide();
             event.preventDefault();
@@ -89,8 +90,10 @@ app.on('ready', function() {
             cleanedUpQueryEngine = true;
         } else if (msg === 'close-omnisharp') {
             cleanedUpOmnisharp = true;
+        } else if (msg === 'close-log') {
+            cleanedUpLogs = true;
         }
-        if (cleanedUpQueryEngine && cleanedUpOmnisharp) {
+        if (cleanedUpQueryEngine && cleanedUpOmnisharp && cleanedUpLogs) {
             mainWindow.close();
         }
     });

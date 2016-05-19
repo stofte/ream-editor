@@ -9,3 +9,4 @@ obj
 project.lock.json
 omnisharp-win-x64-netcoreapp1.zip
 linq-editor-win32-x64
+linq-editor.dev.log

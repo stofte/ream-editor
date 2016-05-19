@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
+import { LogService } from './log.service';
 import config from '../config';
 
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
+const fs = electronRequire('fs');
 
 const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
@@ -20,7 +22,10 @@ export class MonitorService {
     private queryResolver;
     private checker;
         
-    constructor(private http: Http) {
+    constructor(
+        private http: Http,
+        private logService: LogService
+    ) {
         ipc.on('application-event', this.applicationEventHandler.bind(this));
         this.omnisharpReady = new Promise((res, err) => {
             this.omnisharpResolver = (arg) => {
@@ -82,10 +87,10 @@ export class MonitorService {
     
     private startProcess(cmd: string, options: any) {
         child_process.exec(cmd, options, (error: string, stdout: string, stderr: string) => {
-            console.log(`stdout: ${stdout}`);
-            console.log(`stderr: ${stderr}`);            
+            this.logService.log("stdout", stdout);
+            this.logService.log("stderr", stderr);
             if (error !== null) {
-                console.log(`exec error: ${error}`);
+                this.logService.log("error", error);
             }
         });
     }

@@ -42,8 +42,8 @@ build_script:
   - ps: .\build.ps1
 
 test_script:
-  - node spectron-hack.js
   - npm run int-test
+  - type %ELECTRON_OUT%\linq-editor.log
 
 artifacts:
   - path: $(ELECTRON_OUT)

@@ -3,8 +3,14 @@ Linq Editor [![Build status](https://ci.appveyor.com/api/projects/status/s7adk4g
 
 Linq Editor is a desktop application that allows you to write C#/LINQ queries against SQL databases.
 
-Running locally
----------------
+Builds
+------
+
+[Windows x64 builds](https://ci.appveyor.com/project/stofte/linq-editor/build/artifacts) courtesy of [AppVeyor](https://www.appveyor.com/) 
+
+
+Developing
+----------
 
 - Install the latest `dotnet` using [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries)
 - Download the latest [OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`

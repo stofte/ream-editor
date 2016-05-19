@@ -20,9 +20,9 @@ dotnet restore
 dotnet publish --configuration Release --output $env:PACKAGE_BASE\query --runtime win7-x64 --framework netcoreapp1.0
 # these files are used by omnisharp to simulate a project structure.
 # these will be copied to a folder in APPDATA, which omnisharp is pointed at. 
-copy NuGet.Config $env:PACKAGE_BASE\query\NuGet.Config
-copy project.json $env:PACKAGE_BASE\query\project.json
-copy project.lock.json $env:PACKAGE_BASE\query\project.lock.json
+copy NuGet.Config $env:PACKAGE_BASE\NuGet.Config
+copy project.json $env:PACKAGE_BASE\project.json
+copy project.lock.json $env:PACKAGE_BASE\project.lock.json
 # include omnisharp in dist
 7z x $env:OMNISHARP_ZIP -y -o"$env:PACKAGE_BASE\omnisharp"
 # bundle everything in the package folder

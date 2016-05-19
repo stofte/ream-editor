@@ -42,7 +42,7 @@ build_script:
   - ps: .\build.ps1
 
 test_script:
-  - npm run int-test
+  - ps: .\test-script.ps1
   - type %ELECTRON_OUT%\linq-editor.log
 
 artifacts:

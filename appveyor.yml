@@ -45,7 +45,7 @@ build_script:
   - ps: .\build.ps1
 
 test_script:
-  - ps: .\ci-test-script.ps1
+  - npm run int-test
 
 artifacts:
   - path: $(ELECTRON_OUT)

@@ -117,7 +117,7 @@ describe('fresh build', function() {
     
     // seems tricky to close the window without bypassing the 
     // close event handler that in turn closes the backend services
-    it('closes the single window', function () {
+    it('can shutdown', function () {
         this.timeout(timeStepMax);
         this.app.client
             .timeoutsAsyncScript(timeForBackend)
@@ -135,14 +135,14 @@ describe('fresh build', function() {
     });
     
     // check via http if services are still up and going.
-    it('closes omnisharp service', function(done) {
+    it('shuts down omnisharp service after closing', function(done) {
         this.timeout(timeForBackend);
         let url = `http://localhost:2000/checkreadystate`;
         http.get(url, res => { done(new Error('response received')); })
             .on('error', () => { done(); });
     });
     
-    it('closes query service', function(done) {
+    it('shuts query service after closing', function(done) {
         this.timeout(timeForBackend);
         let url = `http://localhost:8111/checkreadystate`;
         http.get(url, res => { done(new Error('response received')); })

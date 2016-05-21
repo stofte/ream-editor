@@ -11,3 +11,5 @@ omnisharp-win-x64-netcoreapp1.zip
 linq-editor-win32-x64
 linq-editor.dev.log
 npm-debug.log
+create-generated.sql
+insert-generated.sql

@@ -9,12 +9,12 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
     selector: 'f-connection-selector',
     directives: [DROPDOWN_DIRECTIVES],
     template: `
-<div class="input-group" (click)="$event.preventDefault()">
+<div class="input-group int-test-conn-sel" (click)="$event.preventDefault()">
     <div class="input-group-btn btn-group" dropdown keyboardNav="true">
-        <button id="simple-btn-keyboard-nav" type="button" class="btn btn-default" dropdownToggle>
+        <button id="connection-selector-btn-keyboard-nav" type="button" class="btn btn-default" dropdownToggle>
             Connection <span class="caret"></span>
         </button>
-        <ul ref="menulist" class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
+        <ul ref="menulist" class="dropdown-menu" role="menu" aria-labelledby="connection-selector-btn-keyboard-nav">
             <li role="menuitem" *ngFor="let conn of connectionService.connections">
                 <a class="dropdown-item" href="javascript:void(0)" (click)="select(conn)">{{conn.connectionString}}</a>
             </li>

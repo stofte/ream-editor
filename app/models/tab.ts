@@ -10,4 +10,18 @@ export class Tab {
     public templateHeader: string;
     public templateFooter: string;
     public templateLineOffset: number; // used by omnisharp, maps the partial view into the full template. columns not mapped
+
+    public clone(): Tab {
+        return <Tab> {
+            id: this.id,
+            connection: this.connection,
+            title: this.title,
+            active: this.active,
+            output: this.output,
+            fileName: this.fileName,
+            templateHeader: this.templateHeader,
+            templateFooter: this.templateFooter,
+            templateLineOffset: this.templateLineOffset
+        };
+    }
 }

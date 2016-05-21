@@ -16,11 +16,11 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
             <!-- some content for when header is collapsed -->
         </div>
         <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav int-test-tab-list">
                 <li *ngFor="let tab of tabService.tabs"
                      class="{{tabService.active.id === tab.id ? 'active' : ''}}">
                     <a [routerLink]="['EditorTab', {tab: tab.id, connection: tab.connection.id, output: 'tab.output' }]">
-                        Edit {{tab.title}}
+                        Edit {{tab.id}}
                     </a>
                 </li>
                 <li>

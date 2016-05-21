@@ -7,6 +7,7 @@ namespace QueryEngine.Handlers
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
+    using QueryEngine.Converters;
 
     public abstract class BaseHandler<TResult, TInput>
     {
@@ -63,7 +64,9 @@ namespace QueryEngine.Handlers
             using (var jsonWriter = new JsonTextWriter(writer))
             {
                 jsonWriter.CloseOutput = false;
-                var jsonSerializer = JsonSerializer.Create(/*TODO: SerializerSettings*/);
+                var settings = new JsonSerializerSettings();
+                settings.Converters.Add(new NumberConverter());
+                var jsonSerializer = JsonSerializer.Create(settings);
                 jsonSerializer.Serialize(jsonWriter, value);
             }
         }

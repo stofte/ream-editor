@@ -11,6 +11,7 @@ import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
 import { EditorChange } from '../models/editor-change';
 import { Tab } from '../models/tab';
+import { TemplateResult } from '../models/template-result';
 import config from '../config';
 const path = electronRequire('path');
 
@@ -61,13 +62,17 @@ export class OmnisharpService {
     public initializeTab(tab: Tab) {
         
         if (this.initialized[tab.id] === tab.connection.id) {
+            // todo: might be useless?
             return;
         }
         
         // wait for backends to start before doing this
         this.monitorService.queryReady.then(() => {
             this.queryService.queryTemplate(tab.connection)
-                .subscribe(result => {
+                .subscribe((result: TemplateResult) => {
+                    tab.templateHeader = result.header;
+                    tab.templateFooter = result.footer;
+                    tab.templateLineOffset = result.lineOffset;
                     // need to update omnisharp with an initial buffer template
                     // from which it can perform intellisense operations
                     let json = JSON.stringify({

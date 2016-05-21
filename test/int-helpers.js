@@ -1,5 +1,5 @@
 const path = require('path');
-
+const helper = require('../scripts/sql-helper');
 const isCI = process.env['CI']; // set by appveyor
 const ciMod = isCI ? 3 : 1;
 const timeTotal = 2 * 60 * 1000 * ciMod; // locally test runs at < 30 secs
@@ -12,10 +12,12 @@ const connectionString =
     isCI ? 'Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb'  
          : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
 
-const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
+const connectionString2 = 
+    isCI ? 'Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb2'
+         : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb2';
 
 // first create checks for all cell values, ensuring we keep passing the client around, 
-// and return it in the end, so it can be awaited. total bullshit logic ftw
+// and return it in the end, so it can be awaited
 function checkTable(client, rows, rowIndex, isBody) {
     if (!rows || rows.length === 0) {
         return client;
@@ -23,7 +25,7 @@ function checkTable(client, rows, rowIndex, isBody) {
     let rowIdx = rowIndex || 1;
     let cellSelector = isBody ? 'td' : 'th';
     let rowSelector = isBody ? 'tbody' : 'thead';
-    let rowCheckingClient = rows[0].reduce((wrapped, cellValue, idx) => {
+    let rowCheckingClient = rows[0].reduce((wrapped, expectedVal, idx) => {
         let selector = `table.table.table-condensed ${isBody ? 'tbody' : 'thead'} 
             tr:nth-child(${rowIdx}) ${isBody ? 'td' : 'th'}:nth-child(${idx + 1})`;
         return wrapped
@@ -31,7 +33,10 @@ function checkTable(client, rows, rowIndex, isBody) {
             .catch(function(e) { throw e })
             .getText(selector)
             .then(function (val) {
-                val.should.equal(cellValue);
+                // for datetime/timespan and the binary cols, 
+                // we just use a regex. for binary we dont care
+                let op = expectedVal.constructor.name === 'RegExp' ? 'match' : 'equal';
+                val.should[op](expectedVal);
             });
     }, client);
     return checkTable(rowCheckingClient, rows.slice(1), isBody ? rowIdx + 1 : 1, true);
@@ -53,6 +58,12 @@ function checkHints(client, hints) {
     }, client);
 }
 
+const sqlData = new Promise((done, err) => {
+    helper.load().then(data => {
+        done(data);
+    });
+});
+
 module.exports = {
     timeTotal,
     timeForBackend,
@@ -61,7 +72,8 @@ module.exports = {
     timeStepMin,
     appPath,
     connectionString,
-    queryText,
+    connectionString2,
     checkTable,
-    checkHints
+    checkHints,
+    sqlData
 };

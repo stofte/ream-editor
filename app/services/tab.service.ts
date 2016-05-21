@@ -21,17 +21,8 @@ export class TabService {
     }
     
     public newForeground(connection: Connection, navigate = true) {
+        const newId = this.id++;
         const tab = new Tab();
-        this.monitorService.queryReady.then(() => {
-            this.queryService
-                .queryTemplate(connection)
-                .subscribe(template => {
-                    // set template when possible
-                    tab.templateLineOffset = template.lineOffset;
-                    tab.templateHeader = template.header;
-                    tab.templateFooter = template.footer;
-                });
-        });
         tab.id = this.id++;
         tab.output = 'console';
         tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
@@ -45,19 +36,24 @@ export class TabService {
         }       
     }
     
-    public updateTabId(tabId: number, connection: Connection, navigate = true): void {
-        const tab = this.tabs.find(t => t.id === tabId);
+    public updateTabId(tabId: number, connection: Connection): void {
+        const tab = this.get(tabId);
         tab.connection = connection;
-        this.updateTab(tab, navigate);
+        this.updateTab(tab);
     }
     
-    public updateTab(tab: Tab, navigate = true): void {
+    public updateTab(tab: Tab): void {
         this.tabs.find(t => {
             if (t.id === tab.id) {
+                let updateTemplate = tab.connection && t.connection && 
+                    t.connection.id !== tab.connection.id;
                 t.connection = tab.connection;
                 t.output = tab.output; 
                 t.title = tab.title;
-                this.goto(tab);
+                if (updateTemplate) {
+                    this.omnisharpService.initializeTab(t);
+                }
+                this.goto(t);
                 return true;
             }
             return false;
@@ -66,11 +62,12 @@ export class TabService {
     
     public get(id: number) {
         const tab = this.tabs.find(x => x.id === id);
-        return tab; 
+        return tab && tab.clone(); 
     }
     
     public get active(): Tab {
-        return this.tabs.find(x => x.active);
+        let a = this.tabs.find(x => x.active);
+        return a && a.clone();
     }
     
     public routedTo(id: number): void {

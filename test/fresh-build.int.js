@@ -11,16 +11,14 @@ const {
     timeStepMin,
     appPath,
     connectionString,
-    queryText
+    connectionString2,
+    sqlData
 } = require('./int-helpers');
 
-const expectedQueryResults = [
-    ['Ident', 'SomeDesc'],
-    ['0', 'Foo 0'],
-    ['1', 'Foo 1'],
-    ['2', 'Foo 2'],
-    ['3', 'Foo 3']
-];
+
+const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
+const queryText2 = 'TypeTest.Take(10).Dump();';
+const queryText3 = 'TypeTest.Select(x => x.';
 
 const expectedAutocompletion = [
     'Description',
@@ -32,7 +30,21 @@ const expectedAutocompletion = [
     'ToString'
 ];
 
+const expectedAutocompletion2 = [
+    'Dump'
+];
+
+let expectedData = null;
+function setExpectedData(data) {
+    expectedData = data;
+    // since we do some mapping in our query, we modify the header values
+    expectedData[0][0][0] = 'Ident';
+    expectedData[0][0][1] = 'SomeDesc';    
+}
+
 describe('fresh build', function() {
+    let err = function(e) { throw e; };
+    
     this.timeout(timeTotal);
     before(function () {
         chai.should();
@@ -43,10 +55,14 @@ describe('fresh build', function() {
         return this.app.start();
     });
     
+    before(function() {
+        return sqlData.then(setExpectedData);
+    });
+    
     it('can add a new connection and perform a query and receive data', function () {
         // waitForX and similar functions will pass to catch if not fulfilled,
         // to pass the error up to mocha and fail the test, we just rethrow. 
-        let err = function(e) { throw e; };
+        
         let executingClient = this.app.client
             // assume timeout applies to all js invocations, individually, not combined
             .timeoutsAsyncScript(timeStepMax)
@@ -82,10 +98,12 @@ describe('fresh build', function() {
             .waitForVisible('.backend-timer-pulse', timeForBackend, true)
             .catch(err)
             .pause(timeStepMin)
-            .click('.int-test-execute-btn');
+            .click('.int-test-execute-btn')
+            ;
         
-        return checkTable(executingClient, expectedQueryResults)
-            .pause(timeStep);
+        return checkTable(executingClient, expectedData[0])
+            .pause(timeStep)
+            ;
     });
     
     it('provides the expected member completions for Foo entity', function() {
@@ -109,14 +127,102 @@ describe('fresh build', function() {
             .pause(timeStepMin)
             .keys('\uE009') // press down ctrl
             .keys('\uE00D') // space
-            .keys('\uE000'); // lift modifier (ctrl)
+            .keys('\uE000') // lift modifier (ctrl)
+            ;
             
         return checkHints(suggestionClient, expectedAutocompletion)
-            .pause(timeStep);
+            .pause(timeStep)
+            ;
     });
     
-    // seems tricky to close the window without bypassing the 
-    // close event handler that in turn closes the backend services
+    it('can add another connection string via the connection manager', function() {
+        return this.app.client 
+            .timeoutsAsyncScript(timeStepMax)
+            .click('.main-layer.layer-visible')
+            .pause(timeStepMin)
+            .keys('\uE009')
+            .keys('d')
+            .keys('\uE000')
+            .pause(timeStepMin)
+            .click('.int-test-conn-man p input')
+            // setValue seems to fail, the output gets messed up (must be some parsing going on)
+            .executeAsync(function(str, done) {
+                document.querySelector('.int-test-conn-man p input').value = str;
+                done(document.querySelector('.int-test-conn-man p input').value);
+            }, connectionString2)
+            .then(function(ret) {
+                ret.value.should.equal(connectionString2);
+            })
+            .keys('Enter')
+            .pause(timeStepMin)
+            .keys('\uE009')
+            .keys('d')
+            .keys('\uE000')
+            ;
+    });
+    
+    it('can open a new tab and change the connection to the newly created', function() {
+        return this.app.client
+            .click('.int-test-tab-list .glyphicon.glyphicon-plus')
+            .waitForText('.int-test-tab-list li:nth-child(2) a', 'Edit 1', timeStepMax)
+            .catch(err)
+            .click('#connection-selector-btn-keyboard-nav')
+            .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(2) a')
+            .keys('\uE015')
+            .keys('\uE015')
+            .keys('Enter')
+            // todo there's no indicator for this, so just wait some time
+            .pause(timeForBackend)
+            ;
+    });
+    
+    it('can query a sql table with complex types and receive expected results', function() {
+        const executingClient = this.app.client
+            .timeoutsAsyncScript(timeStepMax)
+            .executeAsync(function(query, done) {
+                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
+            }, queryText2)
+            .pause(timeStepMin)
+            .click('.int-test-execute-btn')
+            ;
+        
+        return checkTable(executingClient, expectedData[1])
+            .pause(timeStep)
+            ;
+    });
+    
+    // fix up omnisharp suggestions first
+    it.skip('can provide expected autocompletions for complex types', function() {
+        // cursor index, given the query
+        let cursorCol = queryText3.indexOf('x.') + 2;
+        let cursorRow = 0;
+        let suggestionClient = this.app.client
+            .timeoutsAsyncScript(timeStepMax)
+            .executeAsync(function(query, done) {
+                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
+            }, queryText3)
+            .pause(timeStepMin)
+            .moveToObject('.CodeMirror')
+            .click('.CodeMirror')
+            .executeAsync(function(row, col, done) {
+                document.querySelector('.CodeMirror').CodeMirror.setCursor(row, col);
+                done(document.querySelector('.CodeMirror').CodeMirror.getCursor());
+            }, cursorRow, cursorCol)
+            .then(function(cursor) {
+                cursor.value.ch.should.equal(cursorCol);
+                cursor.value.line.should.equal(cursorRow);
+            })
+            .pause(timeStepMin)
+            .keys('\uE009') // press down ctrl
+            .keys('\uE00D') // space
+            .keys('\uE000') // lift modifier (ctrl)
+            ;
+        
+        return checkHints(suggestionClient, expectedAutocompletion2)
+            .pause(timeStep)
+            ;
+    });
+    
     it('can shutdown', function () {
         this.timeout(timeStepMax);
         this.app.client

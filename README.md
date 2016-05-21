@@ -15,6 +15,9 @@ Developing
 
 TODO
 ----
+- Error handling
+- Culture handling
+- EF fails if table has no primary key?
 - Editor/OmniSharp improvements
 - SQLite and Postgres EF Core database providers
 

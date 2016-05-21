@@ -39,7 +39,7 @@ export class EditorDirective implements OnInit {
         const tabId = parseInt(routeParams.get('tab'), 10);
         this.current = tabService.get(tabId);
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
-        // need the service injected, even if this should be static
+        // todo: hack somewhere else. service ref should be passable
         if (!onetimeBullshit) {
             onetimeBullshit = true;
             CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
@@ -47,11 +47,13 @@ export class EditorDirective implements OnInit {
                 let cur = mirror.getCursor();
                 let range = mirror.findWordAt(cur);
                 let fragment = mirror.getRange(range.anchor, range.head);
-                let request = new AutocompletionQuery();
-                request.fileName = tab.fileName;
-                request.column = cur.ch + 1;
-                request.line = cur.line + tab.templateLineOffset;
-                request.buffer = tab.templateHeader + mirror.getValue() + tab.templateFooter;
+                let request = <AutocompletionQuery> {
+                    fileName: tab.fileName,
+                    column: cur.ch + 1,
+                    line: cur.line + tab.templateLineOffset,
+                    buffer: tab.templateHeader + mirror.getValue() + tab.templateFooter,
+                    wantKind: true
+                };
                 omnisharpService
                     .autocomplete(request)
                     .subscribe(list => {

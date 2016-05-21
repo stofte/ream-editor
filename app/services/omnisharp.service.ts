@@ -111,14 +111,14 @@ export class OmnisharpService {
             .groupBy(r => r.CompletionText)
             .map(nameList => {
                 // filter out duplicates of the same name and type
-                    let byType = _.reduce(nameList, (saved, item: any) => {
-                        if (!_.includes(saved, i => i.Kind !== item.Kind)) {
-                            saved.push(item);
-                        }
-                        return saved;
-                    }, []);
-                    let res = _.sortBy(byType, 'Kind');
-                    return res;
+                let byType = _.reduce(nameList, (saved, item: any) => {
+                    if (!saved.find(s => s.Kind === item.Kind)) {
+                        saved.push(item);
+                    }
+                    return saved;
+                }, []);
+                let res = _.sortBy(byType, 'Kind');
+                return res;
             })
             .flatten()
             .map((i: any) => {

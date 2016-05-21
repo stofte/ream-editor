@@ -110,6 +110,7 @@ namespace ##NS##
         public static IDictionary<string, object> _results;
         public static int _count;
 
+        /// <summary>QueryEngine.Inlined.Dumper</summary>
         public static T Dump<T>(this T o)
         {
             // since the context is lost when returning, we tolist anything we dump

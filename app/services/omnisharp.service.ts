@@ -112,7 +112,8 @@ export class OmnisharpService {
             .map(nameList => {
                 // filter out duplicates of the same name and type
                 let byType = _.reduce(nameList, (saved, item: any) => {
-                    if (!saved.find(s => s.Kind === item.Kind)) {
+                    let isCustomDump = item.Description === 'QueryEngine.Inlined.Dumper';
+                    if (!isCustomDump && !saved.find(s => s.Kind === item.Kind)) {
                         saved.push(item);
                     }
                     return saved;

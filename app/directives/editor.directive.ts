@@ -52,7 +52,8 @@ export class EditorDirective implements OnInit {
                     column: cur.ch + 1,
                     line: cur.line + tab.templateLineOffset,
                     buffer: tab.templateHeader + mirror.getValue() + tab.templateFooter,
-                    wantKind: true
+                    wantKind: true,
+                    wantDocumentationForEveryCompletionResult: true,
                 };
                 omnisharpService
                     .autocomplete(request)

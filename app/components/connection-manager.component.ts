@@ -6,30 +6,42 @@ import { Connection } from '../models/connection';
 @Component({
     selector: 'f-connection-manager',
     template: `
-<div class="container" class="int-test-conn-man">
-    <h1>connection manager</h1>
-    <p>
-        <label>
-            <input placeholder="Add new connectionstring" #newconnection 
-                [(ngModel)]="newConnectionStringText" 
-                (keyup.enter)="addNewConnection(newconnection.value)">
-        </label>
-    </p>
-    <ul>
-        <li *ngFor="let connection of connectionService.connections">
-            <div *ngIf="!connection.Editing">
-                <label (dblclick)="editConnection(connection)">{{connection.connectionString}}</label>
-                <button (click)="removeConnection(connection)">remove</button>
-            </div>
-            <input #editedconn
-                *ngIf="connection.editing" 
-                [value]="connection.temporary" 
-                (blur)="stopEditing(connection, editedconn.value)" 
-                (keyup.enter)="updateEditing(connection, editedconn.value)" 
-                (keyup.escape)="cancelEditing(connection)">
-        </li>
-    </ul>
-    <p><a (click)="closeManager()">close connection manager</a></p>
+<div class="container-fluid">
+    <div class="row int-test-conn-man">
+        <div class="col-md-12">
+            <h1>Connection Manager</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                <label>
+                    <input placeholder="Add new connectionstring" #newconnection 
+                        [(ngModel)]="newConnectionStringText" 
+                        (keyup.enter)="addNewConnection(newconnection.value)">
+                </label>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ul>
+                <li *ngFor="let connection of connectionService.connections">
+                    <div *ngIf="!connection.Editing">
+                        <label (dblclick)="editConnection(connection)">{{connection.connectionString}}</label>
+                        <button (click)="removeConnection(connection)">remove</button>
+                    </div>
+                    <input #editedconn
+                        *ngIf="connection.editing" 
+                        [value]="connection.temporary" 
+                        (blur)="stopEditing(connection, editedconn.value)" 
+                        (keyup.enter)="updateEditing(connection, editedconn.value)" 
+                        (keyup.escape)="cancelEditing(connection)">
+                </li>
+            </ul>
+            <p><a (click)="closeManager()">close connection manager</a></p>
+        </div>
+    </div>
 </div>
 `
 })

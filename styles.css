@@ -1,4 +1,5 @@
 .main-layer {
+    position: absolute;
     visibility: hidden;
     z-index: 0;
 }

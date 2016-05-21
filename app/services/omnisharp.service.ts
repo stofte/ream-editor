@@ -124,11 +124,12 @@ export class OmnisharpService {
             .flatten()
             .map((i: any) => {
                 return {
+                    sortKey: i.CompletionText.toLocaleLowerCase(), 
                     text: i.CompletionText,
                     className: `foo`
                 };
             })
-            .sortBy('text')
+            .sortBy('sortKey')
             .value();
     }
     

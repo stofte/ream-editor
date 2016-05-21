@@ -1,6 +1,7 @@
 const Application = require('spectron').Application
 const chai = require('chai');
 const http = require('http');
+const _ = require('lodash');
 const { 
     checkTable,
     checkHints,
@@ -12,34 +13,28 @@ const {
     appPath,
     connectionString,
     connectionString2,
-    sqlData
+    sqlData,
+    objectMethods
 } = require('./int-helpers');
-
 
 const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
 const queryText2 = 'TypeTest.Take(10).Dump();';
 const queryText3 = 'TypeTest.Select(x => x.';
 
-const expectedAutocompletion = [
-    'Description',
-    'Dump',
-    'Equals',
-    'GetHashCode',
-    'GetType',
-    'Id',
-    'ToString'
-];
-
-const expectedAutocompletion2 = [
-    'Dump'
-];
-
 let expectedData = null;
+let expectedCompletions = null;
+
 function setExpectedData(data) {
-    expectedData = data;
+    expectedData = _.cloneDeep(data);
     // since we do some mapping in our query, we modify the header values
     expectedData[0][0][0] = 'Ident';
-    expectedData[0][0][1] = 'SomeDesc';    
+    expectedData[0][0][1] = 'SomeDesc';
+    expectedCompletions = [
+        _.sortBy(data[0][0].concat(objectMethods), str => str.toLocaleLowerCase()),
+        _.sortBy(data[1][0].concat(objectMethods)
+            .concat(['rowversioncol']), str => str.toLocaleLowerCase())
+    ];
+    console.log('complex:', expectedCompletions[1]);
 }
 
 describe('fresh build', function() {
@@ -59,12 +54,8 @@ describe('fresh build', function() {
         return sqlData.then(setExpectedData);
     });
     
-    it('can add a new connection and perform a query and receive data', function () {
-        // waitForX and similar functions will pass to catch if not fulfilled,
-        // to pass the error up to mocha and fail the test, we just rethrow. 
-        
+    it('can add a new connection and perform a query and receive data', function () {        
         let executingClient = this.app.client
-            // assume timeout applies to all js invocations, individually, not combined
             .timeoutsAsyncScript(timeStepMax)
             .waitUntil(function () {
                 return this.getText('.int-test-start-page > p > a')
@@ -130,7 +121,7 @@ describe('fresh build', function() {
             .keys('\uE000') // lift modifier (ctrl)
             ;
             
-        return checkHints(suggestionClient, expectedAutocompletion)
+        return checkHints(suggestionClient, expectedCompletions[0])
             .pause(timeStep)
             ;
     });
@@ -192,7 +183,7 @@ describe('fresh build', function() {
     });
     
     // fix up omnisharp suggestions first
-    it.skip('can provide expected autocompletions for complex types', function() {
+    it('can provide expected autocompletions for complex types', function() {
         // cursor index, given the query
         let cursorCol = queryText3.indexOf('x.') + 2;
         let cursorRow = 0;
@@ -218,7 +209,7 @@ describe('fresh build', function() {
             .keys('\uE000') // lift modifier (ctrl)
             ;
         
-        return checkHints(suggestionClient, expectedAutocompletion2)
+        return checkHints(suggestionClient, expectedCompletions[1])
             .pause(timeStep)
             ;
     });

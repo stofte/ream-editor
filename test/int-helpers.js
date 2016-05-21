@@ -1,5 +1,6 @@
 const path = require('path');
 const helper = require('../scripts/sql-helper');
+
 const isCI = process.env['CI']; // set by appveyor
 const ciMod = isCI ? 3 : 1;
 const timeTotal = 2 * 60 * 1000 * ciMod; // locally test runs at < 30 secs
@@ -7,7 +8,10 @@ const timeForBackend = 10 * 1000 * ciMod;
 const timeStep = 1 * 1000 * ciMod;
 const timeStepMax = 1.5 * 1000 * ciMod;
 const timeStepMin = 500 * ciMod;
-const appPath = path.normalize(`${path.dirname(__dirname)}/linq-editor-win32-x64/linq-editor.exe`);
+
+const appPath = path.normalize(`${path.dirname(__dirname)
+    }/linq-editor-win32-x64/linq-editor.exe`);
+
 const connectionString = 
     isCI ? 'Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb'  
          : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
@@ -15,6 +19,19 @@ const connectionString =
 const connectionString2 = 
     isCI ? 'Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb2'
          : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb2';
+
+const objectMethods = [
+    'Equals',
+    'ToString',
+    'GetType',
+    'GetHashCode'  
+];
+
+const sqlData = new Promise((done, err) => {
+    helper.load().then(data => {
+        done(data);
+    });
+});
 
 // first create checks for all cell values, ensuring we keep passing the client around, 
 // and return it in the end, so it can be awaited
@@ -58,12 +75,6 @@ function checkHints(client, hints) {
     }, client);
 }
 
-const sqlData = new Promise((done, err) => {
-    helper.load().then(data => {
-        done(data);
-    });
-});
-
 module.exports = {
     timeTotal,
     timeForBackend,
@@ -75,5 +86,6 @@ module.exports = {
     connectionString2,
     checkTable,
     checkHints,
-    sqlData
+    sqlData,
+    objectMethods
 };

@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const _ = require('lodash');
 const dbJson = path.join(__dirname, 'db.sql.json');
 const outDirname = path.dirname(__dirname);
 const createPath = path.join(outDirname, 'create-generated.sql');

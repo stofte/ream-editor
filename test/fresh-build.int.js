@@ -37,9 +37,9 @@ function setExpectedData(data) {
 }
 
 describe('fresh build', function() {
-    let err = function(e) { throw e; };
-    
+    let err = function(e) { throw e; };    
     this.timeout(timeTotal);
+
     before(function () {
         chai.should();
         this.app = new Application({
@@ -219,8 +219,6 @@ describe('fresh build', function() {
             this.app.client
                 .timeoutsAsyncScript(timeStepMax)
                 .executeAsync(function() {
-                    // for debug purposes
-                    localStorage.clear();
                     // this sends the close event to the regular shutdown handler.
                     // other ways to close the window seems to fail.
                     const win = electronRequire('electron').remote.getCurrentWindow();
@@ -232,14 +230,14 @@ describe('fresh build', function() {
         });
 
         // check via http if services are still up and going.
-        it('closes omnisharp', function(done) {
+        it('also closes background omnisharp process', function(done) {
             this.timeout(timeForBackend);
             let url = `http://localhost:2000/checkreadystate`;
             http.get(url, res => { done(new Error('response received')); })
                 .on('error', () => { done(); });
         });
         
-        it('closes query', function(done) {
+        it('also closes background query process', function(done) {
             this.timeout(timeForBackend);
             let url = `http://localhost:8111/checkreadystate`;
             http.get(url, res => { done(new Error('response received')); })
@@ -249,4 +247,18 @@ describe('fresh build', function() {
     });
     
 
+});
+
+describe('instance with saved connections', function() {
+    let err = function(e) { throw e; };    
+    this.timeout(timeTotal);
+
+    before(function () {
+        chai.should();
+        this.app = new Application({
+            path: appPath,
+            requireName: 'electronRequire'
+        });
+        return this.app.start();
+    });    
 });

@@ -34,7 +34,6 @@ function setExpectedData(data) {
         _.sortBy(data[1][0].concat(objectMethods)
             .concat(['rowversioncol']), str => str.toLocaleLowerCase())
     ];
-    console.log('complex:', expectedCompletions[1]);
 }
 
 describe('fresh build', function() {

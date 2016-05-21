@@ -37,7 +37,8 @@ function setExpectedData(data) {
 }
 
 describe('fresh build', function() {
-    let err = function(e) { throw e; };    
+    const err = function waitErrorHandler(e) { throw e; };
+    this.retries(2); // todo: rare local failures?
     this.timeout(timeTotal);
 
     before(function () {
@@ -213,52 +214,71 @@ describe('fresh build', function() {
             ;
     });
     
-    describe('when closing', function () {
-        before(function() {
-            this.timeout(timeStepMax);
-            this.app.client
-                .timeoutsAsyncScript(timeStepMax)
-                .executeAsync(function() {
-                    // this sends the close event to the regular shutdown handler.
-                    // other ways to close the window seems to fail.
-                    const win = electronRequire('electron').remote.getCurrentWindow();
-                    win.emit('close');
-                });
-            return new Promise((succ, err) => {
-                setTimeout(succ, timeStep);
-            });            
-        });
+    it('shuts down', function() {
+        this.timeout(timeForBackend * 2);
+        this.app.client
+            .timeoutsAsyncScript(timeStepMax)
+            .executeAsync(function() {
+                // this sends the close event to the regular shutdown handler.
+                // other ways to close the window seems to fail.
+                const win = electronRequire('electron').remote.getCurrentWindow();
+                win.emit('close');
+            });
+        return new Promise((succ, err) => {
+            setTimeout(succ, timeForBackend);
+        });        
+    })
+    
+    describe('instance with saved connections', function() {
+        let err = function(e) { throw e; };    
+        this.timeout(timeTotal);
 
-        // check via http if services are still up and going.
-        it('also closes background omnisharp process', function(done) {
-            this.timeout(timeForBackend);
-            let url = `http://localhost:2000/checkreadystate`;
-            http.get(url, res => { done(new Error('response received')); })
-                .on('error', () => { done(); });
+        before(function () {
+            chai.should();
+            this.app = new Application({
+                path: appPath,
+                requireName: 'electronRequire'
+            });
+            return this.app.start();
         });
         
-        it('also closes background query process', function(done) {
-            this.timeout(timeForBackend);
-            let url = `http://localhost:8111/checkreadystate`;
-            http.get(url, res => { done(new Error('response received')); })
-                .on('error', () => { done(); });
+        it('becomes visible', function(done) {
+            this.timeout(timeForBackend * 2);
+            setTimeout(function() {
+                done();
+            }, timeForBackend);
         });
 
+        describe('when closing', function () {
+            before(function() {
+                this.timeout(timeStepMax);
+                this.app.client
+                    .timeoutsAsyncScript(timeStepMax)
+                    .executeAsync(function() {
+                        localStorage.clear(); // for next run
+                        const win = electronRequire('electron').remote.getCurrentWindow();
+                        win.emit('close');
+                    });
+                return new Promise((succ, err) => {
+                    setTimeout(succ, timeStep);
+                });            
+            });
+
+            // check via http if services are still up and going.
+            it('also closes background omnisharp process', function(done) {
+                this.timeout(timeForBackend);
+                let url = `http://localhost:2000/checkreadystate`;
+                http.get(url, res => { done(new Error('response received')); })
+                    .on('error', () => { done(); });
+            });
+            
+            it('also closes background query process', function(done) {
+                this.timeout(timeForBackend);
+                let url = `http://localhost:8111/checkreadystate`;
+                http.get(url, res => { done(new Error('response received')); })
+                    .on('error', () => { done(); });
+            });
+
+        });
     });
-    
-
-});
-
-describe('instance with saved connections', function() {
-    let err = function(e) { throw e; };    
-    this.timeout(timeTotal);
-
-    before(function () {
-        chai.should();
-        this.app = new Application({
-            path: appPath,
-            requireName: 'electronRequire'
-        });
-        return this.app.start();
-    });    
 });

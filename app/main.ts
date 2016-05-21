@@ -1,8 +1,10 @@
 
 import { enableProdMode } from '@angular/core';
-console.log(MODE);
+
 if (MODE === 'PRODUCTION') {
     enableProdMode();
+} else {
+    console.log(MODE);
 }
 
 import { provide } from '@angular/core';

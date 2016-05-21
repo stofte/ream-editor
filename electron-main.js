@@ -58,12 +58,12 @@ app.on('ready', function() {
     ];
 
     mainWindow.setMenu(Menu.buildFromTemplate(template));
-    //mainWindow.maximize();
 
     // and load the index.html of the app.
     mainWindow.loadURL('file://' + __dirname.replace(/\\/g,'/') + '/index.html');
     if (MODE === 'DEBUG') {
         // Open the DevTools.
+        mainWindow.maximize();
         mainWindow.webContents.openDevTools();        
     }
 

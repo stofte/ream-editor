@@ -10,6 +10,8 @@ export class Tab {
     public templateHeader: string;
     public templateFooter: string;
     public templateLineOffset: number; // used by omnisharp, maps the partial view into the full template. columns not mapped
+    public omnisharpReady: () => void;
+    public omnisharp: Promise<void>;
 
     public clone(): Tab {
         return <Tab> {
@@ -21,7 +23,9 @@ export class Tab {
             fileName: this.fileName,
             templateHeader: this.templateHeader,
             templateFooter: this.templateFooter,
-            templateLineOffset: this.templateLineOffset
+            templateLineOffset: this.templateLineOffset,
+            omnisharp: this.omnisharp,
+            omnisharpReady: this.omnisharpReady
         };
     }
 }

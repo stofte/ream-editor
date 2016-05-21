@@ -27,29 +27,17 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
                     <a (click)="newTab()" href="javascript:void(0)"><span class="glyphicon glyphicon-plus"></span></a>
                 </li>
             </ul>
-            <ul *ngIf="timerEnabled" class="nav navbar-nav navbar-right">
-                <li class="backend-timer-pulse"><a href="javascript:void(0)">
-                    <span class="glyphicon glyphicon-time" title="Backend starting"></span></a>
-                </li>
-            </ul>
         </div>
     </div>
 </nav>
 `
 })
 export class TabListComponent {
-    timerEnabled: boolean = true;
     constructor(
         private tabService: TabService,
         private router: Router,
-        private location: Location,
-        monitorService: MonitorService
+        private location: Location
     ) {
-        monitorService.omnisharpReady.then(() => {
-            monitorService.queryReady.then(() => {
-                this.timerEnabled = false;
-            });
-        });
     }
     
     private newTab() {

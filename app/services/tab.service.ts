@@ -27,6 +27,9 @@ export class TabService {
         tab.output = 'console';
         tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
         tab.fileName = this.omnisharpService.randomFile(tab.id);
+        tab.omnisharp = new Promise<void>((done, err) => {
+            tab.omnisharpReady = () => done();
+        });
         this.omnisharpService.initializeTab(tab);
         this.tabs.forEach(t => t.active = false);
         tab.active = true;

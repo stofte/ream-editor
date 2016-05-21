@@ -85,7 +85,7 @@ describe('fresh build', function() {
                 // codemirror saves a reference to itself in the DOM weee
                 done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
             }, queryText)
-            .waitForVisible('.backend-timer-pulse', timeForBackend, true)
+            .waitForEnabled('.int-test-execute-btn', timeForBackend)
             .catch(err)
             .pause(timeStepMin)
             .click('.int-test-execute-btn')
@@ -162,11 +162,11 @@ describe('fresh build', function() {
             .keys('\uE015')
             .keys('Enter')
             // todo there's no indicator for this, so just wait some time
-            .pause(timeForBackend)
+            .pause(timeStepMin)
             ;
     });
     
-    it('can query a sql table with complex types and receive expected results', function() {
+    it('can query TypeTest using new connection and receive expected results', function() {
         const executingClient = this.app.client
             .timeoutsAsyncScript(timeStepMax)
             .executeAsync(function(query, done) {
@@ -213,35 +213,40 @@ describe('fresh build', function() {
             ;
     });
     
-    it('can shutdown', function () {
-        this.timeout(timeStepMax);
-        this.app.client
-            .timeoutsAsyncScript(timeForBackend)
-            .executeAsync(function() {
-                // for debug purposes
-                localStorage.clear();
-                // this sends the close event to the regular shutdown handler.
-                // other ways to close the window seems to fail.
-                const win = electronRequire('electron').remote.getCurrentWindow();
-                win.emit('close');
-            });
-        return new Promise((succ, err) => {
-            setTimeout(succ, timeStep);
+    describe('when closing', function () {
+        before(function() {
+            this.timeout(timeStepMax);
+            this.app.client
+                .timeoutsAsyncScript(timeStepMax)
+                .executeAsync(function() {
+                    // for debug purposes
+                    localStorage.clear();
+                    // this sends the close event to the regular shutdown handler.
+                    // other ways to close the window seems to fail.
+                    const win = electronRequire('electron').remote.getCurrentWindow();
+                    win.emit('close');
+                });
+            return new Promise((succ, err) => {
+                setTimeout(succ, timeStep);
+            });            
         });
+
+        // check via http if services are still up and going.
+        it('closes omnisharp', function(done) {
+            this.timeout(timeForBackend);
+            let url = `http://localhost:2000/checkreadystate`;
+            http.get(url, res => { done(new Error('response received')); })
+                .on('error', () => { done(); });
+        });
+        
+        it('closes query', function(done) {
+            this.timeout(timeForBackend);
+            let url = `http://localhost:8111/checkreadystate`;
+            http.get(url, res => { done(new Error('response received')); })
+                .on('error', () => { done(); });
+        });
+
     });
     
-    // check via http if services are still up and going.
-    it('shuts down omnisharp service after closing', function(done) {
-        this.timeout(timeForBackend);
-        let url = `http://localhost:2000/checkreadystate`;
-        http.get(url, res => { done(new Error('response received')); })
-            .on('error', () => { done(); });
-    });
-    
-    it('shuts query service after closing', function(done) {
-        this.timeout(timeForBackend);
-        let url = `http://localhost:8111/checkreadystate`;
-        http.get(url, res => { done(new Error('response received')); })
-            .on('error', () => { done(); });
-    });
+
 });

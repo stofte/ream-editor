@@ -60,7 +60,7 @@ export class OmnisharpService {
     }
     
     public initializeTab(tab: Tab) {
-        
+
         if (this.initialized[tab.id] === tab.connection.id) {
             // todo: might be useless?
             return;
@@ -84,6 +84,7 @@ export class OmnisharpService {
                         .subscribe(data => {
                             if (data.status === 200) {
                                 this.initialized[tab.id] = tab.connection.id;
+                                tab.omnisharpReady();
                             }
                         });
                 });

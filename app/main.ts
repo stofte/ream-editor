@@ -1,3 +1,4 @@
+
 import { enableProdMode } from '@angular/core';
 console.log(MODE);
 if (MODE === 'PRODUCTION') {
@@ -19,18 +20,21 @@ import { EditorService } from './services/editor.service';
 import { QueryService } from './services/query.service';
 import { OmnisharpService } from './services/omnisharp.service';
 import { LogService } from './services/log.service';
-
-bootstrap(AppComponent, [
-    MonitorService,
-    OverlayUiStateService,
-    StorageService,
-    ConnectionService,
-    TabService,
-    EditorService,
-    QueryService,
-    OmnisharpService,
-    LogService,
-    HTTP_PROVIDERS,
-    ROUTER_PROVIDERS,
-    provide(LocationStrategy, { useClass: HashLocationStrategy }),
-]);
+try {
+    bootstrap(AppComponent, [
+        MonitorService,
+        OverlayUiStateService,
+        StorageService,
+        ConnectionService,
+        TabService,
+        EditorService,
+        QueryService,
+        OmnisharpService,
+        LogService,
+        HTTP_PROVIDERS,
+        ROUTER_PROVIDERS,
+        provide(LocationStrategy, { useClass: HashLocationStrategy }),
+    ]);
+} catch (exn) {
+    console.log(':)');
+}

@@ -20,27 +20,35 @@ import { Connection } from '../models/connection';
             <div class="form-group">
                 <label for="connectringStringInp">Add new</label>
                 <input type="string" class="form-control" 
-                    id="connectringStringInp" placeholder="Type/paste connection string and press enter ..."
+                    id="connectringStringInp" placeholder="Type/paste connection string and press enter to add"
                     #newconnection [(ngModel)]="newConnectionStringText"
                     (keyup.enter)="addNewConnection(newconnection.value)">
             </div>
         </form>
         <div class="row">
             <div class="col-md-12">
-                <ul>
-                    <li *ngFor="let connection of connectionService.connections">
-                        <div *ngIf="!connection.Editing">
-                            <label (dblclick)="editConnection(connection)">{{connection.connectionString}}</label>
-                            <button (click)="removeConnection(connection)">remove</button>
-                        </div>
-                        <input #editedconn
-                            *ngIf="connection.editing" 
-                            [value]="connection.temporary" 
-                            (blur)="stopEditing(connection, editedconn.value)" 
-                            (keyup.enter)="updateEditing(connection, editedconn.value)" 
-                            (keyup.escape)="cancelEditing(connection)">
-                    </li>
-                </ul>
+                <table class="table">
+                    <thead><caption style="white-space: pre">Current connections</caption></thead>
+                    <tbody>
+                        <tr *ngFor="let conn of connectionService.connections">
+                            <td style="vertical-align: middle">
+                                <p *ngIf="!conn.editing" style="margin-bottom: 0">
+                                    <span (dblclick)="editConnection(conn)" title="Double-click to edit">{{conn.connectionString}}</span>
+                                </p>
+                                <p *ngIf="conn.editing" style="margin-bottom: 0">
+                                    <input #editedconn class="form-control"
+                                        [value]="conn.temporary" 
+                                        (blur)="stopEditing(conn, editedconn.value)" 
+                                        (keyup.enter)="updateEditing(conn, editedconn.value)" 
+                                        (keyup.escape)="cancelEditing(conn)">
+                                </p>
+                            </td>
+                            <td>
+                                <button (click)="removeConnection(conn)" class="btn btn-default float-right">Remove</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="row">

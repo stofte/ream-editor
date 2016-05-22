@@ -15,6 +15,7 @@ Developing
 
 TODO
 ----
+- TS Model persistence should be picky (ie no "editing" property)
 - Error handling
 - Culture handling
 - Multiple instance handling

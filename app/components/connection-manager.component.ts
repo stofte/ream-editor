@@ -44,7 +44,7 @@ import { Connection } from '../models/connection';
                                 </p>
                             </td>
                             <td>
-                                <button (click)="removeConnection(conn)" class="btn btn-default float-right">Remove</button>
+                                <button (click)="removeConnection(conn)" class="btn btn-default pull-right">Remove</button>
                             </td>
                         </tr>
                     </tbody>

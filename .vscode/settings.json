@@ -10,5 +10,8 @@
 		"build": true,
 		"omnisharp": true,
 		"omnisharp-win-x64-netcoreapp1*": true
+	},
+	"search.exclude": {
+		"linq-editor-win32-x64": true
 	}
 }

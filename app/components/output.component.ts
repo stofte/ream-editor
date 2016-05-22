@@ -12,22 +12,12 @@ import { ResultPage } from '../models/result-page';
 <div class="row" style="margin-bottom:10px">
     <div class="col-md-12">
         <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default" 
-                (click)="showConsole()">Console</button>
             <button 
-                
                 *ngFor="let page of pages"
                 (click)="showResult(page.index)"
-                type="button" class="btn btn-default">
+                type="button" class="btn btn-default {{page.index === activeResultPage ? 'active' : ''}}">
                 {{page.text}}
             </button>
-        </div>
-    </div>
-</div>
-<div class="row" *ngIf="consoleVisible">
-    <div class="col-md-12">
-        <div class="well well-sm">
-            <p>console</p>
         </div>
     </div>
 </div>
@@ -55,8 +45,6 @@ import { ResultPage } from '../models/result-page';
 export class OutputComponent {
     tabId: number;
     connectionId: number;
-    consoleVisible: boolean;
-    outputParam: any;
     activeResultPage: number = null;
     pages: any[] = [];
     results: any[][] = [];
@@ -68,40 +56,30 @@ export class OutputComponent {
         private routeParams: RouteParams
     ) {
         this.tabId = parseInt(routeParams.get('tab'), 10);
+        const tab = tabService.get(this.tabId);
         this.connectionId = parseInt(routeParams.get('connection'), 10);
-        this.outputParam = this.routeParams.get('output');
-        this.consoleVisible = this.outputParam === 'console';
+        //this.outputParam = this.routeParams.get('output');
         let mapper = (x: ResultPage, i) => { 
             return { text: x.title, index: i, rows: x.rows, columns: x.columns }; 
         };
         let previous = queryService.loaded(this.tabId);
         this.pages = previous.length > 0 ? previous[0].pages.map(mapper) : [];
-        this.activeResultPage = parseInt(this.outputParam, 10);
+        this.activeResultPage = tab.output;
 
         queryService
             .results(this.tabId)
             .subscribe(result => {
-                // once results tick in, and user is looking at the console, 
-                // then change tab to first data table
-                if (this.consoleVisible && result.pages.length > 0) {
-                    this.router.navigate(['EditorTab', { tab: this.tabId, connection: this.connectionId, output: 0 }]);
-                }
                 this.pages = result.pages.map(mapper);
+                if (this.pages.length > 0) {
+                    this.activeResultPage = 0;
+                }
             });
     }
     
-    attached() {
-        let tab = this.tabService.active;
-        tab.title = 'foo';
-        tab.output = this.outputParam;
-        this.tabService.updateTab(tab);
-    }
-        
     showResult(idx: number) {
-        this.router.navigate(['EditorTab', { tab: this.tabId, connection: this.connectionId, output: idx }]);
-    }
-    
-    showConsole()  {
-        this.router.navigate(['EditorTab', { tab: this.tabId, connection: this.connectionId, output: 'console' }]);
+        let tab = this.tabService.active;
+        tab.output = idx;
+        this.activeResultPage = idx;
+        this.tabService.updateTab(tab);
     }
 }

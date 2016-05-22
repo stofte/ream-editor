@@ -19,7 +19,7 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
             <ul class="nav navbar-nav">
                 <li *ngFor="let tab of tabService.tabs"
                      class="{{tabService.active.id === tab.id ? 'active' : ''}}">
-                    <a [routerLink]="['EditorTab', {tab: tab.id, connection: tab.connection.id, output: 'tab.output' }]">
+                    <a [routerLink]="['EditorTab', {tab: tab.id, connection: tab.connection.id }]">
                         {{tab.title}}
                     </a>
                 </li>

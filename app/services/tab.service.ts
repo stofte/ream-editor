@@ -24,7 +24,7 @@ export class TabService {
         const tab = new Tab();
         tab.id = this.id++;
         tab.title = `Query ${tab.id}`;
-        tab.output = 'console';
+        tab.output = null; // new tab has no output set
         tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
         tab.fileName = this.omnisharpService.randomFile(tab.id);
         tab.omnisharp = new Promise<void>((done, err) => {
@@ -56,6 +56,7 @@ export class TabService {
                 if (updateTemplate) {
                     this.omnisharpService.initializeTab(t);
                 }
+                // might not actually go anywhere but of well
                 this.goto(t);
                 return true;
             }
@@ -80,6 +81,6 @@ export class TabService {
     }
     
     private goto(tab: Tab): void {
-        this.router.navigate(['EditorTab', { tab: tab.id, connection: tab.connection.id, output: tab.output }]);
+        this.router.navigate(['EditorTab', { tab: tab.id, connection: tab.connection.id }]);
     }
 }

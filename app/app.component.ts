@@ -20,7 +20,7 @@ export class ChatComponent {}
 @RouteConfig([
     { path: '/start', as: 'StartPage', component: StartPageComponent, useAsDefault: true },
     { path: '/guide', as: 'GuidePage', component: StartPageComponent },
-    { path: '/tab/:tab/:connection/:output', as: 'EditorTab', component: BufferTabComponent }
+    { path: '/tab/:tab/:connection', as: 'EditorTab', component: BufferTabComponent }
 ])
 @Component({
     selector: 'f-app',

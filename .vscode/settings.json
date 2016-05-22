@@ -8,7 +8,6 @@
 		"obj": true,
 		"bin": true,
 		"build": true,
-		"linq-editor-win32-x64": true,
 		"omnisharp": true,
 		"omnisharp-win-x64-netcoreapp1*": true
 	}

@@ -5,13 +5,16 @@ const outDirname = path.dirname(__dirname);
 const createPath = path.join(outDirname, 'create-generated.sql');
 const insertPath = path.join(outDirname, 'insert-generated.sql');
 
+// these are auto generated
+const insertColumnFilter = x => x !== 'rowversioncol' && x !== 'IdAuto';
+
 // loads the json in a format the test runner will recognize, 
 // a list of lists of values. first list is the table headers
 function loadMapper(t) {
     let table = t.slice(2);
     let tableCols = table
         .map(col => Object.keys(col).filter(k => k !== 'data')[0])
-        .filter(x => x  !== 'rowversioncol');
+        ;//.filter(columnFilter);
     let tableRows = table[0].data.map((_, idx) => {
             return table
                 .map((col, i) => col.data && col.data[idx])
@@ -26,7 +29,7 @@ function loadMapper(t) {
                     } else if (dateRegex.test(x)) {
                         return dateRegex;
                     } else if (x.indexOf && x.indexOf('0x') === 0) {
-                         return /.../; // not really sure whats being returned by sql server here ...
+                         return /.*/; // not really sure whats being returned by sql server here ...
                     } else if (x.replace) { // unquote \o/
                         return x.replace(/^\'([^']*)'$/, '$1');
                     } else {
@@ -62,7 +65,7 @@ function generate() {
                 }).join(',\n');
                 let insertCols = def
                     .map(column => Object.keys(column).filter(k => k !== 'data')[0])
-                    .filter(x => x !== 'rowversioncol') // todo exception!
+                    .filter(insertColumnFilter)
                     .join(',\n');
                 const rowsVals = def
                     .map(c => c.data)
@@ -124,6 +127,7 @@ ${data}
 `;
     });
     return `use ${useName};
+delete ${tableName}; -- dump any previous data
 ${inserts.join('\n')}
 `;
 }

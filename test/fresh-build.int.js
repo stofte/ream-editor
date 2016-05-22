@@ -17,7 +17,7 @@ const {
     objectMethods
 } = require('./int-helpers');
 
-const queryText = 'Foo.Select(x => new { Ident = x.Id, SomeDesc = x.Description }).Dump();';
+const queryText = 'Foo.Select(x => new { SomeDesc = x.Description, Ident = x.IdAuto }).Dump();';
 const queryText2 = 'TypeTest.Take(10).Dump();';
 const queryText3 = 'TypeTest.Select(x => x.';
 
@@ -27,17 +27,34 @@ let expectedCompletions = null;
 function setExpectedData(data) {
     expectedData = _.cloneDeep(data);
     // since we do some mapping in our query, we modify the header values
-    expectedData[0][0][0] = 'Ident';
-    expectedData[0][0][1] = 'SomeDesc';
+    expectedData[0][0][0] = 'SomeDesc';
+    expectedData[0][0][1] = 'Ident';
     expectedCompletions = [
         _.sortBy(data[0][0].concat(objectMethods), str => str.toLocaleLowerCase()),
-        _.sortBy(data[1][0].concat(objectMethods)
-            .concat(['rowversioncol']), str => str.toLocaleLowerCase())
+        _.sortBy(data[1][0].concat(objectMethods), str => str.toLocaleLowerCase())
     ];
 }
 
+const err = function waitErrorHandler(e) { throw e; };
+
+function queryFooUsingCurrentConnectionAndCheckResults() {
+        let executingClient = this.app.client
+            .executeAsync(function(query, done) {
+                // codemirror saves a reference to itself in the DOM weee
+                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
+            }, queryText)
+            .waitForEnabled('.int-test-execute-btn', timeForBackend)
+            .catch(err)
+            .pause(timeStepMin)
+            .click('.int-test-execute-btn')
+            ;
+        
+        return checkTable(executingClient, expectedData[0])
+            .pause(timeStep)
+            ;
+    }
+
 describe('fresh build', function() {
-    const err = function waitErrorHandler(e) { throw e; };
     this.retries(2); // todo: rare local failures?
     this.timeout(timeTotal);
 
@@ -54,20 +71,18 @@ describe('fresh build', function() {
         return sqlData.then(setExpectedData);
     });
     
-    it('can add a new connection and perform a query and receive data', function () {        
-        let executingClient = this.app.client
-            .timeoutsAsyncScript(timeStepMax)
-            .waitUntil(function () {
-                return this.getText('.int-test-start-page > p > a')
-                    .then((val) => val.should.equal('click to open connection manager'));
-            })
-            .catch(err)
-            .click('.int-test-start-page > p > a')
+    it('starts on the start page', function() {
+        return this.app.client
             .waitUntil(function() {
-                return this.getText('.int-test-conn-man > h1')
-                    .then((val) => val.should.equal('connection manager'));
-            })
-            .catch(err)
+                return this.getText('.int-test-start-page > p > a')
+                    .then((val) => val === 'click to open connection manager');
+            });
+    });
+    
+    it('can add a new connection and close connection manager', function () {        
+        return this.app.client
+            .click('.int-test-start-page > p > a')
+            .pause(timeStepMin)
             .click('.int-test-conn-man p input')
             // setValue seems to fail, the output gets messed up (must be some parsing going on)
             .executeAsync(function(str, done) {
@@ -79,23 +94,11 @@ describe('fresh build', function() {
             })
             .keys('Enter')
             .pause(timeStepMin)
-            .click('.int-test-conn-man > p > a')
-            .pause(timeStepMin)
-            .click('.int-test-start-page > p > a')
-            .executeAsync(function(query, done) {
-                // codemirror saves a reference to itself in the DOM weee
-                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
-            }, queryText)
-            .waitForEnabled('.int-test-execute-btn', timeForBackend)
-            .catch(err)
-            .pause(timeStepMin)
-            .click('.int-test-execute-btn')
-            ;
-        
-        return checkTable(executingClient, expectedData[0])
-            .pause(timeStep)
-            ;
+            .click('.int-test-conn-man p > a')
+            .pause(timeStep);
     });
+       
+    it('can query using new connection', queryFooUsingCurrentConnectionAndCheckResults);
     
     it('provides the expected member completions for Foo entity', function() {
         // cursor index, given the query
@@ -162,7 +165,6 @@ describe('fresh build', function() {
             .keys('\uE015')
             .keys('\uE015')
             .keys('Enter')
-            // todo there's no indicator for this, so just wait some time
             .pause(timeStepMin)
             ;
     });
@@ -182,8 +184,7 @@ describe('fresh build', function() {
             ;
     });
     
-    // fix up omnisharp suggestions first
-    it('can provide expected autocompletions for complex types', function() {
+    it('can provide autocompletions for TypeTest table', function() {
         // cursor index, given the query
         let cursorCol = queryText3.indexOf('x.') + 2;
         let cursorRow = 0;
@@ -215,7 +216,7 @@ describe('fresh build', function() {
     });
     
     it('shuts down', function() {
-        this.timeout(timeForBackend * 2);
+        this.timeout(timeForBackend);
         this.app.client
             .timeoutsAsyncScript(timeStepMax)
             .executeAsync(function() {
@@ -225,11 +226,11 @@ describe('fresh build', function() {
                 win.emit('close');
             });
         return new Promise((succ, err) => {
-            setTimeout(succ, timeForBackend);
+            setTimeout(succ, timeStepMax * 3); // ~ 5 secs
         });        
-    })
+    });
     
-    describe('instance with saved connections', function() {
+    describe('second run', function() {
         let err = function(e) { throw e; };    
         this.timeout(timeTotal);
 
@@ -242,12 +243,8 @@ describe('fresh build', function() {
             return this.app.start();
         });
         
-        it('becomes visible', function(done) {
-            this.timeout(timeForBackend * 2);
-            setTimeout(function() {
-                done();
-            }, timeForBackend);
-        });
+        it('starts in editor with testdb connection and can query Foo', 
+            queryFooUsingCurrentConnectionAndCheckResults);
 
         describe('when closing', function () {
             before(function() {

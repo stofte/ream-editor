@@ -1,7 +1,19 @@
+.loading-msg {
+    width: 100%;
+    margin-top: 40%;
+    text-align: center;
+    color: #999; 
+}
+
 .main-layer {
-    position: absolute;
     visibility: hidden;
     z-index: 0;
+}
+
+.main-layer .container-fluid {
+    overflow: hidden;
+    height: 0;
+    min-height: 0;
 }
 
 .main-layer.layer-visible {
@@ -9,9 +21,15 @@
     z-index: 1;
 }
 
+
+.main-layer.layer-visible .container-fluid {
+    overflow: auto;
+    height: auto;
+    min-height: auto;
+}
+
 body {
   min-height: 100%;
-  /* align using 51px */
   padding-top: 64px;
 }
 

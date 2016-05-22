@@ -1,3 +1,7 @@
+/*
+    initial loading msg
+*/
+
 .loading-msg {
     position: absolute;
     top: 0;
@@ -8,7 +12,12 @@
     color: #999; 
 }
 
+/*
+    overlay handling
+*/
+
 .main-layer {
+    height: calc(100% - 64px);
     visibility: hidden;
     z-index: 0;
 }
@@ -22,6 +31,20 @@
 .main-layer.layer-visible {
     visibility: visible;
     z-index: 1;
+}
+
+.main-layer.layer-visible .container-fluid {
+    overflow: auto;
+    height: auto;
+    min-height: auto;
+}
+
+/*
+    style output text areas
+*/
+
+.output-table {
+    overflow: auto;
 }
 
 .output-table td {
@@ -45,15 +68,21 @@
     outline: none;
 }
 
-.main-layer.layer-visible .container-fluid {
-    overflow: auto;
-    height: auto;
-    min-height: auto;
+/*
+    other random stuff
+*/
+
+html {
+    height: 100%;
 }
 
 body {
   min-height: 100%;
   padding-top: 64px;
+}
+
+.container-fluid {
+    
 }
 
 .CodeMirror {

@@ -21,7 +21,7 @@ import { ResultPage } from '../models/result-page';
         </div>
     </div>
 </div>
-<div class="row" *ngIf="activeResultPage > -1">
+<div class="row" style="overflow: auto" *ngIf="activeResultPage > -1">
     <div class="col-md-12" *ngFor="let page of pages">
         <div *ngIf="page.index === activeResultPage">
             <table class="table table-condensed output-table">
@@ -58,7 +58,6 @@ export class OutputComponent {
         this.tabId = parseInt(routeParams.get('tab'), 10);
         const tab = tabService.get(this.tabId);
         this.connectionId = parseInt(routeParams.get('connection'), 10);
-        //this.outputParam = this.routeParams.get('output');
         let mapper = (x: ResultPage, i) => { 
             return { text: x.title, index: i, rows: x.rows, columns: x.columns }; 
         };

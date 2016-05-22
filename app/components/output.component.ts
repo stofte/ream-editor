@@ -70,13 +70,16 @@ export class OutputComponent {
             .subscribe(result => {
                 this.pages = result.pages.map(mapper);
                 if (this.pages.length > 0) {
-                    this.activeResultPage = 0;
+                    let tab = this.tabService.get(this.tabId);
+                    tab.output = 0;
+                    this.activeResultPage = tab.output;
+                    this.tabService.updateTab(tab);
                 }
             });
     }
     
     showResult(idx: number) {
-        let tab = this.tabService.active;
+        let tab = this.tabService.get(this.tabId);
         tab.output = idx;
         this.activeResultPage = idx;
         this.tabService.updateTab(tab);

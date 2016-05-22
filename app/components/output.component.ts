@@ -34,19 +34,16 @@ import { ResultPage } from '../models/result-page';
 <div class="row" *ngIf="activeResultPage > -1">
     <div class="col-md-12" *ngFor="let page of pages">
         <div *ngIf="page.index === activeResultPage">
-            <table class="table table-condensed">
+            <table class="table table-condensed output-table">
                 <thead>
                     <tr>
-                        <th *ngFor="let head of page.columns">
-                            {{head}}
-                        </th>
+                        <th *ngFor="let head of page.columns" [innerText]="head"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of page.rows">
-                        <td *ngFor="let cell of row">
-                            {{cell}}
-                        </td>
+                        <td *ngFor="let cell of row"
+                            ><textarea readonly rows="1" [value]="cell"></textarea></td>
                     </tr>
                 </tbody>
             </table>

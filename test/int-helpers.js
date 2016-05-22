@@ -44,16 +44,21 @@ function checkTable(client, rows, rowIndex, isBody) {
     let rowSelector = isBody ? 'tbody' : 'thead';
     let rowCheckingClient = rows[0].reduce((wrapped, expectedVal, idx) => {
         let selector = `table.table.table-condensed ${isBody ? 'tbody' : 'thead'} 
-            tr:nth-child(${rowIdx}) ${isBody ? 'td' : 'th'}:nth-child(${idx + 1})`;
+            tr:nth-child(${rowIdx}) ${isBody ? 'td' : 'th'}:nth-child(${idx + 1}) ${isBody ? 'textarea' : ''}`;
         return wrapped
+            .timeoutsAsyncScript(timeStepMax)
             .waitForExist(selector, timeForBackend)
             .catch(function(e) { throw e })
-            .getText(selector)
+            // tab is filtered if using getValue so instead this workaround
+            .executeAsync(function(sel, isBody, done) {
+                isBody ? done(document.querySelector(sel).value) // textarea
+                       : done(document.querySelector(sel).innerText) // th
+            }, selector, isBody)
             .then(function (val) {
                 // for datetime/timespan and the binary cols, 
                 // we just use a regex. for binary we dont care
                 let op = expectedVal.constructor.name === 'RegExp' ? 'match' : 'equal';
-                val.should[op](expectedVal);
+                val.value.should[op](expectedVal);
             });
     }, client);
     return checkTable(rowCheckingClient, rows.slice(1), isBody ? rowIdx + 1 : 1, true);

@@ -24,6 +24,26 @@
     z-index: 1;
 }
 
+.output-table td {
+    padding-bottom: 2px !important;
+}
+
+.output-table td > textarea {
+    border: none;
+    width: 100%;
+    resize: none;
+}
+
+.output-table td > textarea:focus,
+.output-table td > textarea:active,
+.output-table td > textarea:hover {
+    resize: both;
+}
+
+.output-table td > textarea:focus,
+.output-table td > textarea:active {
+    outline: none;
+}
 
 .main-layer.layer-visible .container-fluid {
     overflow: auto;

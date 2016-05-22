@@ -15,7 +15,6 @@ Developing
 
 TODO
 ----
-- Default query
 - Error handling
 - Culture handling
 - Multiple instance handling

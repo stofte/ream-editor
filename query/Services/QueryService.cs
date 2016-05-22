@@ -47,7 +47,8 @@ namespace QueryEngine.Services
         public TemplateResult GetTemplate(QueryInput input) 
         {
             var assmName = Guid.NewGuid().ToIdentifierWithPrefix("a");
-            var schemaSrc = _schemaService.GetSchemaSource(input.ConnectionString, assmName, withUsings: false);
+            var schemaResult = _schemaService.GetSchemaSource(input.ConnectionString, assmName, withUsings: false);
+            var schemaSrc = schemaResult.Schema;
             
             var src = _template
                 .Replace("##NS##", assmName)
@@ -62,15 +63,16 @@ namespace QueryEngine.Services
             var fullSrc = src.Replace(srcToken, "");
             var header = src.Substring(0, srcIdx);
             var footer = src.Substring(srcIdx + srcToken.Length);
-            Console.WriteLine("regex matches", ms.Count);
             // the usage of the template should not require mapping the column value
-            return new TemplateResult {
+            return new TemplateResult 
+            {
                 Template = fullSrc,
                 Header = header,
                 Footer = footer,
                 Namespace = assmName,
                 ColumnOffset = 0,
-                LineOffset = ms.Count // todo magic bullshit
+                LineOffset = ms.Count,
+                DefaultQuery = string.Format("{0}.Take(100).Dump();\n\n", schemaResult.DefaultTable)
             };
         }
 

@@ -1,5 +1,6 @@
 
 export class EditorChange {
+    public tabId: number;
     public fileName: string;
     public newText: string;
     public startLine: number;

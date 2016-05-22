@@ -4,4 +4,5 @@ export class TemplateResult {
     public header: string;
     public footer: string;
     public lineOffset: number;
+    public defaultQuery: string;
 }

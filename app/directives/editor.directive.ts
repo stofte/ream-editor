@@ -6,6 +6,7 @@ import { Router, RouteParams } from '@angular/router-deprecated';
 
 import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';
+import { EditorChange } from '../models/editor-change';
 import { OmnisharpService } from '../services/omnisharp.service';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
@@ -26,6 +27,7 @@ CodeMirror.keyMap.default[(mac ? 'Cmd' : 'Ctrl') + '-Space'] = 'autocomplete';
 export class EditorDirective implements OnInit {
     private current: Tab = null;
     private textContent: string = null;
+    private touched = false;
     editor: any;
     constructor(
         private editorService: EditorService,
@@ -70,7 +72,7 @@ export class EditorDirective implements OnInit {
             });
             CodeMirror.hint.ajax.async = true;
         }
-        
+        editorService.changes.subscribe(this.editorValueUpdated.bind(this));
         this.editor._tab = this.current.id;
         const contents = editorService.get(this.current);
         this.editor.setValue(contents);
@@ -78,8 +80,15 @@ export class EditorDirective implements OnInit {
         domElm.classList.toggle('form-control');
         this.editor.on('change', this.codemirrorValueChanged.bind(this));
     }
+    
+    private editorValueUpdated(change: EditorChange) {
+        if (this.current.id === change.tabId && !this.touched) {
+            this.editor.setValue(change.newText);
+        }
+    }
         
     private codemirrorValueChanged(doc: any) {
+        this.touched = true;
         let newValue = doc.getValue();
         this.editorService.set(this.current, newValue);
     }

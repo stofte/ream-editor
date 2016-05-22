@@ -10,5 +10,7 @@ namespace QueryEngine.Models
         public int ColumnOffset { get; set; }
         
         public int LineOffset { get; set; }
+        
+        public string DefaultQuery { get; set; }
     }
 }

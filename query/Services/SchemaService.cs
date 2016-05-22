@@ -6,10 +6,11 @@ namespace QueryEngine.Services
     using System.Linq;
     using Microsoft.Extensions.Logging;
     using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
+    using QueryEngine.Models;
 
     public class SchemaService 
     {
-        public string GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
+        public SchemaResult GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
         {
             var loggerFactory = new LoggerFactory().AddConsole();
 
@@ -62,10 +63,12 @@ namespace QueryEngine.Services
             var resFiles = rGen.GenerateAsync(conf);
             resFiles.Wait();
             
-            var ctx = CreateContext(fs.RetrieveFileContents(outputPath, programName + ".cs"), isLibrary: withUsings);
-            Console.WriteLine("CreateContext", ctx);
+            var dbCtx = CreateContext(fs.RetrieveFileContents(outputPath, programName + ".cs"), isLibrary: withUsings);
+            Console.WriteLine("CreateContext", dbCtx.Item1);
+            var ctx = dbCtx.Item1;
             if (!withUsings) 
             {
+                var x = 
                 ctx = StripHeaderLines(3, ctx);
             }
             else
@@ -77,7 +80,12 @@ namespace QueryEngine.Services
             {
                 output.Append(StripHeaderLines(4, fs.RetrieveFileContents(outputPath, System.IO.Path.GetFileName(fpath))));
             }
-            return output.ToString();
+            
+            return new SchemaResult 
+            {
+                Schema = output.ToString(),
+                DefaultTable = dbCtx.Item2
+            };
         }
 
         string StripHeaderLines(int lines, string contents) 
@@ -85,7 +93,7 @@ namespace QueryEngine.Services
             return string.Join("\n", contents.Split('\n').Skip(lines));
         }
 
-        string CreateContext(string ctx, bool isLibrary = true) 
+        Tuple<string, string> CreateContext(string ctx, bool isLibrary = true) 
         {
             var idx1 = ctx.IndexOf("{");
             var idx = ctx.IndexOf("{", idx1 + 1) + 1;
@@ -95,12 +103,17 @@ namespace QueryEngine.Services
             var regex = new Regex(@"^\s*public virtual DbSet\<([^>]*).*$", RegexOptions.Multiline);
             var tables = regex.Matches(ctx);
             var proxyCtx = _proxyPre.Replace("##PROXY##", isLibrary ? "Main" : "Proxy");
+            var firstTable = string.Empty;
             foreach(Match t in tables)
             {
+                if (string.IsNullOrEmpty(firstTable)) 
+                {
+                    firstTable = t.Groups[1].Value.ToString();
+                }
                 var proxy = "get { return Ctx.Instance.Value." + t.Groups[1].Value + "; }";
                 proxyCtx += t.Value.Replace("get; set;", proxy);
             }
-            return newCtx + proxyCtx + _proxyPost;
+            return Tuple.Create(newCtx + proxyCtx + _proxyPost, firstTable);
         }
 
         string _refs = @"

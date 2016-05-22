@@ -16,15 +16,13 @@ export class EditorService {
         return this.buffers[tab.id] || '\n\n';
     }
     
-    public set(tab: Tab, text: string) {
+    public set(tab: Tab, text: string, isDirective = true) {
         let change = new EditorChange();
-        change.startColumn = 1;
-        change.startLine = 1;
-        change.endColumn = text.length;
-        change.endLine = 1;
-        change.fileName = tab.fileName;
         change.newText = text;
-        this.changes.next(change);
+        change.tabId = tab.id;
+        if (!isDirective) {
+            this.changes.next(change);            
+        }
         this.buffers[tab.id] = text;
     }
 }

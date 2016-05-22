@@ -29,8 +29,8 @@ namespace QueryEngine.Services
             if (!_map.ContainsKey(connectionString))
             {
                 var assmName = Guid.NewGuid().ToIdentifierWithPrefix("a");
-                var schemaSrc = _schemaService.GetSchemaSource(connectionString, assmName);
-                var result = _compileService.LoadType(schemaSrc, assmName);
+                var schemaResult = _schemaService.GetSchemaSource(connectionString, assmName);
+                var result = _compileService.LoadType(schemaResult.Schema, assmName);
                 _map.Add(connectionString, result);
             }
 

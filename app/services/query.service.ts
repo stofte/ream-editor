@@ -65,6 +65,7 @@ export class QueryService {
                 m.header = json.Header;
                 m.footer = json.Footer;
                 m.lineOffset = json.LineOffset;
+                m.defaultQuery = json.DefaultQuery;
                 return m;
             });
     }

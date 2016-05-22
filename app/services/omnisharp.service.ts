@@ -73,6 +73,7 @@ export class OmnisharpService {
                     tab.templateHeader = result.header;
                     tab.templateFooter = result.footer;
                     tab.templateLineOffset = result.lineOffset;
+                    this.editorService.set(tab, result.defaultQuery, false);
                     // need to update omnisharp with an initial buffer template
                     // from which it can perform intellisense operations
                     let json = JSON.stringify({

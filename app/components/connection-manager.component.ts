@@ -16,17 +16,15 @@ import { Connection } from '../models/connection';
         </div>
     </nav>
     <div class="jumbotron center-block">
-        <div class="row">
-            <div class="col-md-12">
-                <p>
-                    <label>
-                        <input placeholder="Add new connectionstring" #newconnection 
-                            [(ngModel)]="newConnectionStringText" 
-                            (keyup.enter)="addNewConnection(newconnection.value)">
-                    </label>
-                </p>
+        <form>
+            <div class="form-group">
+                <label for="connectringStringInp">Add new</label>
+                <input type="string" class="form-control" 
+                    id="connectringStringInp" placeholder="Type/paste connection string and press enter ..."
+                    #newconnection [(ngModel)]="newConnectionStringText"
+                    (keyup.enter)="addNewConnection(newconnection.value)">
             </div>
-        </div>
+        </form>
         <div class="row">
             <div class="col-md-12">
                 <ul>
@@ -43,7 +41,11 @@ import { Connection } from '../models/connection';
                             (keyup.escape)="cancelEditing(connection)">
                     </li>
                 </ul>
-                <p><a (click)="closeManager()">close connection manager</a></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p><button type="button" (click)="closeManager()" class="btn btn-default">Close</button></p>
             </div>
         </div>
     </div>

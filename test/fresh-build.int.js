@@ -84,18 +84,18 @@ describe('fresh build', function() {
         return this.app.client
             .click('.int-test-start-page .btn-default')
             .pause(timeStepMin)
-            .click('.int-test-conn-man p input')
+            .click('.int-test-conn-man form input')
             // setValue seems to fail, the output gets messed up (must be some parsing going on)
             .executeAsync(function(str, done) {
-                document.querySelector('.int-test-conn-man p input').value = str;
-                done(document.querySelector('.int-test-conn-man p input').value);
+                document.querySelector('.int-test-conn-man form input').value = str;
+                done(document.querySelector('.int-test-conn-man form input').value);
             }, connectionString)
             .then(function(ret) {
                 ret.value.should.equal(connectionString);
             })
             .keys('Enter')
             .pause(timeStepMin)
-            .click('.int-test-conn-man p > a')
+            .click('.int-test-conn-man p > button')
             .pause(timeStep);
     });
        
@@ -139,11 +139,11 @@ describe('fresh build', function() {
             .keys('d')
             .keys('\uE000')
             .pause(timeStep)
-            .click('.int-test-conn-man p input')
+            .click('.int-test-conn-man form input')
             // setValue seems to fail, the output gets messed up (must be some parsing going on)
             .executeAsync(function(str, done) {
-                document.querySelector('.int-test-conn-man p input').value = str;
-                done(document.querySelector('.int-test-conn-man p input').value);
+                document.querySelector('.int-test-conn-man form input').value = str;
+                done(document.querySelector('.int-test-conn-man form input').value);
             }, connectionString2)
             .then(function(ret) {
                 ret.value.should.equal(connectionString2);

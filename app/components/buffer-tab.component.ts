@@ -25,6 +25,8 @@ import { EditorDirective } from '../directives/editor.directive';
             <p><textarea editor></textarea></p>
         </div>
     </div>
+</div>
+<div class="container-fluid">
     <f-output></f-output>
 </div>
 `

@@ -3,21 +3,23 @@
 */
 
 .loading-msg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
     margin-top: 25%;
     text-align: center;
-    color: #999; 
+    color: #999;
 }
 
 /*
     overlay handling
 */
 
-.main-layer {
+f-app {
+    position: absolute;
     height: calc(100% - 64px);
+    width: 100%;
+}
+
+.main-layer {
+    height: 0;
     visibility: hidden;
     z-index: 0;
 }
@@ -29,12 +31,13 @@
 }
 
 .main-layer.layer-visible {
+    height: calc(100% - 64px);
     visibility: visible;
     z-index: 1;
 }
 
 .main-layer.layer-visible .container-fluid {
-    overflow: auto;
+    overflow: visible;
     height: auto;
     min-height: auto;
 }

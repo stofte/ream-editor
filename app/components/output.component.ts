@@ -21,7 +21,7 @@ import { ResultPage } from '../models/result-page';
         </div>
     </div>
 </div>
-<div class="row" style="overflow: auto" *ngIf="activeResultPage > -1">
+<div class="row" *ngIf="activeResultPage > -1">
     <div class="col-md-12" *ngFor="let page of pages">
         <div *ngIf="page.index === activeResultPage">
             <table class="table table-condensed output-table">

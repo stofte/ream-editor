@@ -7,14 +7,21 @@ import { TabService } from '../services/tab.service';
 @Component({
     selector: 'f-start-page',
     template: `
-    <div class="int-test-start-page">
-        <p *ngIf="!connectionService.defaultConnection">
-            <a (click)="connectionsToggle()">click to open connection manager</a>
-        </p>
-        <p *ngIf="connectionService.defaultConnection">
-            <a (click)="blankTab()">click to open a new tab</a>
-        </p>
+<div class="container-fluid int-test-start-page">
+    <div class="row">
+        <div *ngIf="!connectionService.defaultConnection">
+            <div class="col-md-12">
+                <p>
+                    Start by adding a database connection 
+                    using the Connection Manager. <em>(shortcut: ctrl + d)</em>
+                </p>
+                <p>
+                    <button (click)="connectionsToggle()" class="btn btn-default">Open Connection Manager</button>
+                </p>
+            </div>
+        </div>
     </div>
+</div>
 `    
 })
 export class StartPageComponent {

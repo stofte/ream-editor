@@ -55,7 +55,6 @@ function queryFooUsingCurrentConnectionAndCheckResults() {
     }
 
 describe('fresh build', function() {
-    this.retries(2); // todo: rare local failures?
     this.timeout(timeTotal);
 
     before(function () {
@@ -73,15 +72,17 @@ describe('fresh build', function() {
     
     it('starts on the start page', function() {
         return this.app.client
-            .waitUntil(function() {
-                return this.getText('.int-test-start-page > p > a')
-                    .then((val) => val === 'click to open connection manager');
-            });
+            .pause(timeStep)
+            .getText('.int-test-tab-list .navbar-brand')
+            .then(function (val) {
+                val.should.equal('Hello!');
+            })
+            ;
     });
     
     it('can add a new connection and close connection manager', function () {        
         return this.app.client
-            .click('.int-test-start-page > p > a')
+            .click('.int-test-start-page .btn-default')
             .pause(timeStepMin)
             .click('.int-test-conn-man p input')
             // setValue seems to fail, the output gets messed up (must be some parsing going on)
@@ -132,12 +133,12 @@ describe('fresh build', function() {
     it('can add another connection string via the connection manager', function() {
         return this.app.client 
             .timeoutsAsyncScript(timeStepMax)
-            .click('.main-layer.layer-visible')
-            .pause(timeStepMin)
+            .click('.int-test-tab-list ul li:first-child')
+            .pause(timeStep)
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
-            .pause(timeStepMin)
+            .pause(timeStep)
             .click('.int-test-conn-man p input')
             // setValue seems to fail, the output gets messed up (must be some parsing going on)
             .executeAsync(function(str, done) {
@@ -148,7 +149,7 @@ describe('fresh build', function() {
                 ret.value.should.equal(connectionString2);
             })
             .keys('Enter')
-            .pause(timeStepMin)
+            .pause(timeStep)
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
@@ -158,8 +159,11 @@ describe('fresh build', function() {
     it('can open a new tab and change the connection to the newly created', function() {
         return this.app.client
             .click('.int-test-tab-list .glyphicon.glyphicon-plus')
-            .waitForText('.int-test-tab-list li:nth-child(2) a', 'Edit 1', timeStepMax)
-            .catch(err)
+            .pause(timeStep)
+            .getText('.int-test-tab-list li:nth-child(2) a')
+            .then(function(val) {
+                val.should.equal('Query 2');
+            })
             .click('#connection-selector-btn-keyboard-nav')
             .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(2) a')
             .keys('\uE015')
@@ -231,7 +235,6 @@ describe('fresh build', function() {
     });
     
     describe('second run', function() {
-        let err = function(e) { throw e; };    
         this.timeout(timeTotal);
 
         before(function () {
@@ -242,8 +245,17 @@ describe('fresh build', function() {
             });
             return this.app.start();
         });
+              
+        it('starts in editor mode', function() {
+            return this.app.client
+                .pause(timeStepMax)
+                .getText('.int-test-tab-list .navbar-brand')
+                .then(function (val) {
+                    val.should.equal(''); 
+                });
+        });
         
-        it('starts in editor with testdb connection and can query Foo', 
+        it('uses testdb connection and can query Foo', 
             queryFooUsingCurrentConnectionAndCheckResults);
 
         describe('when closing', function () {

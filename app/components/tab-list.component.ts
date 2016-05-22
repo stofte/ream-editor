@@ -11,16 +11,16 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
     directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     template: `
 <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid" *ngIf="tabsEnabled">
-        <div class="navbar-header">
-            <!-- some content for when header is collapsed -->
+    <div class="container-fluid int-test-tab-list">
+        <div class="navbar-header {{viewTitleClass}}">
+            <a class="navbar-brand">{{viewTitle}}</a>
         </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav int-test-tab-list">
+        <div class="navbar-collapse collapse" *ngIf="tabsEnabled">
+            <ul class="nav navbar-nav">
                 <li *ngFor="let tab of tabService.tabs"
                      class="{{tabService.active.id === tab.id ? 'active' : ''}}">
                     <a [routerLink]="['EditorTab', {tab: tab.id, connection: tab.connection.id, output: 'tab.output' }]">
-                        Edit {{tab.id}}
+                        {{tab.title}}
                     </a>
                 </li>
                 <li>
@@ -48,5 +48,13 @@ export class TabListComponent {
     private get tabsEnabled(): boolean {
         // dont show tabs on start page
         return this.location.path().indexOf('/start') === -1;
+    }
+    
+    private get viewTitle(): string {
+        return this.tabsEnabled ? '' : 'Hello!';
+    }
+    
+    private get viewTitleClass(): string {
+        return this.tabsEnabled ? 'hidden' : '';
     }
 }

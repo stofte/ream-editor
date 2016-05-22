@@ -8,7 +8,7 @@ import { Tab } from '../models/tab';
 
 @Injectable()
 export class TabService {
-    private id: number = 0;
+    private id: number = 1;
     public tabs: Tab[] = [];
     
     constructor(
@@ -21,9 +21,9 @@ export class TabService {
     }
     
     public newForeground(connection: Connection, navigate = true) {
-        const newId = this.id++;
         const tab = new Tab();
         tab.id = this.id++;
+        tab.title = `Query ${tab.id}`;
         tab.output = 'console';
         tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
         tab.fileName = this.omnisharpService.randomFile(tab.id);

@@ -7,7 +7,6 @@ import { Connection } from '../models/connection';
 @Component({
     selector: 'f-connection-manager',
     template: `
-
 <div class="container-fluid int-test-conn-man">
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
@@ -65,7 +64,9 @@ export class ConnectionManagerComponent {
         const isStart = location.hash.indexOf('/start') !== -1;
         if (isStart) {
             const conn = this.connectionService.defaultConnection;
-            this.tabService.newForeground(conn);
+            if (conn) {
+                this.tabService.newForeground(conn);
+            }
         }
         this.overlayUiStateService.toggleConnections();
     }
@@ -83,7 +84,6 @@ export class ConnectionManagerComponent {
     }
     
     private removeConnection(connection: Connection) {
-        console.log('removeConnection', connection);
         this.connectionService.remove(connection);
     }
     

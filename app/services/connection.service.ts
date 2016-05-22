@@ -29,7 +29,7 @@ export class ConnectionService {
     }
     
     public addNew(conn: Connection) {
-        conn.id = this.id++;
+        conn.id = this.getNextValidId();
         this.connections.push(conn);
         this.storageService.Save(this.storageKey, this.connections);
     }
@@ -49,4 +49,11 @@ export class ConnectionService {
            return false;
         });
     }
+    
+    private getNextValidId(guess = 0): number {
+        if (this.connections.find(c => c.id === guess)) {
+            return this.getNextValidId(guess + 1);
+        }
+        return guess;
+    } 
 }

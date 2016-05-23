@@ -11,7 +11,8 @@ const fs = electronRequire('fs');
 
 const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
-const dirname = isProduction ? path.normalize(process.resourcesPath + '/app') : __dirname;
+const dirname = (isProduction ? path.normalize(process.resourcesPath + '/app') : path.dirname(path.dirname(__dirname)))
+    .replace(/%20/g, ' '); // otherwise file fetch files on windows
 
 @Injectable()
 export class MonitorService {
@@ -100,18 +101,17 @@ export class MonitorService {
     }
     
     private queryCmd(): { dir: string, cmd: string } {
-        let dir = path.normalize(isProduction ? `${dirname}/query` :
-            `${path.dirname(path.dirname(dirname))}`);
-        let cmd = isProduction ? path.normalize(`${dir}/linq-editor.exe`) :
-            `"${config.dotnetDebugPath}" run`;
+        let dir = isProduction ? `${dirname}/query` : dirname;
+        let cmd = isProduction ? `"${dir}/linq-editor.exe"` :
+            `"${config.dotnetDebugPath}" run `;
         return { dir, cmd };
     }
     
     private omnisharpCmd(): { dir: string, cmd: string } {
-        let slnPath = path.normalize(`${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`);
-        let dir = path.normalize(isProduction ? `${dirname}/omnisharp` :
-            `${path.dirname(path.dirname(dirname))}/omnisharp`);
-        let cmd = `${dir}/OmniSharp.exe -s ${slnPath} -p ${config.omnisharpPort}`;
+        let slnPath = `${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`;
+        let exePath = `"${dirname}/omnisharp/OmniSharp.exe"`;
+        slnPath = slnPath.replace(/\//g, '\\');
+        let cmd = `${exePath} -s ${slnPath} -p ${config.omnisharpPort}`;
         return { dir: dirname, cmd };
     }
 }

@@ -90,9 +90,15 @@ export class EditorDirective implements OnInit {
         }
     }
         
-    private codemirrorValueChanged(doc: any) {
+    private codemirrorValueChanged(mirror: any) {
         this.touched = true;
-        let newValue = doc.getValue();
+        let newValue = mirror.getValue();
+        let cur = mirror.getCursor();
+        let range = mirror.findWordAt(cur);
+        let fragment = mirror.getRange(range.anchor, range.head);
+        if (fragment === '.' || fragment === ').') {
+            CodeMirror.commands.autocomplete(mirror);
+        }
         this.editorService.set(this.current, newValue);
     }
     

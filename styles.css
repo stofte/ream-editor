@@ -91,11 +91,11 @@ body {
 
 .CodeMirror-hints {
     font-family: 'Consolas';
-    max-height: 50em;
+    max-height: 35em;
 }
 
 .CodeMirror-hint {
-    max-width: 30em;
+    max-width: 20em;
     /* 
     todo: ideally only if completions are overflowing.
     otherwise we'll cover some of the text with scrollbar ...

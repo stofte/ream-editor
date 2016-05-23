@@ -15,6 +15,7 @@ cache:
   - 'node_modules -> package.json' # local npm modules
   - '%APPDATA%\npm-cache -> package.json' # npm cache
   - '%USERPROFILE%\.nuget\packages -> project.json' # project.json cache
+  - '%USERPROFILE%\.electron -> package.json' # project.json cache
   - '%OMNISHARP_ZIP%'
 
 install:

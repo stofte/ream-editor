@@ -10,6 +10,7 @@ Developing
 ----------
 - Install the latest `dotnet` using [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries)
 - Download the latest [OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`
+- `dotnet restore`
 - `npm install`
 - `npm start`
 
@@ -22,6 +23,7 @@ TODO
 - EF fails if table has no primary key?
 - SQLite and Postgres EF Core database providers
 - OmniSharp hosting/custom build?
+- [dotnet run in folder with spaces fails](https://github.com/dotnet/cli/issues/1189)
 
 VS Code
 -------------

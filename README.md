@@ -21,6 +21,7 @@ TODO
 - Multiple instance handling
 - EF fails if table has no primary key?
 - SQLite and Postgres EF Core database providers
+- OmniSharp hosting/custom build?
 
 VS Code
 -------------

@@ -49,6 +49,11 @@ export class EditorDirective implements OnInit {
                 let cur = mirror.getCursor();
                 let range = mirror.findWordAt(cur);
                 let fragment = mirror.getRange(range.anchor, range.head);
+                if (fragment === '.' || fragment === ').') {
+                    range.anchor.ch = range.head.ch;
+                    fragment = null; // dont send to omnisharp
+                }
+                
                 let request = <AutocompletionQuery> {
                     fileName: tab.fileName,
                     column: cur.ch + 1,
@@ -56,13 +61,11 @@ export class EditorDirective implements OnInit {
                     buffer: tab.templateHeader + mirror.getValue() + tab.templateFooter,
                     wantKind: true,
                     wantDocumentationForEveryCompletionResult: true,
+                    wordToComplete: fragment
                 };
                 omnisharpService
                     .autocomplete(request)
                     .subscribe(list => {
-                        if (fragment === '.') {
-                            range.anchor.ch = range.head.ch;
-                        }
                         callback({
                             list,
                             from: range.anchor,

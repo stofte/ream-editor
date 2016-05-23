@@ -24,11 +24,10 @@ builder
 .then(function() {
 	console.log('systemjs bundle in', ((new Date().getTime() - start) / 1000).toFixed(0), 'seconds')
 	// include the other required stuff
-	var result = UglifyJS.minify([ 
-        'node_modules/es6-shim/es6-shim.min.js',
+	var result = UglifyJS.minify([
         'node_modules/zone.js/dist/zone.js',
         'node_modules/reflect-metadata/Reflect.js',
-		jsOutput 
+		jsOutput
 	], {
 	    outSourceMap: jsOutput + '.map'
 	});

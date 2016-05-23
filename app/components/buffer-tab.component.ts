@@ -41,10 +41,6 @@ export class BufferTabComponent {
         private routeParams: RouteParams
     ) {
         this.id = parseInt(this.routeParams.get('tab'), 10);
-        editorService.errors(this.id)
-            .subscribe(val => {
-                console.log('saw errors', val);
-            });
     }
     
     routerOnActivate() {

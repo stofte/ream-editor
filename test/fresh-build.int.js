@@ -102,8 +102,9 @@ describe('fresh build', function() {
     it('can query using new connection', queryFooUsingCurrentConnectionAndCheckResults);
     
     it('provides the expected member completions for Foo entity', function() {
-        // cursor index, given the query
-        let cursorCol = queryText.indexOf('x.') + 2;
+        // cursor index, given the query, we're gonna have to delete the current member
+        // otherwise we just autocomplete the current word and confuse the test 
+        let cursorCol = queryText.indexOf('x.Description') + 13;
         let cursorRow = 0;
         let suggestionClient = this.app.client
             // setting the cursor by codemirror api alone doesn't seem good enough. 
@@ -119,6 +120,17 @@ describe('fresh build', function() {
                 cursor.value.ch.should.equal(cursorCol);
                 cursor.value.line.should.equal(cursorRow);
             })
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
+            .keys('\uE003')
             .pause(timeStepMin)
             .keys('\uE009') // press down ctrl
             .keys('\uE00D') // space

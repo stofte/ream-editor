@@ -45,15 +45,27 @@ export class EditorDirective implements OnInit {
         if (!onetimeBullshit) {
             onetimeBullshit = true;
             CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
-                let tab = this.tabService.get(mirror._tab);
-                let cur = mirror.getCursor();
-                let range = mirror.findWordAt(cur);
-                let fragment = mirror.getRange(range.anchor, range.head);
-                if (fragment === '.' || fragment === ').') {
-                    range.anchor.ch = range.head.ch;
-                    fragment = null; // dont send to omnisharp
+                // todo: test if syntax mode changes anything,
+                // otherwise findWordAt seems pretty useless, 
+                // returning random whitespace/syntax as words.
+                // for now this manual parsing, that doesn't work cross lines
+                const memberAccessTest = /\.$/; 
+                const partialMemberAccessTest = /\.(\w*)$/; // this cant work
+                const tab = this.tabService.get(mirror._tab);
+                const cur = mirror.getCursor();
+                const editorLine: string = mirror.getRange({line: cur.line, ch: 0}, cur);
+                let fragment: string = null;
+                let range = { 
+                    head: { line: cur.line, ch: cur.ch },
+                    anchor: { line: cur.line, ch: cur.ch }
+                };
+                if (!memberAccessTest.test(editorLine)) {
+                    let match = editorLine.match(partialMemberAccessTest);
+                    if (match[1] && match[1].length > 0) { // had partial access
+                        fragment = match[1];
+                        range.anchor.ch = match.index + 1;
+                    }
                 }
-                
                 let request = <AutocompletionQuery> {
                     fileName: tab.fileName,
                     column: cur.ch + 1,
@@ -115,4 +127,5 @@ export class EditorDirective implements OnInit {
             mode: 'text/x-csharp'
         };
     }
+    
 }

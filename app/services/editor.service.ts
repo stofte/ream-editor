@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { EditorChange } from '../models/editor-change';
+import { CodeCheckResult } from '../models/code-check-result';
 import { Tab } from '../models/tab';
-import { Subject } from 'rxjs/Rx';
+import { Subject, Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class EditorService {
     private buffers: any = {};
     public changes: Subject<EditorChange>;
+    public rawErrors: Subject<CodeCheckResult>;
     
     constructor() {
         this.changes = new Subject<EditorChange>(); 
@@ -24,5 +26,15 @@ export class EditorService {
             this.changes.next(change);            
         }
         this.buffers[tab.id] = text;
+    }
+    
+    public errors(tabId: number): Observable<CodeCheckResult> {
+        return new Observable<CodeCheckResult>(obs => {
+            setTimeout(function() {
+                obs.next({
+                    messages: []
+                });
+            }, 10000);
+        });
     }
 }

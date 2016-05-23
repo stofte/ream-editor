@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouteParams } from '@angular/router-deprecated';
 import { ConnectionService } from '../services/connection.service';
 import { TabService } from '../services/tab.service';
+import { EditorService } from '../services/editor.service';
 import { ConnectionSelectorComponent } from './connection-selector.component';
 import { ExecuteQueryComponent } from './execute-query.component';
 import { OutputComponent } from './output.component';
@@ -32,16 +33,21 @@ import { EditorDirective } from '../directives/editor.directive';
 `
 })
 export class BufferTabComponent {
+    private id: number;
     constructor(
         private connectionService: ConnectionService,
         private tabService: TabService,
+        private editorService: EditorService,
         private routeParams: RouteParams
     ) {
-        
+        this.id = parseInt(this.routeParams.get('tab'), 10);
+        editorService.errors(this.id)
+            .subscribe(val => {
+                console.log('saw errors', val);
+            });
     }
     
     routerOnActivate() {
-        const id = parseInt(this.routeParams.get('tab'), 10);
-        this.tabService.routedTo(id);
+        this.tabService.routedTo(this.id); // todo: used?
     }
 }

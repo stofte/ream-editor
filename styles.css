@@ -84,12 +84,23 @@ body {
   padding-top: 64px;
 }
 
-.container-fluid {
-    
+.CodeMirror {
+    font-family: 'Consolas';
+    height: auto;
 }
 
-.CodeMirror {
-    height: auto;
+.CodeMirror-hints {
+    font-family: 'Consolas';
+    max-height: 50em;
+}
+
+.CodeMirror-hint {
+    max-width: 30em;
+    /* 
+    todo: ideally only if completions are overflowing.
+    otherwise we'll cover some of the text with scrollbar ...
+    */
+    padding-right: 20px;
 }
 
 @keyframes pulse_animation {

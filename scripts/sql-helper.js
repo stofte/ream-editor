@@ -127,6 +127,7 @@ ${data}
 `;
     });
     return `use ${useName};
+set nocount on;
 delete ${tableName}; -- dump any previous data
 ${inserts.join('\n')}
 `;

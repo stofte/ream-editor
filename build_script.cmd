@@ -7,11 +7,12 @@ if "%CI%" == "" (
     set NPM="C:\Program Files (x86)\nodejs\npm.cmd"
     rmdir /q /s %PACKAGE_BASE%
 )
+where npm
 mkdir %PACKAGE_BASE%
 call %NPM% install
-call %NPM% run lint
-call %NPM% run ts-build
-call %NPM% run bundle %PACKAGE_BASE%
+call %NPM% run-script lint
+call %NPM% run-script ts-build
+call %NPM% run-script bundle %PACKAGE_BASE%
 copy index.static.html %PACKAGE_BASE%\index.html
 copy electron-main.js %PACKAGE_BASE%\electron-main.js
 copy omnisharp-setup.js %PACKAGE_BASE%\omnisharp-setup.js
@@ -27,4 +28,4 @@ copy NuGet.Config %PACKAGE_BASE%\query\NuGet.Config
 copy project.json %PACKAGE_BASE%\query\project.json
 copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
-call %NPM% run package_electron
+call %NPM% run-script package_electron

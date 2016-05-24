@@ -39,6 +39,10 @@ const err = function waitErrorHandler(e) { throw e; };
 
 function queryFooUsingCurrentConnectionAndCheckResults() {
         let executingClient = this.app.client
+            .moveToObject('.CodeMirror')
+            .click('.CodeMirror')
+            .keys('x')
+            .pause(timeStep)
             .executeAsync(function(query, done) {
                 // codemirror saves a reference to itself in the DOM weee
                 done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));

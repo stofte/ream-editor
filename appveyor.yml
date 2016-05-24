@@ -44,7 +44,7 @@ before_build:
   - dotnet --info
           
 build_script:
-  - ps: .\build.ps1
+  - build_script.cmd
 
 test_script:
   - npm run int-test

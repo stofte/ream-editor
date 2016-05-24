@@ -5,6 +5,7 @@ namespace QueryEngine.Services
     using System.Text.RegularExpressions;
     using System.Linq;
     using Microsoft.Extensions.Logging;
+    using Microsoft.EntityFrameworkCore.Scaffolding;
     using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
     using QueryEngine.Models;
 

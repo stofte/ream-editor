@@ -47,7 +47,7 @@ build_script:
   - build_script.cmd
 
 test_script:
-  - ps: .\test-script.ps1
+  - npm run int-test
 
 artifacts:
   - path: $(ELECTRON_OUT)

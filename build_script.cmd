@@ -18,7 +18,7 @@ copy omnisharp-setup.js %PACKAGE_BASE%\omnisharp-setup.js
 copy package.json %PACKAGE_BASE%\package.json
 mkdir %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts
 copy node_modules\bootstrap\dist\fonts\*.* %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts\
-rem dotnet restore
+dotnet restore
 dotnet publish --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
 copy NuGet.Config %PACKAGE_BASE%\NuGet.Config
 copy project.json %PACKAGE_BASE%\project.json

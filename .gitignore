@@ -8,7 +8,6 @@ bin
 obj
 omnisharp-win-x64-netcoreapp1.zip
 linq-editor-win32-x64
-linq-editor-win32-x64-old
 project.lock.json
 linq-editor.dev.log
 npm-debug.log

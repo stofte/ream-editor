@@ -4,15 +4,13 @@ if "%CI%" == "" (
     set ELECTRON_OUT="linq-editor-win32-x64"
     set OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.zip"
     rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
-    set NPM="C:\Program Files (x86)\nodejs\npm.cmd"
     rmdir /q /s %PACKAGE_BASE%
 )
-where npm
 mkdir %PACKAGE_BASE%
-call %NPM% install
-call %NPM% run-script lint
-call %NPM% run-script ts-build
-call %NPM% run-script bundle %PACKAGE_BASE%
+call npm install
+call npm run-script lint
+call npm run-script ts-build
+call npm run-script bundle %PACKAGE_BASE%
 copy index.static.html %PACKAGE_BASE%\index.html
 copy electron-main.js %PACKAGE_BASE%\electron-main.js
 copy omnisharp-setup.js %PACKAGE_BASE%\omnisharp-setup.js
@@ -28,4 +26,4 @@ copy NuGet.Config %PACKAGE_BASE%\query\NuGet.Config
 copy project.json %PACKAGE_BASE%\query\project.json
 copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
-call %NPM% run-script package_electron
+call npm run-script package_electron

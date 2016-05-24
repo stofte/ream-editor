@@ -47,7 +47,7 @@ build_script:
   - build_script.cmd
 
 test_script:
-  - ps: test-script.cmd
+  - ps: .\test-script.ps1
 
 artifacts:
   - path: $(ELECTRON_OUT)

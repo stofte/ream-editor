@@ -3,6 +3,7 @@ import { Router } from '@angular/router-deprecated';
 import { OmnisharpService } from '../services/omnisharp.service';
 import { QueryService } from '../services/query.service';
 import { MonitorService } from '../services/monitor.service';
+import { BufferNameStream } from '../streams/buffer-name.stream';
 import { Connection } from '../models/connection';
 import { Tab } from '../models/tab';
 
@@ -15,7 +16,8 @@ export class TabService {
         private router: Router,
         private omnisharpService: OmnisharpService,
         private queryService: QueryService,
-        private monitorService: MonitorService
+        private monitorService: MonitorService,
+        private bufferNameStream: BufferNameStream
     ) {
         
     }
@@ -26,7 +28,7 @@ export class TabService {
         tab.title = `Query ${tab.id}`;
         tab.output = null; // new tab has no output set
         tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
-        tab.fileName = this.omnisharpService.randomFile(tab.id);
+        tab.fileName = this.bufferNameStream.newName(tab.id);
         tab.omnisharp = new Promise<void>((done, err) => {
             tab.omnisharpReady = () => done();
         });

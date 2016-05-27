@@ -7,8 +7,10 @@ import * as uuid from 'node-uuid';
 import { QueryService } from '../services/query.service';
 import { EditorService } from '../services/editor.service';
 import { MonitorService } from '../services/monitor.service';
+import { BufferNameStream } from '../streams/buffer-name.stream';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
+import { MirrorChangeStream } from '../streams/mirror-change.stream';
 import { EditorChange } from '../models/editor-change';
 import { Tab } from '../models/tab';
 import { TemplateResult } from '../models/template-result';
@@ -28,10 +30,16 @@ export class OmnisharpService {
     constructor(
         private queryService: QueryService,
         private editorService: EditorService,
-        private monitorService: MonitorService, 
+        private monitorService: MonitorService,
+        private mirrorChangeStream: MirrorChangeStream,
         private http: Http
     ) {
         this.dotnetPath = dirname;
+        mirrorChangeStream.stream
+            .throttleTime(250)
+            .subscribe(x => {
+            console.log('omnisharp saw editor change:', x);
+        })
     }
     
     private handleChange(change: EditorChange) {
@@ -51,12 +59,6 @@ export class OmnisharpService {
             .post(this.action('autocomplete'), JSON.stringify(request))
             .map(res => res.json())
             .map(mapCodeMirror);
-    }
-    
-    // when creating a new tab, this is used to generate the path used in omnisharp, to seperate it from other tabs
-    // if a previously used tabId is seen, the previous fileName is returned instead.
-    public randomFile(tabId: number) {
-        return this.dotnetPath + '/b' + uuid.v4().replace(/\-/g, '') + '.cs';
     }
     
     public initializeTab(tab: Tab) {

@@ -22,6 +22,8 @@ import { EditorService } from './services/editor.service';
 import { QueryService } from './services/query.service';
 import { OmnisharpService } from './services/omnisharp.service';
 import { LogService } from './services/log.service';
+import { BufferNameStream } from './streams/buffer-name.stream';
+import { MirrorChangeStream } from './streams/mirror-change.stream';
 
 bootstrap(AppComponent, [
     MonitorService,
@@ -33,6 +35,8 @@ bootstrap(AppComponent, [
     QueryService,
     OmnisharpService,
     LogService,
+    BufferNameStream,
+    MirrorChangeStream,
     HTTP_PROVIDERS,
     ROUTER_PROVIDERS,
     provide(LocationStrategy, { useClass: HashLocationStrategy }),

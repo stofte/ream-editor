@@ -8,6 +8,7 @@ import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';
 import { EditorChange } from '../models/editor-change';
 import { OmnisharpService } from '../services/omnisharp.service';
+import { MirrorChangeStream } from '../streams/mirror-change.stream';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
 import { Tab } from '../models/tab';
@@ -33,6 +34,7 @@ export class EditorDirective implements OnInit {
         private editorService: EditorService,
         private omnisharpService: OmnisharpService,
         private tabService: TabService,
+        private mirrorChangeStream: MirrorChangeStream,
         private route: Router,
         private routeParams: RouteParams,
         public element: ElementRef, 
@@ -41,6 +43,7 @@ export class EditorDirective implements OnInit {
         const tabId = parseInt(routeParams.get('tab'), 10);
         this.current = tabService.get(tabId);
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
+        mirrorChangeStream.initMirror(this.editor, tabId);
         // todo: hack somewhere else. service ref should be passable
         if (!onetimeBullshit) {
             onetimeBullshit = true;

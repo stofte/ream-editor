@@ -23,18 +23,23 @@ const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
 const dirname = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
 
+class SessionMap {
+    fileName: string;
+    tabId: number;
+    connId: number;
+}
+
 @Injectable()
 export class OmnisharpService {
     private port: number = config.omnisharpPort;
     private initialized: any = {};
     private dotnetPath: string = null;
     
-    private ready: Observable<any>;
+    private sessions: Observable<SessionMap[]>;
+    private ready: Observable<boolean>;
     private fileName: Observable<string>;
     
     constructor(
-        // private queryService: QueryService,
-        // private editorService: EditorService,
         private conns: ConnectionService,
         private monitorService: MonitorService,
         private mirrorChangeStream: MirrorChangeStream,
@@ -44,9 +49,10 @@ export class OmnisharpService {
         const startUpPauser = Observable.fromPromise(monitorService.ready)
             // .map(x => x) // invert promises' true value, to false, to indicate unpausing
             .startWith(false);
-        let s = startUpPauser
+
+        this.sessions = startUpPauser
             .switchMap(ready => {
-                console.log('startup.switch', ready)
+                // console.log('startup.switch', ready)
                 return ready ? tabs.newContext : Observable.never<Tab>();
             })
             .withLatestFrom(conns.all, (tab, conns) => { return { tab, conns }; })
@@ -56,65 +62,70 @@ export class OmnisharpService {
                 return { conn, tabId };
             }, {})
             .flatMap((x: {conn: Connection, tabId: number }) => {
-                console.log('flatMap', x.conn.connectionString);
+                // console.log('flatMap', x.conn.connectionString);
                 let req = { connectionString: x.conn.connectionString, text: '' };
-                // return http.post('http://localhost:8111/querytemplate', JSON.stringify(req)).retry(1);
-                return new Observable<{buffer: string, tabId: number}>((obs: Observer<{buffer: string, tabId: number}>) => {
+                return new Observable<{buffer: string, tabId: number, connId: number}>((obs: Observer<{buffer: string, tabId: number, connId: number}>) => {
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
                             obs.next({
                                 tabId: x.tabId,
-                                buffer: <string> data.Template
+                                buffer: <string> data.Template,
+                                connId: x.conn.id
                             });
                             obs.complete();
                         });
                 });
             })
-            // .map(x => x.json())
             .flatMap(x => {
                 let json = {
                     FileName: `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`,
                     FromDisk: false,
                     Buffer: x.buffer,
                 };
-                return new Observable<{fileName: string, tabId: number }>((obs: Observer<{fileName: string, tabId: number }>) => {
+                return new Observable<SessionMap>((obs: Observer<SessionMap>) => {
                     http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
                         .map(res => res.json)
                         .subscribe(data => {
-                            obs.next({
+                            obs.next(<SessionMap> {
                                 fileName: json.FileName,
-                                tabId: x.tabId
+                                tabId: x.tabId,
+                                connId: x.connId
                             });
                             obs.complete();
                         });
                 });
             })
+            .startWith(<SessionMap> null)
+            .scan((sessions, newSession) => {
+                if (newSession) {
+                    return [newSession, ...sessions];
+                }
+                return sessions;
+            }, [])
+            // replay 1 from this point
+            .publishReplay()
+            .refCount();
+        
+        this.fileName = tabs.active
+            .combineLatest(this.sessions, (tab, sessions) => {
+                // console.log('fileName.combine', tab.id, tab.connectionId, sessions.length);
+                let session = sessions.find(x => x.tabId === tab.id && x.connId === tab.connectionId);
+                return session !== undefined && session.fileName;
+            })
+            .filter(x => !!x) // if session wasn't found, filter undefineds
             ;
         
-        this.ready = s.startWith(null);
+        this.fileName.subscribe(fn => {
+            console.log('fileName', fn);
+        });
         
-        this.ready
-            // .scan((sessions, newSession) => {
-            //     return sessions;
-            // }, [])
-            .subscribe(x => {
-                console.log(`omni ready: ${JSON.stringify(x)}`);
-            });
-
-        // 
-        // pauser.switchMap(paused => paused ? Observable.never() : tabs.newContext)
-        //     .subscribe(x => {
-        //         console.log('omnisharp ctx', x);
-        //     });
         this.dotnetPath = dirname;
         mirrorChangeStream.stream
             .throttleTime(250)
             .subscribe(x => {
             console.log('omnisharp saw editor change:', x);
         });
-        
-        
     }
     
     

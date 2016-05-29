@@ -38,7 +38,7 @@ export class MonitorService {
         this.queryReady = new Promise((res, err) => {
             this.queryResolver = res;
         });
-        
+
         this.start();
     }
     
@@ -52,6 +52,7 @@ export class MonitorService {
     }
         
     private start() {
+        console.log('monitor.service:starting');
         let queryParams = this.queryCmd();
         let omnisharpCmd = this.omnisharpCmd().cmd;
         

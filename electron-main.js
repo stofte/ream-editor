@@ -69,12 +69,12 @@ app.on('ready', function() {
 
     // msg app that we're closing and wait for the response
     mainWindow.on('close', function(event) {
-        // if (!(cleanedUpQueryEngine && cleanedUpOmnisharp && cleanedUpLogs)) {
-        //     mainWindow.webContents.send('application-event', 'close');
-        //     mainWindow.hide();
-        //     event.preventDefault();
-        //     return false;
-        // }
+        if (!(cleanedUpQueryEngine && cleanedUpOmnisharp && cleanedUpLogs)) {
+            mainWindow.webContents.send('application-event', 'close');
+            mainWindow.hide();
+            event.preventDefault();
+            return false;
+        }
     });
 
     // Emitted when the window is closed.

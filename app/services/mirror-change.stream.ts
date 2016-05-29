@@ -14,9 +14,9 @@ export class MirrorChangeStream {
         
     }
     
-    public initMirror(mirror: CodeMirror.Editor, tabId: number) {
+    public initMirror(mirror: CodeMirror.Editor) {
         mirror.on('change', (mirror, cs) => {
-            this.sub.next(this.mapEvent(cs, tabId));
+            this.sub.next(this.mapEvent(cs));
         });
     }
     
@@ -29,9 +29,8 @@ export class MirrorChangeStream {
             });
     }
     
-    private mapEvent(val: any, tabId: number): EditorChange {
+    private mapEvent(val: any): EditorChange {
         return <EditorChange> {
-            tabId,
             startLine: val.from.line,
             startColumn: val.from.ch,
             endLine: val.to.line,

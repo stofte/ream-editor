@@ -1,11 +1,12 @@
 import { Injectable} from '@angular/core';
 import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Rx';
+import { Observable, Subject, ConnectableObservable } from 'rxjs/Rx';
 import 'rxjs/Rx';
 import * as _ from 'lodash';
 import * as uuid from 'node-uuid';
 import { QueryService } from '../services/query.service';
 import { EditorService } from '../services/editor.service';
+import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
@@ -31,8 +32,14 @@ export class OmnisharpService {
         private editorService: EditorService,
         private monitorService: MonitorService,
         private mirrorChangeStream: MirrorChangeStream,
+        private tabs: TabService,
         private http: Http
     ) {
+        let pauser = Observable.fromPromise(monitorService.omnisharpReady).map(x => !x);
+        pauser.switchMap(paused => paused ? Observable.never() : tabs.newContext)
+            .subscribe(x => {
+                console.log('omnisharp ctx', x);
+            });
         this.dotnetPath = dirname;
         mirrorChangeStream.stream
             .throttleTime(250)

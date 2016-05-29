@@ -42,7 +42,7 @@ export class EditorDirective implements OnInit {
         // const tabId = 0; //parseInt(routeParams.get('tab'), 10);
         // this.current = tabService.get(tabId);
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
-        // mirrorChangeStream.initMirror(this.editor, tabId);
+        mirrorChangeStream.initMirror(this.editor);
         // // todo: hack somewhere else. service ref should be passable
         // if (!onetimeBullshit) {
         //     onetimeBullshit = true;

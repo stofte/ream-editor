@@ -57,14 +57,27 @@ export class TabService {
     public get active(): Observable<Tab> {
         let detect = this.activeBase
             // having issues detecting changes otherwise?
-            .map(x => `${x.id} + ${x.connectionId} + ${x.active.toString()}`)
-            // .map(x =>{
-            //     console.log('active:', x);
-            //     return x;
-            // })
+            .map(x => `${x.id}:${x.connectionId}`)
             .distinctUntilChanged((x, y) => x === y);
         // whenever we detect, we emit the latest from the active tabs list
         return detect.withLatestFrom(this.activeTab, (x, tab) => tab);
+    }
+    
+    // is notified when a tab enters a new db context for the first time
+    public get newContext(): Observable<Tab> {
+        return this.active
+            .scan((ctx, tab) => {
+                if (!ctx.conns.find(x => x === tab.id+':'+tab.connectionId)) {
+                    ctx.conns = [tab.id+':'+tab.connectionId, ...ctx.conns];
+                    ctx.updated = true;
+                } else {
+                    ctx.updated = false;
+                }
+                ctx.tab = tab;
+                return ctx;
+            }, {tab: null, conns:[], updated: false})
+            .filter(ctx => ctx.updated)
+            .map(x => x.tab);
     }
     
     public goto(tabId: number) {

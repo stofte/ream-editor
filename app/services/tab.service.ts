@@ -3,12 +3,12 @@ import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
 import { Tab } from '../models/tab';
 import { Connection } from '../models/connection';
 import { ConnectionService } from './connection.service';
+// import { OmnisharpService } from './omnisharp.service';
 
 @Injectable()
 export class TabService {
     private nextId = 0;
     private stream: Observable<Tab[]>;
-    // private newStream = new Subject<Tab>();
     private ops = new ReplaySubject<IStreamOperation>();
     
     constructor(
@@ -21,18 +21,6 @@ export class TabService {
                 return res;
             }, []);
         conns.all.subscribe(this.handleConnections.bind(this));
-        // this.stream
-        //     .filter(ts => ts.length > 0)
-        //     .map(ts => {
-        //         let active = ts.find(t => t.active);
-        //         if (!active) {
-        //             throw 'no active found';
-        //         }
-        //         return active;
-        //     })
-        //     .subscribe(x => {
-        //         //console.log('active', x.id, x.connectionId, x.active);
-        //     });
     }
     
     public get tabs(): Observable<Tab[]> {
@@ -79,7 +67,7 @@ export class TabService {
             .filter(ctx => ctx.updated)
             .map(x => x.tab);
     }
-    
+        
     public goto(tabId: number) {
         this.ops.next((tabs: Tab[]) => {
             return tabs.map(t => {

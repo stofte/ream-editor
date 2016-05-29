@@ -1,18 +1,20 @@
 import { Injectable} from '@angular/core';
 import { Http } from '@angular/http';
-import { Observable, Subject, ConnectableObservable } from 'rxjs/Rx';
+import { Observable, Subject, ConnectableObservable, Observer } from 'rxjs/Rx';
 import 'rxjs/Rx';
 import * as _ from 'lodash';
 import * as uuid from 'node-uuid';
-import { QueryService } from '../services/query.service';
-import { EditorService } from '../services/editor.service';
+// import { QueryService } from '../services/query.service';
+// import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
 import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { EditorChange } from '../models/editor-change';
+import { ConnectionService } from '../services/connection.service';
 import { Tab } from '../models/tab';
+import { Connection } from '../models/connection';
 import { TemplateResult } from '../models/template-result';
 import config from '../config';
 const path = electronRequire('path');
@@ -27,26 +29,95 @@ export class OmnisharpService {
     private initialized: any = {};
     private dotnetPath: string = null;
     
+    private ready: Observable<any>;
+    private fileName: Observable<string>;
+    
     constructor(
-        private queryService: QueryService,
-        private editorService: EditorService,
+        // private queryService: QueryService,
+        // private editorService: EditorService,
+        private conns: ConnectionService,
         private monitorService: MonitorService,
         private mirrorChangeStream: MirrorChangeStream,
         private tabs: TabService,
         private http: Http
     ) {
-        let pauser = Observable.fromPromise(monitorService.omnisharpReady).map(x => !x);
-        pauser.switchMap(paused => paused ? Observable.never() : tabs.newContext)
+        const startUpPauser = Observable.fromPromise(monitorService.ready)
+            // .map(x => x) // invert promises' true value, to false, to indicate unpausing
+            .startWith(false);
+        let s = startUpPauser
+            .switchMap(ready => {
+                console.log('startup.switch', ready)
+                return ready ? tabs.newContext : Observable.never<Tab>();
+            })
+            .withLatestFrom(conns.all, (tab, conns) => { return { tab, conns }; })
+            .scan((ctx, newCtx) => {
+                const conn = newCtx.conns.find(x => x.id === newCtx.tab.connectionId);
+                const tabId = newCtx.tab.id;
+                return { conn, tabId };
+            }, {})
+            .flatMap((x: {conn: Connection, tabId: number }) => {
+                console.log('flatMap', x.conn.connectionString);
+                let req = { connectionString: x.conn.connectionString, text: '' };
+                // return http.post('http://localhost:8111/querytemplate', JSON.stringify(req)).retry(1);
+                return new Observable<{buffer: string, tabId: number}>((obs: Observer<{buffer: string, tabId: number}>) => {
+                    http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
+                        .map(res => res.json())
+                        .subscribe(data => {
+                            obs.next({
+                                tabId: x.tabId,
+                                buffer: <string> data.Template
+                            });
+                            obs.complete();
+                        });
+                });
+            })
+            // .map(x => x.json())
+            .flatMap(x => {
+                let json = {
+                    FileName: `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`,
+                    FromDisk: false,
+                    Buffer: x.buffer,
+                };
+                return new Observable<{fileName: string, tabId: number }>((obs: Observer<{fileName: string, tabId: number }>) => {
+                    http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
+                        .map(res => res.json)
+                        .subscribe(data => {
+                            obs.next({
+                                fileName: json.FileName,
+                                tabId: x.tabId
+                            });
+                            obs.complete();
+                        });
+                });
+            })
+            ;
+        
+        this.ready = s.startWith(null);
+        
+        this.ready
+            // .scan((sessions, newSession) => {
+            //     return sessions;
+            // }, [])
             .subscribe(x => {
-                console.log('omnisharp ctx', x);
+                console.log(`omni ready: ${JSON.stringify(x)}`);
             });
+
+        // 
+        // pauser.switchMap(paused => paused ? Observable.never() : tabs.newContext)
+        //     .subscribe(x => {
+        //         console.log('omnisharp ctx', x);
+        //     });
         this.dotnetPath = dirname;
         mirrorChangeStream.stream
             .throttleTime(250)
             .subscribe(x => {
             console.log('omnisharp saw editor change:', x);
-        })
+        });
+        
+        
     }
+    
+    
     
     private handleChange(change: EditorChange) {
         this.monitorService.omnisharpReady.then(() => {
@@ -68,7 +139,7 @@ export class OmnisharpService {
     }
     
     public initializeTab(tab: Tab) {
-
+        
         // if (this.initialized[tab.id] === tab.connectionId.id) {
         //     // todo: might be useless?
         //     return;

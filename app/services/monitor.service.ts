@@ -18,6 +18,7 @@ const dirname = (isProduction ? path.normalize(process.resourcesPath + '/app') :
 export class MonitorService {
     public omnisharpReady: Promise<boolean>;
     public queryReady: Promise<boolean>;
+    public ready: Promise<boolean>;
     
     private omnisharpResolver;
     private queryResolver;
@@ -37,6 +38,14 @@ export class MonitorService {
         
         this.queryReady = new Promise((res, err) => {
             this.queryResolver = res;
+        });
+        
+        this.ready = new Promise((res) => {
+            this.omnisharpReady.then(() => {
+                this.queryReady.then(() => {
+                    res(true);
+                });                
+            });
         });
 
         this.start();

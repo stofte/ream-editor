@@ -16,6 +16,7 @@ export class MirrorChangeStream {
     
     public initMirror(mirror: CodeMirror.Editor) {
         mirror.on('change', (mirror, cs) => {
+            console.log('onchange', cs);
             this.sub.next(this.mapEvent(cs));
         });
     }

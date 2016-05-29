@@ -10,22 +10,45 @@ const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
 const dirname: string = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
 
+class BufferMap {
+    public tabId: number;
+    public connId: number;
+    public fileName: string;
+}
+
 @Injectable()
 export class BufferNameService {
     private dotnetPath = dirname;
-    private buffers = new ReplaySubject<EditorChange>();
+    private buffers: Observable<EditorChange[]>;
+    private ops = new ReplaySubject<IStreamOperation>();
     
-    public newName(tabId: number): string {
-        const fileName = `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`;
-        this.buffers.next(<EditorChange> { fileName, tabId });
-        let z = new Observable<EditorChange>();
-        return fileName;
+    constructor() {
+        this.buffers = this.ops
+            .scan((bs: BufferMap[], op) => {
+                return op(bs);
+            }, []);
+    }
+    
+    public setConnection(tabId: number, connId: number): void {
+        this.ops.next((bs: BufferMap[]) => {
+            if (!bs.find(x => x.connId === connId && x.tabId == tabId)) {
+                bs.push(<BufferMap> {
+                    tabId,
+                    connId,
+                    fileName: `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`
+                });
+            }
+            return bs;
+        });
+        // const fileName = `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`;
+        // this.buffers.next(<EditorChange> { fileName, tabId });
+        // return fileName;
     }
     
     public get byTabId(): Observable<Map<number, string>> {
         return this.buffers
             .scan((map, value) => {
-                return map.set(value.tabId, value.fileName);
+                return map; //.set(value.tabId, value.fileName);
             }, new Map<number, string>());
     }
 }

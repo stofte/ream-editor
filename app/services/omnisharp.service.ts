@@ -33,7 +33,6 @@ class SessionMap {
 export class OmnisharpService {
     private port: number = config.omnisharpPort;
     private initialized: any = {};
-    private dotnetPath: string = null;
     
     private sessions: Observable<SessionMap[]>;
     private ready: Observable<boolean>;
@@ -103,9 +102,17 @@ export class OmnisharpService {
                 }
                 return sessions;
             }, [])
-            // replay 1 from this point
             .publishReplay()
             .refCount();
+        
+        this.ready = tabs.active
+            .combineLatest(this.sessions, (tab, sessions) => {
+                // console.log('fileName.combine', tab.id, tab.connectionId, sessions.length);
+                let session = sessions.find(x => x.tabId === tab.id && x.connId === tab.connectionId);
+                return session !== undefined;
+            })
+            .distinctUntilChanged()
+            ;
         
         this.fileName = tabs.active
             .combineLatest(this.sessions, (tab, sessions) => {
@@ -116,16 +123,49 @@ export class OmnisharpService {
             .filter(x => !!x) // if session wasn't found, filter undefineds
             ;
         
-        this.fileName.subscribe(fn => {
-            console.log('fileName', fn);
-        });
+        // buffers the mirror stream when omnisharp isn't ready yet
+        let mirrorBuffer = Observable.timer(0, 200)
+            .combineLatest(this.ready, (val, status) => {
+                return status ? 42 : status;
+            })
+            .filter(x => !!x);
         
-        this.dotnetPath = dirname;
-        mirrorChangeStream.stream
-            .throttleTime(250)
+        // doesn't account that mirror updates may have come from multiple tabs
+        let changeStream = mirrorChangeStream.stream
+            .buffer(mirrorBuffer)
+            .filter(x => x.length > 0)
+            .combineLatest(this.fileName, (changes, fileName) => {
+                return changes.map(x => {
+                    x.fileName = fileName;
+                    return x;
+                });
+            })
+            .flatMap(changes => {
+                let json = {
+                    FileName: changes[0].fileName,
+                    FromDisk: false,
+                    Changes: changes.map(c => {
+                        return <EditorChange> {
+                            newText: c.newText,
+                            startLine: c.startLine + 1,
+                            startColumn: c.startColumn + 1,
+                            endLine: c.endLine + 1,
+                            endColumn: c.endColumn + 1  
+                        };
+                    }),
+                };
+                return new Observable<boolean>((obs: Observer<boolean>) => {
+                    http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
+                        .map(res => res.status === 200)
+                        .subscribe(data => {
+                            obs.next(data);
+                            obs.complete();
+                        });
+                });
+            })
             .subscribe(x => {
-            console.log('omnisharp saw editor change:', x);
-        });
+                console.log('after',x);
+            });
     }
     
     

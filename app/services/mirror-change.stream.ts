@@ -16,7 +16,6 @@ export class MirrorChangeStream {
     
     public initMirror(mirror: CodeMirror.Editor) {
         mirror.on('change', (mirror, cs) => {
-            console.log('onchange', cs);
             this.sub.next(this.mapEvent(cs));
         });
     }
@@ -24,10 +23,7 @@ export class MirrorChangeStream {
     public get stream(): Observable<EditorChange> {
         return this.sub
             .asObservable()
-            .withLatestFrom(this.bufferNames.byTabId, (change, names) => {
-                change.fileName = names.get(change.tabId);
-                return change;
-            });
+            ;
     }
     
     private mapEvent(val: any): EditorChange {

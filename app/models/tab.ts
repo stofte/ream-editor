@@ -2,7 +2,7 @@ import { Connection } from './connection';
 
 export class Tab {
     public id: number; // primary key for tab
-    public connection: Connection; // stores a connection reference for the given tab
+    public connectionId: number; // stores a connection reference for the given tab
     public title: string; // not used
     public active: boolean; // is the visible tab
     public output: any; // which output tab is active for the tab
@@ -16,7 +16,7 @@ export class Tab {
     public clone(): Tab {
         return <Tab> {
             id: this.id,
-            connection: this.connection,
+            connectionId: this.connectionId,
             title: this.title,
             active: this.active,
             output: this.output,

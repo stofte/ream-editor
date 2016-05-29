@@ -7,10 +7,9 @@ import * as uuid from 'node-uuid';
 import { QueryService } from '../services/query.service';
 import { EditorService } from '../services/editor.service';
 import { MonitorService } from '../services/monitor.service';
-import { BufferNameStream } from '../streams/buffer-name.stream';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
-import { MirrorChangeStream } from '../streams/mirror-change.stream';
+import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { EditorChange } from '../models/editor-change';
 import { Tab } from '../models/tab';
 import { TemplateResult } from '../models/template-result';
@@ -63,35 +62,35 @@ export class OmnisharpService {
     
     public initializeTab(tab: Tab) {
 
-        if (this.initialized[tab.id] === tab.connection.id) {
-            // todo: might be useless?
-            return;
-        }
+        // if (this.initialized[tab.id] === tab.connectionId.id) {
+        //     // todo: might be useless?
+        //     return;
+        // }
         
-        // wait for backends to start before doing this
-        this.monitorService.queryReady.then(() => {
-            this.queryService.queryTemplate(tab.connection)
-                .subscribe((result: TemplateResult) => {
-                    tab.templateHeader = result.header;
-                    tab.templateFooter = result.footer;
-                    tab.templateLineOffset = result.lineOffset;
-                    this.editorService.set(tab, result.defaultQuery, false);
-                    // need to update omnisharp with an initial buffer template
-                    // from which it can perform intellisense operations
-                    let json = JSON.stringify({
-                        FileName: tab.fileName,
-                        FromDisk: false,
-                        Buffer: result.template,
-                    });
-                    this.http.post(this.action('updatebuffer'), json)
-                        .subscribe(data => {
-                            if (data.status === 200) {
-                                this.initialized[tab.id] = tab.connection.id;
-                                tab.omnisharpReady();
-                            }
-                        });
-                });
-        });
+        // // wait for backends to start before doing this
+        // this.monitorService.queryReady.then(() => {
+        //     this.queryService.queryTemplate(tab.connectionId)
+        //         .subscribe((result: TemplateResult) => {
+        //             tab.templateHeader = result.header;
+        //             tab.templateFooter = result.footer;
+        //             tab.templateLineOffset = result.lineOffset;
+        //             this.editorService.set(tab, result.defaultQuery, false);
+        //             // need to update omnisharp with an initial buffer template
+        //             // from which it can perform intellisense operations
+        //             let json = JSON.stringify({
+        //                 FileName: tab.fileName,
+        //                 FromDisk: false,
+        //                 Buffer: result.template,
+        //             });
+        //             this.http.post(this.action('updatebuffer'), json)
+        //                 .subscribe(data => {
+        //                     if (data.status === 200) {
+        //                         this.initialized[tab.id] = tab.connectionId.id;
+        //                         tab.omnisharpReady();
+        //                     }
+        //                 });
+        //         });
+        // });
     }
     
     private updateTab(tab: Tab, text: string) {

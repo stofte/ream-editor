@@ -14,33 +14,59 @@
 
 f-app {
     position: absolute;
-    height: calc(100% - 64px);
+    min-height: 100%;
     width: 100%;
 }
 
-.main-layer {
-    height: 0;
-    visibility: hidden;
+.main-layer,
+.main-cover,
+.over-layer {
+    padding-top: 64px;
+    min-height: calc(100% - 64px);
+    width: 100%;
+    position: absolute;
     z-index: 0;
 }
 
-.main-layer .container-fluid {
-    overflow: hidden;
-    height: 0;
-    min-height: 0;
+.main-cover {
+    padding-top: 0;
+    min-height: 100%;
+    display: none;
+    background: black;
+    opacity: 0.5;
+}
+
+.main-cover.layer-visible {
+    z-index: 1;
+    display: block;
+}
+
+.over-layer {
+    display: none;
+}
+
+.over-layer .jumbotron {
+    background-color: white;
+}
+
+.over-layer.layer-visible {
+    z-index: 2;
+    display: block;
+    overflow: auto;
+    height: 100%;
 }
 
 .main-layer.layer-visible {
-    height: calc(100% - 64px);
-    visibility: visible;
+    /*height: calc(100% - 64px);
+    visibility: visible;*/
     z-index: 1;
 }
-
+/*
 .main-layer.layer-visible .container-fluid {
     overflow: visible;
     height: auto;
     min-height: auto;
-}
+}*/
 
 /*
     style output text areas
@@ -76,12 +102,12 @@ f-app {
 */
 
 html {
-    height: 100%;
+    min-height: 100%;
 }
 
 body {
   min-height: 100%;
-  padding-top: 64px;
+  /*padding-top: 64px;*/
 }
 
 .CodeMirror {

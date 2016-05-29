@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { RouteParams } from '@angular/router-deprecated';
 import { BUTTON_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 import { EditorService } from '../services/editor.service';
 import { MonitorService } from '../services/monitor.service';
@@ -11,7 +10,6 @@ import { Connection } from '../models/connection';
 
 @Component({
     selector: 'f-execute-query',
-    directives: [BUTTON_DIRECTIVES],
     template: `
 <button class="btn btn-primary form-control int-test-execute-btn"
     type="button"
@@ -32,18 +30,18 @@ export class ExecuteQueryComponent {
     constructor(
         private editorService: EditorService,
         private queryService: QueryService,
-        private routeParams: RouteParams,
+        //private routeParams: RouteParams,
         monitorService: MonitorService,
         tabService: TabService,
         connectionService: ConnectionService
     ) {
-        this.id = parseInt(this.routeParams.get('tab'), 10);
-        this.tab = tabService.get(this.id);
-        monitorService.queryReady.then(() => {
-            this.isDisabled = false;
-        });
-        const connId = parseInt(this.routeParams.get('connection'), 10);
-        this.conn = connectionService.get(connId);
+        // this.id = parseInt(this.routeParams.get('tab'), 10);
+        // this.tab = tabService.get(this.id);
+        // monitorService.queryReady.then(() => {
+        //     this.isDisabled = false;
+        // });
+        // const connId = parseInt(this.routeParams.get('connection'), 10);
+        // this.conn = connectionService.get(connId);
     }
     
     private run(): void {

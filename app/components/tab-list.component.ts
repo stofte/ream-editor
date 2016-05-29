@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router, ROUTER_DIRECTIVES } from '@angular/router-deprecated';
 import { Location } from '@angular/common';
+import { Tab } from '../models/tab';
+import { Connection } from '../models/connection';
 import { Observable } from 'rxjs/Observable';
 import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
@@ -17,14 +19,14 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
         </div>
         <div class="navbar-collapse collapse" *ngIf="tabsEnabled">
             <ul class="nav navbar-nav">
-                <li *ngFor="let tab of tabService.tabs"
-                     class="{{tabService.active.id === tab.id ? 'active' : ''}}">
-                    <a [routerLink]="['EditorTab', {tab: tab.id, connection: tab.connection.id }]">
+                <li *ngFor="let tab of currentTabs"
+                     class="{{tab.active ? 'active' : ''}}">
+                    <a (click)="goto(tab.id)" href="javascript:void 0">
                         {{tab.title}}
                     </a>
                 </li>
                 <li>
-                    <a (click)="newTab()" href="javascript:void(0)"><span class="glyphicon glyphicon-plus"></span></a>
+                    <a (click)="newTab()" href="javascript:void 0"><span class="glyphicon glyphicon-plus"></span></a>
                 </li>
             </ul>
         </div>
@@ -33,21 +35,28 @@ import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 `
 })
 export class TabListComponent {
+    private title = '';
+    private currentTabs: Tab[] = [];
+    private tabsEnabled = false;
     constructor(
-        private tabService: TabService,
-        private router: Router,
-        private location: Location
+        private tabs: TabService
+        // private tabService: TabService,
+        // private router: Router,
+        // private location: Location
     ) {
+        tabs.tabs
+            .subscribe(ts => {
+                this.currentTabs = ts;
+                this.tabsEnabled = ts.length > 0;
+            });
     }
     
     private newTab() {
-        const activeConn = this.tabService.active.connection;
-        this.tabService.newForeground(activeConn);
+        this.tabs.newTab();
     }
     
-    private get tabsEnabled(): boolean {
-        // dont show tabs on start page
-        return this.location.path().indexOf('/start') === -1;
+    private goto(id: number) {
+        this.tabs.goto(id);
     }
     
     private get viewTitle(): string {

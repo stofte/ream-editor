@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Router } from '@angular/router-deprecated';
 import { Subject, Observable } from 'rxjs/Rx';
 import 'rxjs/Rx';
 import { union, find, values } from 'lodash';
@@ -10,10 +9,6 @@ import { TemplateResult } from '../models/template-result';
 import { ResultPage } from '../models/result-page';
 import config from '../config';
 
-class SubscriberMap {
-    
-}
-
 @Injectable()
 export class QueryService {
     private port: number = config.queryEnginePort;
@@ -21,8 +16,7 @@ export class QueryService {
     private data: any = {};
     private cachedTemplate = {};
     constructor(
-        private http: Http,
-        private router: Router
+        private http: Http
     ) {
     }
     

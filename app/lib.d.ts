@@ -13,3 +13,7 @@ declare module CodeMirror {
     const hint: any;
     const registerHelper: any;
 }
+
+interface IStreamOperation extends Function {
+    (conns: any[]): any[]
+}

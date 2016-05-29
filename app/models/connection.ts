@@ -6,4 +6,10 @@ export class Connection {
     constructor(connectionString: string) {
         this.connectionString = connectionString;
     }
+    public toJSON(): Connection {
+        return <Connection> {
+            id: this.id,
+            connectionString: this.connectionString 
+        };
+    }
 }

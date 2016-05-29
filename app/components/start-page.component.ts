@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router-deprecated';
-import { OverlayUiStateService } from '../services/overlay-ui-state.service';
+import { OverlayService } from '../services/overlay.service';
 import { ConnectionService } from '../services/connection.service';
-import { TabService } from '../services/tab.service';
 
 @Component({
     selector: 'f-start-page',
@@ -22,23 +20,17 @@ import { TabService } from '../services/tab.service';
         </div>
     </div>
 </div>
-`    
+`
 })
 export class StartPageComponent {
     constructor(
-        private overlayUiStateService: OverlayUiStateService,
-        private connectionService: ConnectionService,
-        private tabService: TabService,
-        private router: Router
+        private overlay: OverlayService,
+        private connectionService: ConnectionService
     ) {
         
     }
     
     private connectionsToggle() {
-        this.overlayUiStateService.toggleConnections();
-    }
-    
-    private blankTab() {
-        this.tabService.newForeground(this.connectionService.defaultConnection);
+        this.overlay.showConnections();
     }
 }

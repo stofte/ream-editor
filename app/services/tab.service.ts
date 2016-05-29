@@ -1,88 +1,144 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router-deprecated';
-import { OmnisharpService } from '../services/omnisharp.service';
-import { QueryService } from '../services/query.service';
-import { MonitorService } from '../services/monitor.service';
-import { BufferNameStream } from '../streams/buffer-name.stream';
-import { Connection } from '../models/connection';
+import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
 import { Tab } from '../models/tab';
+import { Connection } from '../models/connection';
+import { ConnectionService } from './connection.service';
 
 @Injectable()
 export class TabService {
-    private id: number = 1;
-    public tabs: Tab[] = [];
+    private nextId = 0;
+    private stream: Observable<Tab[]>;
+    // private newStream = new Subject<Tab>();
+    private ops = new ReplaySubject<IStreamOperation>();
     
     constructor(
-        private router: Router,
-        private omnisharpService: OmnisharpService,
-        private queryService: QueryService,
-        private monitorService: MonitorService,
-        private bufferNameStream: BufferNameStream
+        private conns: ConnectionService
     ) {
-        
+        this.stream = this.ops
+            .scan((tabs: Tab[], op) => {
+                let res = op(tabs);
+                // console.log('scan', res.map(x => x.id + ':' + x.connectionId + ':' + x.active))
+                return res;
+            }, []);
+        conns.all.subscribe(this.handleConnections.bind(this));
+        // this.stream
+        //     .filter(ts => ts.length > 0)
+        //     .map(ts => {
+        //         let active = ts.find(t => t.active);
+        //         if (!active) {
+        //             throw 'no active found';
+        //         }
+        //         return active;
+        //     })
+        //     .subscribe(x => {
+        //         //console.log('active', x.id, x.connectionId, x.active);
+        //     });
     }
     
-    public newForeground(connection: Connection, navigate = true) {
-        const tab = new Tab();
-        tab.id = this.id++;
-        tab.title = `Query ${tab.id}`;
-        tab.output = null; // new tab has no output set
-        tab.connection = connection == null ? this.tabs.find(x => x.active).connection : connection;
-        tab.fileName = this.bufferNameStream.newName(tab.id);
-        tab.omnisharp = new Promise<void>((done, err) => {
-            tab.omnisharpReady = () => done();
+    public get tabs(): Observable<Tab[]> {
+        return this.stream;
+    }
+    
+    public get hasTabs(): Observable<boolean> {
+        return this
+            .tabs
+            .map(x => x.length > 0);
+    }
+    
+    // notify only when active tab id changes
+    public get activeTab(): Observable<Tab> {
+        return this.activeBase
+            .distinctUntilChanged((x, y) => x.id === y.id);
+    }
+    
+    // is notified when
+    // - connection id for current tab is changed
+    // - active tab is changed
+    public get active(): Observable<Tab> {
+        let detect = this.activeBase
+            // having issues detecting changes otherwise?
+            .map(x => `${x.id} + ${x.connectionId} + ${x.active.toString()}`)
+            // .map(x =>{
+            //     console.log('active:', x);
+            //     return x;
+            // })
+            .distinctUntilChanged((x, y) => x === y);
+        // whenever we detect, we emit the latest from the active tabs list
+        return detect.withLatestFrom(this.activeTab, (x, tab) => tab);
+    }
+    
+    public goto(tabId: number) {
+        this.ops.next((tabs: Tab[]) => {
+            return tabs.map(t => {
+                t.active = tabId === t.id;
+                return t;
+            });
         });
-        this.omnisharpService.initializeTab(tab);
-        this.tabs.forEach(t => t.active = false);
-        tab.active = true;
-        this.tabs.push(tab);
-        if (navigate) {
-            this.goto(tab);
-        }       
     }
     
-    public updateTabId(tabId: number, connection: Connection): void {
-        const tab = this.get(tabId);
-        tab.connection = connection;
-        this.updateTab(tab);
+    public newTab() {
+          this.ops.next((tabs: Tab[]) => {
+                const conn = tabs.find(t => t.active).connectionId;
+                const tab = this.getNewTab(tabs, conn);
+                    // console.log('inserting new tab', newTab.id, tabs.length, newTab.active);
+                    return [
+                        ...tabs.map(tab => {
+                            tab.active = false; 
+                            return tab;
+                        }),
+                        tab
+                    ] 
+                });
     }
     
-    public updateTab(tab: Tab): void {
-        this.tabs.find(t => {
-            if (t.id === tab.id) {
-                let updateTemplate = tab.connection && t.connection && 
-                    t.connection.id !== tab.connection.id;
-                t.connection = tab.connection;
-                t.output = tab.output; 
-                t.title = tab.title;
-                if (updateTemplate) {
-                    this.omnisharpService.initializeTab(t);
+    public setConnection(tabId: number, conn: Connection) {
+        this.ops.next((tabs: Tab[]) => {
+            return tabs.map(x => {
+                if (x.id === tabId) {
+                    //console.log(`setting tab id ${x.id} (has conn ${JSON.stringify(x.connectionId)}) to conn id ${JSON.stringify(conn.id)}`);
+                    x.connectionId = conn.id;
                 }
-                // might not actually go anywhere but of well
-                this.goto(t);
-                return true;
+                return x;
+            });
+        });
+    }
+
+    // handles updates to the tabs as the connections change.
+    private handleConnections(conns: Connection[]) {
+        this.ops.next((tabs: Tab[]) => {
+            let filtered = tabs.filter(tab => {
+                return conns.find(c => c.id === tab.connectionId) !== undefined;
+            });
+            if (filtered.length > 0 && !filtered.find(x => x.active)  && tabs.length !== filtered.length) {
+                // set a new active
+                filtered[0].active = true;
+            } else if (filtered.length === 0 && conns.length > 0) {
+                // id will take account for old tabs
+                filtered.push(this.getNewTab(tabs, conns[0].id));
             }
-            return false;
+            return filtered;
         });
     }
     
-    public get(id: number) {
-        const tab = this.tabs.find(x => x.id === id);
-        return tab && tab.clone(); 
+    private getNewTab(tabs: Tab[], connectionId: number, active = true): Tab {
+        const id = tabs.reduce((max, val) => val.id >= max ? val.id + 1 : max, 0);
+        return <Tab> {
+            id,
+            active,
+            connectionId,
+            title: `Query ${id}`,
+        };
     }
     
-    public get active(): Tab {
-        let a = this.tabs.find(x => x.active);
-        return a && a.clone();
-    }
-    
-    public routedTo(id: number): void {
-        this.tabs.forEach(t => {
-            t.active = t.id === id;
-        });
-    }
-    
-    private goto(tab: Tab): void {
-        this.router.navigate(['EditorTab', { tab: tab.id, connection: tab.connection.id }]);
+    private get activeBase(): Observable<Tab> {
+        return this.stream
+            .filter(ts => ts.length > 0)
+            .map(ts => {
+                let active = ts.find(t => t.active);
+                if (!active) {
+                    throw 'no active found';
+                }
+                return active;
+            });
     }
 }

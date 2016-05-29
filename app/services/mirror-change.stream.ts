@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EditorChange } from '../models/editor-change';
-import { BufferNameStream } from './buffer-name.stream';
+import { BufferNameService } from './buffer-name.service';
 import * as CodeMirror from 'codemirror';
 import { Observable, Subject } from 'rxjs/Rx';
 
@@ -9,7 +9,7 @@ export class MirrorChangeStream {
     private sub = new Subject<EditorChange>();
     
     constructor(
-        private bufferNames: BufferNameStream
+        private bufferNames: BufferNameService
     ) {
         
     }

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { RouteParams } from '@angular/router-deprecated';
 import { ConnectionService } from '../services/connection.service';
 import { TabService } from '../services/tab.service';
 import { EditorService } from '../services/editor.service';
@@ -35,15 +34,15 @@ import { EditorDirective } from '../directives/editor.directive';
 export class BufferTabComponent {
     private id: number;
     constructor(
-        private connectionService: ConnectionService,
-        private tabService: TabService,
-        private editorService: EditorService,
-        private routeParams: RouteParams
+        // private connectionService: ConnectionService,
+        // private tabService: TabService,
+        // private editorService: EditorService
+        // private routeParams: RouteParams
     ) {
-        this.id = parseInt(this.routeParams.get('tab'), 10);
+        // this.id = parseInt(this.routeParams.get('tab'), 10);
     }
     
-    routerOnActivate() {
-        this.tabService.routedTo(this.id); // todo: used?
-    }
+    // routerOnActivate() {
+    //     this.tabService.routedTo(this.id); // todo: used?
+    // }
 }

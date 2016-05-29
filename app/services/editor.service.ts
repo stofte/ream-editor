@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EditorChange } from '../models/editor-change';
+import { TabService } from './tab.service';
 import { CodeCheckResult } from '../models/code-check-result';
 import { Tab } from '../models/tab';
 import { Subject, Observable } from 'rxjs/Rx';
@@ -10,7 +11,9 @@ export class EditorService {
     public changes: Subject<EditorChange>;
     public rawErrors: Subject<CodeCheckResult>;
     
-    constructor() {
+    constructor(
+        private tabs: TabService
+    ) {
         this.changes = new Subject<EditorChange>(); 
     }
     

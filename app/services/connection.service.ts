@@ -1,59 +1,78 @@
 import { Injectable } from '@angular/core';
-import { StorageService } from './storage.service';
+import { ReplaySubject, Subject, Observable } from 'rxjs/Rx';
 import { Connection } from '../models/connection';
 
 @Injectable()
 export class ConnectionService {
-    private storageKey = 'connectionstrings';
-    public connections: Connection[] = null;
-    private id: number = 0;
+    private key = 'connections';
+    private stream: Observable<Connection[]>;
+    private ops = new ReplaySubject<IStreamOperation>();
     
-    constructor(private storageService: StorageService) {
-        this.connections = this.storageService.Load(this.storageKey, []);
-        this.id = this.connections.reduce((prev, curr) => Math.max(prev, curr.id), 0);
-    }
-    
-    public get defaultConnection(): Connection {
-        if (this.connections.length > 0) {
-            return this.connections[0]; // todo
-        }
-        return null;
-    }
-    
-    public get(id: number): Connection {
-        return this.connections.find(x => x.id === id);
-    }
-    
-    public get Connections(): Connection[] {
-        return this.connections;
-    }
-    
-    public addNew(conn: Connection) {
-        conn.id = this.getNextValidId();
-        this.connections.push(conn);
-        this.storageService.Save(this.storageKey, this.connections);
-    }
-    
-    public remove(conn: Connection) {
-        this.connections = this.connections.filter(x => x.id !== conn.id);
-        this.storageService.Save(this.storageKey, this.connections);
-    }
-    
-    public update(conn: Connection) {
-        this.connections.find(c => {
-           if (c.id === conn.id) {
-               c.connectionString = conn.connectionString;
-               this.storageService.Save(this.storageKey, this.connections);
-               return true;
-           } 
-           return false;
+    constructor() {
+        // initial values
+        this.ops.next(x => x);
+        this.stream = this.ops
+            .scan((acc: Connection[], op: IStreamOperation) => {
+                return op([...acc]);
+            }, this.load());
+        this.stream.subscribe(cs => {
+            this.save(cs);
         });
     }
     
-    private getNextValidId(guess = 0): number {
-        if (this.connections.find(c => c.id === guess)) {
-            return this.getNextValidId(guess + 1);
+    public get all(): Observable<Connection[]> {
+        return this.stream;
+    }
+    
+    public add(conn: Connection) {
+        this.ops.next((conns) => {
+            conn.id = this.getNextValidId(0, conns);
+            return [conn, ...conns];   
+        });
+    }
+    
+    public remove(conn: Connection) {
+        this.ops.next((conns) => {
+            return [...conns.filter(x => x.id !== conn.id)];
+        });
+    }
+
+    public update(conn: Connection) {
+        this.ops.next((conns) => {
+            let idx = -1;
+            conns.forEach((x, i) => {
+                x.id === conn.id ? idx = i : null;
+            });
+            if (idx < 0) {
+                throw 'update id not found';
+            }
+            return [...conns.slice(0, idx),
+            <Connection> {
+                id: conn.id,
+                connectionString: conn.connectionString,
+            }, ...conns.slice(idx + 1)];
+        });
+    }
+    
+    private load(): Connection[] {
+        try {
+            let raw = localStorage.getItem(this.key);
+            return raw ? <Connection[]> JSON.parse(raw) : [];
+        }
+        catch (e) {
+            console.error(`connection-service load exception: ${e}`);
+            return [];
+        }
+    }
+    
+    private save(conns: Connection[]) {
+        localStorage.setItem(this.key, JSON.stringify(conns));
+    }
+
+    private getNextValidId(guess = 0, conns: Connection[]): number {
+        if (conns.find(c => c.id === guess)) {
+            return this.getNextValidId(guess + 1, conns);
         }
         return guess;
-    } 
+    }
 }

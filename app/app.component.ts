@@ -1,63 +1,61 @@
 import { Component } from '@angular/core';
-import { RouteConfig, Router, ROUTER_DIRECTIVES } from '@angular/router-deprecated';
-
 import { MonitorService } from './services/monitor.service';
 import { ConnectionService } from './services/connection.service';
 import { TabService } from './services/tab.service';
-import { OverlayUiStateService } from './services/overlay-ui-state.service';
-
+import { OverlayService } from './services/overlay.service';
 import { StartPageComponent } from './components/start-page.component';
 import { BufferTabComponent } from './components/buffer-tab.component';
 import { TabListComponent } from './components/tab-list.component';
 import { ConnectionManagerComponent } from './components/connection-manager.component';
+import { TabViewComponent } from './components/tab-view.component';
 
-@Component({
-    selector: 'chat',
-    template: `<h1>Chat Component</h1>`
-})
-export class ChatComponent {}
-
-@RouteConfig([
-    { path: '/start', as: 'StartPage', component: StartPageComponent, useAsDefault: true },
-    { path: '/guide', as: 'GuidePage', component: StartPageComponent },
-    { path: '/tab/:tab/:connection', as: 'EditorTab', component: BufferTabComponent }
-])
 @Component({
     selector: 'f-app',
-    directives: [TabListComponent, ConnectionManagerComponent, ROUTER_DIRECTIVES],
+    directives: [
+        TabListComponent, ConnectionManagerComponent, TabViewComponent 
+    ],
     template: `
-<div class="main-layer {{connectionsVisible ? '' : 'layer-visible'}}">
+<div class="main-layer">
     <f-tab-list></f-tab-list>
-    <router-outlet></router-outlet>
+    <f-tab-view></f-tab-view>
 </div>
-<f-connection-manager class="main-layer {{connectionsVisible ? 'layer-visible' : ''}}"></f-connection-manager>
+<div class="main-cover {{connectionsVisible ? 'layer-visible' : ''}}">
+</div>
+<div class="over-layer {{connectionsVisible ? 'layer-visible' : ''}}">
+    <f-connection-manager></f-connection-manager>
+</div>
 `
 })
 export class AppComponent {
     private connectionsVisible: boolean = false;
     
     constructor(
-        private monitorService: MonitorService, 
-        private connectionService: ConnectionService,
-        private overlayUiStateService: OverlayUiStateService,
-        private tabService: TabService,
-        private router: Router) {
-        monitorService.start();
+        private overlayService: OverlayService
+        // private monitorService: MonitorService, 
+        // private connectionService: ConnectionService,
+        // private overlayUiStateService: OverlayUiStateService,
+        // private tabService: TabService
+        // private router: Router
+        ) {
+        //monitorService.start();
+        overlayService.connections
+            .subscribe(visible => {
+                this.connectionsVisible = visible;
+            });
+        // // decide where to go
+        // let connection = connectionService.defaultConnection;
+        // if (!connection) {
+        //     //router.navigate(['StartPage']);
+        // } else {
+        //     // check if there are any open tabs ...
+        //     if (!tabService.active) {
+        //         //this.tabService.newForeground(connection);    
+        //     }
+        // }
         
-        // decide where to go
-        let connection = connectionService.defaultConnection;
-        if (!connection) {
-            router.navigate(['StartPage']);
-        } else {
-            // check if there are any open tabs ...
-            if (!tabService.active) {
-                this.tabService.newForeground(connection);    
-            }
-        }
-        
-        // setup subs for toggle between overlays
-        overlayUiStateService.connectionsVisible.subscribe(val => {
-            this.connectionsVisible = val;
-        });
+        // // setup subs for toggle between overlays
+        // overlayUiStateService.connectionsVisible.subscribe(val => {
+        //     this.connectionsVisible = val;
+        // });
     }
 }

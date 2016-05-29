@@ -38,6 +38,8 @@ export class MonitorService {
         this.queryReady = new Promise((res, err) => {
             this.queryResolver = res;
         });
+        
+        this.start();
     }
     
     private applicationEventHandler(event: any, msg: string) {
@@ -49,7 +51,7 @@ export class MonitorService {
         }
     }
         
-    public start() {
+    private start() {
         let queryParams = this.queryCmd();
         let omnisharpCmd = this.omnisharpCmd().cmd;
         

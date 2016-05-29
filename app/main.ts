@@ -14,7 +14,7 @@ import { ROUTER_PROVIDERS } from '@angular/router-deprecated';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { AppComponent } from './app.component';
 import { MonitorService } from './services/monitor.service';
-import { OverlayUiStateService } from './services/overlay-ui-state.service';
+import { OverlayService } from './services/overlay.service';
 import { StorageService } from './services/storage.service';
 import { ConnectionService } from './services/connection.service';
 import { TabService } from './services/tab.service';
@@ -22,12 +22,12 @@ import { EditorService } from './services/editor.service';
 import { QueryService } from './services/query.service';
 import { OmnisharpService } from './services/omnisharp.service';
 import { LogService } from './services/log.service';
-import { BufferNameStream } from './streams/buffer-name.stream';
-import { MirrorChangeStream } from './streams/mirror-change.stream';
+import { BufferNameService } from './services/buffer-name.service';
+import { MirrorChangeStream } from './services/mirror-change.stream';
 
 bootstrap(AppComponent, [
     MonitorService,
-    OverlayUiStateService,
+    OverlayService,
     StorageService,
     ConnectionService,
     TabService,
@@ -35,9 +35,10 @@ bootstrap(AppComponent, [
     QueryService,
     OmnisharpService,
     LogService,
-    BufferNameStream,
+    BufferNameService,
     MirrorChangeStream,
-    HTTP_PROVIDERS,
-    ROUTER_PROVIDERS,
-    provide(LocationStrategy, { useClass: HashLocationStrategy }),
+    TabService,
+    HTTP_PROVIDERS
+    // ROUTER_PROVIDERS,
+    // provide(LocationStrategy, { useClass: HashLocationStrategy })
 ]);

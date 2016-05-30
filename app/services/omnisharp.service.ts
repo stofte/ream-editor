@@ -52,12 +52,10 @@ export class OmnisharpService {
         private http: Http
     ) {
         const startUpPauser = Observable.fromPromise(monitorService.ready)
-            // .map(x => x) // invert promises' true value, to false, to indicate unpausing
             .startWith(false);
 
         this.sessions = startUpPauser
             .switchMap(ready => {
-                // console.log('startup.switch', ready)
                 return ready ? tabs.newContext : Observable.never<Tab>();
             })
             .withLatestFrom(conns.all, (tab, conns) => { return { tab, conns }; })
@@ -67,10 +65,8 @@ export class OmnisharpService {
                 return { conn, tabId };
             }, {})
             .flatMap((x: {conn: Connection, tabId: number }) => {
-                // console.log('flatMap', x.conn.connectionString);
                 let req = { connectionString: x.conn.connectionString, text: '' };
                 return new Observable<{buffer: string, tabId: number, connId: number}>((obs: Observer<{buffer: string, tabId: number, connId: number}>) => {
-                    // console.log('querytemplate')
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
@@ -93,7 +89,6 @@ export class OmnisharpService {
                     Buffer: x.buffer,
                 };
                 return new Observable<SessionMap>((obs: Observer<SessionMap>) => {
-                    // console.log('updatebuffer');
                     http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
                         .map(res => res.json)
                         .subscribe(data => {
@@ -127,39 +122,23 @@ export class OmnisharpService {
         
         this.fileName = tabs.active
             .combineLatest(this.sessions, (tab, sessions) => {
-                // console.log('fileName.combine', tab.id, tab.connectionId, sessions.length);
                 let session = sessions.find(x => x.tabId === tab.id && x.connId === tab.connectionId);
                 return session !== undefined && session.fileName;
             })
-            .filter(x => !!x) // if session wasn't found, filter undefineds
+            .filter(x => !!x) // if session wasn't found, filter undefined/false
             ;
-        
-        
-        let completions = new Subject<boolean>();
         
         let mirrorBuffer: Observable<boolean> = Observable.timer(0, 250)
             .combineLatest(this.ready, (val, status) => {
                 return status; // ? 42 : status;
             })
+            .filter(x => x)
             ;
         
-        let completionBuffer: Observable<boolean> = completions
-            .combineLatest(this.ready, (completion, status) => {
-                return status; // ? 42 : status;
-            })
-            ;
-        
-        let buffer = mirrorBuffer
-            .merge(completionBuffer)
-            .filter(x => x);
-            
-        // doesn't account that mirror updates may have come from multiple tabs
         this.readyState = mirrorChangeStream.changes
-            .buffer(mirrorBuffer
-                .merge(completionBuffer)
-                .filter(x => x))
+            .buffer(mirrorBuffer)
             .filter(x => x.length > 0)
-            .combineLatest(this.fileName, (changes, fileName) => {
+            .withLatestFrom(this.fileName, (changes, fileName) => {
                 return changes.map(x => {
                     x.fileName = fileName;
                     return x;

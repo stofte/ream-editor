@@ -54,7 +54,9 @@ export class MirrorChangeStream {
                 });
             });
         mirror.on('change', (mirror, cs) => {
-            this.sub.next(this.mapEvent(cs));
+            if (cs.origin !== 'setValue') {
+                this.sub.next(this.mapEvent(cs));                
+            }
         });
     }
     
@@ -71,6 +73,7 @@ export class MirrorChangeStream {
             endLine: val.to.line,
             endColumn: val.to.ch,
             newText: val.text.join('\n'),
+            origin: val.origin,
             created: performance.now()
         };
     }

@@ -19,6 +19,9 @@ import { TemplateResult } from '../models/template-result';
 import config from '../config';
 const path = electronRequire('path');
 
+// all templates have the same offset
+let TEMPLATE_LINE_OFFSET = null;
+
 const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
 const dirname = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
@@ -70,6 +73,9 @@ export class OmnisharpService {
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
+                            if (!TEMPLATE_LINE_OFFSET) {
+                                TEMPLATE_LINE_OFFSET = data.LineOffset;
+                            }
                             obs.next({
                                 tabId: x.tabId,
                                 buffer: <string> data.Template,
@@ -165,9 +171,9 @@ export class OmnisharpService {
                     Changes: changes.map(c => {
                         return <EditorChange> {
                             newText: c.newText,
-                            startLine: c.startLine + 1,
+                            startLine: c.startLine + 1 + TEMPLATE_LINE_OFFSET,
                             startColumn: c.startColumn + 1,
-                            endLine: c.endLine + 1,
+                            endLine: c.endLine + 1 + TEMPLATE_LINE_OFFSET,
                             endColumn: c.endColumn + 1
                         };
                     }),
@@ -214,67 +220,29 @@ export class OmnisharpService {
     }
     
     public autocomplete(request: AutocompletionQuery): Observable<any[]> {
+        let mapCodeMirror: (AutocompletionResult) => any[] = this.mapToCodeMirror.bind(this);
         return this.readyState
             .filter(x => x)
             .take(1)
-            .map(x => [{
-                sortKey: "foo", 
-                text: "foo"
-            }]);
-        // let mapCodeMirror: (AutocompletionResult) => any[] = this.mapToCodeMirror.bind(this);
-        // return this.http
-        //     .post(this.action('autocomplete'), JSON.stringify(request))
-        //     .map(res => res.json())
-        //     .map(mapCodeMirror);
-    }
-    
-    public initializeTab(tab: Tab) {
-        
-        // if (this.initialized[tab.id] === tab.connectionId.id) {
-        //     // todo: might be useless?
-        //     return;
-        // }
-        
-        // // wait for backends to start before doing this
-        // this.monitorService.queryReady.then(() => {
-        //     this.queryService.queryTemplate(tab.connectionId)
-        //         .subscribe((result: TemplateResult) => {
-        //             tab.templateHeader = result.header;
-        //             tab.templateFooter = result.footer;
-        //             tab.templateLineOffset = result.lineOffset;
-        //             this.editorService.set(tab, result.defaultQuery, false);
-        //             // need to update omnisharp with an initial buffer template
-        //             // from which it can perform intellisense operations
-        //             let json = JSON.stringify({
-        //                 FileName: tab.fileName,
-        //                 FromDisk: false,
-        //                 Buffer: result.template,
-        //             });
-        //             this.http.post(this.action('updatebuffer'), json)
-        //                 .subscribe(data => {
-        //                     if (data.status === 200) {
-        //                         this.initialized[tab.id] = tab.connectionId.id;
-        //                         tab.omnisharpReady();
-        //                     }
-        //                 });
-        //         });
-        // });
-    }
-    
-    private updateTab(tab: Tab, text: string) {
-        let json = JSON.stringify({
-            FileName: tab.fileName,
-            FromDisk: false,
-            Changes: [{
-                NewText: text,
-                StartLine: 1,
-                StartColumn: 1,
-                EndLine: 1,
-                EndColumn: 1
-            }]
-        });
-        this.http
-            .post(this.action('updatebuffer'), json);
+            .withLatestFrom(this.fileName, (status, fileName) => {
+                return fileName;
+            })
+            .flatMap(fileName => {
+                let json = request;
+                json.fileName = fileName;
+                json.column += 1;
+                json.line += 1 + TEMPLATE_LINE_OFFSET;
+                return new Observable<any>((obs: Observer<any>) => {
+                    this.http.post('http://localhost:2000/autocomplete', JSON.stringify(json))
+                        .map(res => res.json())
+                        .map(mapCodeMirror)
+                        .subscribe(data => {
+                            obs.next(data);
+                            obs.complete();
+                        });
+                });                
+            })
+            ;
     }
     
     private mapToCodeMirror(result: any[]): any[] {

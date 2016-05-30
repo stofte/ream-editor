@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "electron electron-main.js DEBUG",
-    "ts": "start tsc -w",
+    "ts": "tsc -w",
     "ts-build": "tsc",
     "bundle": "node bundle-app.js",
     "package_electron": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",

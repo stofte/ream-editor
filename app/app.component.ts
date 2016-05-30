@@ -29,33 +29,11 @@ import { TabViewComponent } from './components/tab-view.component';
 export class AppComponent {
     private connectionsVisible: boolean = false;
     
-    constructor(
-        private overlayService: OverlayService
-        // private monitorService: MonitorService, 
-        // private connectionService: ConnectionService,
-        // private overlayUiStateService: OverlayUiStateService,
-        // private tabService: TabService
-        // private router: Router
-        ) {
-        //monitorService.start();
-        overlayService.connections
+    constructor(overlayService: OverlayService) {
+        overlayService
+            .connections
             .subscribe(visible => {
                 this.connectionsVisible = visible;
             });
-        // // decide where to go
-        // let connection = connectionService.defaultConnection;
-        // if (!connection) {
-        //     //router.navigate(['StartPage']);
-        // } else {
-        //     // check if there are any open tabs ...
-        //     if (!tabService.active) {
-        //         //this.tabService.newForeground(connection);    
-        //     }
-        // }
-        
-        // // setup subs for toggle between overlays
-        // overlayUiStateService.connectionsVisible.subscribe(val => {
-        //     this.connectionsVisible = val;
-        // });
     }
 }

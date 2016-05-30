@@ -70,7 +70,7 @@ export class OmnisharpService {
                 // console.log('flatMap', x.conn.connectionString);
                 let req = { connectionString: x.conn.connectionString, text: '' };
                 return new Observable<{buffer: string, tabId: number, connId: number}>((obs: Observer<{buffer: string, tabId: number, connId: number}>) => {
-                    console.log('querytemplate')
+                    // console.log('querytemplate')
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
@@ -93,7 +93,7 @@ export class OmnisharpService {
                     Buffer: x.buffer,
                 };
                 return new Observable<SessionMap>((obs: Observer<SessionMap>) => {
-                    console.log('updatebuffer');
+                    // console.log('updatebuffer');
                     http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
                         .map(res => res.json)
                         .subscribe(data => {
@@ -154,7 +154,7 @@ export class OmnisharpService {
             .filter(x => x);
             
         // doesn't account that mirror updates may have come from multiple tabs
-        this.readyState = mirrorChangeStream.stream
+        this.readyState = mirrorChangeStream.changes
             .buffer(mirrorBuffer
                 .merge(completionBuffer)
                 .filter(x => x))
@@ -188,7 +188,7 @@ export class OmnisharpService {
                         });
                 });
             })
-            .combineLatest(mirrorChangeStream.stream, (latest, change) => {
+            .combineLatest(mirrorChangeStream.changes, (latest, change) => {
                 return change.created - latest;
             })
             .map(x => x <= 0)

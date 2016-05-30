@@ -34,9 +34,11 @@ export class TabService {
     }
     
     // notify only when active tab id changes
-    public get activeTab(): Observable<Tab> {
+    // first slot is new active,
+    // second slot is previous active
+    public get activeTab(): Observable<Tab[]> {
         return this.activeBase
-            .distinctUntilChanged((x, y) => x.id === y.id);
+            .distinctUntilChanged((x, y) => x[0].id === y[0].id);
     }
     
     // is notified when
@@ -45,10 +47,10 @@ export class TabService {
     public get active(): Observable<Tab> {
         let detect = this.activeBase
             // having issues detecting changes otherwise?
-            .map(x => `${x.id}:${x.connectionId}`)
+            .map(x => `${x[0].id}:${x[0].connectionId}`)
             .distinctUntilChanged((x, y) => x === y);
         // whenever we detect, we emit the latest from the active tabs list
-        return detect.withLatestFrom(this.activeTab, (x, tab) => tab);
+        return detect.withLatestFrom(this.activeTab, (x, tab) => tab[0]);
     }
     
     // is notified when a tab enters a new db context for the first time
@@ -70,10 +72,11 @@ export class TabService {
         
     public goto(tabId: number) {
         this.ops.next((tabs: Tab[]) => {
-            return tabs.map(t => {
-                t.active = tabId === t.id;
-                return t;
-            });
+            return this.setActiveTab(tabs, tabId);
+            // tabs.map(t => {
+            //     t.active = tabId === t.id;
+            //     return t;
+            // });
         });
     }
     
@@ -83,10 +86,7 @@ export class TabService {
                 const tab = this.getNewTab(tabs, conn);
                     // console.log('inserting new tab', newTab.id, tabs.length, newTab.active);
                     return [
-                        ...tabs.map(tab => {
-                            tab.active = false; 
-                            return tab;
-                        }),
+                        ...this.setActiveTab(tabs, null),
                         tab
                     ] 
                 });
@@ -107,6 +107,7 @@ export class TabService {
     // handles updates to the tabs as the connections change.
     private handleConnections(conns: Connection[]) {
         this.ops.next((tabs: Tab[]) => {
+            let oldActive = tabs.find(t => t.active);
             let filtered = tabs.filter(tab => {
                 return conns.find(c => c.id === tab.connectionId) !== undefined;
             });
@@ -116,6 +117,13 @@ export class TabService {
             } else if (filtered.length === 0 && conns.length > 0) {
                 // id will take account for old tabs
                 filtered.push(this.getNewTab(tabs, conns[0].id));
+            }
+            let newActive = filtered.find(t => t.active);
+            if (newActive && oldActive) {
+                filtered = filtered.map(t => {
+                    t.previousActive = t.id === oldActive.id;
+                    return t;
+                })
             }
             return filtered;
         });
@@ -131,15 +139,36 @@ export class TabService {
         };
     }
     
-    private get activeBase(): Observable<Tab> {
+    private get activeBase(): Observable<Tab[]> {
         return this.stream
             .filter(ts => ts.length > 0)
             .map(ts => {
                 let active = ts.find(t => t.active);
+                let prev = ts.find(t => t.previousActive);
                 if (!active) {
                     throw 'no active found';
                 }
-                return active;
+                return [active, prev];
             });
+    }
+    
+    private setActiveTab(tabs: Tab[], newId: number) {
+        if (newId === null) {
+            // new tab, so just set all inactive, and flag previous
+            return tabs.map(t => {
+                t.previousActive = t.active;
+                t.active = false;
+                return t;
+            })
+        }
+        let old = tabs.find(t => t.active);
+        if (old && old.id !== newId) {
+            return tabs.map(t => {
+                t.active = newId === t.id;
+                t.previousActive = old.id === t.id;
+                return t;
+            });            
+        }
+        return tabs;
     }
 }

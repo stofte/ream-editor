@@ -1,6 +1,6 @@
 import { Injectable} from '@angular/core';
 import { Http } from '@angular/http';
-import { Observable, Subject, ConnectableObservable, Observer } from 'rxjs/Rx';
+import { Observable, Subject, ConnectableObservable, Observer, ReplaySubject } from 'rxjs/Rx';
 import 'rxjs/Rx';
 import * as _ from 'lodash';
 import * as uuid from 'node-uuid';
@@ -42,6 +42,7 @@ export class OmnisharpService {
     private fileName: Observable<string>;
     private changeStream: Observable<number>;
     private readyState: Observable<boolean>;
+    private readyState2: ReplaySubject<boolean>;
     
     constructor(
         private conns: ConnectionService,
@@ -153,7 +154,7 @@ export class OmnisharpService {
             .filter(x => x);
             
         // doesn't account that mirror updates may have come from multiple tabs
-        this.changeStream = mirrorChangeStream.stream
+        this.readyState = mirrorChangeStream.stream
             .buffer(mirrorBuffer
                 .merge(completionBuffer)
                 .filter(x => x))
@@ -187,25 +188,18 @@ export class OmnisharpService {
                         });
                 });
             })
-            .publishReplay()
-            .refCount()
-            ;
-
-        this.readyState = mirrorChangeStream.stream
-            .combineLatest(this.changeStream.startWith(NaN), (change, latest) => {
+            .combineLatest(mirrorChangeStream.stream, (latest, change) => {
                 return change.created - latest;
             })
             .map(x => x <= 0)
             .publishReplay()
             .refCount()
             ;
-        
-        // todo: needed otherwise the stream isn't consumed, 
-        // and no data will be sent from the msg buffer
+
+        // todo fix this bullshit
+        this.readyState2 = new ReplaySubject<boolean>(1);
         this.readyState
-            .subscribe(x => {
-                //console.log('ready', x);
-            });
+            .subscribe(x => this.readyState2.next(x));
     }
     
     private handleChange(change: EditorChange) {
@@ -221,7 +215,7 @@ export class OmnisharpService {
     
     public autocomplete(request: AutocompletionQuery): Observable<any[]> {
         let mapCodeMirror: (AutocompletionResult) => any[] = this.mapToCodeMirror.bind(this);
-        return this.readyState
+        return this.readyState2
             .filter(x => x)
             .take(1)
             .withLatestFrom(this.fileName, (status, fileName) => {

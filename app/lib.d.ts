@@ -15,5 +15,5 @@ declare module CodeMirror {
 }
 
 interface IStreamOperation extends Function {
-    (conns: any[]): any[]
+    (conns: any): any;
 }

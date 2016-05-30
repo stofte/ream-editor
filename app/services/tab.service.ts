@@ -52,7 +52,13 @@ export class TabService {
         // whenever we detect, we emit the latest from the active tabs list
         return detect.withLatestFrom(this.activeTab, (x, tab) => tab[0]);
     }
-    
+
+    public get connectionChanged(): Observable<Tab[]> {
+        return this.activeBase
+            .distinctUntilChanged((x, y) => x[0].id === y[0].id && 
+                x[0].connectionId !== y[0].connectionId);
+    }
+
     // is notified when a tab enters a new db context for the first time
     public get newContext(): Observable<Tab> {
         return this.active

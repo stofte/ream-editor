@@ -32,7 +32,8 @@ export class MirrorChangeStream {
             startColumn: val.from.ch,
             endLine: val.to.line,
             endColumn: val.to.ch,
-            newText: val.text.join('\n')
+            newText: val.text.join('\n'),
+            created: performance.now()
         };
     }
 }

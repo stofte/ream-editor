@@ -37,6 +37,8 @@ export class OmnisharpService {
     private sessions: Observable<SessionMap[]>;
     private ready: Observable<boolean>;
     private fileName: Observable<string>;
+    private changeStream: Observable<number>;
+    private readyState: Observable<boolean>;
     
     constructor(
         private conns: ConnectionService,
@@ -64,6 +66,7 @@ export class OmnisharpService {
                 // console.log('flatMap', x.conn.connectionString);
                 let req = { connectionString: x.conn.connectionString, text: '' };
                 return new Observable<{buffer: string, tabId: number, connId: number}>((obs: Observer<{buffer: string, tabId: number, connId: number}>) => {
+                    console.log('querytemplate')
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
@@ -83,6 +86,7 @@ export class OmnisharpService {
                     Buffer: x.buffer,
                 };
                 return new Observable<SessionMap>((obs: Observer<SessionMap>) => {
+                    console.log('updatebuffer');
                     http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
                         .map(res => res.json)
                         .subscribe(data => {
@@ -123,16 +127,30 @@ export class OmnisharpService {
             .filter(x => !!x) // if session wasn't found, filter undefineds
             ;
         
-        // buffers the mirror stream when omnisharp isn't ready yet
-        let mirrorBuffer = Observable.timer(0, 200)
-            .combineLatest(this.ready, (val, status) => {
-                return status ? 42 : status;
-            })
-            .filter(x => !!x);
         
+        let completions = new Subject<boolean>();
+        
+        let mirrorBuffer: Observable<boolean> = Observable.timer(0, 250)
+            .combineLatest(this.ready, (val, status) => {
+                return status; // ? 42 : status;
+            })
+            ;
+        
+        let completionBuffer: Observable<boolean> = completions
+            .combineLatest(this.ready, (completion, status) => {
+                return status; // ? 42 : status;
+            })
+            ;
+        
+        let buffer = mirrorBuffer
+            .merge(completionBuffer)
+            .filter(x => x);
+            
         // doesn't account that mirror updates may have come from multiple tabs
-        let changeStream = mirrorChangeStream.stream
-            .buffer(mirrorBuffer)
+        this.changeStream = mirrorChangeStream.stream
+            .buffer(mirrorBuffer
+                .merge(completionBuffer)
+                .filter(x => x))
             .filter(x => x.length > 0)
             .combineLatest(this.fileName, (changes, fileName) => {
                 return changes.map(x => {
@@ -150,25 +168,39 @@ export class OmnisharpService {
                             startLine: c.startLine + 1,
                             startColumn: c.startColumn + 1,
                             endLine: c.endLine + 1,
-                            endColumn: c.endColumn + 1  
+                            endColumn: c.endColumn + 1
                         };
                     }),
                 };
-                return new Observable<boolean>((obs: Observer<boolean>) => {
+                return new Observable<number>((obs: Observer<number>) => {
                     http.post('http://localhost:2000/updatebuffer', JSON.stringify(json))
                         .map(res => res.status === 200)
                         .subscribe(data => {
-                            obs.next(data);
+                            obs.next(performance.now());
                             obs.complete();
                         });
                 });
             })
+            .publishReplay()
+            .refCount()
+            ;
+
+        this.readyState = mirrorChangeStream.stream
+            .combineLatest(this.changeStream.startWith(NaN), (change, latest) => {
+                return change.created - latest;
+            })
+            .map(x => x <= 0)
+            .publishReplay()
+            .refCount()
+            ;
+        
+        // todo: needed otherwise the stream isn't consumed, 
+        // and no data will be sent from the msg buffer
+        this.readyState
             .subscribe(x => {
-                console.log('after',x);
+                //console.log('ready', x);
             });
     }
-    
-    
     
     private handleChange(change: EditorChange) {
         this.monitorService.omnisharpReady.then(() => {
@@ -182,11 +214,18 @@ export class OmnisharpService {
     }
     
     public autocomplete(request: AutocompletionQuery): Observable<any[]> {
-        let mapCodeMirror: (AutocompletionResult) => any[] = this.mapToCodeMirror.bind(this);
-        return this.http
-            .post(this.action('autocomplete'), JSON.stringify(request))
-            .map(res => res.json())
-            .map(mapCodeMirror);
+        return this.readyState
+            .filter(x => x)
+            .take(1)
+            .map(x => [{
+                sortKey: "foo", 
+                text: "foo"
+            }]);
+        // let mapCodeMirror: (AutocompletionResult) => any[] = this.mapToCodeMirror.bind(this);
+        // return this.http
+        //     .post(this.action('autocomplete'), JSON.stringify(request))
+        //     .map(res => res.json())
+        //     .map(mapCodeMirror);
     }
     
     public initializeTab(tab: Tab) {

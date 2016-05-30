@@ -21,6 +21,56 @@ CodeMirror.commands.autocomplete = function(cm) {
 const mac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
 CodeMirror.keyMap.default[(mac ? 'Cmd' : 'Ctrl') + '-Space'] = 'autocomplete';
 
+let omnisharpResolver = null;
+const omnisharpInject = new Promise<OmnisharpService>((res) => {
+    omnisharpResolver = res;
+})
+
+CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
+    // todo: test if syntax mode changes anything,
+    // otherwise findWordAt seems pretty useless, 
+    // returning random whitespace/syntax as words.
+    // for now this manual parsing, that doesn't work cross lines
+    const memberAccessTest = /\.$/; 
+    const partialMemberAccessTest = /\.(\w*)$/; // this cant work
+    // const tab = this.tabService.get(mirror._tab);
+    const cur = mirror.getCursor();
+    const editorLine: string = mirror.getRange({line: cur.line, ch: 0}, cur);
+    let fragment: string = null;
+    let range = { 
+        head: { line: cur.line, ch: cur.ch },
+        anchor: { line: cur.line, ch: cur.ch }
+    };
+    if (!memberAccessTest.test(editorLine)) {
+        let match = editorLine.match(partialMemberAccessTest);
+        if (match[1] && match[1].length > 0) { // had partial access
+            fragment = match[1];
+            range.anchor.ch = match.index + 1;
+        }
+    }
+    let request = <AutocompletionQuery> {
+        // fileName: tab.fileName,
+        column: cur.ch, // + 1,
+        line: cur.line, // + tab.templateLineOffset,
+        wantKind: true,
+        wantDocumentationForEveryCompletionResult: true,
+        wordToComplete: fragment
+    };
+    omnisharpInject
+        .then(svc => {
+            svc.autocomplete(request)
+                .subscribe(list => {
+                    callback({
+                        list,
+                        from: range.anchor,
+                        to: range.head
+                    });
+                });               
+        });
+});
+CodeMirror.hint.ajax.async = true;
+
+
 @Directive({
     selector: '[editor]'
 })
@@ -43,52 +93,11 @@ export class EditorDirective implements OnInit {
         // this.current = tabService.get(tabId);
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
         mirrorChangeStream.initMirror(this.editor);
-        // // todo: hack somewhere else. service ref should be passable
-        // if (!onetimeBullshit) {
-        //     onetimeBullshit = true;
-        //     CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
-        //         // todo: test if syntax mode changes anything,
-        //         // otherwise findWordAt seems pretty useless, 
-        //         // returning random whitespace/syntax as words.
-        //         // for now this manual parsing, that doesn't work cross lines
-        //         const memberAccessTest = /\.$/; 
-        //         const partialMemberAccessTest = /\.(\w*)$/; // this cant work
-        //         const tab = this.tabService.get(mirror._tab);
-        //         const cur = mirror.getCursor();
-        //         const editorLine: string = mirror.getRange({line: cur.line, ch: 0}, cur);
-        //         let fragment: string = null;
-        //         let range = { 
-        //             head: { line: cur.line, ch: cur.ch },
-        //             anchor: { line: cur.line, ch: cur.ch }
-        //         };
-        //         if (!memberAccessTest.test(editorLine)) {
-        //             let match = editorLine.match(partialMemberAccessTest);
-        //             if (match[1] && match[1].length > 0) { // had partial access
-        //                 fragment = match[1];
-        //                 range.anchor.ch = match.index + 1;
-        //             }
-        //         }
-        //         let request = <AutocompletionQuery> {
-        //             fileName: tab.fileName,
-        //             column: cur.ch + 1,
-        //             line: cur.line + tab.templateLineOffset,
-        //             buffer: tab.templateHeader + mirror.getValue() + tab.templateFooter,
-        //             wantKind: true,
-        //             wantDocumentationForEveryCompletionResult: true,
-        //             wordToComplete: fragment
-        //         };
-        //         omnisharpService
-        //             .autocomplete(request)
-        //             .subscribe(list => {
-        //                 callback({
-        //                     list,
-        //                     from: range.anchor,
-        //                     to: range.head
-        //                 });
-        //             });
-        //     });
-        //     CodeMirror.hint.ajax.async = true;
-        // }
+        // todo one time service injection hack
+        if (omnisharpResolver) {
+            omnisharpResolver(omnisharpService);
+            omnisharpResolver = null;
+        }
         // editorService.changes.subscribe(this.editorValueUpdated.bind(this));
         // this.editor._tab = this.current.id;
         // const contents = editorService.get(this.current);

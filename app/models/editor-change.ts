@@ -7,4 +7,5 @@ export class EditorChange {
     public startColumn: number;
     public endLine: number;
     public endColumn: number;
+    public created: number;
 }

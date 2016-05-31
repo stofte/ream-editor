@@ -31,7 +31,9 @@ import { Connection } from '../models/connection';
                         <tr *ngFor="let conn of connections">
                             <td style="vertical-align: middle">
                                 <p *ngIf="!conn.editing" style="margin-bottom: 0">
-                                    <span (dblclick)="editConnection(conn)" title="Double-click to edit">{{conn.connectionString}}</span>
+                                    <span (dblclick)="editConnection(conn)" 
+                                        style="font-size: 80%;"
+                                        title="Double-click to edit">{{conn.connectionString}}</span>
                                     
                                 </p>
                                 <p *ngIf="conn.editing" style="margin-bottom: 0">
@@ -44,7 +46,6 @@ import { Connection } from '../models/connection';
                             </td>
                             <td>
                                 <button (click)="removeConnection(conn)" class="btn btn-default pull-right">Remove</button>
-                                <p class="pull-right">{{conn.id}}</p>
                             </td>
                         </tr>
                     </tbody>

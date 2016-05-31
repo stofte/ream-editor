@@ -60,7 +60,6 @@ export class MirrorChangeStream {
                     let fromBuffer = buffers.find(x => x.active);
                     let toBuffer = buffers.find(bufferFilter);
                     let sameTab = fromBuffer && toTab.id === fromBuffer.tabId;
-                    // console.log('loop.sameTab:', sameTab, '<=',fromBuffer, toBuffer)
                     assert(!toBuffer, 'no target buffer found');
                     if (fromBuffer) {
 

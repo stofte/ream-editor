@@ -113,7 +113,6 @@ export class OmnisharpService {
         
         this.ready = tabs.active
             .combineLatest(this.sessions, (tab, sessions) => {
-                // console.log('fileName.combine', tab.id, tab.connectionId, sessions.length);
                 let session = sessions.find(x => x.tabId === tab.id && x.connId === tab.connectionId);
                 return session !== undefined;
             })

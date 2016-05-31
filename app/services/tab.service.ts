@@ -16,7 +16,6 @@ export class TabService {
         this.stream = this.ops
             .scan((tabs: Tab[], op) => {
                 let res = op(tabs);
-                // console.log('scan', res.map(x => x.id + ':' + x.connectionId + ':' + x.active))
                 return res;
             }, []);
         conns.all.subscribe(this.handleConnections.bind(this));
@@ -138,9 +137,7 @@ export class TabService {
             .map(ts => {
                 let active = ts.find(t => t.active);
                 let prev = ts.find(t => t.previousActive);
-                if (!active) {
-                    throw 'no active found';
-                }
+                assert(active, 'no active found')
                 return [active, prev];
             });
     }

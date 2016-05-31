@@ -14,6 +14,11 @@
         delete window.exports;
         delete window.module;
         window.MODE = 'DEVELOPMENT';
+        function assert(cond, msg) {
+            if (!cond) {
+                throw msg ? msg : 'assert failed';
+            }
+        }
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="node_modules/normalizecss/normalize.css">

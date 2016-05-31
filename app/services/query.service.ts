@@ -17,7 +17,8 @@ import config from '../config';
 @Injectable()
 export class QueryService {
     private port: number = config.queryEnginePort;
-    private stream: ReplaySubject<ResultStore>;
+    private stream: Observable<ResultStore>;
+    private resultOps = new ReplaySubject<IStreamOperation>();
     
     constructor(
         tabs: TabService,
@@ -25,8 +26,12 @@ export class QueryService {
         mirror: MirrorChangeStream,
         http: Http
     ) {
-        this.stream = new ReplaySubject<ResultStore>(1);
-        
+        this.stream = this.resultOps
+            .scan((store: ResultStore, op: IStreamOperation) => {
+                return <ResultStore> op(store);
+            }, new ResultStore())
+            ;
+            
         mirror
             .executing
             .subscribe(executing => {
@@ -63,12 +68,16 @@ export class QueryService {
                         });
                 });
             })
-            .scan((results: ResultStore, res) => {
-                results.add(res.tabId, res);
-                return results;
-            }, new ResultStore())
-            .subscribe(store => {
-                this.stream.next(store);
+            // .scan((results: ResultStore, res) => {
+            //     results.add(res.tabId, res);
+            //     return results;
+            // }, new ResultStore())
+            .subscribe(res => {
+                this.resultOps.next((store: ResultStore) => {
+                    console.log('stuffing res into op stream', store);
+                    store.add(res.tabId, res);
+                    return store;
+                });
             });
             ;
     }
@@ -76,8 +85,13 @@ export class QueryService {
     public get activeResult(): Observable<ResultStore> {
         return this
             .stream
-            .asObservable()
             ;
+    }
+    
+    public setActivePage(queryId: string, pageId: string) {
+        this.resultOps.next((store: ResultStore) => {
+            return store.setActive(queryId, pageId);
+        });
     }
     
     private extractQueryResult(res: Response): QueryResult {

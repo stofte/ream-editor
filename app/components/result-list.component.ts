@@ -22,6 +22,8 @@ class ResultMap {
 })
 export class ResultListComponent {
     private currentResults: QueryResult[] = [];
+    private currentId: string;
+    
     constructor(
         query: QueryService,
         tabs: TabService
@@ -36,7 +38,6 @@ export class ResultListComponent {
             })
             .subscribe((x: ResultMap) => {
                 this.currentResults = x.results;
-                console.log('results', x.tab, x.results);
             });
     }
 }

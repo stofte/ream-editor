@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { QueryService } from '../services/query.service';
 import { QueryResult } from '../models/query-result';
 import { ResultPage } from '../models/result-page';
 
@@ -15,8 +16,8 @@ import { ResultPage } from '../models/result-page';
                         <button 
                             *ngFor="let page of result.pages"
                             (click)="showResult(page)"
-                            type="button" class="btn btn-default {{btnActive(page)}}">
-                            {{page.title}}
+                            type="button" class="btn btn-default {{page.active ? 'active' : ''}}">
+                            {{page.title}} 
                         </button>
                     </div>
                 </div>
@@ -31,11 +32,11 @@ export class ResultDisplayComponent {
     private expanded = true;
     private currentPage: ResultPage = null;
     
-    private showResult(page: ResultPage) {
-        this.currentPage = page;
+    constructor(private query: QueryService) {
+        
     }
     
-    private btnActive(page: ResultPage): string {
-        return this.currentPage && this.currentPage.id === page.id ? 'active' : '';
+    private showResult(page: ResultPage) {
+        this.query.setActivePage(this.result.id, page.id);
     }
 }

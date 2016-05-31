@@ -21,12 +21,16 @@ let THERE_CAN_BE_ONLY_ONE = false;
 export class MirrorChangeStream {
     private sub = new Subject<EditorChange>();
     private buffers: Observable<BufferMap>;
-    private ops = new ReplaySubject<IStreamOperation>();
+    private bufferOps = new ReplaySubject<IStreamOperation>();
+    // the current value, used for executing queries
+    public executing: Observable<string>;
+    private currentOps = new ReplaySubject<IStreamOperation>();
+    private mirror: CodeMirror.Editor = null;
     
     constructor(
         private tabs: TabService
     ) {
-        this.buffers = this.ops
+        this.buffers = this.bufferOps
             .scan((bfs: BufferMap, op) => {
                 let res = op(bfs);
                 return res;
@@ -34,13 +38,28 @@ export class MirrorChangeStream {
             .publishReplay()
             .refCount()
             ;
+        this.executing = this.currentOps
+            .scan((str, op) => {
+                return op(str);
+            }, '')
+            .publishReplay()
+            .refCount()
+            ;
         this.buffers.subscribe();
     }
     
+    public execute() {
+        this.currentOps.next((str) => {
+            return this.mirror.getDoc().getValue();
+        });
+    }
+    
     public initMirror(mirror: CodeMirror.Editor) {
+        assert(this.mirror === null, 'mirror was set');
+        this.mirror = mirror;
         this.tabs.activeBase
             .subscribe(tabs => {
-                this.ops.next((m: BufferMap) => {
+                this.bufferOps.next((m: BufferMap) => {
                     let toTab = tabs[0];
                     assert(toTab, 'no active tab');
                     let buffers = m.tabs;
@@ -66,7 +85,7 @@ export class MirrorChangeStream {
                         // update the value of the fromBuffer, if it existed
                         buffers = buffers.map(x => {
                             if (x.tabId === fromBuffer.tabId && x.connId === fromBuffer.connId) {
-                                x.value = mirror.getDoc().getValue();
+                                x.value = this.mirror.getDoc().getValue();
                             }
                             return x;
                         });

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { BUTTON_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 import { EditorService } from '../services/editor.service';
+import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { MonitorService } from '../services/monitor.service';
 import { ConnectionService } from '../services/connection.service';
 import { QueryService } from '../services/query.service';
@@ -21,31 +22,17 @@ import { Connection } from '../models/connection';
 `
 })
 export class ExecuteQueryComponent {
-    
-    private tab: Tab;
-    private conn: Connection;
-    private id: number;
     private isDisabled = true;
-    
     constructor(
-        private editorService: EditorService,
-        private queryService: QueryService,
-        //private routeParams: RouteParams,
-        monitorService: MonitorService,
-        tabService: TabService,
-        connectionService: ConnectionService
+        private mirrors: MirrorChangeStream,
+        monitorService: MonitorService
     ) {
-        // this.id = parseInt(this.routeParams.get('tab'), 10);
-        // this.tab = tabService.get(this.id);
-        // monitorService.queryReady.then(() => {
-        //     this.isDisabled = false;
-        // });
-        // const connId = parseInt(this.routeParams.get('connection'), 10);
-        // this.conn = connectionService.get(connId);
+        monitorService.queryReady.then(() => {
+            this.isDisabled = false;
+        });
     }
     
     private run(): void {
-        const query = this.editorService.get(this.tab);
-        this.queryService.run(this.id, this.conn, query);
+        this.mirrors.execute();
     }
 }

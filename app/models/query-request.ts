@@ -1,5 +1,6 @@
 export class QueryRequest {
-    connectionId: number;
-    connectionString: string;
-    text: string;
+    public tabId: number;
+    public connectionId: number;
+    public connectionString: string;
+    public text: string;
 }

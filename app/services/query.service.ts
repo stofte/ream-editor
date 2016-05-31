@@ -11,6 +11,7 @@ import { QueryResult } from '../models/query-result';
 import { TemplateResult } from '../models/template-result';
 import { ResultPage } from '../models/result-page';
 import { QueryRequest } from '../models/query-request';
+import { ResultStore } from '../models/result-store';
 import config from '../config';
 
 @Injectable()
@@ -19,6 +20,7 @@ export class QueryService {
     private subs: any = {};
     private data: any = {};
     private cachedTemplate = {};
+    private stream: Observable<ResultStore>;
     constructor(
         private tabs: TabService,
         private conns: ConnectionService,
@@ -27,10 +29,11 @@ export class QueryService {
     ) {
         let ts = tabs.tabs.publishReplay(1).refCount();
         let cs = conns.all.publishReplay(1).refCount();
-        mirror
+        this.stream = mirror
             .executing
             .withLatestFrom(tabs.tabs.filter(x => x !== null && x !== undefined), (queryText, tabs) => {
                 return <QueryRequest> {
+                    tabId: tabs[0].id,
                     connectionId: tabs[0].connectionId,
                     text: queryText
                 };
@@ -38,6 +41,7 @@ export class QueryService {
             .withLatestFrom(conns.all.filter(x => x !== null && x !== undefined), (req, conns) => {
                 return <QueryRequest> {
                     connectionString: conns.find(x => x.id === req.connectionId).connectionString,
+                    tabId: req.tabId,
                     text: req.text
                 };
             })
@@ -47,6 +51,7 @@ export class QueryService {
                     http.post(this.action('executequery'), JSON.stringify(req))
                         .map(mapper)
                         .subscribe(data => {
+                            data.tabId = req.tabId;
                             data.connectionString = req.connectionString;
                             data.query = req.text;
                             obs.next(data);
@@ -54,9 +59,11 @@ export class QueryService {
                         });
                 });
             })
-            .subscribe(buf => {
-                console.log('query saw execution of', buf);
-            })
+            .scan((results: ResultStore, res) => {
+                results.add(res.tabId, res);
+                return results;
+            }, new ResultStore())
+            ;
     }
     
     private extractQueryResult(res: Response): QueryResult {

@@ -3,7 +3,6 @@ import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
 import { Tab } from '../models/tab';
 import { Connection } from '../models/connection';
 import { ConnectionService } from './connection.service';
-// import { OmnisharpService } from './omnisharp.service';
 
 @Injectable()
 export class TabService {
@@ -53,12 +52,6 @@ export class TabService {
         return detect.withLatestFrom(this.activeTab, (x, tab) => tab[0]);
     }
 
-    public get connectionChanged(): Observable<Tab[]> {
-        return this.activeBase
-            .distinctUntilChanged((x, y) => x[0].id === y[0].id && 
-                x[0].connectionId !== y[0].connectionId);
-    }
-
     // is notified when a tab enters a new db context for the first time
     public get newContext(): Observable<Tab> {
         return this.active
@@ -79,10 +72,6 @@ export class TabService {
     public goto(tabId: number) {
         this.ops.next((tabs: Tab[]) => {
             return this.setActiveTab(tabs, tabId);
-            // tabs.map(t => {
-            //     t.active = tabId === t.id;
-            //     return t;
-            // });
         });
     }
     
@@ -90,7 +79,6 @@ export class TabService {
           this.ops.next((tabs: Tab[]) => {
                 const conn = tabs.find(t => t.active).connectionId;
                 const tab = this.getNewTab(tabs, conn);
-                    // console.log('inserting new tab', newTab.id, tabs.length, newTab.active);
                     return [
                         ...this.setActiveTab(tabs, null),
                         tab
@@ -102,7 +90,6 @@ export class TabService {
         this.ops.next((tabs: Tab[]) => {
             return tabs.map(x => {
                 if (x.id === tabId) {
-                    //console.log(`setting tab id ${x.id} (has conn ${JSON.stringify(x.connectionId)}) to conn id ${JSON.stringify(conn.id)}`);
                     x.connectionId = conn.id;
                 }
                 return x;
@@ -145,7 +132,7 @@ export class TabService {
         };
     }
     
-    private get activeBase(): Observable<Tab[]> {
+    public get activeBase(): Observable<Tab[]> {
         return this.stream
             .filter(ts => ts.length > 0)
             .map(ts => {

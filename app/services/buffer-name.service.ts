@@ -3,7 +3,6 @@ import { EditorChange } from '../models/editor-change';
 import config from '../config';
 import * as uuid from 'node-uuid';
 import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
-import * as Rx from 'rxjs/Rx';
 const path = electronRequire('path');
 
 const isProduction = MODE !== 'DEVELOPMENT';

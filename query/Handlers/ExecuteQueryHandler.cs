@@ -1,5 +1,6 @@
 namespace QueryEngine.Handlers
 {
+    using System;
     using Microsoft.AspNetCore.Http;
     using QueryEngine.Services;
     using QueryEngine.Models;
@@ -23,6 +24,8 @@ namespace QueryEngine.Handlers
             var res = _service.ExecuteQuery(input);
             return new QueryResult
             {
+                Id = Guid.NewGuid(),
+                Created = DateTime.Now,
                 Results = res
             };
         }

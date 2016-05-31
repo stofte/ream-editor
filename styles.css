@@ -76,6 +76,12 @@ f-app {
     overflow: auto;
 }
 
+table.table.output-table > caption {
+    padding-top: 0;
+    padding-bottom: 0;
+    color: inherit;
+}
+
 .output-table td {
     padding-bottom: 2px !important;
 }

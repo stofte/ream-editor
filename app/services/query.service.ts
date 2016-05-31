@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Subject, Observable, Observer } from 'rxjs/Rx';
+import { ReplaySubject, Subject, Observable, Observer } from 'rxjs/Rx';
 import 'rxjs/Rx';
 import { union, find, values } from 'lodash';
 import { MirrorChangeStream } from '../services/mirror-change.stream';
@@ -17,19 +17,23 @@ import config from '../config';
 @Injectable()
 export class QueryService {
     private port: number = config.queryEnginePort;
-    private subs: any = {};
-    private data: any = {};
-    private cachedTemplate = {};
-    private stream: Observable<ResultStore>;
+    private stream: ReplaySubject<ResultStore>;
+    
     constructor(
-        private tabs: TabService,
-        private conns: ConnectionService,
-        private mirror: MirrorChangeStream,
-        private http: Http
+        tabs: TabService,
+        conns: ConnectionService,
+        mirror: MirrorChangeStream,
+        http: Http
     ) {
-        let ts = tabs.tabs.publishReplay(1).refCount();
-        let cs = conns.all.publishReplay(1).refCount();
-        this.stream = mirror
+        this.stream = new ReplaySubject<ResultStore>(1);
+        
+        mirror
+            .executing
+            .subscribe(executing => {
+                console.log('executing now', executing);
+            })
+        
+        mirror
             .executing
             .withLatestFrom(tabs.tabs.filter(x => x !== null && x !== undefined), (queryText, tabs) => {
                 return <QueryRequest> {
@@ -63,6 +67,16 @@ export class QueryService {
                 results.add(res.tabId, res);
                 return results;
             }, new ResultStore())
+            .subscribe(store => {
+                this.stream.next(store);
+            });
+            ;
+    }
+    
+    public get activeResult(): Observable<ResultStore> {
+        return this
+            .stream
+            .asObservable()
             ;
     }
     
@@ -71,13 +85,16 @@ export class QueryService {
             throw new Error('Bad response status: ' + res.status);
         }
         let result = new QueryResult();
-        result.created = performance.now();
         let body = res.json();
+        result.created = new Date(body.Created);
+        result.id = body.Id;
+        
         // todo need smarter dumper code in query-engine
-        Object.keys(body.Results).forEach(key => {
+        Object.keys(body.Results).forEach((key, idx) => {
             const raw = body.Results[key];
             const page = this.transformSet(raw);
             page.title = key;
+            page.id = `${idx}-${result.id}`;
             result.pages.push(page);
         });
         return result;

@@ -5,11 +5,12 @@ import { EditorService } from '../services/editor.service';
 import { ConnectionSelectorComponent } from './connection-selector.component';
 import { ExecuteQueryComponent } from './execute-query.component';
 import { OutputComponent } from './output.component';
+import { ResultListComponent } from './result-list.component';
 import { EditorDirective } from '../directives/editor.directive';
 
 @Component({
     selector: 'f-buffer-tab',
-    directives: [OutputComponent, EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent],
+    directives: [OutputComponent, EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent, ResultListComponent],
     template: `
 <div class="container-fluid">
     <div class="row">
@@ -26,23 +27,7 @@ import { EditorDirective } from '../directives/editor.directive';
         </div>
     </div>
 </div>
-<div class="container-fluid">
-    <f-output></f-output>
-</div>
+<f-result-list></f-result-list>
 `
 })
-export class BufferTabComponent {
-    private id: number;
-    constructor(
-        // private connectionService: ConnectionService,
-        // private tabService: TabService,
-        // private editorService: EditorService
-        // private routeParams: RouteParams
-    ) {
-        // this.id = parseInt(this.routeParams.get('tab'), 10);
-    }
-    
-    // routerOnActivate() {
-    //     this.tabService.routedTo(this.id); // todo: used?
-    // }
-}
+export class BufferTabComponent { }

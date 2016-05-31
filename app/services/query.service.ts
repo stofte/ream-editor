@@ -47,6 +47,8 @@ export class QueryService {
                     http.post(this.action('executequery'), JSON.stringify(req))
                         .map(mapper)
                         .subscribe(data => {
+                            data.connectionString = req.connectionString;
+                            data.query = req.text;
                             obs.next(data);
                             obs.complete();
                         });
@@ -62,6 +64,7 @@ export class QueryService {
             throw new Error('Bad response status: ' + res.status);
         }
         let result = new QueryResult();
+        result.created = performance.now();
         let body = res.json();
         // todo need smarter dumper code in query-engine
         Object.keys(body.Results).forEach(key => {

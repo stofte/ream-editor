@@ -108,6 +108,7 @@ export class QueryService {
             const raw = body.Results[key];
             const page = this.transformSet(raw);
             page.title = key;
+            page.active = idx === 0; // mark the first as active
             page.id = `${idx}-${result.id}`;
             result.pages.push(page);
         });

@@ -61,7 +61,6 @@ export class MonitorService {
     }
         
     private start() {
-        console.log('monitor.service:starting');
         let queryParams = this.queryCmd();
         let omnisharpCmd = this.omnisharpCmd().cmd;
         

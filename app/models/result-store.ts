@@ -13,7 +13,6 @@ export class ResultStore {
     public setActive(queryResultId: string, pageId: string): ResultStore {
         let tabId: number = null; // todo: pass from component instead
         let newList: QueryResult[] = null;
-
         for(let [key, queries] of this.data) {
             let query = queries.find(q => q.id === queryResultId); 
             if (query) {
@@ -36,14 +35,38 @@ export class ResultStore {
         return this;
     }
     
-    public add(tabId: number, result: QueryResult): ResultStore {
+    public addLoading(tabId: number) {
         if (!this.data) {
             this.data = new Map<number, QueryResult[]>();
         }
         if (!this.data.has(tabId)) {
             this.data.set(tabId, []);
         }
-        this.data.set(tabId, [result, ...this.data.get(tabId)]);
+        this.data.set(tabId, [<QueryResult> {
+            tabId,
+            loading: true,
+            pages: [],
+            created: new Date()
+        }, ...this.data.get(tabId)]);
+        return this;        
+    }
+    
+    public add(tabId: number, result: QueryResult): ResultStore {
+        let all = this.data.get(tabId);
+        // todo multiple loadings in same tab ...
+        let loading = all.find(x => x.loading && x.tabId === tabId);
+        let filtered = all.filter(x => !(x.loading && x.tabId === tabId));
+        Assert(all.length === filtered.length + 1, `Length mismatch: ${all.length} === ${filtered.length + 1}`);
+        this.data.set(tabId, [<QueryResult> {
+            id: result.id,
+            tabId: result.tabId,
+            query: result.query,
+            connectionString: result.connectionString,
+            created: loading.created,
+            finished: result.finished,
+            loading: false,
+            pages: result.pages
+        }, ...filtered]);
         return this;
     }
 }

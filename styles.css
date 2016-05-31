@@ -76,6 +76,10 @@ f-app {
     overflow: auto;
 }
 
+.output-table > caption .pull-right {
+    margin: 0;
+}
+
 table.table.output-table > caption {
     padding-top: 0;
     padding-bottom: 0;

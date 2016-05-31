@@ -6,5 +6,7 @@ export class QueryResult {
     public query: string;
     public connectionString: string;
     public created: Date;
+    public finished: Date;
+    public loading: boolean;
     public pages: ResultPage[] = [];
 }

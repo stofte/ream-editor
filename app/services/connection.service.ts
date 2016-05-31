@@ -43,7 +43,7 @@ export class ConnectionService {
             conns.forEach((x, i) => {
                 x.id === conn.id ? idx = i : null;
             });
-            assert(idx >= 0, 'update id not found');
+            Assert(idx >= 0, 'update id not found');
             return [...conns.slice(0, idx),
             <Connection> {
                 id: conn.id,

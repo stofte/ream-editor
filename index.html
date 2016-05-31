@@ -14,9 +14,9 @@
         delete window.exports;
         delete window.module;
         window.MODE = 'DEVELOPMENT';
-        function assert(cond, msg) {
+        window.Assert = function Assert(cond, msg) {
             if (!cond) {
-                throw msg ? msg : 'assert failed';
+                throw (msg ? msg : 'assert failed');
             }
         }
         </script>

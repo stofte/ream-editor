@@ -11,7 +11,9 @@ import { ResultPage } from '../models/result-page';
         <table class="table table-condensed output-table">
             <caption class="panel panel-default">
                 <div class="panel-body">
-                    <p class="pull-right">{{result.query}} @ {{result.created | date:'shortTime'}}</p>
+                    <p class="pull-right">
+                        <em>{{result.loading ? 'Loading' : ''}}{{roundtripTime}}</em>
+                    </p>
                     <div class="btn-group" role="group">
                         <button 
                             *ngFor="let page of result.pages"
@@ -49,5 +51,17 @@ export class ResultDisplayComponent {
     
     private get activePage(): ResultPage {
         return this.result.pages.find(p => p.active);
+    }
+    
+    private get roundtripTime() {
+        let ts = '';
+        if (!this.result.loading) {
+            let ticks = this.result.finished.getTime() - this.result.created.getTime();
+            let unit = ticks < 1000 ? 'ms' : 'sec';
+            let div = ticks < 1000 ? 1 : 1000;
+            let fixed = ticks < 1000 ? 0 : 2;
+            ts = `${(ticks / div).toFixed(fixed)} ${unit}.`;
+        }
+        return ts; 
     }
 }

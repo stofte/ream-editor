@@ -18,5 +18,5 @@ interface IStreamOperation extends Function {
     (conns: any): any;
 }
 
-declare function assert(cond: any): void;
-declare function assert(cond: any, msg: string): void;
+declare function Assert(cond: any): void;
+declare function Assert(cond: any, msg: string): void;

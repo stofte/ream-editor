@@ -137,7 +137,7 @@ export class TabService {
             .map(ts => {
                 let active = ts.find(t => t.active);
                 let prev = ts.find(t => t.previousActive);
-                assert(active, 'no active found')
+                Assert(active, 'no active found')
                 return [active, prev];
             });
     }

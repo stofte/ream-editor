@@ -32,13 +32,7 @@ export class QueryService {
             }, new ResultStore())
             ;
             
-        mirror
-            .executing
-            .subscribe(executing => {
-                console.log('executing now', executing);
-            })
-        
-        mirror
+        let mirrorWithTab = mirror
             .executing
             .withLatestFrom(tabs.tabs.filter(x => x !== null && x !== undefined), (queryText, tabs) => {
                 return <QueryRequest> {
@@ -46,7 +40,17 @@ export class QueryService {
                     connectionId: tabs[0].connectionId,
                     text: queryText
                 };
+            });
+            
+        mirrorWithTab
+            .subscribe(executing => {
+                this.resultOps.next((store: ResultStore) => {
+                    store.addLoading(executing.tabId);
+                    return store;
+                });;
             })
+        
+        mirrorWithTab
             .withLatestFrom(conns.all.filter(x => x !== null && x !== undefined), (req, conns) => {
                 return <QueryRequest> {
                     connectionString: conns.find(x => x.id === req.connectionId).connectionString,
@@ -68,13 +72,8 @@ export class QueryService {
                         });
                 });
             })
-            // .scan((results: ResultStore, res) => {
-            //     results.add(res.tabId, res);
-            //     return results;
-            // }, new ResultStore())
             .subscribe(res => {
                 this.resultOps.next((store: ResultStore) => {
-                    console.log('stuffing res into op stream', store);
                     store.add(res.tabId, res);
                     return store;
                 });
@@ -100,7 +99,8 @@ export class QueryService {
         }
         let result = new QueryResult();
         let body = res.json();
-        result.created = new Date(body.Created);
+        // todo: dont use server field, but grab roundtime from header
+        result.finished = new Date(body.Created);
         result.id = body.Id;
         
         // todo need smarter dumper code in query-engine

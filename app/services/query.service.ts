@@ -34,7 +34,7 @@ export class QueryService {
             
         let mirrorWithTab = mirror
             .executing
-            .withLatestFrom(tabs.tabs.filter(x => x !== null && x !== undefined), (queryText, tabs) => {
+            .withLatestFrom(tabs.activeBase.filter(x => x !== null && x !== undefined), (queryText, tabs) => {
                 return <QueryRequest> {
                     tabId: tabs[0].id,
                     connectionId: tabs[0].connectionId,

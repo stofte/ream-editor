@@ -65,7 +65,6 @@ namespace QueryEngine.Services
             resFiles.Wait();
             
             var dbCtx = CreateContext(fs.RetrieveFileContents(outputPath, programName + ".cs"), isLibrary: withUsings);
-            Console.WriteLine("CreateContext", dbCtx.Item1);
             var ctx = dbCtx.Item1;
             if (!withUsings) 
             {

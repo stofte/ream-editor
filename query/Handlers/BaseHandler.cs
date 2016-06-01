@@ -32,6 +32,7 @@ namespace QueryEngine.Handlers
                     input = ReadIn(context.Request);
                 }
                 var res = Execute(input);
+                Console.WriteLine("{2}:Request:\n{0}\n{2}:Response{1}", JsonConvert.SerializeObject(input), JsonConvert.SerializeObject(res), context.Request.Path);
                 context.Response.Headers.Add("X-Duration-Milliseconds", Math.Ceiling(sw.Elapsed.TotalMilliseconds).ToString());
                 if (typeof(TResult) == typeof(string))
                 {

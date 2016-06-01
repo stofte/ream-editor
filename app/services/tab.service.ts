@@ -122,7 +122,7 @@ export class TabService {
     }
     
     private getNewTab(tabs: Tab[], connectionId: number, active = true): Tab {
-        const id = tabs.reduce((max, val) => val.id >= max ? val.id + 1 : max, 0);
+        const id = tabs.reduce((max, val) => val.id >= max ? val.id + 1 : max, 1);
         return <Tab> {
             id,
             active,

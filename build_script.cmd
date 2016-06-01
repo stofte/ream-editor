@@ -15,6 +15,8 @@ copy index.static.html %PACKAGE_BASE%\index.html
 copy electron-main.js %PACKAGE_BASE%\electron-main.js
 copy omnisharp-setup.js %PACKAGE_BASE%\omnisharp-setup.js
 copy package.json %PACKAGE_BASE%\package.json
+copy node_modules\zone.jz\dist\zone.js %PACKAGE_BASE%\zone.js
+copy node_modules\reflect-metadata\Reflect.js %PACKAGE_BASE%\Reflect.js
 mkdir %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts
 copy node_modules\bootstrap\dist\fonts\*.* %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts\
 dotnet restore

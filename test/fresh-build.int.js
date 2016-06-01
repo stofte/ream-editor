@@ -41,12 +41,8 @@ function queryFooUsingCurrentConnectionAndCheckResults() {
         let executingClient = this.app.client
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
-            .keys('x')
+            .keys(queryText)
             .pause(timeStep)
-            .executeAsync(function(query, done) {
-                // codemirror saves a reference to itself in the DOM weee
-                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
-            }, queryText)
             .waitForEnabled('.int-test-execute-btn', timeForBackend)
             .catch(err)
             .pause(timeStepMin)
@@ -89,7 +85,6 @@ describe('fresh build', function() {
             .click('.int-test-start-page .btn-default')
             .pause(timeStepMin)
             .click('.int-test-conn-man form input')
-            // setValue seems to fail, the output gets messed up (must be some parsing going on)
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;
                 done(document.querySelector('.int-test-conn-man form input').value);
@@ -156,7 +151,6 @@ describe('fresh build', function() {
             .keys('\uE000')
             .pause(timeStep)
             .click('.int-test-conn-man form input')
-            // setValue seems to fail, the output gets messed up (must be some parsing going on)
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;
                 done(document.querySelector('.int-test-conn-man form input').value);
@@ -181,8 +175,7 @@ describe('fresh build', function() {
                 val.should.equal('Query 2');
             })
             .click('#connection-selector-btn-keyboard-nav')
-            .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(2) a')
-            .keys('\uE015')
+            .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(1) a')
             .keys('\uE015')
             .keys('Enter')
             .pause(timeStepMin)
@@ -191,11 +184,11 @@ describe('fresh build', function() {
     
     it('can query TypeTest using new connection and receive expected results', function() {
         const executingClient = this.app.client
-            .timeoutsAsyncScript(timeStepMax)
-            .executeAsync(function(query, done) {
-                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
-            }, queryText2)
-            .pause(timeStepMin)
+            //.timeoutsAsyncScript(timeStepMax)
+            .moveToObject('.CodeMirror')
+            .click('.CodeMirror')
+            .keys(queryText2)
+            .pause(timeForBackend) // todo wait for db ctx to get switched. need some UI feedback here
             .click('.int-test-execute-btn')
             ;
         
@@ -209,10 +202,9 @@ describe('fresh build', function() {
         let cursorCol = queryText3.indexOf('x.') + 2;
         let cursorRow = 0;
         let suggestionClient = this.app.client
-            .timeoutsAsyncScript(timeStepMax)
-            .executeAsync(function(query, done) {
-                done(document.querySelector('.CodeMirror').CodeMirror.setValue(query));
-            }, queryText3)
+            .moveToObject('.CodeMirror')
+            .click('.CodeMirror')
+            .keys(queryText3)
             .pause(timeStepMin)
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
@@ -240,6 +232,7 @@ describe('fresh build', function() {
         this.app.client
             .timeoutsAsyncScript(timeStepMax)
             .executeAsync(function() {
+                localStorage.clear();
                 // this sends the close event to the regular shutdown handler.
                 // other ways to close the window seems to fail.
                 const win = electronRequire('electron').remote.getCurrentWindow();
@@ -250,60 +243,60 @@ describe('fresh build', function() {
         });        
     });
     
-    describe('second run', function() {
-        this.timeout(timeTotal);
+    // describe('second run', function() {
+    //     this.timeout(timeTotal);
 
-        before(function () {
-            chai.should();
-            this.app = new Application({
-                path: appPath,
-                requireName: 'electronRequire'
-            });
-            return this.app.start();
-        });
+    //     before(function () {
+    //         chai.should();
+    //         this.app = new Application({
+    //             path: appPath,
+    //             requireName: 'electronRequire'
+    //         });
+    //         return this.app.start();
+    //     });
               
-        it('starts in editor mode', function() {
-            return this.app.client
-                .pause(timeStepMax)
-                .getText('.int-test-tab-list .navbar-brand')
-                .then(function (val) {
-                    val.should.equal(''); 
-                });
-        });
+    //     it('starts in editor mode', function() {
+    //         return this.app.client
+    //             .pause(timeStepMax)
+    //             .getText('.int-test-tab-list .navbar-brand')
+    //             .then(function (val) {
+    //                 val.should.equal(''); 
+    //             });
+    //     });
         
-        it('uses testdb connection and can query Foo', 
-            queryFooUsingCurrentConnectionAndCheckResults);
+    //     it('uses testdb connection and can query Foo', 
+    //         queryFooUsingCurrentConnectionAndCheckResults);
 
-        describe('when closing', function () {
-            before(function() {
-                this.timeout(timeStepMax);
-                this.app.client
-                    .timeoutsAsyncScript(timeStepMax)
-                    .executeAsync(function() {
-                        localStorage.clear(); // for next run
-                        const win = electronRequire('electron').remote.getCurrentWindow();
-                        win.emit('close');
-                    });
-                return new Promise((succ, err) => {
-                    setTimeout(succ, timeStep);
-                });            
-            });
+    //     describe('when closing', function () {
+    //         before(function() {
+    //             this.timeout(timeStepMax);
+    //             this.app.client
+    //                 .timeoutsAsyncScript(timeStepMax)
+    //                 .executeAsync(function() {
+    //                     localStorage.clear(); // for next run
+    //                     const win = electronRequire('electron').remote.getCurrentWindow();
+    //                     win.emit('close');
+    //                 });
+    //             return new Promise((succ, err) => {
+    //                 setTimeout(succ, timeStep);
+    //             });            
+    //         });
 
-            // check via http if services are still up and going.
-            it('also closes background omnisharp process', function(done) {
-                this.timeout(timeForBackend);
-                let url = `http://localhost:2000/checkreadystate`;
-                http.get(url, res => { done(new Error('response received')); })
-                    .on('error', () => { done(); });
-            });
+    //         // check via http if services are still up and going.
+    //         it('also closes background omnisharp process', function(done) {
+    //             this.timeout(timeForBackend);
+    //             let url = `http://localhost:2000/checkreadystate`;
+    //             http.get(url, res => { done(new Error('response received')); })
+    //                 .on('error', () => { done(); });
+    //         });
             
-            it('also closes background query process', function(done) {
-                this.timeout(timeForBackend);
-                let url = `http://localhost:8111/checkreadystate`;
-                http.get(url, res => { done(new Error('response received')); })
-                    .on('error', () => { done(); });
-            });
+    //         it('also closes background query process', function(done) {
+    //             this.timeout(timeForBackend);
+    //             let url = `http://localhost:8111/checkreadystate`;
+    //             http.get(url, res => { done(new Error('response received')); })
+    //                 .on('error', () => { done(); });
+    //         });
 
-        });
-    });
+    //     });
+    // });
 });

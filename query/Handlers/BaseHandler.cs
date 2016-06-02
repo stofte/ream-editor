@@ -67,6 +67,7 @@ namespace QueryEngine.Handlers
                 jsonWriter.CloseOutput = false;
                 var settings = new JsonSerializerSettings();
                 settings.Converters.Add(new NumberConverter());
+                settings.Converters.Add(new TupleConverter());
                 var jsonSerializer = JsonSerializer.Create(settings);
                 jsonSerializer.Serialize(jsonWriter, value);
             }

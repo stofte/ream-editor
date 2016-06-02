@@ -2,10 +2,24 @@ namespace QueryEngine.Services
 {
     using System;
     using System.Diagnostics;
-    using System.Collections.Generic;
     using System.Reflection;
     using QueryEngine.Models;
     using System.Text.RegularExpressions;
+    // cant reuse types from project itself so doing some silly stuff here
+    using DumpInternal = System.Collections.Generic.IDictionary<
+        string,
+        System.Tuple<
+            System.Collections.Generic.IEnumerable<
+                System.Tuple<
+                    string,
+                    string
+                >
+            >,
+            object
+        >
+    >;
+    using System.Collections.Generic;
+
     public class QueryService
     {
         CompileService _compiler;
@@ -19,7 +33,7 @@ namespace QueryEngine.Services
             _schemaService = schemaService;
         }
 
-        public IDictionary<string, object> ExecuteQuery(QueryInput input)
+        public DumpInternal ExecuteQuery(QueryInput input)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -30,6 +44,7 @@ namespace QueryEngine.Services
                 .Replace("##NS##", assmName)
                 .Replace("##DB##", contextResult.Type.ToString());
             var e1 = sw.Elapsed.TotalMilliseconds;
+            Console.WriteLine(programSource);
             sw.Reset();
             sw.Start();
             var result = _compiler.LoadType(programSource, assmName, contextResult.Reference);
@@ -38,7 +53,7 @@ namespace QueryEngine.Services
             var e2 = sw.Elapsed.TotalMilliseconds;
             sw.Reset();
             sw.Start();
-            var res = method.Invoke(programInstance, new object[] { }) as IDictionary<string, object>;
+            var res = method.Invoke(programInstance, new object[] { }) as DumpInternal;
             var e3 = sw.Elapsed.TotalMilliseconds;
             //res.Add("Performance", new { DbContext = e1, Loading = e2, Execution = e3 });
             return res;
@@ -76,26 +91,28 @@ namespace QueryEngine.Services
             };
         }
 
-        string _template = @"using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-
-namespace ##NS##
+        string _template = @"namespace ##NS##
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata;
+    using DumpType = System.Tuple<System.Collections.Generic.IEnumerable<
+        System.Tuple<string, string>>, object>;
+    
     public class Main : ##DB##
     {
-        public IDictionary<string, object> Run()
+        public IDictionary<string, DumpType> Run()
         {
             // todo need something better
-            Dumper._results = new Dictionary<string, object>();
+            Dumper._results = new Dictionary<string, DumpType>();
             Dumper._count = 0;
             Query();
             return Dumper._results;
@@ -106,40 +123,68 @@ namespace ##NS##
 ##SOURCE##
         }
     }
-
+    
     public static class Dumper 
     {
-        public static IDictionary<string, object> _results;
+        public static IDictionary<string, DumpType> _results;
         public static int _count;
 
         /// <summary>QueryEngine.Inlined.Dumper</summary>
         public static T Dump<T>(this T o)
         {
-            // since the context is lost when returning, we tolist anything we dump
-            var name = o.GetType().Name;
-            object result = null;
-            
-            if (o is IEnumerable<object>)
+            if (o != null)
             {
-                name = o.GetType().GetTypeInfo().GenericTypeArguments[0].Name;
-                var ol = o as IEnumerable<object>;
-                result = ol.ToList();
+                var objType = o.GetType();
+                var name = objType.Name;
+                if (o is IEnumerable<object>) {
+                    name = objType.GetTypeInfo().GenericTypeArguments[0].Name; 
+                }
+                _results.Add(PrettyAnonymous(name), Tuple.Create(TypeColumns((object)o), (object)o));
             }
-            else
-            {
-                result = o;
-            }
-            var displayName = string.Format(""{0} {1}"", PrettyAnonymous(name), ++_count);
-            _results.Add(displayName, result);
             return o;
         }
-
+        
+        static IEnumerable<Tuple<string, string>> TypeColumns(object o) 
+        {
+            var t = o.GetType();
+            if (o is IEnumerable<object>) 
+            {
+                t = t.GetTypeInfo().GenericTypeArguments[0];
+            }
+            var list = new List<Tuple<string, string>>();
+            foreach(var m in t.GetMembers())
+            {
+                if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+                {
+                    list.Add(Tuple.Create(m.Name, m.DeclaringType.Name));
+                }
+            }
+            return list;
+        }
+        
         static string PrettyAnonymous(string name) 
         {
-            return name.Contains(""AnonymousType"") ? ""AnonymousType"" : name;
+            return name.Contains(""AnonymousType"") ? string.Format(""AnonymousType {0}"", ++_count) : name;
         }
     }
 }
 ";
+        static IEnumerable<Tuple<string, string>> TypeColumns(object o) 
+        {
+            var t = o.GetType();
+            if (o is IEnumerable<object>) 
+            {
+                t = t.GetTypeInfo().GenericTypeArguments[0];
+            }
+            var list = new List<Tuple<string, string>>();
+            foreach(var m in t.GetMembers())
+            {
+                if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+                {
+                    list.Add(Tuple.Create(m.Name, m.DeclaringType.Name));
+                }
+            }
+            return list;
+        }
     }
 }

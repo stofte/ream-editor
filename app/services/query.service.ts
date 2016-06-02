@@ -99,37 +99,25 @@ export class QueryService {
         }
         let result = new QueryResult();
         let body = res.json();
-        
-        // todo: dont use server field, but grab roundtime from header
-        result.finished = new Date(body.Created);
+        result.finished = new Date();
         result.id = body.Id;
-        
-        // todo need smarter dumper code in query-engine
         Object.keys(body.Results).forEach((key, idx) => {
             const set = body.Results[key];
             const dataRows = set.Item2;
             const dataCols = set.Item1;
-            const page = this.transformSet(dataCols, dataRows);
+            const page = new ResultPage();
+            page.columns = dataCols.map(col => col[0]);
+            page.rows = dataRows.map((row) => {
+                return dataCols.map(col => {
+                    return row[col[0]];
+                });
+            });
             page.title = key;
             page.active = idx === 0; // mark the first as active
             page.id = `${idx}-${result.id}`;
             result.pages.push(page);
         });
         return result;
-    }
-    
-    private transformSet(columns: any[], data: any[]): ResultPage {
-        let page = new ResultPage();
-        let cols: string[] = [];
-        let rows: any[] = columns
-        data.forEach(row => {
-            cols = union(Object.keys(row), cols);
-            // this also assumes all objects have same lay
-            rows.push(values(row));
-        });
-        page.columns = cols;
-        page.rows = rows;
-        return page;
     }
     
     private action(name: string) {

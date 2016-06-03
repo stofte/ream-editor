@@ -91,22 +91,21 @@ namespace QueryEngine.Services
             };
         }
 
-        string _template = @"namespace ##NS##
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata;
-    using DumpType = System.Tuple<System.Collections.Generic.IEnumerable<
-        System.Tuple<string, string>>, object>;
-    
+        string _template = @"using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using DumpType = System.Tuple<System.Collections.Generic.IEnumerable<System.Tuple<string, string>>, object>;
+
+namespace ##NS## 
+{     
     public class Main : ##DB##
     {
         public IDictionary<string, DumpType> Run()

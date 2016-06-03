@@ -20,6 +20,7 @@ copy node_modules\reflect-metadata\Reflect.js %PACKAGE_BASE%\Reflect.js
 mkdir %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts
 copy node_modules\bootstrap\dist\fonts\*.* %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts\
 dotnet restore
+rem dotnet publish --configuration Release --output linq-editor-win32-x64\resources\app\query --runtime win7-x64 --framework netcoreapp1.0
 dotnet publish --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
 copy NuGet.Config %PACKAGE_BASE%\NuGet.Config
 copy project.json %PACKAGE_BASE%\project.json

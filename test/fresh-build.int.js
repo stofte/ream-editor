@@ -241,13 +241,19 @@ describe('fresh build', function() {
             return this.app.start();
         });
               
-        it('starts in editor mode', function() {
+        it('starts in editor mode and can change connection to initial connection', function() {
             return this.app.client
                 .waitForExist('.int-test-tab-list .navbar-brand')
                 .getText('.int-test-tab-list .navbar-brand')
                 .then(function (val) {
                     val.should.equal(''); 
-                });
+                })
+                .click('#connection-selector-btn-keyboard-nav')
+                .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(2) a')
+                .keys('\uE015')
+                .keys('\uE015')
+                .keys('Enter')
+                ;
         });
         
         it('uses testdb connection and can query Foo', 

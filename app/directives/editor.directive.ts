@@ -13,6 +13,8 @@ import { AutocompletionResult } from '../models/autocompletion-result';
 import { Tab } from '../models/tab';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/addon/hint/show-hint';
+import 'codemirror/mode/clike/clike';
+
 let onetimeBullshit = false;
 CodeMirror.commands.autocomplete = function(cm) {
     cm.showHint({ hint: CodeMirror.hint.ajax });

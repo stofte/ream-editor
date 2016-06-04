@@ -32,6 +32,11 @@ class SessionMap {
     connId: number;
 }
 
+class UpdateMap {
+    status: boolean;
+    fileName: string;
+}
+
 class QueryTemplateResult {
     buffer: string;
     tabId: number;
@@ -47,8 +52,9 @@ export class OmnisharpService {
     private ready: Observable<boolean>;
     private fileName: Observable<string>;
     private changeStream: Observable<number>;
-    private readyState: Observable<boolean>;
-    private readyState2: ReplaySubject<boolean>;
+    private readyState: Observable<UpdateMap>;
+    private readyState2: ReplaySubject<UpdateMap>;
+    private codecheck: Observable<string[]>;
     
     constructor(
         private conns: ConnectionService,
@@ -173,34 +179,43 @@ export class OmnisharpService {
                 });
             })
             .combineLatest(mirrorChangeStream.changes, (latest, change) => {
-                return change.created - latest;
+                return <UpdateMap> {
+                    status: change.created - latest > 0,
+                    fileName: change.fileName
+                }
             })
-            .map(x => x <= 0)
             .publishReplay()
             .refCount()
             ;
 
         // todo fix this bullshit
-        this.readyState2 = new ReplaySubject<boolean>(1);
+        this.readyState2 = new ReplaySubject<UpdateMap>(1);
         this.readyState
             .subscribe(x => this.readyState2.next(x));
-    }
-    
-    private handleChange(change: EditorChange) {
-        this.monitorService.omnisharpReady.then(() => {
-            const json = {
-                fileName: change.fileName,
-                changes: [change]
-            }; 
-            this.http
-                .post(this.action('updatebuffer'), JSON.stringify(json));
+            
+        this.codecheck = this.readyState2
+            .delay(500)
+            .flatMap(update => {
+                 return new Observable<string[]>((obs: Observer<string[]>) => {
+                    http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: update.fileName }))
+                        .map(res => res.json())
+                        .subscribe(data => {
+                            obs.next(["foo", "foo"]);
+                            obs.complete();
+                        });
+                });               
+            })
+            ;
+            
+        this.codecheck.subscribe(x => {
+            console.log('codecheck', x);
         });
     }
     
     public autocomplete(request: AutocompletionQuery): Observable<any[]> {
         let mapCodeMirror: (AutocompletionResult) => any[] = this.mapToCodeMirror.bind(this);
         return this.readyState2
-            .filter(x => x)
+            .filter(x => x.status)
             .take(1)
             .withLatestFrom(this.fileName, (status, fileName) => {
                 return fileName;

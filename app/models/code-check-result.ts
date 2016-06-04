@@ -1,3 +1,8 @@
 export class CodeCheckResult {
-    public messages: string[];
+    public column: number;
+    public endColumn: number;
+    public endLine: number;
+    public line: number;
+    public fileName: string;
+    
 }

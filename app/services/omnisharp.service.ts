@@ -208,8 +208,7 @@ export class OmnisharpService {
                         });
                 });               
             })
-            .map(fixes => fixes.filter(fix => fix.logLevel !== 'Hidden'))
-            .filter(fixes => fixes.length > 0)
+            .map(this.filterCodeChecks)
             ;
             
         this.codecheck.subscribe(x => {
@@ -283,6 +282,15 @@ export class OmnisharpService {
                 endColumn: x.EndColumn
             };
         })
+    }
+    
+    private filterCodeChecks(checks: CodeCheckResult[]): CodeCheckResult[] {
+        return checks
+            .filter(c => {
+                var isMissingSemicolon = c.text === '; expected';
+                var isHidden = c.logLevel === 'Hidden'
+                return !(isHidden || isMissingSemicolon);
+            });
     }
     
     private action(name: string) {

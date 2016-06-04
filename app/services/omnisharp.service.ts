@@ -181,7 +181,7 @@ export class OmnisharpService {
             })
             .combineLatest(mirrorChangeStream.changes, (latest, change) => {
                 return <UpdateMap> {
-                    status: change.created - latest > 0,
+                    status: (change.created - latest) <= 0,
                     fileName: change.fileName
                 }
             })
@@ -195,7 +195,7 @@ export class OmnisharpService {
             .subscribe(x => this.readyState2.next(x));
             
         this.codecheck = this.readyState2
-            .delay(500)
+            .filter(x => x.status)
             .flatMap(update => {
                  return new Observable<CodeCheckResult[]>((obs: Observer<CodeCheckResult[]>) => {
                     http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: update.fileName }))

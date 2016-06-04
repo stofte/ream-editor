@@ -37,7 +37,7 @@ export class ConnectionSelectorComponent {
             .subscribe(tab => {
                 this.connId = tab.connectionId;
                 this.tabId = tab.id;
-            })
+            });
         conns.all
             .subscribe(cs => {
                 this.connections = cs;

@@ -24,7 +24,7 @@ CodeMirror.keyMap.default[(mac ? 'Cmd' : 'Ctrl') + '-Space'] = 'autocomplete';
 let omnisharpResolver = null;
 const omnisharpInject = new Promise<OmnisharpService>((res) => {
     omnisharpResolver = res;
-})
+});
 
 CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
     // todo: test if syntax mode changes anything,

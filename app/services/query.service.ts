@@ -31,13 +31,13 @@ export class QueryService {
                 return <ResultStore> op(store);
             }, new ResultStore())
             ;
-            
+           
         let mirrorWithTab = mirror
             .executing
-            .withLatestFrom(tabs.activeBase.filter(x => x !== null && x !== undefined), (queryText, tabs) => {
+            .withLatestFrom(tabs.activeBase.filter(x => x !== null && x !== undefined), (queryText, activeTabs) => {
                 return <QueryRequest> {
-                    tabId: tabs[0].id,
-                    connectionId: tabs[0].connectionId,
+                    tabId: activeTabs[0].id,
+                    connectionId: activeTabs[0].connectionId,
                     text: queryText
                 };
             });
@@ -47,13 +47,13 @@ export class QueryService {
                 this.resultOps.next((store: ResultStore) => {
                     store.addLoading(executing.tabId);
                     return store;
-                });;
-            })
+                });
+            });
         
         mirrorWithTab
-            .withLatestFrom(conns.all.filter(x => x !== null && x !== undefined), (req, conns) => {
+            .withLatestFrom(conns.all.filter(x => x !== null && x !== undefined), (req, currentConns) => {
                 return <QueryRequest> {
-                    connectionString: conns.find(x => x.id === req.connectionId).connectionString,
+                    connectionString: currentConns.find(x => x.id === req.connectionId).connectionString,
                     tabId: req.tabId,
                     text: req.text
                 };

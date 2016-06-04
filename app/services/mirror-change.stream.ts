@@ -133,7 +133,7 @@ export class MirrorChangeStream {
                     };
                 });
             });
-        mirror.on('change', (mirror, cs) => {
+        mirror.on('change', (_, cs) => {
             if (cs.origin !== 'setValue') {
                 this.sub.next(this.mapEvent(cs));
             }
@@ -157,6 +157,4 @@ export class MirrorChangeStream {
             created: performance.now()
         };
     }
-    
-    private mapIntigrety
 }

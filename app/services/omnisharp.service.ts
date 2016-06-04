@@ -32,6 +32,12 @@ class SessionMap {
     connId: number;
 }
 
+class QueryTemplateResult {
+    buffer: string;
+    tabId: number;
+    connId: number;
+}
+
 @Injectable()
 export class OmnisharpService {
     private port: number = config.omnisharpPort;
@@ -58,7 +64,7 @@ export class OmnisharpService {
             .switchMap(ready => {
                 return ready ? tabs.newContext : Observable.never<Tab>();
             })
-            .withLatestFrom(conns.all, (tab, conns) => { return { tab, conns }; })
+            .withLatestFrom(conns.all, (tab, newConns) => { return { tab, conns: newConns }; })
             .scan((ctx, newCtx) => {
                 const conn = newCtx.conns.find(x => x.id === newCtx.tab.connectionId);
                 const tabId = newCtx.tab.id;
@@ -66,14 +72,14 @@ export class OmnisharpService {
             }, {})
             .flatMap((x: {conn: Connection, tabId: number }) => {
                 let req = { connectionString: x.conn.connectionString, text: '' };
-                return new Observable<{buffer: string, tabId: number, connId: number}>((obs: Observer<{buffer: string, tabId: number, connId: number}>) => {
+                return new Observable<QueryTemplateResult>((obs: Observer<QueryTemplateResult>) => {
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
                             if (!TEMPLATE_LINE_OFFSET) {
                                 TEMPLATE_LINE_OFFSET = data.LineOffset;
                             }
-                            obs.next({
+                            obs.next(<QueryTemplateResult> {
                                 tabId: x.tabId,
                                 buffer: <string> data.Template,
                                 connId: x.conn.id

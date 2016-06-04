@@ -13,7 +13,7 @@ export class ResultStore {
     public setActive(queryResultId: string, pageId: string): ResultStore {
         let tabId: number = null; // todo: pass from component instead
         let newList: QueryResult[] = null;
-        for(let [key, queries] of this.data) {
+        for (let [key, queries] of this.data) {
             let query = queries.find(q => q.id === queryResultId); 
             if (query) {
                 newList = queries;

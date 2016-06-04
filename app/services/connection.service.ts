@@ -41,7 +41,9 @@ export class ConnectionService {
         this.ops.next((conns) => {
             let idx = -1;
             conns.forEach((x, i) => {
-                x.id === conn.id ? idx = i : null;
+                if (x.id === conn.id) {
+                    idx = i;
+                }
             });
             Assert(idx >= 0, 'update id not found');
             return [...conns.slice(0, idx),
@@ -56,8 +58,7 @@ export class ConnectionService {
         try {
             let raw = localStorage.getItem(this.key);
             return raw ? <Connection[]> JSON.parse(raw) : [];
-        }
-        catch (e) {
+        } catch (e) {
             console.error(`connection-service load exception: ${e}`);
             return [];
         }

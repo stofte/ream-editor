@@ -30,7 +30,7 @@ export class BufferNameService {
     
     public setConnection(tabId: number, connId: number): void {
         this.ops.next((bs: BufferMap[]) => {
-            if (!bs.find(x => x.connId === connId && x.tabId == tabId)) {
+            if (!bs.find(x => x.connId === connId && x.tabId === tabId)) {
                 bs.push(<BufferMap> {
                     tabId,
                     connId,
@@ -39,15 +39,12 @@ export class BufferNameService {
             }
             return bs;
         });
-        // const fileName = `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`;
-        // this.buffers.next(<EditorChange> { fileName, tabId });
-        // return fileName;
     }
     
     public get byTabId(): Observable<Map<number, string>> {
         return this.buffers
             .scan((map, value) => {
-                return map; //.set(value.tabId, value.fileName);
+                return map;
             }, new Map<number, string>());
     }
 }

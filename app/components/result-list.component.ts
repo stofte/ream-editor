@@ -8,7 +8,7 @@ import { ResultDisplayComponent } from './result-display.component';
 
 class ResultMap {
     tab: Tab;
-    results: QueryResult[]
+    results: QueryResult[];
 }
 
 @Component({

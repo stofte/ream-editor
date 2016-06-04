@@ -55,15 +55,15 @@ export class TabService {
     public get newContext(): Observable<Tab> {
         return this.active
             .scan((ctx, tab) => {
-                if (!ctx.conns.find(x => x === tab.id+':'+tab.connectionId)) {
-                    ctx.conns = [tab.id+':'+tab.connectionId, ...ctx.conns];
+                if (!ctx.conns.find(x => x === tab.id + ':' + tab.connectionId)) {
+                    ctx.conns = [tab.id + ':' + tab.connectionId, ...ctx.conns];
                     ctx.updated = true;
                 } else {
                     ctx.updated = false;
                 }
                 ctx.tab = tab;
                 return ctx;
-            }, {tab: null, conns:[], updated: false})
+            }, {tab: null, conns: [], updated: false})
             .filter(ctx => ctx.updated)
             .map(x => x.tab);
     }
@@ -81,7 +81,7 @@ export class TabService {
                     return [
                         ...this.setActiveTab(tabs, null),
                         tab
-                    ] 
+                    ];
                 });
     }
     
@@ -115,7 +115,7 @@ export class TabService {
                 filtered = filtered.map(t => {
                     t.previousActive = t.id === oldActive.id;
                     return t;
-                })
+                });
             }
             return filtered;
         });
@@ -137,7 +137,7 @@ export class TabService {
             .map(ts => {
                 let active = ts.find(t => t.active);
                 let prev = ts.find(t => t.previousActive);
-                Assert(active, 'no active found')
+                Assert(active, 'no active found');
                 return [active, prev];
             });
     }
@@ -149,7 +149,7 @@ export class TabService {
                 t.previousActive = t.active;
                 t.active = false;
                 return t;
-            })
+            });
         }
         let old = tabs.find(t => t.active);
         if (old && old.id !== newId) {

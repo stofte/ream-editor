@@ -16,7 +16,7 @@ import { Connection } from '../models/connection';
 <button class="btn btn-primary form-control int-test-execute-btn"
     type="button"
     (click)="run()" 
-    disabled="{{ isDisabled ? 'disabled' : '' }}"
+    disabled="{{ isEnabled ? '' : 'disabled' }}"
     >
     <span class="glyphicon glyphicon-play"></span>
 </button>
@@ -24,6 +24,7 @@ import { Connection } from '../models/connection';
 })
 export class ExecuteQueryComponent {
     private isDisabled = true;
+    private isExecuting = false;
     constructor(
         private mirrors: MirrorChangeStream,
         monitorService: MonitorService,
@@ -36,7 +37,20 @@ export class ExecuteQueryComponent {
             .subscribe(() => this.run());
     }
     
+    private get isEnabled(): boolean {
+        return !this.isDisabled && !this.isExecuting;
+    }
+    
     private run(): void {
-        this.mirrors.execute();
+        if (!this.isEnabled) {
+            console.log('run was disabled');
+            return;
+        } else {
+            this.isExecuting = true;
+            this.mirrors.execute();
+            setTimeout(() => {
+                this.isExecuting = false;
+            }, 1000); // disable spamming
+        }
     }
 }

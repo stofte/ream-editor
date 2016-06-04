@@ -12,8 +12,12 @@ export class HotkeyService {
     public executeQuery: Observable<boolean>;
     
     constructor(ngZone: NgZone) {
-        this.executeQuery = this.exeQuery.asObservable();
-        this.connectionManager = this.connMan.asObservable();
+        this.executeQuery = this.exeQuery
+            .asObservable()
+            ;
+        this.connectionManager = this.connMan
+            .asObservable()
+            ;
         ipc.on('application-event', (event: any, msg: string) => {
             ngZone.run(() => {
                 if (msg === 'connections-panel') {

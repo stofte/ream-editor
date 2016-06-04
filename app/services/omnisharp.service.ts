@@ -196,6 +196,7 @@ export class OmnisharpService {
             
         this.codecheck = this.readyState2
             .filter(x => x.status)
+            .debounceTime(500)
             .flatMap(update => {
                  return new Observable<CodeCheckResult[]>((obs: Observer<CodeCheckResult[]>) => {
                     http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: update.fileName }))

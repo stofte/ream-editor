@@ -53,7 +53,7 @@ test_script:
   - dir 
   - cd ..
   - cd ..
-  - ps: .\test-script.cmd
+  - .\test-script.cmd
 
 artifacts:
   - path: $(ELECTRON_OUT)

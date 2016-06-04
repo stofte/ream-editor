@@ -25,22 +25,25 @@ namespace QueryEngine.Services
         CompileService _compiler;
         DatabaseContextService _databaseContextService;
         SchemaService _schemaService;
+        FragmentService _fragmentService;
 
-        public QueryService(CompileService compiler, DatabaseContextService databaseContextService, SchemaService schemaService)
+        public QueryService(CompileService compiler, DatabaseContextService databaseContextService, SchemaService schemaService, FragmentService fragmentService)
         {
             _compiler = compiler;
             _databaseContextService = databaseContextService;
             _schemaService = schemaService;
+            _fragmentService = fragmentService;
         }
 
         public DumpInternal ExecuteQuery(QueryInput input)
         {
             var sw = new Stopwatch();
             sw.Start();
+            var newInput = _fragmentService.Fix(input.Text);
             var contextResult = _databaseContextService.GetDatabaseContext(input.ConnectionString);
             var assmName = Guid.NewGuid().ToIdentifierWithPrefix("a");
             var programSource = _template
-                .Replace("##SOURCE##", input.Text)
+                .Replace("##SOURCE##", newInput)
                 .Replace("##NS##", assmName)
                 .Replace("##DB##", contextResult.Type.ToString());
             var e1 = sw.Elapsed.TotalMilliseconds;
@@ -112,7 +115,8 @@ namespace ##NS##
         {
             // todo need something better
             Dumper._results = new Dictionary<string, DumpType>();
-            Dumper._count = 0;
+            Dumper._counts = new Dictionary<string, int>();
+            Dumper._anonynousCount = 0;
             Query();
             return Dumper._results;
         }
@@ -126,7 +130,8 @@ namespace ##NS##
     public static class Dumper 
     {
         public static IDictionary<string, DumpType> _results;
-        public static int _count;
+        public static IDictionary<string, int> _counts;
+        public static int _anonynousCount;
 
         /// <summary>QueryEngine.Inlined.Dumper</summary>
         public static T Dump<T>(this T o)
@@ -138,7 +143,7 @@ namespace ##NS##
                 if (o is IEnumerable<object>) {
                     name = objType.GetTypeInfo().GenericTypeArguments[0].Name; 
                 }
-                _results.Add(PrettyAnonymous(name), Tuple.Create(TypeColumns((object)o), (object)o));
+                _results.Add(FormatNameKey(name), Tuple.Create(TypeColumns((object)o), (object)o));
             }
             return o;
         }
@@ -161,9 +166,26 @@ namespace ##NS##
             return list;
         }
         
-        static string PrettyAnonymous(string name) 
+        static string FormatNameKey(string name) 
         {
-            return name.Contains(""AnonymousType"") ? string.Format(""AnonymousType {0}"", ++_count) : name;
+            var isAnon = name.Contains(""AnonymousType"");
+            var count = -1;
+            if (isAnon)
+            {
+                count = ++_anonynousCount;
+            }
+            else 
+            {
+                if (!_counts.ContainsKey(name))
+                {
+                    _counts.Add(name, 0);
+                }
+                count = _counts[name] + 1;
+                _counts[name] = count;
+            }
+            var typeName = isAnon ? ""AnonymousType"" : name;
+            var result =  string.Format(""{0} {1}"", typeName, count);
+            return result;
         }
     }
 }

@@ -21,13 +21,15 @@ namespace QueryEngine
         public void ConfigureServices(IServiceCollection services)
         {
             var schemaService = new SchemaService();
+            var fragmentService = new FragmentService();
             var compiler = new CompileService(schemaService);
             var dbContextService = new DatabaseContextService(schemaService, compiler);
-            var queryService = new QueryService(compiler, dbContextService, schemaService);
+            var queryService = new QueryService(compiler, dbContextService, schemaService, fragmentService);
             services.AddSingleton<QueryService>(queryService);
             services.AddSingleton<SchemaService>(schemaService);
             services.AddSingleton<CompileService>(compiler);
             services.AddSingleton<DatabaseContextService>(dbContextService);
+            services.AddSingleton<FragmentService>(fragmentService);
         }
     }
 }

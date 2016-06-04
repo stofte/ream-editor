@@ -75,6 +75,8 @@ namespace QueryEngine.Services
             {
                 output.Append(_refs);
             }
+            // remove the entity generated warning about injected connection strings
+            ctx = Regex.Replace(ctx, @"#warning.*", "");
             output.Append(ctx);
             foreach(var fpath in resFiles.Result.EntityTypeFiles)
             {

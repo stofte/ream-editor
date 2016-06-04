@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { TabService } from '../services/tab.service';
-import { BufferTabComponent } from './buffer-tab.component';
+import { QuerySuiteComponent } from './query-suite.component';
 import { StartPageComponent } from './start-page.component';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'f-tab-view',
-    directives: [BufferTabComponent, StartPageComponent],
+    directives: [QuerySuiteComponent, StartPageComponent],
     template: `
 <div *ngIf="editorVisible" class="my-editor">
-    <f-buffer-tab></f-buffer-tab>
+    <f-query-suite></f-query-suite>
 </div>
 <div *ngIf="startVisible" class="my-start">
     <f-start-page></f-start-page>

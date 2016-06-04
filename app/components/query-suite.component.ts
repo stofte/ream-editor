@@ -4,13 +4,12 @@ import { TabService } from '../services/tab.service';
 import { EditorService } from '../services/editor.service';
 import { ConnectionSelectorComponent } from './connection-selector.component';
 import { ExecuteQueryComponent } from './execute-query.component';
-import { OutputComponent } from './output.component';
 import { ResultListComponent } from './result-list.component';
 import { EditorDirective } from '../directives/editor.directive';
 
 @Component({
-    selector: 'f-buffer-tab',
-    directives: [OutputComponent, EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent, ResultListComponent],
+    selector: 'f-query-suite',
+    directives: [EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent, ResultListComponent],
     template: `
 <div class="container-fluid">
     <div class="row">
@@ -30,4 +29,4 @@ import { EditorDirective } from '../directives/editor.directive';
 <f-result-list></f-result-list>
 `
 })
-export class BufferTabComponent { }
+export class QuerySuiteComponent { }

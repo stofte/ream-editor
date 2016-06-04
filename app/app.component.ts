@@ -1,10 +1,5 @@
 import { Component } from '@angular/core';
-import { MonitorService } from './services/monitor.service';
-import { ConnectionService } from './services/connection.service';
-import { TabService } from './services/tab.service';
 import { OverlayService } from './services/overlay.service';
-import { StartPageComponent } from './components/start-page.component';
-import { BufferTabComponent } from './components/buffer-tab.component';
 import { TabListComponent } from './components/tab-list.component';
 import { ConnectionManagerComponent } from './components/connection-manager.component';
 import { TabViewComponent } from './components/tab-view.component';

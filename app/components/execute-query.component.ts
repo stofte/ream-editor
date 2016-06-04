@@ -6,6 +6,7 @@ import { MonitorService } from '../services/monitor.service';
 import { ConnectionService } from '../services/connection.service';
 import { QueryService } from '../services/query.service';
 import { TabService } from '../services/tab.service';
+import { HotkeyService } from '../services/hotkey.service';
 import { Tab } from '../models/tab';
 import { Connection } from '../models/connection';
 
@@ -25,11 +26,14 @@ export class ExecuteQueryComponent {
     private isDisabled = true;
     constructor(
         private mirrors: MirrorChangeStream,
-        monitorService: MonitorService
+        monitorService: MonitorService,
+        hotkeys: HotkeyService
     ) {
         monitorService.queryReady.then(() => {
             this.isDisabled = false;
         });
+        hotkeys.executeQuery
+            .subscribe(() => this.run());
     }
     
     private run(): void {

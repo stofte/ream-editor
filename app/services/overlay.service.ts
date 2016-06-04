@@ -1,30 +1,20 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Subject, ReplaySubject } from 'rxjs/Rx';
 import { Observable } from 'rxjs/Observable';
-
-const ipc = electronRequire('electron').ipcRenderer;
+import { HotkeyService } from './hotkey.service';
 
 @Injectable()
 export class OverlayService {
     private connSub: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
     
     constructor(
-        private ngZone: NgZone
+        private ngZone: NgZone,
+        hotkeys: HotkeyService
     ) {
         this.connSub.next(false); // set initial value
-        ipc.on('application-event', this.applicationEventHandler.bind(this));
-    }
-    
-    private applicationEventHandler(event: any, msg: string) {
-        if (msg === 'connections-panel') {
-            this.ngZone.run(() => 
-                // seems silly but works to keep state inside rx
-                this.connections
-                    .take(1)
-                    .subscribe(x => 
-                        x ? this.hideConnections() : this.showConnections()
-                    ));
-        }
+        hotkeys.connectionManager.subscribe(() => {
+            this.toggleConnections();
+        });
     }
     
     public showConnections() {
@@ -33,6 +23,14 @@ export class OverlayService {
     
     public hideConnections() {
         this.connSub.next(false);
+    }
+    
+    public toggleConnections() {
+        this.connections
+            .take(1)
+            .subscribe(x => 
+                x ? this.hideConnections() : this.showConnections()
+            );        
     }
     
     public get connections(): Observable<boolean> {

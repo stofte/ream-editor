@@ -23,6 +23,7 @@ import { QueryService } from './services/query.service';
 import { OmnisharpService } from './services/omnisharp.service';
 import { LogService } from './services/log.service';
 import { MirrorChangeStream } from './services/mirror-change.stream';
+import { HotkeyService } from './services/hotkey.service';
 
 bootstrap(AppComponent, [
     MonitorService,
@@ -36,6 +37,7 @@ bootstrap(AppComponent, [
     LogService,
     MirrorChangeStream,
     TabService,
+    HotkeyService,
     HTTP_PROVIDERS
     // ROUTER_PROVIDERS,
     // provide(LocationStrategy, { useClass: HashLocationStrategy })

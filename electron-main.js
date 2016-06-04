@@ -35,6 +35,11 @@ app.on('ready', function() {
                     click: () => 
                         mainWindow.webContents.send('application-event', 'connections-panel'),
                 }, {
+                    label: 'Execute query',
+                    accelerator: 'CmdOrCtrl+E',
+                    click: () => 
+                        mainWindow.webContents.send('application-event', 'execute-query'),
+                }, {
                     label: 'Exit',
                     click: () => 
                         mainWindow.close(),

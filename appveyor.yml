@@ -46,14 +46,14 @@ before_build:
 build_script:
   - build_script.cmd
 
-test_script:
-  - cd %PACKAGE_BASE%
-  - dir
-  - cd query
-  - dir 
-  - cd ..
-  - cd ..
-  - .\test-script.cmd
+# test_script:
+#   - cd %PACKAGE_BASE%
+#   - dir
+#   - cd query
+#   - dir 
+#   - cd ..
+#   - cd ..
+#   - .\test-script.cmd
 
 artifacts:
   - path: $(ELECTRON_OUT)

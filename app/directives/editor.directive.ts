@@ -86,13 +86,9 @@ export class EditorDirective implements OnInit {
         private omnisharpService: OmnisharpService,
         private tabService: TabService,
         private mirrorChangeStream: MirrorChangeStream,
-        // private route: Router,
-        // private routeParams: RouteParams,
         public element: ElementRef, 
         public renderer: Renderer
     ) {
-        // const tabId = 0; //parseInt(routeParams.get('tab'), 10);
-        // this.current = tabService.get(tabId);
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
         mirrorChangeStream.initMirror(this.editor);
         // todo one time service injection hack
@@ -100,13 +96,8 @@ export class EditorDirective implements OnInit {
             omnisharpResolver(omnisharpService);
             omnisharpResolver = null;
         }
-        // editorService.changes.subscribe(this.editorValueUpdated.bind(this));
-        // this.editor._tab = this.current.id;
-        // const contents = editorService.get(this.current);
-        // this.editor.setValue(contents);
         const domElm = this.editor.getWrapperElement();
         domElm.classList.toggle('form-control');
-        // this.editor.on('change', this.codemirrorValueChanged.bind(this));
     }
     
     private editorValueUpdated(change: EditorChange) {

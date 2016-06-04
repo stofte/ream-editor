@@ -121,8 +121,14 @@ body {
 }
 
 .CodeMirror {
+    border: 1px solid #eee;
+    border-radius: 4px;
     font-family: 'Consolas';
     height: auto;
+}
+
+.CodeMirror-focused {
+    border: 1px solid #ccc;
 }
 
 .CodeMirror-hints {
@@ -137,6 +143,37 @@ body {
     otherwise we'll cover some of the text with scrollbar ...
     */
     padding-right: 20px;
+}
+
+.CodeMirror-lint-tooltip {
+    font-family: 'Consolas';
+}
+
+.CodeMirror-lint-marker-error:before {
+    content: "\e101";
+    position: relative;
+    top: -3px;
+    left: 4px;
+    zoom: 1.2;
+}
+
+.CodeMirror-lint-message-error:before {
+    font-family: 'Glyphicons Halflings';
+    color: #e10000;
+    content: "\e101";
+    position: absolute;
+    top: 2px;
+    left: 5px;
+}
+
+.CodeMirror-lint-message-error {
+    background-image: none;
+}
+
+.CodeMirror-lint-marker-error {
+    background-image: none;
+    font-family: 'Glyphicons Halflings';
+    color: #e10000;
 }
 
 @keyframes pulse_animation {

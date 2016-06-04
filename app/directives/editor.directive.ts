@@ -1,8 +1,6 @@
 // tsdm doesn't include this file
 /// <reference path="../../node_modules/retyped-codemirror-tsd-ambient/codemirror-showhint.d.ts" />
-
 import { Directive, ElementRef, Renderer, OnInit } from '@angular/core';
-
 import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';
 import { EditorChange } from '../models/editor-change';
@@ -11,9 +9,11 @@ import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
 import { Tab } from '../models/tab';
+import { CodeCheckResult } from '../models/code-check-result';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/mode/clike/clike';
+import 'codemirror/addon/lint/lint';
 
 let onetimeBullshit = false;
 CodeMirror.commands.autocomplete = function(cm) {
@@ -27,6 +27,13 @@ let omnisharpResolver = null;
 const omnisharpInject = new Promise<OmnisharpService>((res) => {
     omnisharpResolver = res;
 });
+
+CodeMirror.registerHelper('lint', 'text/x-csharp', (text, callback) => {
+    omnisharpInject.then(svc => {
+        svc.lintRequests.next(callback);
+    });
+});
+CodeMirror.lint['text/x-csharp'].async = true;
 
 CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
     // todo: test if syntax mode changes anything,
@@ -80,7 +87,7 @@ export class EditorDirective implements OnInit {
     private current: Tab = null;
     private textContent: string = null;
     private touched = false;
-    editor: any;
+    editor: CodeMirror.Editor;
     constructor(
         private editorService: EditorService,
         private omnisharpService: OmnisharpService,
@@ -96,16 +103,8 @@ export class EditorDirective implements OnInit {
             omnisharpResolver(omnisharpService);
             omnisharpResolver = null;
         }
-        const domElm = this.editor.getWrapperElement();
-        domElm.classList.toggle('form-control');
     }
     
-    private editorValueUpdated(change: EditorChange) {
-        if (this.current.id === change.tabId && !this.touched) {
-            this.editor.setValue(change.newText);
-        }
-    }
-        
     private codemirrorValueChanged(mirror: any) {
         this.touched = true;
         let newValue = mirror.getValue();
@@ -124,7 +123,9 @@ export class EditorDirective implements OnInit {
     
     private editorOptions() {
         return {
-            lineNumbers: false,
+            lineNumbers: true,
+            gutters: ['CodeMirror-lint-markers'],
+            lint: true,
             matchBrackets: true,
             viewportMargin: Infinity,
             showCursorWhenSelecting: true,

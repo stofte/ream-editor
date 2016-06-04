@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { Observable, Subject, ConnectableObservable, Observer, ReplaySubject } from 'rxjs/Rx';
 import 'rxjs/Rx';
 import * as _ from 'lodash';
+import * as CodeMirror from 'codemirror';
 import * as uuid from 'node-uuid';
 // import { QueryService } from '../services/query.service';
 // import { EditorService } from '../services/editor.service';
@@ -44,6 +45,12 @@ class QueryTemplateResult {
     connId: number;
 }
 
+class CodeCheckMap {
+    callback: Function;
+    fileName: string;
+    fixes: CodeCheckResult[];
+}
+
 @Injectable()
 export class OmnisharpService {
     private port: number = config.omnisharpPort;
@@ -55,7 +62,8 @@ export class OmnisharpService {
     private changeStream: Observable<number>;
     private readyState: Observable<UpdateMap>;
     private readyState2: ReplaySubject<UpdateMap>;
-    private codecheck: Observable<CodeCheckResult[]>;
+    public codecheck: Observable<CodeCheckMap>;
+    public lintRequests = new Subject<Function>();
     
     constructor(
         private conns: ConnectionService,
@@ -163,9 +171,9 @@ export class OmnisharpService {
                     Changes: changes.map(c => {
                         return <EditorChange> {
                             newText: c.newText,
-                            startLine: c.startLine + 1 + TEMPLATE_LINE_OFFSET,
+                            startLine: c.startLine + TEMPLATE_LINE_OFFSET,
                             startColumn: c.startColumn + 1,
-                            endLine: c.endLine + 1 + TEMPLATE_LINE_OFFSET,
+                            endLine: c.endLine + TEMPLATE_LINE_OFFSET,
                             endColumn: c.endColumn + 1
                         };
                     }),
@@ -194,25 +202,43 @@ export class OmnisharpService {
         this.readyState
             .subscribe(x => this.readyState2.next(x));
             
-        this.codecheck = this.readyState2
-            .filter(x => x.status)
+        this.codecheck = this.lintRequests
             .debounceTime(500)
+            .withLatestFrom(this.readyState2, (cb, status: UpdateMap) => {
+                return <CodeCheckMap> {
+                    fileName: status.fileName,
+                    callback: cb
+                };
+            })
             .flatMap(update => {
-                 return new Observable<CodeCheckResult[]>((obs: Observer<CodeCheckResult[]>) => {
+                 return new Observable<CodeCheckMap>((obs: Observer<CodeCheckMap>) => {
                     http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: update.fileName }))
                         .map(res => res.json())
                         .map(this.mapQuickFixes)
                         .subscribe(data => {
-                            obs.next(data);
+                            obs.next(<CodeCheckMap> {
+                                callback: update.callback,
+                                fixes: this.filterCodeChecks(data)
+                            });
                             obs.complete();
                         });
-                });               
+                });
             })
-            .map(this.filterCodeChecks)
             ;
-            
+
         this.codecheck.subscribe(x => {
-            console.log('codecheck', x);
+            let mapped = x.fixes.map(check => {
+                if (check.column === check.endColumn && check.column > 0) {
+                    check.column = check.column - 1;
+                }
+                return {
+                    from: CodeMirror.Pos(check.line - TEMPLATE_LINE_OFFSET, check.column - 1),
+                    to: CodeMirror.Pos(check.endLine - TEMPLATE_LINE_OFFSET, check.endColumn - 1),
+                    severity: 'error',
+                    message: check.text
+                };
+            });
+            x.callback(mapped);
         });
     }
     
@@ -228,7 +254,7 @@ export class OmnisharpService {
                 let json = request;
                 json.fileName = fileName;
                 json.column += 1;
-                json.line += 1 + TEMPLATE_LINE_OFFSET;
+                json.line += TEMPLATE_LINE_OFFSET;
                 return new Observable<any>((obs: Observer<any>) => {
                     this.http.post('http://localhost:2000/autocomplete', JSON.stringify(json))
                         .map(res => res.json())

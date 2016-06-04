@@ -11,6 +11,7 @@ declare module 'node-uuid' {
 declare module CodeMirror {
     const keyMap: any;
     const hint: any;
+    const lint: any;
     const registerHelper: any;
 }
 

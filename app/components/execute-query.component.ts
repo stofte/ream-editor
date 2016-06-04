@@ -43,7 +43,6 @@ export class ExecuteQueryComponent {
     
     private run(): void {
         if (!this.isEnabled) {
-            console.log('run was disabled');
             return;
         } else {
             this.isExecuting = true;

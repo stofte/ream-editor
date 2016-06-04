@@ -14,6 +14,7 @@ import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { EditorChange } from '../models/editor-change';
 import { ConnectionService } from '../services/connection.service';
 import { Tab } from '../models/tab';
+import { CodeCheckResult } from '../models/code-check-result';
 import { Connection } from '../models/connection';
 import { TemplateResult } from '../models/template-result';
 import config from '../config';
@@ -54,7 +55,7 @@ export class OmnisharpService {
     private changeStream: Observable<number>;
     private readyState: Observable<UpdateMap>;
     private readyState2: ReplaySubject<UpdateMap>;
-    private codecheck: Observable<string[]>;
+    private codecheck: Observable<CodeCheckResult[]>;
     
     constructor(
         private conns: ConnectionService,
@@ -196,15 +197,18 @@ export class OmnisharpService {
         this.codecheck = this.readyState2
             .delay(500)
             .flatMap(update => {
-                 return new Observable<string[]>((obs: Observer<string[]>) => {
+                 return new Observable<CodeCheckResult[]>((obs: Observer<CodeCheckResult[]>) => {
                     http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: update.fileName }))
                         .map(res => res.json())
+                        .map(this.mapQuickFixes)
                         .subscribe(data => {
-                            obs.next(["foo", "foo"]);
+                            obs.next(data);
                             obs.complete();
                         });
                 });               
             })
+            .map(fixes => fixes.filter(fix => fix.logLevel !== 'Hidden'))
+            .filter(fixes => fixes.length > 0)
             ;
             
         this.codecheck.subscribe(x => {
@@ -263,6 +267,21 @@ export class OmnisharpService {
             })
             .sortBy('sortKey')
             .value();
+    }
+    
+    private mapQuickFixes(result: any): CodeCheckResult[] {
+        let fixes: any[] = result.QuickFixes;
+        return fixes.map(x => {
+            return <CodeCheckResult> {
+                text: x.Text,
+                logLevel: x.LogLevel,
+                fileName: x.FileName,
+                line: x.Line,
+                endLine: x.EndLine,
+                column: x.Column,
+                endColumn: x.EndColumn
+            };
+        })
     }
     
     private action(name: string) {

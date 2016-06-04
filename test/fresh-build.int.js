@@ -17,8 +17,8 @@ const {
     objectMethods
 } = require('./int-helpers');
 
-const queryText = 'Foo.Select(x => new { SomeDesc = x.Description, Ident = x.IdAuto }).Dump();';
-const queryText2 = 'TypeTest.Take(10).Dump();';
+const queryText = 'Foo.Select(x => new { SomeDesc = x.Description, Ident = x.IdAuto })';
+const queryText2 = 'TypeTest.Take(10)';
 const queryText3 = 'TypeTest.Select(x => x.';
 
 let expectedData = null;

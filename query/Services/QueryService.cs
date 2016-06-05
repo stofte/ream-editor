@@ -158,9 +158,10 @@ namespace ##NS##
             var list = new List<Tuple<string, string>>();
             foreach(var m in t.GetMembers())
             {
-                if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+                var propInfo = m as System.Reflection.PropertyInfo;
+                if (propInfo != null)
                 {
-                    list.Add(Tuple.Create(m.Name, m.DeclaringType.Name));
+                    list.Add(Tuple.Create(m.Name, propInfo.GetGetMethod().ReturnType.Name));
                 }
             }
             return list;
@@ -200,9 +201,10 @@ namespace ##NS##
             var list = new List<Tuple<string, string>>();
             foreach(var m in t.GetMembers())
             {
-                if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+                var propInfo = m as System.Reflection.PropertyInfo;
+                if (propInfo != null)
                 {
-                    list.Add(Tuple.Create(m.Name, m.DeclaringType.Name));
+                    list.Add(Tuple.Create(m.Name, propInfo.GetGetMethod().ReturnType.Name));
                 }
             }
             return list;

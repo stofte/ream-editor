@@ -7,7 +7,6 @@ class ColumnSizing {
     width: number;
     column: number;
     fixed: boolean;
-    userOffset: number;
 }
 
 @Component({
@@ -33,14 +32,14 @@ class ColumnSizing {
             [style.marginLeft]="(-1 * outputColumnOffset) + 'px'"
             style="overflow:hidden">
             <div [style.width]="columnWidth(0, true)">
-                <div>&nbsp;</div>
+                <div title="Row #">&nbsp;</div>
                 <div class="output-table-col-dragger"
                     (mousedown)="dragStart($event, 0)"></div>
             </div>
             <div *ngFor="let head of activePage.columns; let colIdx = index"
                 [style.width]="columnWidth(colIdx + 1, true)"
                 >
-                    <div [innerText]="head"></div>
+                    <div [innerText]="head" [title]="head"></div>
                     <div class="output-table-col-dragger"
                         (mousedown)="dragStart($event, colIdx + 1)"></div>
             </div>
@@ -48,10 +47,10 @@ class ColumnSizing {
         <div *ngIf="activePage" class="output-table-rows" [style.height]="calcHeight()"
             (scroll)="updateColumns()">
             <div *ngFor="let row of activePage.rows; let rowIdx = index" [style.width]="outputWidth + 'px'">
-                <div [style.width]="columnWidth(0)"><div>{{rowIdx + 1}}</div></div>
+                <div [style.width]="columnWidth(0)" [title]="'Row ' + rowIdx + 1"><div>{{rowIdx + 1}}</div></div>
                 <div *ngFor="let cell of row; let colIdx = index"
                     [style.width]="columnWidth(colIdx + 1)"
-                    ><div [innerText]="cell"></div></div>
+                    ><div [innerText]="cell" [title]="cell"></div></div>
             </div>
         </div>
     </div>
@@ -61,10 +60,6 @@ export class ResultDisplayComponent {
     @Input() public result: QueryResult;
     private sizes: ColumnSizing[] = [];
     private availableWidth: number = null;
-    
-    // private columns: number[] = [];
-    
-    private dragColumns: number[] = [];
     private dragClientX: number;
     private dragging: number = null;
     private outputWidth: number = 0;
@@ -85,7 +80,7 @@ export class ResultDisplayComponent {
     private columnWidth(idx: number, isHeader: boolean): string {
         if (this.sizes[idx]) {
             let isLast = this.sizes.length - 1 === idx;
-            return (this.sizes[idx].width - (isLast && !isHeader ? 17 : 1)) + 'px';
+            return this.sizes[idx].width + 'px';
         }
         return '0';
     }
@@ -113,39 +108,46 @@ export class ResultDisplayComponent {
             let changed = oldHeight !== this.outputHeight || this.availableWidth !== newWidth;
             this.availableWidth = newWidth;
             if (changed) {
-                // console.log('changed');
                 if (this.sizes.length > 0) {
                     this.layoutResize(oldWidth, newWidth);
                 } else {
                     this.layoutInitial();
                 }
             }
-            
         }
     }
     
     private dragMove(event) {
         if (this.dragging !== null && this.sizes[this.dragging]) {
             let delta = event.clientX - this.dragClientX;
+            let oldWidth = this.sizes[this.dragging].width;
             let newWidth = this.sizes[this.dragging].width + delta;
-            this.sizes[this.dragging].width = newWidth < 30 ? 30 : newWidth;
-            // adjust the next column, if possible
-            if (this.dragging < this.sizes.length - 1) {
+            // set new width with limits
+            this.sizes[this.dragging].width = newWidth <= 30 ? 30 : newWidth;
+            // check if we changed anything
+            let actualDelta = this.sizes[this.dragging].width - oldWidth;
+            let performedSizing = actualDelta !== 0;
+            let nextSizing = false;
+            // adjust the next column, if possible, and only if the primary col isnt yet 30
+            if (this.dragging < this.sizes.length - 1 && performedSizing) {
                 let endCol = this.sizes[this.dragging + 1];
                 // we only adjust if the column wasnt yet < 30, or we're growing the it
-                if (endCol.width > 30 || delta < 0) {
-                    endCol.width += (-1 * delta);
+                if (endCol.width > 30 || actualDelta < 0) {
+                    nextSizing = true;
+                    endCol.width += (-1 * actualDelta);
                 }
             }
             this.updateTableWidth();
-            // ensure we didnt shrink table too much
-            if (this.outputWidth < this.availableWidth) {
-                this.sizes[this.sizes.length - 1].width += (this.availableWidth - this.outputWidth);
+            // ensure we dont shrink under width of window
+            if (performedSizing && !nextSizing && this.dragging === this.sizes.length - 1 && actualDelta < 0
+                && this.outputWidth < (this.availableWidth - 17)) {
+                let currVal = this.sizes[this.sizes.length - 1].width;
+                this.sizes[this.sizes.length - 1].width -= actualDelta;
+                this.updateTableWidth();
             }
-            this.updateTableWidth();
-            Assert(this.outputWidth >= this.availableWidth, 'Did not fix total width');
-            // for next delta
-            this.dragClientX = event.clientX;
+            if (performedSizing) {
+                this.dragClientX = event.clientX;
+            }
         }
     }
     
@@ -173,21 +175,19 @@ export class ResultDisplayComponent {
         let charSize = 13;
         let page = this.activePage;
         if (!page) {
-            console.log('no page');
             return;
         }
         if (this.sizes.length === 0) {
-            console.log('setting sizes');
             this.sizes = [<ColumnSizing> {
                 fixed: true,
-                width: page.rows.length.toString().length * charSize,
-                column: 2 * charSize,
+                width: 0,
+                column: (page.rows.length.toString().length + 1) * charSize,
                 userOffset: 0
             }].concat(page.columnTypes.map((colType, idx) => {
                 let name = page.columns[idx];
                 let fixed = ['string'].indexOf(colType.toLocaleLowerCase()) === -1;
                 return <ColumnSizing> {
-                    width: 0, // to be computed
+                    width: 0,
                     column: name.length * charSize,
                     fixed,
                     userOffset: 0
@@ -195,15 +195,15 @@ export class ResultDisplayComponent {
             }));
         }
         let fixedWidth = this.sizes.reduce((acc, size) => {
-            return size.fixed ? (size.column + size.userOffset) : acc;
+            return acc + (size.fixed ? size.column : 0);
         }, 0);
-        let avail = this.availableWidth - 17 - (this.sizes.filter(size => size.fixed).length) * 4; // paddings and scrollbar
+        let avail = this.availableWidth - 17; // paddings and scrollbar
         let availableFlex = (avail - fixedWidth) / (this.sizes.filter(size => !size.fixed).length);
         this.sizes.forEach((size, idx) => {
             if (size.fixed) {
-                size.width = size.column + size.userOffset;
+                size.width = size.column;
             } else {
-                size.width = availableFlex + size.userOffset;
+                size.width = availableFlex;
             }
         });
         this.updateTableWidth();

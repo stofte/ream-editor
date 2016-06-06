@@ -113,10 +113,14 @@ f-app {
     border-bottom: 1px solid #eee;
 }
 
+.output-table-header > div > div:first-child,
+.output-table-rows > div > div:first-child > div:first-child {
+    color: #888;
+}
+
 .output-table-header > div:first-child > div:first-child,
 .output-table-rows > div > div:first-child > div:first-child {
     text-align: right;
-    color: #888;
 }
 
 .output-table-rows > div > div > div:first-child {

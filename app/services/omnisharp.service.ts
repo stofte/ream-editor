@@ -218,10 +218,11 @@ export class OmnisharpService {
                 };
             })
             .flatMap(reqAndFilename => {
-                 return new Observable<CodeCheckMap>((obs: Observer<CodeCheckMap>) => {
+                return new Observable<CodeCheckMap>((obs: Observer<CodeCheckMap>) => {
+                    let mapQ: ((val: any) => CodeCheckResult[]) = this.mapQuickFixes.bind(this);
                     http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: reqAndFilename.fileName }))
                         .map(res => res.json())
-                        .map(this.mapQuickFixes)
+                        .map(mapQ)
                         .subscribe(data => {
                             obs.next(<CodeCheckMap> {
                                 request: reqAndFilename.request,
@@ -318,7 +319,7 @@ export class OmnisharpService {
         let fixes: any[] = result.QuickFixes;
         return fixes.map(x => {
             return <CodeCheckResult> {
-                text: x.Text,
+                text: this.cleanupMessage(x.Text),
                 logLevel: x.LogLevel,
                 fileName: x.FileName,
                 line: x.Line,
@@ -327,6 +328,17 @@ export class OmnisharpService {
                 endColumn: x.EndColumn
             };
         });
+    }
+    
+    private cleanupMessage(text: string) {
+        let fluf = [
+            / \(are you missing a using directive or an assembly reference\?\)/
+        ];
+        let s = text;
+        fluf.forEach(r => {
+            s = s.replace(r, '');
+        });
+        return s;
     }
     
     private filterCodeChecks(checks: CodeCheckResult[]): CodeCheckResult[] {

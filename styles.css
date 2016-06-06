@@ -1,4 +1,4 @@
-/*
+/******************************************************************************
     basics
 */
 html {
@@ -79,8 +79,8 @@ f-app {
     z-index: 1;
 }
 
-/*
-    style output text areas
+/******************************************************************************
+    output table
 */
 
 .result-display-container {
@@ -115,7 +115,6 @@ f-app {
 
 .output-table-header > div,
 .output-table-rows > div > div {
-    /*outline: 1px solid hotpink;*/
     background-color: inherit;
     display: block;
     float: left;
@@ -127,7 +126,6 @@ f-app {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: pre;
-    /*background-color: lightsalmon;*/
     font-weight: bold;
     border-bottom: 1px solid #eee;
 }
@@ -148,7 +146,6 @@ f-app {
     text-overflow: ellipsis;
     white-space: pre;
     border-bottom: 1px solid #eee;
-    /*background-color: greenyellow;*/
 }
 
 .output-table-col-dragger {
@@ -177,7 +174,9 @@ f-app {
     padding: 0 15px 15px;
 }
 
-/* general codemirror */
+/******************************************************************************
+    general codemirror 
+*/
 .CodeMirror {
     border: 1px solid #eee;
     border-radius: 4px;
@@ -207,7 +206,7 @@ f-app {
 
 /* general linting font */
 .CodeMirror-lint-tooltip {
-    font-family: 'Consolas';
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* customize gutter errors */

@@ -45,6 +45,10 @@ before_build:
           
 build_script:
   - build_script.cmd
+  - echo checking build folder
+  - cd linq-editor-win32-x64\resources\app\omnisharp
+  - dir
+  - cd %APPVEYOR_BUILD_FOLDER%
 
 after_build:
   - test-script.cmd

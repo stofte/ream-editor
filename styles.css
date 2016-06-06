@@ -213,17 +213,18 @@ f-app {
 /* customize gutter errors */
 .CodeMirror-lint-marker-error {
     background: none;
-    position: relative;
 }
 
 .CodeMirror-lint-marker-multiple  {
     position: relative;
     left: 8px;
-    top: -1px;
+    top: 0;
     z-index: 1;
+    zoom: 1.5;
 }
 
-.CodeMirror-lint-marker-error:before {
+.CodeMirror-lint-marker-error:before,
+.CodeMirror-lint-marker-eol-error:before {
     font-family: 'Glyphicons Halflings';
     color: #e10000;
     z-index: 0;
@@ -234,12 +235,45 @@ f-app {
     zoom: 1.2;
 }
 
-/* customize tooltip errors */
-.CodeMirror-lint-message-error {
+/* new eol marker types (same as error) */
+.CodeMirror-lint-marker-eol-error {
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    vertical-align: middle;
+    position: relative;
+}
+
+/* todo hardcoded values for font sizing */
+.CodeMirror-lint-mark-eol-error {
+    position: relative;
+}
+
+.CodeMirror-lint-mark-eol-error:before {
+    content: '';
+    position: absolute;
+    right: -10px;
+    bottom: 0;
+    /* about the size of a char */
+    height: 19px;
+    width: 10px;
+    background-position: center bottom;
+    background-repeat: repeat-x;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
+}
+
+/* customize tooltip errors (and eol marker type treatment) */
+.CodeMirror-lint-message-error,
+.CodeMirror-lint-message-eol-error {
+    padding-left: 18px;
     background-image: none;
 }
 
-.CodeMirror-lint-message-error:before {
+.CodeMirror-lint-message-error:before, 
+.CodeMirror-lint-message-eol-error:before {
     font-family: 'Glyphicons Halflings';
     color: #e10000;
     content: "\e101";

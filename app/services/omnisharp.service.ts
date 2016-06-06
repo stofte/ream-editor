@@ -237,20 +237,24 @@ export class OmnisharpService {
             const maxEndl = codecheck.request.endLine;
             const maxEndc = codecheck.request.endColumn;
             let mapped = codecheck.fixes.map(check => {
+                let severity = 'error';
                 let fromLine = check.line - TEMPLATE_LINE_OFFSET;
                 let toLine = check.endLine - TEMPLATE_LINE_OFFSET;
                 let adjustedFrom = fromLine > maxEndl ? maxEndl : fromLine;
-                let adjustedFromCol = fromLine > maxEndl ? (maxEndc - 1) : check.column - 1;
+                let adjustedFromCol = fromLine > maxEndl ? maxEndc : check.column - 1;
                 let adjustedTo = toLine > maxEndl ? maxEndl : toLine;
                 let adjustedToCol =  toLine > maxEndl ? maxEndc : check.endColumn - 1;
+                // to make codemirror work, the location must be inside the text
                 if (adjustedFromCol === adjustedToCol && adjustedFrom === adjustedTo && adjustedFromCol > 0) {
-                    adjustedFromCol -= 1; // make error one char wide for codemirror
+                    adjustedFromCol -= 1;
+                    // in compensation, we use this css class, to shift the actual DOM marker instead
+                    severity = 'eol-error';
                 }
                 return {
                     from: CodeMirror.Pos(adjustedFrom, adjustedFromCol),
                     to: CodeMirror.Pos(adjustedTo, adjustedToCol),
-                    severity: 'error',
-                    message: check.text
+                    message: check.text,
+                    severity
                 };
             });
             codecheck.request.callback(mapped);

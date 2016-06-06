@@ -15,8 +15,8 @@ class ResultMap {
     selector: 'f-result-list',
     directives: [ResultDisplayComponent],
     template: `
-<div class="result-display-container" *ngFor="let result of currentResults" [style.top]="editorOffset()">
-    <f-result-display [result]="result"></f-result-display>
+<div class="result-display-container" *ngIf="currentResults.length > 0" [style.top]="editorOffset()">
+    <f-result-display [result]="currentResults[0]"></f-result-display>
 </div>
 `
 })

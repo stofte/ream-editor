@@ -65,6 +65,7 @@ export class ResultDisplayComponent {
     private outputWidth: number = 0;
     private outputHeight = 0;
     private outputColumnOffset = 0;
+    private layoutFor: string = null;
     
     constructor(private query: QueryService) {
     }
@@ -97,6 +98,10 @@ export class ResultDisplayComponent {
     }
     
     ngAfterContentChecked() {
+        if (this.activePage && this.activePage.id !== this.layoutFor && this.layoutFor !== null) {
+            this.sizes = [];
+            this.availableWidth = 0;
+        }
         let rowOverflower = document.querySelector('.output-table-rows');
         let container = document.querySelector('.result-display-container');
         if (rowOverflower) {
@@ -176,6 +181,8 @@ export class ResultDisplayComponent {
         let page = this.activePage;
         if (!page) {
             return;
+        } else {
+            this.layoutFor = page.id;
         }
         if (this.sizes.length === 0) {
             this.sizes = [<ColumnSizing> {
@@ -203,7 +210,7 @@ export class ResultDisplayComponent {
             if (size.fixed) {
                 size.width = size.column;
             } else {
-                size.width = availableFlex;
+                size.width = availableFlex < size.column ? size.column : availableFlex;
             }
         });
         this.updateTableWidth();

@@ -191,7 +191,7 @@ export class OmnisharpService {
                 return <UpdateMap> {
                     status: (change.created - latest) <= 0,
                     fileName: change.fileName
-                }
+                };
             })
             .publishReplay()
             .refCount()
@@ -307,14 +307,14 @@ export class OmnisharpService {
                 column: x.Column,
                 endColumn: x.EndColumn
             };
-        })
+        });
     }
     
     private filterCodeChecks(checks: CodeCheckResult[]): CodeCheckResult[] {
         return checks
             .filter(c => {
-                var isMissingSemicolon = c.text === '; expected';
-                var isHidden = c.logLevel === 'Hidden'
+                const isMissingSemicolon = c.text === '; expected';
+                const isHidden = c.logLevel === 'Hidden';
                 return !(isHidden || isMissingSemicolon);
             });
     }

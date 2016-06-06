@@ -46,8 +46,8 @@ before_build:
 build_script:
   - build_script.cmd
 
-test_script:
-  - .\test-script.cmd
+after_build:
+  - test-script.cmd
 
 artifacts:
   - path: $(ELECTRON_OUT)

@@ -130,6 +130,7 @@ describe('fresh build', function() {
             .keys('\uE003')
             .keys('\uE003')
             .keys('\uE003')
+            .pause(timeStep)
             .keys('\uE009') // press down ctrl
             .keys('\uE00D') // space
             .keys('\uE000') // lift modifier (ctrl)
@@ -200,6 +201,7 @@ describe('fresh build', function() {
             .keys('a')
             .keys('\uE000') // lift modifier (ctrl)      
             .keys('\uE003') // delete all      
+            .pause(timeStep)
             .keys(queryText3)
             .executeAsync(function(row, col, done) {
                 document.querySelector('.CodeMirror').CodeMirror.setCursor(row, col);
@@ -209,6 +211,7 @@ describe('fresh build', function() {
                 cursor.value.ch.should.equal(cursorCol);
                 cursor.value.line.should.equal(cursorRow);
             })
+            .pause(timeStep)
             .keys('\uE009') // press down ctrl
             .keys('\uE00D') // space
             .keys('\uE000') // lift modifier (ctrl)

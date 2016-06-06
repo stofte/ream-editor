@@ -2,7 +2,7 @@ const path = require('path');
 const helper = require('../scripts/sql-helper');
 
 const isCI = process.env['CI']; // set by appveyor
-const ciMod = isCI ? 3 : 1;
+const ciMod = isCI ? 5 : 1;
 const timeTotal = 2 * 60 * 1000 * ciMod; // locally test runs at ~1 min
 const timeForBackend = 10 * 1000 * ciMod;
 const timeStep = 1 * 1000 * ciMod;

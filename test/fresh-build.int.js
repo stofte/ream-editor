@@ -44,6 +44,10 @@ function queryFooUsingCurrentConnectionAndCheckResults() {
             .keys(queryText)
             .waitForEnabled('.int-test-execute-btn', timeForBackend)
             .click('.int-test-execute-btn')
+            .waitForExist('.result-display-component', timeForBackend)
+            // appears when result is ready
+            .waitForExist('.output-table-overview button.btn', timeForBackend)
+            .pause(timeStep) // give it some time to render
             .catch(err)
             ;
         

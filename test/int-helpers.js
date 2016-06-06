@@ -40,19 +40,18 @@ function checkTable(client, rows, rowIndex, isBody) {
         return client;
     }
     let rowIdx = rowIndex || 1;
-    let cellSelector = isBody ? 'td' : 'th';
-    let rowSelector = isBody ? 'tbody' : 'thead';
     let rowCheckingClient = rows[0].reduce((wrapped, expectedVal, idx) => {
-        let selector = `table.table.table-condensed ${isBody ? 'tbody' : 'thead'} 
-            tr:nth-child(${rowIdx}) ${isBody ? 'td' : 'th'}:nth-child(${idx + 1}) ${isBody ? 'textarea' : ''}`;
+        let selector = `.output-table-${isBody ? 'rows' : 'header'} 
+            ${isBody ? `div:nth-child(${rowIdx})` : ''}
+            div:nth-child(${idx + 2}) div:first-child`
+            .split('\n').join('').replace(/\s+/g, ' '); // pretty up
         return wrapped
             .timeoutsAsyncScript(timeStepMax)
             .waitForExist(selector, timeForBackend)
             .catch(function(e) { throw e })
             // tab is filtered if using getValue so instead this workaround
             .executeAsync(function(sel, isBody, done) {
-                isBody ? done(document.querySelector(sel).value) // textarea
-                       : done(document.querySelector(sel).innerText) // th
+                done(document.querySelector(sel).innerText);
             }, selector, isBody)
             .then(function (val) {
                 // for datetime/timespan and the binary cols, 

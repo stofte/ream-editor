@@ -107,6 +107,7 @@ export class QueryService {
             const dataCols = set.Item1;
             const page = new ResultPage();
             page.columns = dataCols.map(col => col[0]);
+            page.columnTypes = dataCols.map(col => col[1]);
             page.rows = dataRows.map((row) => {
                 return dataCols.map(col => {
                     return row[col[0]];

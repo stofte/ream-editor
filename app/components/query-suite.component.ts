@@ -11,7 +11,7 @@ import { EditorDirective } from '../directives/editor.directive';
     selector: 'f-query-suite',
     directives: [EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent, ResultListComponent],
     template: `
-<div class="container-fluid">
+<div class="container-fluid query-editor-suite">
     <div class="row">
         <div class="col-md-1">
             <p><f-execute-query></f-execute-query></p>

@@ -126,6 +126,7 @@ export class EditorDirective implements OnInit {
             lineNumbers: true,
             gutters: ['CodeMirror-lint-markers'],
             lint: true,
+            smartIndent: false,
             matchBrackets: true,
             viewportMargin: Infinity,
             showCursorWhenSelecting: true,

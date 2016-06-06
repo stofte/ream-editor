@@ -15,7 +15,7 @@ class ResultMap {
     selector: 'f-result-list',
     directives: [ResultDisplayComponent],
     template: `
-<div class="container-fluid" *ngFor="let result of currentResults">
+<div class="result-display-container" *ngFor="let result of currentResults" [style.top]="editorOffset()">
     <f-result-display [result]="result"></f-result-display>
 </div>
 `
@@ -23,6 +23,7 @@ class ResultMap {
 export class ResultListComponent {
     private currentResults: QueryResult[] = [];
     private currentId: string;
+    private offset = 84;
     
     constructor(
         query: QueryService,
@@ -39,5 +40,13 @@ export class ResultListComponent {
             .subscribe((x: ResultMap) => {
                 this.currentResults = x.results;
             });
+    }
+    
+    private editorOffset() {
+        return (this.offset + 64 /* heder */) + 'px';
+    }
+    
+    ngAfterContentChecked() {
+        this.offset = document.querySelector('.query-editor-suite').clientHeight;
     }
 }

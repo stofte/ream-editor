@@ -22,7 +22,7 @@ f-app {
 .main-cover,
 .over-layer {
     padding-top: 64px;
-    min-height: calc(100% - 64px);
+    height: 100%;
     width: 100%;
     position: absolute;
     z-index: 0;
@@ -57,26 +57,109 @@ f-app {
 }
 
 .main-layer.layer-visible {
-    /*height: calc(100% - 64px);
-    visibility: visible;*/
     z-index: 1;
 }
-/*
-.main-layer.layer-visible .container-fluid {
-    overflow: visible;
-    height: auto;
-    min-height: auto;
-}*/
 
 /*
     style output text areas
 */
 
-.output-table {
+.result-display-container {
+    position: absolute;
+    top: 0; 
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.result-display-container .output-table-rows {
     overflow: auto;
 }
 
-.output-table > caption .pull-right {
+.result-display-component {
+    position: relative;
+}
+
+.output-table-header {
+    height: 31px;
+}
+
+.output-table-rows,
+.output-table-header {
+    width: 100%;
+}
+
+.output-table-rows {
+    height: 29px;
+    position: absolute;
+}
+
+.output-table-header > div,
+.output-table-rows > div > div {
+    /*outline: 1px solid hotpink;*/
+    background-color: inherit;
+    display: block;
+    float: left;
+    position: relative;
+}
+
+.output-table-header > div > div:first-child {    
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    /*background-color: lightsalmon;*/
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+}
+
+.output-table-header > div:first-child > div:first-child,
+.output-table-rows > div > div:first-child > div:first-child {
+    text-align: right;
+    color: #888;
+}
+
+.output-table-rows > div > div > div:first-child {
+    padding: 2px 5px;    
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    border-bottom: 1px solid #eee;
+    /*background-color: greenyellow;*/
+}
+
+.output-table-col-dragger {
+    width: 4px;
+    display: block;
+    cursor: col-resize;
+    position: absolute;
+    top: 0;
+    height: 31px;
+    right: 0;
+}
+
+.output-table-col-dragger:after {
+    background: silver;
+    width: 1px;
+    content: '';
+    display: block;
+    cursor: col-resize;
+    position: absolute;
+    top: 0;
+    height: 31px;
+    right: 0;
+}
+
+.output-table-overview {
+    padding: 0 15px 15px;
+}
+
+/*
+table.table.output-table.resizing-columns th {
+    background-color: bisque;
+}
+
+table.table.output-table > caption .pull-right {
     margin: 0;
 }
 
@@ -86,26 +169,25 @@ table.table.output-table > caption {
     color: inherit;
 }
 
-.output-table td {
-    padding-bottom: 2px !important;
+table.table.output-table th {
+    position: relative;
+    border-bottom: none;
 }
 
-.output-table td > textarea {
-    border: none;
-    width: 100%;
-    resize: none;
+
+table.table.output-table tbody tr:first-child td {
+    border-top-width: 2px;
 }
 
-.output-table td > textarea:focus,
-.output-table td > textarea:active,
-.output-table td > textarea:hover {
-    resize: both;
-}
 
-.output-table td > textarea:focus,
-.output-table td > textarea:active {
-    outline: none;
-}
+table.table.output-table th > div:first-child,
+table.table.output-table td > div:first-child {
+    width: inherit;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0;
+}*/
 
 /*
     other random stuff
@@ -113,11 +195,18 @@ table.table.output-table > caption {
 
 html {
     min-height: 100%;
+    cursor: default;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 body {
   min-height: 100%;
-  /*padding-top: 64px;*/
+  overflow: hidden;
 }
 
 .CodeMirror {
@@ -128,7 +217,8 @@ body {
 }
 
 .CodeMirror-focused {
-    border: 1px solid #ccc;
+    border: 1px solid transparent;
+    outline: auto 2px -webkit-focus-ring-color;
 }
 
 .CodeMirror-hints {

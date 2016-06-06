@@ -308,7 +308,7 @@ export class OmnisharpService {
                 return {
                     sortKey: i.CompletionText.toLocaleLowerCase(), 
                     text: i.CompletionText,
-                    className: `foo`
+                    className: `prop-kind-${i.Kind.toLocaleLowerCase()}`
                 };
             })
             .sortBy('sortKey')

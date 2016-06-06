@@ -61,12 +61,13 @@ CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
         }
     }
     let request = <AutocompletionQuery> {
-        // fileName: tab.fileName,
-        column: cur.ch, // + 1,
-        line: cur.line, // + tab.templateLineOffset,
+        column: cur.ch,
+        line: cur.line,
         wantKind: true,
         wantDocumentationForEveryCompletionResult: true,
-        wordToComplete: fragment
+        wordToComplete: fragment,
+        wantReturnType: true,
+        wantMethodHeader: true
     };
     omnisharpInject
         .then(svc => {

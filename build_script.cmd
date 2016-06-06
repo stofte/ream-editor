@@ -19,6 +19,8 @@ copy node_modules\zone.js\dist\zone.js %PACKAGE_BASE%\zone.js
 copy node_modules\reflect-metadata\Reflect.js %PACKAGE_BASE%\Reflect.js
 mkdir %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts
 copy node_modules\bootstrap\dist\fonts\*.* %PACKAGE_BASE%\node_modules\bootstrap\dist\fonts\
+mkdir %PACKAGE_BASE%\app\styles\icons
+copy app\styles\icons\*.* %PACKAGE_BASE%\app\styles\icons\
 dotnet restore
 rem dotnet publish --configuration Release --output linq-editor-win32-x64\resources\app\query --runtime win7-x64 --framework netcoreapp1.0
 dotnet publish --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0

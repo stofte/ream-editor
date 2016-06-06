@@ -50,7 +50,6 @@ var css = new CleanCSS().minify([
 	'node_modules/normalizecss/normalize.css',
 	'node_modules/bootstrap/dist/css/bootstrap.css',
 	'node_modules/codemirror/lib/codemirror.css',
-	'node_modules/codemirror/addon/hint/show-hint.css',
 	'node_modules/codemirror/addon/lint/lint.css',
 	'app/styles/main.css',
 	'app/styles/codemirror-hint.css'

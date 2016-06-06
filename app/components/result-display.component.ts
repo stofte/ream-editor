@@ -118,7 +118,6 @@ export class ResultDisplayComponent {
             this.availableWidth = newWidth;
             this.outputOverflowing = isOverflowing;
             if (sizeChanged || overflowChanged) {
-                console.log('ngAfterContentChecked.overflowChanged', overflowChanged, this.sizes.length);
                 if (this.sizes.length > 0) {
                     this.layoutResize(oldWidth, newWidth, overflowChanged);
                 } else {
@@ -186,7 +185,7 @@ export class ResultDisplayComponent {
                     }
                 });
                 if (subPart !== 0) { // any buffer
-                    console.log('overflowChanged found remaining bit', subPart);
+                    console.warn('overflowChanged found remaining bit', subPart);
                     this.sizes.find(size => size.fixed).width += subPart;
                 }
             }

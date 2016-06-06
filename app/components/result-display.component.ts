@@ -66,6 +66,7 @@ export class ResultDisplayComponent {
     private outputHeight = 0;
     private outputColumnOffset = 0;
     private layoutFor: string = null;
+    private outputOverflowing = false;
     
     constructor(private query: QueryService) {
     }
@@ -110,11 +111,16 @@ export class ResultDisplayComponent {
                 rowOverflower.parentElement.clientHeight;
             let oldWidth = this.availableWidth;
             let newWidth = container.clientWidth;
-            let changed = oldHeight !== this.outputHeight || this.availableWidth !== newWidth;
+            let isOverflowing = rowOverflower.clientHeight < rowOverflower.scrollHeight;
+            let overflowChanged = isOverflowing !== this.outputOverflowing;
+            let sizeChanged = oldHeight !== this.outputHeight || 
+                this.availableWidth !== newWidth;
             this.availableWidth = newWidth;
-            if (changed) {
+            this.outputOverflowing = isOverflowing;
+            if (sizeChanged || overflowChanged) {
+                console.log('ngAfterContentChecked.overflowChanged', overflowChanged, this.sizes.length);
                 if (this.sizes.length > 0) {
-                    this.layoutResize(oldWidth, newWidth);
+                    this.layoutResize(oldWidth, newWidth, overflowChanged);
                 } else {
                     this.layoutInitial();
                 }
@@ -165,7 +171,26 @@ export class ResultDisplayComponent {
         this.dragging = null;
     }
     
-    private layoutResize(from: number, to: number) {
+    private layoutResize(from: number, to: number, overflowChanged: boolean) {
+        if (overflowChanged) {
+            // chrome scrollbar is 17 pixels. subtract from each non-fixed col
+            let subtract = 17;
+            let variableCnt = this.sizes.filter(s => !s.fixed).length;
+            if (variableCnt > 0) {
+                let subPart = subtract;
+                this.sizes.forEach(size => {
+                    if (!size.fixed && subPart > 0) { // if we didnt yet subtract it all
+                        let sub = Math.ceil((subtract / variableCnt));
+                        size.width -= sub;
+                        subPart -= sub;
+                    }
+                });
+                if (subPart !== 0) { // any buffer
+                    console.log('overflowChanged found remaining bit', subPart);
+                    this.sizes.find(size => size.fixed).width += subPart;
+                }
+            }
+        }
         let delta = (to - from) / this.sizes.filter(x => !x.fixed).length;
         this.sizes.forEach(size => {
             if (!size.fixed) {
@@ -204,7 +229,7 @@ export class ResultDisplayComponent {
         let fixedWidth = this.sizes.reduce((acc, size) => {
             return acc + (size.fixed ? size.column : 0);
         }, 0);
-        let avail = this.availableWidth - 17; // paddings and scrollbar
+        let avail = this.availableWidth;
         let availableFlex = (avail - fixedWidth) / (this.sizes.filter(size => !size.fixed).length);
         this.sizes.forEach((size, idx) => {
             if (size.fixed) {

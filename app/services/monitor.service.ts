@@ -63,7 +63,8 @@ export class MonitorService {
     private start() {
         let queryParams = this.queryCmd();
         let omnisharpCmd = this.omnisharpCmd().cmd;
-        
+        this.logService.log('monitor.service',`starting queryengine: ${JSON.stringify(queryParams)}`);
+        this.logService.log('monitor.service',`starting omnisharp: ${omnisharpCmd}`);
         this.http.get(this.action(config.omnisharpPort, 'checkreadystatus'))
             .subscribe(
                 ok => {

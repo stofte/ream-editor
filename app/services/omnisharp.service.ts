@@ -46,9 +46,15 @@ class QueryTemplateResult {
 }
 
 class CodeCheckMap {
-    callback: Function;
+    request: LintRequestMap;
     fileName: string;
     fixes: CodeCheckResult[];
+}
+
+class LintRequestMap {
+    callback: Function;
+    endLine: number;
+    endColumn: number;
 }
 
 @Injectable()
@@ -63,7 +69,7 @@ export class OmnisharpService {
     private readyState: Observable<UpdateMap>;
     private readyState2: ReplaySubject<UpdateMap>;
     public codecheck: Observable<CodeCheckMap>;
-    public lintRequests = new Subject<Function>();
+    public lintRequests = new Subject<LintRequestMap>();
     
     constructor(
         private conns: ConnectionService,
@@ -204,20 +210,21 @@ export class OmnisharpService {
             
         this.codecheck = this.lintRequests
             .debounceTime(500)
-            .withLatestFrom(this.readyState2, (cb, status: UpdateMap) => {
+            .withLatestFrom(this.readyState2, (lintReq: LintRequestMap, status: UpdateMap) => {
                 return <CodeCheckMap> {
+                    request: lintReq,
                     fileName: status.fileName,
-                    callback: cb
+                    // callback: lintReq.cb
                 };
             })
-            .flatMap(update => {
+            .flatMap(reqAndFilename => {
                  return new Observable<CodeCheckMap>((obs: Observer<CodeCheckMap>) => {
-                    http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: update.fileName }))
+                    http.post('http://localhost:2000/codecheck', JSON.stringify({ FileName: reqAndFilename.fileName }))
                         .map(res => res.json())
                         .map(this.mapQuickFixes)
                         .subscribe(data => {
                             obs.next(<CodeCheckMap> {
-                                callback: update.callback,
+                                request: reqAndFilename.request,
                                 fixes: this.filterCodeChecks(data)
                             });
                             obs.complete();
@@ -226,19 +233,27 @@ export class OmnisharpService {
             })
             ;
 
-        this.codecheck.subscribe(x => {
-            let mapped = x.fixes.map(check => {
-                if (check.column === check.endColumn && check.column > 0) {
-                    check.column = check.column - 1;
+        this.codecheck.subscribe(codecheck => {
+            const maxEndl = codecheck.request.endLine;
+            const maxEndc = codecheck.request.endColumn;
+            let mapped = codecheck.fixes.map(check => {
+                let fromLine = check.line - TEMPLATE_LINE_OFFSET;
+                let toLine = check.endLine - TEMPLATE_LINE_OFFSET;
+                let adjustedFrom = fromLine > maxEndl ? maxEndl : fromLine;
+                let adjustedFromCol = fromLine > maxEndl ? (maxEndc - 1) : check.column - 1;
+                let adjustedTo = toLine > maxEndl ? maxEndl : toLine;
+                let adjustedToCol =  toLine > maxEndl ? maxEndc : check.endColumn - 1;
+                if (adjustedFromCol === adjustedToCol && adjustedFrom === adjustedTo && adjustedFromCol > 0) {
+                    adjustedFromCol -= 1; // make error one char wide for codemirror
                 }
                 return {
-                    from: CodeMirror.Pos(check.line - TEMPLATE_LINE_OFFSET, check.column - 1),
-                    to: CodeMirror.Pos(check.endLine - TEMPLATE_LINE_OFFSET, check.endColumn - 1),
+                    from: CodeMirror.Pos(adjustedFrom, adjustedFromCol),
+                    to: CodeMirror.Pos(adjustedTo, adjustedToCol),
                     severity: 'error',
                     message: check.text
                 };
             });
-            x.callback(mapped);
+            codecheck.request.callback(mapped);
         });
     }
     
@@ -311,12 +326,13 @@ export class OmnisharpService {
     }
     
     private filterCodeChecks(checks: CodeCheckResult[]): CodeCheckResult[] {
-        return checks
+        let filt = checks
             .filter(c => {
                 const isMissingSemicolon = c.text === '; expected';
                 const isHidden = c.logLevel === 'Hidden';
                 return !(isHidden || isMissingSemicolon);
             });
+        return filt;
     }
     
     private action(name: string) {

@@ -1,4 +1,23 @@
 /*
+    basics
+*/
+html {
+    min-height: 100%;
+    cursor: default;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  min-height: 100%;
+  overflow: hidden;
+}
+
+/*
     initial loading msg
 */
 
@@ -158,61 +177,7 @@ f-app {
     padding: 0 15px 15px;
 }
 
-/*
-table.table.output-table.resizing-columns th {
-    background-color: bisque;
-}
-
-table.table.output-table > caption .pull-right {
-    margin: 0;
-}
-
-table.table.output-table > caption {
-    padding-top: 0;
-    padding-bottom: 0;
-    color: inherit;
-}
-
-table.table.output-table th {
-    position: relative;
-    border-bottom: none;
-}
-
-
-table.table.output-table tbody tr:first-child td {
-    border-top-width: 2px;
-}
-
-
-table.table.output-table th > div:first-child,
-table.table.output-table td > div:first-child {
-    width: inherit;
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 0;
-}*/
-
-/*
-    other random stuff
-*/
-
-html {
-    min-height: 100%;
-    cursor: default;
-    -webkit-user-select: none;
-    box-sizing: border-box;
-}
-
-*, *:before, *:after {
-  box-sizing: inherit;
-}
-
-body {
-  min-height: 100%;
-  overflow: hidden;
-}
-
+/* general codemirror */
 .CodeMirror {
     border: 1px solid #eee;
     border-radius: 4px;
@@ -225,6 +190,7 @@ body {
     outline: auto 2px -webkit-focus-ring-color;
 }
 
+/* autocompletion menu */
 .CodeMirror-hints {
     font-family: 'Consolas';
     max-height: 35em;
@@ -239,16 +205,38 @@ body {
     padding-right: 20px;
 }
 
+/* general linting font */
 .CodeMirror-lint-tooltip {
     font-family: 'Consolas';
 }
 
-.CodeMirror-lint-marker-error:before {
-    content: "\e101";
+/* customize gutter errors */
+.CodeMirror-lint-marker-error {
+    background: none;
     position: relative;
+}
+
+.CodeMirror-lint-marker-multiple  {
+    position: relative;
+    left: 8px;
+    top: -1px;
+    z-index: 1;
+}
+
+.CodeMirror-lint-marker-error:before {
+    font-family: 'Glyphicons Halflings';
+    color: #e10000;
+    z-index: 0;
+    content: "\e101";
+    position: absolute;
     top: -3px;
     left: 4px;
     zoom: 1.2;
+}
+
+/* customize tooltip errors */
+.CodeMirror-lint-message-error {
+    background-image: none;
 }
 
 .CodeMirror-lint-message-error:before {
@@ -258,29 +246,4 @@ body {
     position: absolute;
     top: 2px;
     left: 5px;
-}
-
-.CodeMirror-lint-message-error {
-    background-image: none;
-}
-
-.CodeMirror-lint-marker-error {
-    background-image: none;
-    font-family: 'Glyphicons Halflings';
-    color: #e10000;
-}
-
-@keyframes pulse_animation {
-	0% { transform: scale(1); }
-    40% { transform: scale(1.4); }
-    60% { transform: scale(1.4); }
-	100% { transform: scale(1); }
-}
-
-.backend-timer-pulse {
-	animation-name: pulse_animation;
-	animation-duration: 1500ms;
-	transform-origin:50% 50%;
-	animation-iteration-count: infinite;
-	animation-timing-function: linear;
 }

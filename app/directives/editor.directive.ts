@@ -30,7 +30,10 @@ const omnisharpInject = new Promise<OmnisharpService>((res) => {
 
 CodeMirror.registerHelper('lint', 'text/x-csharp', (text, callback) => {
     omnisharpInject.then(svc => {
-        svc.lintRequests.next(callback);
+        let endLine = text.split(/$/g).length - 1;
+        let endColumn = endLine >= 0 ? text.split(/$/g)[endLine].length : text.length;
+        endLine = endLine < 0 ? 0 : endLine;
+        svc.lintRequests.next({callback, endLine, endColumn });
     });
 });
 CodeMirror.lint['text/x-csharp'].async = true;

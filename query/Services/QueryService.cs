@@ -45,6 +45,7 @@ namespace QueryEngine.Services
             var programSource = _template
                 .Replace("##SOURCE##", newInput)
                 .Replace("##NS##", assmName)
+                .Replace("##SCHEMA##", "") // schema is linked
                 .Replace("##DB##", contextResult.Type.ToString());
             var e1 = sw.Elapsed.TotalMilliseconds;
             Console.WriteLine(programSource);
@@ -70,26 +71,22 @@ namespace QueryEngine.Services
             
             var src = _template
                 .Replace("##NS##", assmName)
-                .Replace("##DB##", "Proxy");
+                .Replace("##DB##", "Proxy")
+                .Replace("##SCHEMA##", schemaSrc);
                 
             var srcToken = "##SOURCE##";
             var regex = new Regex(@"$", RegexOptions.Multiline);
             var srcIdx = src.IndexOf(srcToken);
             var srcOffset = src.Substring(0, srcIdx);
             var ms = regex.Matches(srcOffset);
-            src = src + schemaSrc;
             var fullSrc = src.Replace(srcToken, "");
-            var header = src.Substring(0, srcIdx);
-            var footer = src.Substring(srcIdx + srcToken.Length);
             // the usage of the template should not require mapping the column value
             return new TemplateResult 
             {
                 Template = fullSrc,
-                Header = header,
-                Footer = footer,
                 Namespace = assmName,
                 ColumnOffset = 0,
-                LineOffset = ms.Count,
+                LineOffset = ms.Count + 2,// todo why 2?
                 DefaultQuery = string.Format("{0}.Take(100).Dump();\n\n", schemaResult.DefaultTable)
             };
         }
@@ -106,27 +103,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using DumpType = System.Tuple<System.Collections.Generic.IEnumerable<System.Tuple<string, string>>, object>;
-
+##SCHEMA##
 namespace ##NS## 
 {     
-    public class Main : ##DB##
-    {
-        public IDictionary<string, DumpType> Run()
-        {
-            // todo need something better
-            Dumper._results = new Dictionary<string, DumpType>();
-            Dumper._counts = new Dictionary<string, int>();
-            Dumper._anonynousCount = 0;
-            Query();
-            return Dumper._results;
-        }
-
-        void Query()
-        {
-##SOURCE##
-        }
-    }
-    
     public static class Dumper 
     {
         public static IDictionary<string, DumpType> _results;
@@ -187,6 +166,24 @@ namespace ##NS##
             var typeName = isAnon ? ""AnonymousType"" : name;
             var result =  string.Format(""{0} {1}"", typeName, count);
             return result;
+        }
+    }
+
+    public class Main : ##DB##
+    {
+        public IDictionary<string, DumpType> Run()
+        {
+            // todo need something better
+            Dumper._results = new Dictionary<string, DumpType>();
+            Dumper._counts = new Dictionary<string, int>();
+            Dumper._anonynousCount = 0;
+            Query();
+            return Dumper._results;
+        }
+
+        void Query()
+        {
+##SOURCE##
         }
     }
 }

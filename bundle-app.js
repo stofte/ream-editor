@@ -52,7 +52,8 @@ var css = new CleanCSS().minify([
 	'node_modules/codemirror/lib/codemirror.css',
 	'node_modules/codemirror/addon/hint/show-hint.css',
 	'node_modules/codemirror/addon/lint/lint.css',
-	'styles.css'
+	'app/styles/main.css',
+	'app/styles/codemirror-hint.css'
 ]);
 fs.writeFile(cssOutput + '.map', css.sourceMap, (err) => {
 	if (err) throw err;

@@ -65,6 +65,7 @@ namespace QueryEngine.Services
 
         public TemplateResult GetTemplate(QueryInput input) 
         {
+            var srcToken = "##SOURCE##";
             var assmName = Guid.NewGuid().ToIdentifierWithPrefix("a");
             var schemaResult = _schemaService.GetSchemaSource(input.ConnectionString, assmName, withUsings: false);
             var schemaSrc = schemaResult.Schema;
@@ -74,19 +75,23 @@ namespace QueryEngine.Services
                 .Replace("##DB##", "Proxy")
                 .Replace("##SCHEMA##", schemaSrc);
                 
-            var srcToken = "##SOURCE##";
-            var regex = new Regex(@"$", RegexOptions.Multiline);
-            var srcIdx = src.IndexOf(srcToken);
-            var srcOffset = src.Substring(0, srcIdx);
-            var ms = regex.Matches(srcOffset);
-            var fullSrc = src.Replace(srcToken, "");
+            var srcLineOffset = -1;
+            var lines = src.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            for(var i = lines.Length - 1; i > 0; i--) {
+                if (lines[i].Contains(srcToken)) {
+                    lines[i] = string.Empty;
+                    srcLineOffset = i + 1;
+                    break;
+                }
+            }
+            var fullSrc = string.Join("\n", lines); // todo: newline constant?
             // the usage of the template should not require mapping the column value
             return new TemplateResult 
             {
                 Template = fullSrc,
                 Namespace = assmName,
                 ColumnOffset = 0,
-                LineOffset = ms.Count + 2,// todo why 2?
+                LineOffset = srcLineOffset,
                 DefaultQuery = string.Format("{0}.Take(100).Dump();\n\n", schemaResult.DefaultTable)
             };
         }

@@ -10,6 +10,7 @@ environment:
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/v1.0.0-preview1/scripts/obtain/install.ps1
   PACKAGE_BASE: build
   ELECTRON_OUT: linq-editor-win32-x64
+  NODE_ENV: PRODUCTION
 
 cache:
   - 'node_modules -> package.json' # local npm modules

@@ -45,21 +45,3 @@ builder
 	console.log('JS build error');
 	console.log(err);
 });
-
-var css = new CleanCSS().minify([
-	'node_modules/normalizecss/normalize.css',
-	'node_modules/bootstrap/dist/css/bootstrap.css',
-	'node_modules/codemirror/lib/codemirror.css',
-	'node_modules/codemirror/addon/lint/lint.css',
-	'app/styles/main.css',
-	'app/styles/codemirror-hint.css'
-]);
-fs.writeFile(cssOutput + '.map', css.sourceMap, (err) => {
-	if (err) throw err;
-	fs.writeFile(cssOutput, css.styles, (err) => {
-		if (err) throw err;
-		var end = new Date().getTime();
-	  	console.log(cssOutput, 'written in', ((end - start) / 1000).toFixed(0), 'seconds');
-	});
-});
-

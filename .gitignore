@@ -13,3 +13,5 @@ linq-editor.dev.log
 npm-debug.log
 create-generated.sql
 insert-generated.sql
+bundle.css
+bundle.css.map

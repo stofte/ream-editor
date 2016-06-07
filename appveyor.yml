@@ -5,8 +5,8 @@ services:
 environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
-  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta1/omnisharp-win-x64-netcoreapp1.zip
-  OMNISHARP_ZIP: v1.9-beta1-omnisharp-win-x64-netcoreapp1.zip
+  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta5/omnisharp-win-x64-netcoreapp1.0.zip
+  OMNISHARP_ZIP: v1.9-beta5-omnisharp-win-x64-netcoreapp1.zip
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/v1.0.0-preview1/scripts/obtain/install.ps1
   PACKAGE_BASE: build
   ELECTRON_OUT: linq-editor-win32-x64

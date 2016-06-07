@@ -159,6 +159,7 @@ describe('fresh build', function() {
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
+            .pause(timeStep)
             ;
     });
     
@@ -167,12 +168,14 @@ describe('fresh build', function() {
         return this.app.client
             .click('.int-test-tab-list .glyphicon.glyphicon-plus')
             .waitForExist(newTabSelector)
+            .pause(timeStep)
             .getText(newTabSelector)
             .then(function(val) {
                 val.should.equal('Query 2');
             })
             .click('#connection-selector-btn-keyboard-nav')
             .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(1) a')
+            .pause(timeStep)
             .keys('\uE015')
             .keys('Enter')
             ;

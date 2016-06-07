@@ -225,6 +225,7 @@ export class OmnisharpService {
                         .map(mapQ)
                         .subscribe(data => {
                             obs.next(<CodeCheckMap> {
+                                fileName: reqAndFilename.fileName,
                                 request: reqAndFilename.request,
                                 fixes: this.filterCodeChecks(data)
                             });
@@ -233,17 +234,16 @@ export class OmnisharpService {
                 });
             })
             .withLatestFrom(this.sessions, (codecheck, sessions) => {
-                try {
-                    // might not be available. maybe not be an issue ¯\_(ツ)_/¯
-                    codecheck.lineOffset = sessions
-                        .find(ss => ss.fileName === codecheck.fileName)
-                        .templateOffset;
-                } catch (e) { }
+                Assert(sessions.find(ss => ss.fileName === codecheck.fileName), 'session did not contain expected filename');
+                codecheck.lineOffset = sessions
+                    .find(ss => ss.fileName === codecheck.fileName)
+                    .templateOffset;
                 return codecheck;
-            });
+            })
             ;
 
         this.codecheck.subscribe(codecheck => {
+            Assert(codecheck.lineOffset !== null && codecheck.lineOffset !== undefined);
             const maxEndl = codecheck.request.endLine;
             const maxEndc = codecheck.request.endColumn;
             let mapped = codecheck.fixes.map(check => {

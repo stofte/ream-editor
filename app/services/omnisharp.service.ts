@@ -233,8 +233,13 @@ export class OmnisharpService {
                 });
             })
             .withLatestFrom(this.sessions, (codecheck, sessions) => {
-                codecheck.lineOffset = sessions.find(ss => ss.fileName === codecheck.fileName).templateOffset;
-                return codecheck
+                try {
+                    // might not be available. maybe not be an issue ¯\_(ツ)_/¯
+                    codecheck.lineOffset = sessions
+                        .find(ss => ss.fileName === codecheck.fileName)
+                        .templateOffset;
+                } catch (e) { }
+                return codecheck;
             });
             ;
 

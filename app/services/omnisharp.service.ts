@@ -21,15 +21,13 @@ import { TemplateResult } from '../models/template-result';
 import config from '../config';
 const path = electronRequire('path');
 
-// all templates have the same offset
-let TEMPLATE_LINE_OFFSET = null;
-
 const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
 const dirname = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
 
 class SessionMap {
     fileName: string;
+    templateOffset: number;
     tabId: number;
     connId: number;
 }
@@ -41,6 +39,7 @@ class UpdateMap {
 
 class QueryTemplateResult {
     buffer: string;
+    templateOffset: number;
     tabId: number;
     connId: number;
 }
@@ -49,6 +48,7 @@ class CodeCheckMap {
     request: LintRequestMap;
     fileName: string;
     fixes: CodeCheckResult[];
+    lineOffset: number;
 }
 
 class LintRequestMap {
@@ -64,7 +64,7 @@ export class OmnisharpService {
     
     private sessions: Observable<SessionMap[]>;
     private ready: Observable<boolean>;
-    private fileName: Observable<string>;
+    private fileNameAndTemplateInfo: Observable<{fileName: string, offset: number}>;
     private changeStream: Observable<number>;
     private readyState: Observable<UpdateMap>;
     private readyState2: ReplaySubject<UpdateMap>;
@@ -97,13 +97,11 @@ export class OmnisharpService {
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())
                         .subscribe(data => {
-                            if (!TEMPLATE_LINE_OFFSET) {
-                                TEMPLATE_LINE_OFFSET = data.LineOffset;
-                            }
                             obs.next(<QueryTemplateResult> {
                                 tabId: x.tabId,
                                 buffer: <string> data.Template,
-                                connId: x.conn.id
+                                connId: x.conn.id,
+                                templateOffset: data.LineOffset
                             });
                             obs.complete();
                         });
@@ -122,7 +120,8 @@ export class OmnisharpService {
                             obs.next(<SessionMap> {
                                 fileName: json.FileName,
                                 tabId: x.tabId,
-                                connId: x.connId
+                                connId: x.connId,
+                                templateOffset: x.templateOffset
                             });
                             obs.complete();
                         });
@@ -146,10 +145,10 @@ export class OmnisharpService {
             .distinctUntilChanged()
             ;
         
-        this.fileName = tabs.active
+        this.fileNameAndTemplateInfo = tabs.active
             .combineLatest(this.sessions, (tab, sessions) => {
                 let session = sessions.find(x => x.tabId === tab.id && x.connId === tab.connectionId);
-                return session !== undefined && session.fileName;
+                return session !== undefined && {fileName: session.fileName, offset: session.templateOffset};
             })
             .filter(x => !!x) // if session wasn't found, filter undefined/false
             ;
@@ -164,9 +163,10 @@ export class OmnisharpService {
         this.readyState = mirrorChangeStream.changes
             .buffer(mirrorBuffer)
             .filter(x => x.length > 0)
-            .withLatestFrom(this.fileName, (changes, fileName) => {
+            .withLatestFrom(this.fileNameAndTemplateInfo, (changes, fileNameAndOffset) => {
                 return changes.map(x => {
-                    x.fileName = fileName;
+                    x.fileName = fileNameAndOffset.fileName;
+                    x.lineOffset = fileNameAndOffset.offset;
                     return x;
                 });
             })
@@ -177,9 +177,9 @@ export class OmnisharpService {
                     Changes: changes.map(c => {
                         return <EditorChange> {
                             newText: c.newText,
-                            startLine: c.startLine + TEMPLATE_LINE_OFFSET,
+                            startLine: c.startLine + c.lineOffset,
                             startColumn: c.startColumn + 1,
-                            endLine: c.endLine + TEMPLATE_LINE_OFFSET,
+                            endLine: c.endLine + c.lineOffset,
                             endColumn: c.endColumn + 1
                         };
                     }),
@@ -232,6 +232,10 @@ export class OmnisharpService {
                         });
                 });
             })
+            .withLatestFrom(this.sessions, (codecheck, sessions) => {
+                codecheck.lineOffset = sessions.find(ss => ss.fileName === codecheck.fileName).templateOffset;
+                return codecheck
+            });
             ;
 
         this.codecheck.subscribe(codecheck => {
@@ -239,8 +243,8 @@ export class OmnisharpService {
             const maxEndc = codecheck.request.endColumn;
             let mapped = codecheck.fixes.map(check => {
                 let severity = 'error';
-                let fromLine = check.line - TEMPLATE_LINE_OFFSET;
-                let toLine = check.endLine - TEMPLATE_LINE_OFFSET;
+                let fromLine = check.line - codecheck.lineOffset;
+                let toLine = check.endLine - codecheck.lineOffset;
                 let adjustedFrom = fromLine > maxEndl ? maxEndl : fromLine;
                 let adjustedFromCol = fromLine > maxEndl ? maxEndc : check.column - 1;
                 let adjustedTo = toLine > maxEndl ? maxEndl : toLine;
@@ -267,14 +271,14 @@ export class OmnisharpService {
         return this.readyState2
             .filter(x => x.status)
             .take(1)
-            .withLatestFrom(this.fileName, (status, fileName) => {
-                return fileName;
+            .withLatestFrom(this.fileNameAndTemplateInfo, (status, fileName) => {
+                return {fileName: fileName.fileName, lineOffset: fileName.offset};
             })
-            .flatMap(fileName => {
+            .flatMap(fileInfo => {
                 let json = request;
-                json.fileName = fileName;
+                json.fileName = fileInfo.fileName;
                 json.column += 1;
-                json.line += TEMPLATE_LINE_OFFSET;
+                json.line += fileInfo.lineOffset;
                 return new Observable<any>((obs: Observer<any>) => {
                     this.http.post('http://localhost:2000/autocomplete', JSON.stringify(json))
                         .map(res => res.json())

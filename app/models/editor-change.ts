@@ -9,4 +9,5 @@ export class EditorChange {
     public endLine: number;
     public endColumn: number;
     public created: number;
+    public lineOffset: number; 
 }

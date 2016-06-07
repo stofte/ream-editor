@@ -50,14 +50,15 @@ li.CodeMirror-hint-active {
     background-repeat: no-repeat;
 }
 
+/* postcss base64 inlining, so paths are relative from project root */
 .prop-kind-method:before {
-    background-image: url(../resources/icons/Method_636.png);
+    background-image: url('b64---resources/icons/Method_636.png---');
 }
 
 .prop-kind-property:before {
-    background-image: url(../resources/icons/PropertyIcon.png);
+    background-image: url('b64---resources/icons/PropertyIcon.png---');
 }
 
 .prop-kind-field:before {
-    background-image: url(../resources/icons/FieldIcon.png);
+    background-image: url('b64---resources/icons/FieldIcon.png---');
 }

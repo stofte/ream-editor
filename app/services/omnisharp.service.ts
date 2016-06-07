@@ -233,7 +233,7 @@ export class OmnisharpService {
                         });
                 });
             })
-            .withLatestFrom(this.sessions, (codecheck, sessions) => {
+            .combineLatest(this.sessions, (codecheck, sessions) => {
                 let names = sessions.filter(ss => ss.fileName === codecheck.fileName); 
                 Assert(names.length < 1, 'session did not contain expected filename');
                 Assert(names.length > 1, 'session contained too many expected filenames');

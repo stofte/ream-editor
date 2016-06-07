@@ -2,7 +2,6 @@ var path = require('path');
 var Builder = require('systemjs-builder');
 var fs = require('fs');
 var UglifyJS = require('uglify-js');
-var CleanCSS = require('clean-css');
 // if building locally (without params), build right into electron folder
 var output = (process.argv[2] || 'linq-editor-win32-x64/resources/app') + '/';
 

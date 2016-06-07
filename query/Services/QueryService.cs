@@ -48,7 +48,6 @@ namespace QueryEngine.Services
                 .Replace("##SCHEMA##", "") // schema is linked
                 .Replace("##DB##", contextResult.Type.ToString());
             var e1 = sw.Elapsed.TotalMilliseconds;
-            Console.WriteLine(programSource);
             sw.Reset();
             sw.Start();
             var result = _compiler.LoadType(programSource, assmName, contextResult.Reference);

@@ -2,7 +2,7 @@
 if "%CI%" == "" (
     set PACKAGE_BASE="build"
     set ELECTRON_OUT="linq-editor-win32-x64"
-    set OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.zip"
+    set OMNISHARP_ZIP="omnisharp-win-x64-netcoreapp1.0.zip"
     rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
     rmdir /q /s %PACKAGE_BASE%
 )

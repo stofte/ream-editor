@@ -85,6 +85,7 @@ describe('fresh build', function() {
         return this.app.client
             .click('.int-test-start-page .btn-default')
             .waitForVisible('.int-test-conn-man form input')
+            .pause(timeStep)
             .click('.int-test-conn-man form input')
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;
@@ -94,7 +95,9 @@ describe('fresh build', function() {
                 ret.value.should.equal(connectionString);
             })
             .keys('Enter')
+            .pause(timeStep)
             .click('.int-test-conn-man p > button')
+            .pause(timeStep)
             ;
     });
        
@@ -110,6 +113,7 @@ describe('fresh build', function() {
             // seems to work if we click in the editor first, using this approach.
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
+            .pause(timeStep)
             .timeoutsAsyncScript(timeStepMax)
             .executeAsync(function(row, col, done) {
                 document.querySelector('.CodeMirror').CodeMirror.setCursor(row, col);
@@ -119,6 +123,7 @@ describe('fresh build', function() {
                 cursor.value.ch.should.equal(cursorCol);
                 cursor.value.line.should.equal(cursorRow);
             })
+            .pause(timeStep)
             .keys('\uE003')
             .keys('\uE003')
             .keys('\uE003')
@@ -147,6 +152,7 @@ describe('fresh build', function() {
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
+            .pause(timeStep)
             .click('.int-test-conn-man form input')
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;
@@ -156,6 +162,7 @@ describe('fresh build', function() {
                 ret.value.should.equal(connectionString2);
             })
             .keys('Enter')
+            .pause(timeStep)
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
@@ -186,6 +193,7 @@ describe('fresh build', function() {
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
             .keys(queryText2)
+            .pause(timeStep)
             .click('.int-test-execute-btn')
             ;
         
@@ -263,6 +271,7 @@ describe('fresh build', function() {
                 .keys('\uE015')
                 .keys('\uE015')
                 .keys('Enter')
+                .pause(timeStep)
                 ;
         });
         

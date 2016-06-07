@@ -1,3 +1,6 @@
+@import url('../resources/fonts/source-code-pro/source-code-pro.css');
+@import url('../resources/fonts/source-sans-pro/source-sans-pro.css');
+
 /******************************************************************************
     basics
 */
@@ -9,12 +12,14 @@ html {
 }
 
 *, *:before, *:after {
-  box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 body {
-  min-height: 100%;
-  overflow: hidden;
+    font-family: 'Source Sans Pro', 'MS Comic sans';
+    font-size: 1.4em;
+    min-height: 100%;
+    overflow: hidden;
 }
 
 /*
@@ -180,7 +185,7 @@ f-app {
 .CodeMirror {
     border: 1px solid #eee;
     border-radius: 4px;
-    font-family: 'Consolas';
+    font-family: 'Source Code Pro';
     height: auto;
 }
 

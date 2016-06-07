@@ -13,9 +13,8 @@ html {
 }
 
 body {
-    font-family: 'Source Sans Pro', 'MS Comic sans';
+    font-family: 'Source Sans Pro';
     font-size: 1.5em;
-    font-weight: 400;
     min-height: 100%;
     overflow: hidden;
 }
@@ -194,7 +193,7 @@ f-app {
 
 /* general linting font */
 .CodeMirror-lint-tooltip {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Source Sans Pro';
 }
 
 /* customize gutter errors */

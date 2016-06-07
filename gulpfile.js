@@ -7,7 +7,8 @@ const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
 const urlrewrite = require('postcss-urlrewrite');
 
-const DEBUG = process.env.NODE_ENV !== 'PRODUCTION';
+const DEBUG = process.env.PACKAGE_BASE === '';
+const output = DEBUG ? '.' : process.env.PACKAGE_BASE;
 
 const cssFiles = [
     'node_modules/normalizecss/normalize.css',
@@ -25,15 +26,15 @@ const urlRewrites = {
     rules: [
         {
             from: /^\.\.\/fonts\/glyphicons/,
-            to: DEBUG ? 'node_modules/bootstrap/dist/fonts/glyphicons' : 'fonts/glyphicons'
+            to: DEBUG ? 'node_modules/bootstrap/dist/fonts/glyphicons' : 'resources/fonts/glyphicons'
         },
         {
             from: /^(.*)\/SourceCodePro/,
-            to: DEBUG ? 'resources/fonts/source-code-pro/$1/SourceCodePro' : 'fonts/source-code-pro/$1/SourceCodePro'
+            to: 'resources/fonts/source-code-pro/$1/SourceCodePro'
         },
         {
             from: /^(.*)\/SourceSansPro/,
-            to: DEBUG ? 'resources/fonts/source-sans-pro/$1/SourceSansPro' : 'fonts/source-sans-pro/$1/SourceSansPro'
+            to: 'resources/fonts/source-sans-pro/$1/SourceSansPro'
         }
     ]
 };
@@ -49,7 +50,8 @@ gulp.task('css', () => {
             // cssnano(),
         ]))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('.'))
+        .pipe(gulp.dest(output))
+        ;
 });
 
 gulp.task('watch', () => {

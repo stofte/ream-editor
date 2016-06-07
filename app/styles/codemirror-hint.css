@@ -51,13 +51,13 @@ li.CodeMirror-hint-active {
 }
 
 .prop-kind-method:before {
-    background-image: url(icons/Method_636.png);
+    background-image: url(../resources/icons/Method_636.png);
 }
 
 .prop-kind-property:before {
-    background-image: url(icons/PropertyIcon.png);
+    background-image: url(../resources/icons/PropertyIcon.png);
 }
 
 .prop-kind-field:before {
-    background-image: url(icons/FieldIcon.png);
+    background-image: url(../resources/icons/FieldIcon.png);
 }

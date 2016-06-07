@@ -234,7 +234,9 @@ export class OmnisharpService {
                 });
             })
             .withLatestFrom(this.sessions, (codecheck, sessions) => {
-                Assert(sessions.find(ss => ss.fileName === codecheck.fileName), 'session did not contain expected filename');
+                let names = sessions.filter(ss => ss.fileName === codecheck.fileName); 
+                Assert(names.length < 1, 'session did not contain expected filename');
+                Assert(names.length > 1, 'session contained too many expected filenames');
                 codecheck.lineOffset = sessions
                     .find(ss => ss.fileName === codecheck.fileName)
                     .templateOffset;

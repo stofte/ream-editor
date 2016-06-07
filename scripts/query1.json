@@ -1,1 +1,0 @@
-{ "ConnectionString": "Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=eftest", "Text": "eftable.First().MyValue.Dump();" }

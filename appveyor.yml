@@ -53,8 +53,8 @@ build_script:
   - dir
   - cd %APPVEYOR_BUILD_FOLDER%
 
-after_build:
-  - test-script.cmd
+test_script:
+  - npm run int-test
 
 artifacts:
   - path: $(ELECTRON_OUT)

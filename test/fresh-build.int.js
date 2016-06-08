@@ -5,11 +5,10 @@ const _ = require('lodash');
 const { 
     checkTable,
     checkHints,
-    timeTotal,
-    timeForBackend,
-    timeStep,
-    timeStepMax,
-    timeStepMin,
+    suiteTimeout,
+    backendTimeout,
+    pauseTimeout,
+    executeJsTimeout,
     appPath,
     connectionString,
     connectionString2,
@@ -42,12 +41,12 @@ function queryFooUsingCurrentConnectionAndCheckResults() {
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
             .keys(queryText)
-            .waitForEnabled('.int-test-execute-btn', timeForBackend)
+            .waitForEnabled('.int-test-execute-btn', backendTimeout)
             .click('.int-test-execute-btn')
-            .waitForExist('.result-display-component', timeForBackend)
+            .waitForExist('.result-display-component', backendTimeout)
             // appears when result is ready
-            .waitForExist('.output-table-overview button.btn', timeForBackend)
-            .pause(timeStep) // give it some time to render
+            .waitForExist('.output-table-overview button.btn', backendTimeout)
+            .pause(pauseTimeout) // give it some time to render
             .catch(err)
             ;
         
@@ -56,7 +55,7 @@ function queryFooUsingCurrentConnectionAndCheckResults() {
     }
 
 describe('fresh build', function() {
-    this.timeout(timeTotal);
+    this.timeout(suiteTimeout);
 
     before(function () {
         chai.should();
@@ -85,7 +84,7 @@ describe('fresh build', function() {
         return this.app.client
             .click('.int-test-start-page .btn-default')
             .waitForVisible('.int-test-conn-man form input')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .click('.int-test-conn-man form input')
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;
@@ -95,9 +94,9 @@ describe('fresh build', function() {
                 ret.value.should.equal(connectionString);
             })
             .keys('Enter')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .click('.int-test-conn-man p > button')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             ;
     });
        
@@ -113,8 +112,8 @@ describe('fresh build', function() {
             // seems to work if we click in the editor first, using this approach.
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
-            .pause(timeStep)
-            .timeoutsAsyncScript(timeStepMax)
+            .pause(pauseTimeout)
+            .timeoutsAsyncScript(executeJsTimeout)
             .executeAsync(function(row, col, done) {
                 document.querySelector('.CodeMirror').CodeMirror.setCursor(row, col);
                 done(document.querySelector('.CodeMirror').CodeMirror.getCursor());
@@ -123,7 +122,7 @@ describe('fresh build', function() {
                 cursor.value.ch.should.equal(cursorCol);
                 cursor.value.line.should.equal(cursorRow);
             })
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .keys('\uE003')
             .keys('\uE003')
             .keys('\uE003')
@@ -135,7 +134,7 @@ describe('fresh build', function() {
             .keys('\uE003')
             .keys('\uE003')
             .keys('\uE003')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .keys('\uE009') // press down ctrl
             .keys('\uE00D') // space
             .keys('\uE000') // lift modifier (ctrl)
@@ -147,12 +146,12 @@ describe('fresh build', function() {
     
     it('can add another connection string via the connection manager', function() {
         return this.app.client 
-            .timeoutsAsyncScript(timeStepMax)
+            .timeoutsAsyncScript(executeJsTimeout)
             .click('.int-test-tab-list ul li:first-child')
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .click('.int-test-conn-man form input')
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;
@@ -162,11 +161,11 @@ describe('fresh build', function() {
                 ret.value.should.equal(connectionString2);
             })
             .keys('Enter')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             ;
     });
     
@@ -175,14 +174,14 @@ describe('fresh build', function() {
         return this.app.client
             .click('.int-test-tab-list .glyphicon.glyphicon-plus')
             .waitForExist(newTabSelector)
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .getText(newTabSelector)
             .then(function(val) {
                 val.should.equal('Query 2');
             })
             .click('#connection-selector-btn-keyboard-nav')
             .waitForExist('.int-test-conn-sel .dropdown-menu li:nth-child(1) a')
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .keys('\uE015')
             .keys('Enter')
             ;
@@ -193,7 +192,7 @@ describe('fresh build', function() {
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
             .keys(queryText2)
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .click('.int-test-execute-btn')
             ;
         
@@ -212,7 +211,7 @@ describe('fresh build', function() {
             .keys('a')
             .keys('\uE000') // lift modifier (ctrl)      
             .keys('\uE003') // delete all      
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .keys(queryText3)
             .executeAsync(function(row, col, done) {
                 document.querySelector('.CodeMirror').CodeMirror.setCursor(row, col);
@@ -222,7 +221,7 @@ describe('fresh build', function() {
                 cursor.value.ch.should.equal(cursorCol);
                 cursor.value.line.should.equal(cursorRow);
             })
-            .pause(timeStep)
+            .pause(pauseTimeout)
             .keys('\uE009') // press down ctrl
             .keys('\uE00D') // space
             .keys('\uE000') // lift modifier (ctrl)
@@ -233,9 +232,9 @@ describe('fresh build', function() {
     });
     
     it('shuts down', function() {
-        this.timeout(timeForBackend);
+        this.timeout(backendTimeout);
         this.app.client
-            .timeoutsAsyncScript(timeForBackend - timeStep)
+            .timeoutsAsyncScript(backendTimeout - pauseTimeout)
             .executeAsync(function() {
                 // this sends the close event to the regular shutdown handler.
                 // other ways to close the window seems to fail.
@@ -243,12 +242,12 @@ describe('fresh build', function() {
                 win.emit('close');
             });
         return new Promise((succ, err) => {
-            setTimeout(succ, timeForBackend - timeStep);
+            setTimeout(succ, backendTimeout - pauseTimeout);
         });        
     });
     
     describe('second run', function() {
-        this.timeout(timeTotal);
+        this.timeout(suiteTimeout);
 
         before(function () {
             chai.should();
@@ -271,7 +270,7 @@ describe('fresh build', function() {
                 .keys('\uE015')
                 .keys('\uE015')
                 .keys('Enter')
-                .pause(timeStep)
+                .pause(pauseTimeout)
                 ;
         });
         
@@ -280,29 +279,29 @@ describe('fresh build', function() {
 
         describe('when closing', function () {
             before(function() {
-                this.timeout(timeStepMax);
+                this.timeout(executeJsTimeout);
                 this.app.client
-                    .timeoutsAsyncScript(timeStepMax)
+                    .timeoutsAsyncScript(executeJsTimeout)
                     .executeAsync(function() {
                         localStorage.clear(); // for next run
                         const win = electronRequire('electron').remote.getCurrentWindow();
                         win.emit('close');
                     });
                 return new Promise((succ, err) => {
-                    setTimeout(succ, timeStep);
+                    setTimeout(succ, pauseTimeout);
                 });
             });
 
             // check via http if services are still up and going.
             it('also closes background omnisharp process', function(done) {
-                this.timeout(timeForBackend);
+                this.timeout(backendTimeout);
                 let url = `http://localhost:2000/checkreadystate`;
                 http.get(url, res => { done(new Error('response received')); })
                     .on('error', () => { done(); });
             });
             
             it('also closes background query process', function(done) {
-                this.timeout(timeForBackend);
+                this.timeout(backendTimeout);
                 let url = `http://localhost:8111/checkreadystate`;
                 http.get(url, res => { done(new Error('response received')); })
                     .on('error', () => { done(); });

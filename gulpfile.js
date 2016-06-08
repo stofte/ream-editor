@@ -7,7 +7,7 @@ const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
 const urlrewrite = require('postcss-urlrewrite');
 
-const DEBUG = process.env.PACKAGE_BASE === '';
+const DEBUG = !process.env.PACKAGE_BASE;
 const output = DEBUG ? '.' : process.env.PACKAGE_BASE;
 
 const cssFiles = [

@@ -28,11 +28,9 @@ xcopy resources\fonts\source-sans-pro\WOFF2\TTF %PACKAGE_BASE%\resources\fonts\s
 dotnet restore
 rem dotnet publish --configuration Release --output linq-editor-win32-x64\resources\app\query --runtime win7-x64 --framework netcoreapp1.0
 dotnet publish --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
-copy NuGet.Config %PACKAGE_BASE%\NuGet.Config
 copy project.json %PACKAGE_BASE%\project.json
 copy project.lock.json %PACKAGE_BASE%\project.lock.json
-copy NuGet.Config %PACKAGE_BASE%\query\NuGet.Config
 copy project.json %PACKAGE_BASE%\query\project.json
 copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
-call npm run-script package_electron
+call npm run-script package_electron_win32

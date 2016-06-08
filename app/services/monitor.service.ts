@@ -4,6 +4,8 @@ import { Observable } from 'rxjs/Rx';
 import { LogService } from './log.service';
 import config from '../config';
 
+// todo maybe make global?
+const isLinux = !process.env.PATHEXT;
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
@@ -13,6 +15,8 @@ const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
 const dirname = (isProduction ? path.normalize(process.resourcesPath + '/app') : path.dirname(path.dirname(__dirname)))
     .replace(/%20/g, ' '); // otherwise file fetch files on windows
+const omnisharpPath = (isLinux ? `~\\.linq-editor\\` :
+    `${process.env.LOCALAPPDATA}/LinqEditor/)`) + 'omnisharp';
 
 @Injectable()
 export class MonitorService {
@@ -114,15 +118,14 @@ export class MonitorService {
     
     private queryCmd(): { dir: string, cmd: string } {
         let dir = isProduction ? `${dirname}/query` : dirname;
-        let cmd = isProduction ? `"${dir}/linq-editor.exe"` :
+        let cmd = isProduction ? `"${dir}/linq-editor${!isLinux ? '.exe' : ''}"` :
             `"${config.dotnetDebugPath}" run `;
         return { dir, cmd };
     }
     
     private omnisharpCmd(): { dir: string, cmd: string } {
-        let slnPath = `${process.env.LOCALAPPDATA}/LinqEditor/omnisharp`;
-        let exePath = `"${dirname}/omnisharp/OmniSharp.exe"`;
-        slnPath = slnPath.replace(/\//g, '\\');
+        let exePath = `"${dirname}/omnisharp/OmniSharp${!isLinux ? '.exe' : ''}"`;
+        let slnPath = isLinux ? omnisharpPath.replace(/\\/g, '/') : omnisharpPath.replace(/\//g, '\\');
         let cmd = `${exePath} -s ${slnPath} -p ${config.omnisharpPort}`;
         return { dir: dirname, cmd };
     }

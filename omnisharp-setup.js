@@ -34,7 +34,6 @@ module.exports = function omnisharpSetup(mode, folder) {
     }
     let dotnetDir = __dirname;
     [
-        'NuGet.Config',
         'project.json',
         'project.lock.json'
     ].forEach(file => {

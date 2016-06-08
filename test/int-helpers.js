@@ -9,8 +9,10 @@ const timeStep = 1 * 1000 * ciMod;
 const timeStepMax = 1.5 * 1000 * ciMod;
 const timeStepMin = 500 * ciMod;
 
+const isLinux = !process.env.PATHEXT;
+
 const appPath = path.normalize(`${path.dirname(__dirname)
-    }/linq-editor-win32-x64/linq-editor.exe`);
+    }/linq-editor-${isLinux ? 'linux' : 'win32'}-x64/linq-editor${!isLinux ? '.exe' : '' }`);
 
 const connectionString = 
     isCI ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb'  

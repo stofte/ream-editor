@@ -13,12 +13,12 @@ const appPath = path.normalize(`${path.dirname(__dirname)
     }/linq-editor-win32-x64/linq-editor.exe`);
 
 const connectionString = 
-    isCI ? 'Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb'  
-         : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb';
+    isCI ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb'  
+         : 'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb';
 
 const connectionString2 = 
-    isCI ? 'Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb2'
-         : 'Data Source=.\\sqlexpress;Integrated Security=True;Initial Catalog=testdb2';
+    isCI ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb2'
+         : 'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb2';
 
 const objectMethods = [
     'Equals',

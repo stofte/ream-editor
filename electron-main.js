@@ -50,6 +50,10 @@ app.on('ready', function() {
         }, {
             label: 'Debug',
             submenu: [{
+                    label: 'Clear LocalStorage',
+                    click: () => 
+                        mainWindow.webContents.executeJavaScript("localStorage.clear();")
+                }, {
                     label: 'Reload',
                     accelerator: 'CmdOrCtrl+R',
                     click: () => 

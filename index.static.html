@@ -13,6 +13,8 @@
         delete window.require;
         delete window.exports;
         delete window.module;
+        window.IS_LINUX = !process.env.PATHEXT;
+        window.IS_WINDOWS = !window.IS_LINUX;
         window.MODE = 'PRODUCTION';
         window.Assert = function Assert(cond) { } // noop for prod
         </script>

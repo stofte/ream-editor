@@ -9,9 +9,11 @@
 		"bin": true,
 		"build": true,
 		"omnisharp": true,
-		"omnisharp-win-x64-netcoreapp1*": true
+		"omnisharp-win-x64-netcoreapp1*": true,
+		"omnisharp-ubuntu-x64-netcoreapp1*": true
 	},
 	"search.exclude": {
-		"linq-editor-win32-x64": true
+		"linq-editor-win32-x64": true,
+		"linq-editor-linux-x64": true
 	}
 }

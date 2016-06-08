@@ -11,6 +11,13 @@ namespace QueryEngine.Services
 
     public class SchemaService 
     {
+        string _tempFolder;
+
+        public SchemaService() 
+        {
+            _tempFolder = "/temp";
+        }
+
         public SchemaResult GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
         {
             var loggerFactory = new LoggerFactory().AddConsole();
@@ -49,7 +56,6 @@ namespace QueryEngine.Services
                 codeWriter: sb
             );
 
-            var outputPath = @"C:\temp";
             var programName = "Ctx";
             var conf = new ReverseEngineeringConfiguration 
             {
@@ -57,14 +63,14 @@ namespace QueryEngine.Services
                 ContextClassName = programName,
                 ProjectPath = "na",
                 ProjectRootNamespace = assemblyNamespace,
-                OutputPath = outputPath
+                OutputPath = _tempFolder
             };
 
             var output = new StringBuilder();
             var resFiles = rGen.GenerateAsync(conf);
             resFiles.Wait();
             
-            var dbCtx = CreateContext(fs.RetrieveFileContents(outputPath, programName + ".cs"), isLibrary: withUsings);
+            var dbCtx = CreateContext(fs.RetrieveFileContents(_tempFolder, programName + ".cs"), isLibrary: withUsings);
             var ctx = dbCtx.Item1;
             if (!withUsings) 
             {
@@ -80,7 +86,7 @@ namespace QueryEngine.Services
             output.Append(ctx);
             foreach(var fpath in resFiles.Result.EntityTypeFiles)
             {
-                output.Append(StripHeaderLines(4, fs.RetrieveFileContents(outputPath, System.IO.Path.GetFileName(fpath))));
+                output.Append(StripHeaderLines(4, fs.RetrieveFileContents(_tempFolder, System.IO.Path.GetFileName(fpath))));
             }
             
             return new SchemaResult 

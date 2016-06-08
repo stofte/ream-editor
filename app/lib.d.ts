@@ -1,6 +1,10 @@
+// global consts
+declare const MODE: string;
+declare const IS_LINUX: boolean;
+declare const IS_WINDOWS: boolean;
+
 declare const electronRequire: any;
 declare const __dirname: string;
-declare const MODE: string;
 declare const process: any;
 
 declare module 'node-uuid' {

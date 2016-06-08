@@ -5,8 +5,6 @@ import 'rxjs/Rx';
 import * as _ from 'lodash';
 import * as CodeMirror from 'codemirror';
 import * as uuid from 'node-uuid';
-// import { QueryService } from '../services/query.service';
-// import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
 import { AutocompletionQuery } from '../models/autocompletion-query';

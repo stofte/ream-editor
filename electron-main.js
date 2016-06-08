@@ -1,6 +1,6 @@
 'use strict';
 
-const isLinux = !process.env.PATHEXT;
+const IS_LINUX = !process.env.PATHEXT;
 const electron = require('electron');
 const ipc = electron.ipcMain;
 const app = electron.app;  // Module to control application life.
@@ -11,8 +11,9 @@ const MODE = process.argv[2]; // passed by package.json, so absent when running 
 const omnisharpSetup = require('./omnisharp-setup');
 const path = require('path');
 
-const omnisharpPath = (isLinux ? `~\\.linq-editor\\` : 
-    `${process.env.LOCALAPPDATA}/LinqEditor/)`) + 'omnisharp';
+const omnisharpPath = path.normalize((IS_LINUX ? `${process.env.HOME}/.linq-editor/` : 
+    `${process.env.LOCALAPPDATA}\\LinqEditor\\`) + 'omnisharp');
+
 omnisharpSetup(MODE, omnisharpPath);
 
 // Keep a global reference of the window object, if you don't, the window will

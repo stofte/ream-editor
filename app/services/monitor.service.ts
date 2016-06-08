@@ -14,8 +14,6 @@ const isProduction = MODE !== 'DEVELOPMENT';
 // __dirname doesn't seem to work in bundle mode
 const dirname = (isProduction ? path.normalize(process.resourcesPath + '/app') : path.dirname(path.dirname(__dirname)))
     .replace(/%20/g, ' '); // otherwise file fetch fails on windows
-const omnisharpPath = (IS_LINUX ? `${process.env.HOME}/.linq-editor/` :
-    `${process.env.LOCALAPPDATA}/LinqEditor/)`) + 'omnisharp';
 
 @Injectable()
 export class MonitorService {
@@ -124,7 +122,9 @@ export class MonitorService {
     
     private omnisharpCmd(): { dir: string, cmd: string } {
         let exePath = `"${dirname}/omnisharp/OmniSharp${!IS_LINUX ? '.exe' : ''}"`;
-        let slnPath = IS_LINUX ? omnisharpPath.replace(/\\/g, '/') : omnisharpPath.replace(/\//g, '\\');
+        console.log('config.omnisharpProjectPath', config.omnisharpProjectPath);
+        let slnPath = IS_LINUX ? config.omnisharpProjectPath.replace(/\\/g, '/')
+            : config.omnisharpProjectPath.replace(/\//g, '\\');
         let cmd = `${exePath} -s ${slnPath} -p ${config.omnisharpPort}`;
         return { dir: dirname, cmd };
     }

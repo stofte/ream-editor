@@ -19,10 +19,6 @@ import { TemplateResult } from '../models/template-result';
 import config from '../config';
 const path = electronRequire('path');
 
-const isProduction = MODE !== 'DEVELOPMENT';
-// __dirname doesn't seem to work in bundle mode
-const dirname = path.resolve(`${process.env['LOCALAPPDATA']}/LinqEditor/omnisharp`);
-
 class SessionMap {
     fileName: string;
     templateOffset: number;
@@ -107,7 +103,7 @@ export class OmnisharpService {
             })
             .flatMap(x => {
                 let json = {
-                    FileName: `${dirname}/b${uuid.v4().replace(/\-/g, '')}.cs`,
+                    FileName: `${config.omnisharpProjectPath}/b${uuid.v4().replace(/\-/g, '')}.cs`,
                     FromDisk: false,
                     Buffer: x.buffer,
                 };

@@ -3,6 +3,10 @@ const watch = require('gulp-watch');
 const concat = require('gulp-concat')
 const postcss = require('gulp-postcss');
 const sourcemaps = require('gulp-sourcemaps');
+const ts = require('gulp-typescript');
+const tslint = require('gulp-tslint');
+const tsProject = ts.createProject('tsconfig.json');
+const tsBundleProject = ts.createProject('tsconfig.json', { out: 'bundle.js' });
 const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
 const urlrewrite = require('postcss-urlrewrite');
@@ -21,23 +25,45 @@ const cssFiles = [
     'app/styles/main.css'
 ];
 
+const tsFiles = 'app/**/*.ts';
+const jsFiles = [
+    'node_modules/zone.js/dist/zone.js',
+    'node_modules/reflect-metadata/Reflect.js',
+    'app/**/*.js'
+];
+
 const urlRewrites = {
     properties: ['src'],
     rules: [
-        {
-            from: /^\.\.\/fonts\/glyphicons/,
-            to: DEBUG ? 'node_modules/bootstrap/dist/fonts/glyphicons' : 'resources/fonts/glyphicons'
-        },
-        {
-            from: /^(.*)\/SourceCodePro/,
-            to: 'resources/fonts/source-code-pro/$1/SourceCodePro'
-        },
-        {
-            from: /^(.*)\/SourceSansPro/,
-            to: 'resources/fonts/source-sans-pro/$1/SourceSansPro'
-        }
+        { from: /^\.\.\/fonts\/glyphicons/, to: DEBUG ? 'node_modules/bootstrap/dist/fonts/glyphicons' : 'resources/fonts/glyphicons' },
+        { from: /^(.*)\/SourceCodePro/, to: 'resources/fonts/source-code-pro/$1/SourceCodePro' },
+        { from: /^(.*)\/SourceSansPro/, to: 'resources/fonts/source-sans-pro/$1/SourceSansPro' }
     ]
 };
+
+const tslintOptions = require('./tslint.json');
+
+gulp.task('ts:lint', () => {
+    return tsProject.src()
+        .pipe(tslint(tslintOptions))
+        .pipe(tslint.report('prose', { emitError: false }))
+        ;
+});
+
+gulp.task('ts:bundle', () => {
+    return gulp.src(jsFiles)
+        .pipe(concat('bundle.js'))
+        .pipe(gulp.dest(output))
+        ;
+});
+
+gulp.task('ts', () => {
+    return tsProject.src()
+        .pipe(ts(tsProject))
+        .js
+        .pipe(gulp.dest('app'))
+        ;
+});
 
 gulp.task('css', () => {
     return gulp
@@ -56,8 +82,9 @@ gulp.task('css', () => {
 
 gulp.task('watch', () => {
     gulp.watch(cssFiles, ['css']);
+    gulp.watch(tsFiles, ['ts']);
 });
 
 gulp.task('build', ['css']);
 
-gulp.task('default', ['watch', 'css']);
+gulp.task('default', ['watch', 'css', 'ts:lint', 'ts']);

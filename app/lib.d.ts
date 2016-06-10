@@ -16,7 +16,6 @@ declare module CodeMirror {
     const keyMap: any;
     const hint: any;
     const lint: any;
-    const registerHelper: any;
 }
 
 interface IStreamOperation extends Function {

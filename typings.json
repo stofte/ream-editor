@@ -1,0 +1,9 @@
+{
+  "name": "linq-editor",
+  "dependencies": {},
+  "globalDependencies": {
+    "codemirror": "registry:dt/codemirror#0.0.0+20160608063737",
+    "codemirror-showhint": "registry:dt/codemirror-showhint#0.0.0+20160317120654",
+    "lodash": "registry:dt/lodash#3.10.0+20160330154726"
+  }
+}

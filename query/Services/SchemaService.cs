@@ -15,7 +15,7 @@ namespace QueryEngine.Services
 
         public SchemaService() 
         {
-            _tempFolder = "/temp";
+            _tempFolder = Environment.GetEnvironmentVariable("TEMP");
         }
 
         public SchemaResult GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 

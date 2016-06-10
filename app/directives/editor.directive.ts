@@ -1,5 +1,3 @@
-// tsdm doesn't include this file
-/// <reference path="../../node_modules/retyped-codemirror-tsd-ambient/codemirror-showhint.d.ts" />
 import { Directive, ElementRef, Renderer, OnInit } from '@angular/core';
 import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';

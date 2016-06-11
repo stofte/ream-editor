@@ -50,6 +50,9 @@ build_script:
 test_script:
   - npm run int-test
 
+after_test:
+  - 7z a "%APP_FINAL%" "%ELECTRON_OUT%"
+
 artifacts:
-  - path: $(ELECTRON_OUT)
+  - $(APP_FINAL)
   - path: $(ELECTRON_OUT)\linq-editor.log

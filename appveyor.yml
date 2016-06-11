@@ -54,5 +54,5 @@ after_test:
   - 7z a "%APP_FINAL%" "%ELECTRON_OUT%"
 
 artifacts:
-  - $(APP_FINAL)
+  - path: $(APP_FINAL)
   - path: $(ELECTRON_OUT)\linq-editor.log

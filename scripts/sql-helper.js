@@ -61,11 +61,12 @@ function generate() {
                 let def = definition.slice(2);
                 let createCols = def.map(column => {
                     const colName = Object.keys(column).filter(k => k !== 'data')[0];
-                    return `${colName} ${column[colName]}`;
+                    return `"${colName}" ${column[colName]}`;
                 }).join(',\n');
                 let insertCols = def
                     .map(column => Object.keys(column).filter(k => k !== 'data')[0])
                     .filter(insertColumnFilter)
+                    .map(s => `"${s}"`)
                     .join(',\n');
                 const rowsVals = def
                     .map(c => c.data)
@@ -109,7 +110,7 @@ function generate() {
 
 function createTemplate(useName, tableName, columns) {
     return `use ${useName};
-create table ${tableName} (
+create table "${tableName}" (
 ${columns}
 );
 `;
@@ -118,7 +119,7 @@ ${columns}
 function insertTemplate(useName, tableName, insertCols, insertData) {
     let inserts = insertData.map(data => {
         return `
-insert into ${tableName}(
+insert into "${tableName}"(
 ${insertCols}
 )
 values (

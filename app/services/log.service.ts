@@ -8,19 +8,15 @@ const logFile = path.normalize(`${dirname}/linq-editor${isProduction ? '' : '.de
 
 @Injectable()
 export class LogService {
-    private debug: boolean = MODE === 'DEVELOPMENT';
     private logs: string[] = [];
     
     constructor() {
         ipc.on('application-event', this.applicationEventHandler.bind(this));
-        this.log('log.service', `debug=${this.debug}`);
+        this.log('log.service', `mode=${MODE}`);
     }
     
     public log(stamp: string, msg: string) {
         const str = `${stamp} => \n${msg}`;
-        if (this.debug) {
-            console.log(str);
-        }
         this.logs.push(str);
     }
     
@@ -35,7 +31,7 @@ export class LogService {
                     }
                     ipc.send('application-event', 'close-log');
                 });                
-            }, 2000);
+            }, 5000);
         }
     }
 }

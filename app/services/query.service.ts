@@ -52,8 +52,10 @@ export class QueryService {
         
         mirrorWithTab
             .withLatestFrom(conns.all.filter(x => x !== null && x !== undefined), (req, currentConns) => {
+                const conn = currentConns.find(x => x.id === req.connectionId);
                 return <QueryRequest> {
-                    connectionString: currentConns.find(x => x.id === req.connectionId).connectionString,
+                    connectionString: conn.connectionString,
+                    serverType: conn.type,
                     tabId: req.tabId,
                     text: req.text
                 };

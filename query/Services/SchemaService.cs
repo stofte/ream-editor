@@ -23,16 +23,88 @@ namespace QueryEngine.Services
             if (type == DatabaseProviderType.SqlServer) 
             {
                 return GetSchemaSource(connectionString, assemblyNamespace, withUsings);
-            } 
+            }
             else 
             {
-                return GetNpgSqlSchemaSource();
+                return GetNpgSqlSchemaSource(connectionString, assemblyNamespace, withUsings);
             }
         }
 
-        SchemaResult GetNpgSqlSchemaSource() 
+        SchemaResult GetNpgSqlSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
         {
-            throw new NotImplementedException();
+            var loggerFactory = new LoggerFactory().AddConsole();
+            var typeMapper = new Microsoft.EntityFrameworkCore.Storage.Internal.NpgsqlTypeMapper();
+            var dbFac = new NpgsqlDatabaseModelFactory(loggerFactory: loggerFactory);
+            var scaffoldFac = new NpgsqlScaffoldingModelFactory(
+                loggerFactory: loggerFactory,
+                typeMapper: typeMapper,
+                databaseModelFactory: dbFac
+            );
+            var annotationProvider = new Microsoft.EntityFrameworkCore.Metadata.NpgsqlAnnotationProvider();
+            var csUtils = new CSharpUtilities();
+            var scaffUtils = new ScaffoldingUtilities();
+
+            var confFac = new ConfigurationFactory(
+                extensionsProvider: annotationProvider,
+                cSharpUtilities: csUtils,
+                scaffoldingUtilities: scaffUtils
+            );            
+
+            var fs = new InMemoryFileService();
+            var sb = new StringBuilderCodeWriter(
+                fileService: fs,
+                dbContextWriter: new DbContextWriter(
+                    scaffoldingUtilities: scaffUtils,
+                    cSharpUtilities: csUtils
+                ),
+                entityTypeWriter: new EntityTypeWriter(cSharpUtilities: csUtils, scaffoldingUtilities: scaffUtils)
+            );
+
+            var rGen = new ReverseEngineeringGenerator(
+                loggerFactory: loggerFactory,
+                scaffoldingModelFactory: scaffoldFac,
+                configurationFactory: confFac,
+                codeWriter: sb
+            );
+
+            var programName = "Ctx";
+            var conf = new ReverseEngineeringConfiguration 
+            {
+                ConnectionString = connectionString,
+                ContextClassName = programName,
+                ProjectPath = "na",
+                ProjectRootNamespace = assemblyNamespace,
+                OutputPath = _tempFolder
+            };
+            
+            var output = new StringBuilder();
+            var resFiles = rGen.GenerateAsync(conf);
+            resFiles.Wait();
+            
+            var dbCtx = CreateContext(fs.RetrieveFileContents(_tempFolder, programName + ".cs"), isLibrary: withUsings);
+            var ctx = dbCtx.Item1;
+            if (!withUsings) 
+            {
+                var x = 
+                ctx = StripHeaderLines(3, ctx);
+            }
+            else
+            {
+                output.Append(_refs);
+            }
+            // remove the entity generated warning about injected connection strings
+            ctx = Regex.Replace(ctx, @"#warning.*", "");
+            output.Append(ctx);
+            foreach(var fpath in resFiles.Result.EntityTypeFiles)
+            {
+                output.Append(StripHeaderLines(4, fs.RetrieveFileContents(_tempFolder, System.IO.Path.GetFileName(fpath))));
+            }
+            
+            return new SchemaResult 
+            {
+                Schema = output.ToString(),
+                DefaultTable = dbCtx.Item2
+            };
         }
 
         SchemaResult GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 

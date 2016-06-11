@@ -20,6 +20,7 @@ namespace QueryEngine.Services
 
         public SchemaResult GetSchemaSource(string connectionString, DatabaseProviderType type, string assemblyNamespace, bool withUsings = true) 
         {
+            // todo code is identical
             if (type == DatabaseProviderType.SqlServer) 
             {
                 return GetSchemaSource(connectionString, assemblyNamespace, withUsings);
@@ -29,7 +30,6 @@ namespace QueryEngine.Services
                 return GetNpgSqlSchemaSource(connectionString, assemblyNamespace, withUsings);
             }
         }
-
         SchemaResult GetNpgSqlSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
         {
             var loggerFactory = new LoggerFactory().AddConsole();

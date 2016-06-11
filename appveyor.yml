@@ -46,13 +46,6 @@ before_build:
           
 build_script:
   - build_script.cmd
-  - echo checking build folder
-  - cd build
-  - dir 
-  - cd ..
-  - cd linq-editor-win32-x64\resources\app\omnisharp
-  - dir
-  - cd %APPVEYOR_BUILD_FOLDER%
 
 test_script:
   - npm run int-test

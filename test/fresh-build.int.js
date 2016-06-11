@@ -36,11 +36,11 @@ function setExpectedData(data) {
 
 const err = function waitErrorHandler(e) { throw e; };
 
-function queryFooUsingCurrentConnectionAndCheckResults() {
+function pasteQueryToEditorAndCheckResultsAfterExecuting(query, expected) {
         let executingClient = this.app.client
             .moveToObject('.CodeMirror')
             .click('.CodeMirror')
-            .keys(queryText)
+            .keys(query)
             .waitForEnabled('.int-test-execute-btn', backendTimeout)
             .click('.int-test-execute-btn')
             .waitForExist('.result-display-component', backendTimeout)
@@ -50,9 +50,9 @@ function queryFooUsingCurrentConnectionAndCheckResults() {
             .catch(err)
             ;
         
-        return checkTable(executingClient, expectedData[0])
+        return checkTable(executingClient, expected)
             ;
-    }
+}
 
 describe('fresh build', function() {
     this.timeout(suiteTimeout);
@@ -98,14 +98,18 @@ describe('fresh build', function() {
             .click('.int-test-conn-man p > button')
             .pause(pauseTimeout)
             ;
-    });
+    }); 
        
-    it('can query using new connection', queryFooUsingCurrentConnectionAndCheckResults);
+    it('can query using new connection', function() {
+        return pasteQueryToEditorAndCheckResultsAfterExecuting
+            .call(this, queryText, expectedData[0]);
+    });
     
     it('provides the expected member completions for Foo entity', function() {
+        const fragment = 'x.Description';
         // cursor index, given the query, we're gonna have to delete the current member
         // otherwise we just autocomplete the current word and confuse the test 
-        let cursorCol = queryText.indexOf('x.Description') + 13;
+        let cursorCol = queryText.indexOf(fragment) + fragment.length;
         let cursorRow = 0;
         let suggestionClient = this.app.client
             // setting the cursor by codemirror api alone doesn't seem good enough. 
@@ -186,18 +190,11 @@ describe('fresh build', function() {
             .keys('Enter')
             ;
     });
-    
+
+
     it('can query TypeTest using new connection and receive expected results', function() {
-        const executingClient = this.app.client
-            .moveToObject('.CodeMirror')
-            .click('.CodeMirror')
-            .keys(queryText2)
-            .pause(pauseTimeout)
-            .click('.int-test-execute-btn')
-            ;
-        
-        return checkTable(executingClient, expectedData[1])
-            ;
+        return pasteQueryToEditorAndCheckResultsAfterExecuting
+            .call(this, queryText2, expectedData[1]);
     });
     
     it('can provide autocompletions for TypeTest table', function() {
@@ -273,13 +270,15 @@ describe('fresh build', function() {
                 .pause(pauseTimeout)
                 ;
         });
-        
-        it('uses testdb connection and can query Foo', 
-            queryFooUsingCurrentConnectionAndCheckResults);
+       
+        it('uses testdb connection and can query Foo', function() {
+            return pasteQueryToEditorAndCheckResultsAfterExecuting
+                .call(this, queryText, expectedData[0]);
+        });
 
         describe('when closing', function () {
             before(function() {
-                this.timeout(executeJsTimeout);
+                this.timeout(backendTimeout);
                 this.app.client
                     .timeoutsAsyncScript(executeJsTimeout)
                     .executeAsync(function() {
@@ -288,7 +287,8 @@ describe('fresh build', function() {
                         win.emit('close');
                     });
                 return new Promise((succ, err) => {
-                    setTimeout(succ, pauseTimeout);
+                    // give it a bit more time before we check services
+                    setTimeout(succ, backendTimeout * 0.7);
                 });
             });
 

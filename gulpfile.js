@@ -6,7 +6,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 const tslint = require('gulp-tslint');
 const tsProject = ts.createProject('tsconfig.json');
-const tsBundleProject = ts.createProject('tsconfig.json', { out: 'bundle.js' });
 const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
 const urlrewrite = require('postcss-urlrewrite');
@@ -50,13 +49,6 @@ gulp.task('ts:lint', () => {
         ;
 });
 
-gulp.task('ts:bundle', () => {
-    return gulp.src(jsFiles)
-        .pipe(concat('bundle.js'))
-        .pipe(gulp.dest(output))
-        ;
-});
-
 gulp.task('ts', () => {
     return tsProject.src()
         .pipe(ts(tsProject))
@@ -85,6 +77,6 @@ gulp.task('watch', () => {
     gulp.watch(tsFiles, ['ts:lint', 'ts']);
 });
 
-gulp.task('build', ['css']);
-
-gulp.task('default', ['watch', 'css', 'ts:lint', 'ts']);
+const mainTasks = ['css', 'ts:lint', 'ts'];
+gulp.task('build', mainTasks);
+gulp.task('default', ['watch', ...mainTasks]);

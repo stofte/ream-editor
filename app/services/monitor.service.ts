@@ -122,7 +122,6 @@ export class MonitorService {
     
     private omnisharpCmd(): { dir: string, cmd: string } {
         let exePath = `"${dirname}/omnisharp/OmniSharp${!IS_LINUX ? '.exe' : ''}"`;
-        console.log('config.omnisharpProjectPath', config.omnisharpProjectPath);
         let slnPath = IS_LINUX ? config.omnisharpProjectPath.replace(/\\/g, '/')
             : config.omnisharpProjectPath.replace(/\//g, '\\');
         let cmd = `${exePath} -s ${slnPath} -p ${config.omnisharpPort}`;

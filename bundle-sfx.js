@@ -1,10 +1,13 @@
-const IS_LINUX = !process.env.PATHEXT;
 const path = require('path');
 const Builder = require('systemjs-builder');
 const fs = require('fs');
 const UglifyJS = require('uglify-js');
+const IS_LINUX = !process.env.PATHEXT;
+
 // if building locally (without params), build right into electron folder
-const output = (process.argv[2] || `linq-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/resources/app`) + '/';
+const output = (process.env.PACKAGE_BASE ||
+	`linq-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/resources/app`) + '/';
+//(process.argv[2] || ;
 
 try {
 	fs.accessSync(output);
@@ -13,14 +16,15 @@ try {
 }
 
 const jsOutput = output + 'bundle.js';
-const cssOutput = output + 'bundle.css';
 
 // optional constructor options
 // sets the baseURL and loads the configuration file
 var builder = new Builder('./', 'systemjs.config.js');
 var start = new Date().getTime();
 builder
-.buildStatic('app/main.js', jsOutput)
+.buildStatic('app/main.js', jsOutput, {
+	sourceMaps: 'inline'	
+})
 .then(function() {
 	console.log(jsOutput, 'bundled in', ((new Date().getTime() - start) / 1000).toFixed(0), 'seconds')
 	// // include the other required stuff

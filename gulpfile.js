@@ -82,7 +82,7 @@ gulp.task('css', () => {
 
 gulp.task('watch', () => {
     gulp.watch(cssFiles, ['css']);
-    gulp.watch(tsFiles, ['ts']);
+    gulp.watch(tsFiles, ['ts:lint', 'ts']);
 });
 
 gulp.task('build', ['css']);

@@ -2,8 +2,10 @@
   "name": "linq-editor",
   "dependencies": {},
   "globalDependencies": {
+    "chai": "registry:dt/chai#3.4.0+20160317120654",
     "codemirror": "registry:dt/codemirror#0.0.0+20160608063737",
     "codemirror-showhint": "registry:dt/codemirror-showhint#0.0.0+20160317120654",
-    "lodash": "registry:dt/lodash#3.10.0+20160330154726"
+    "lodash": "registry:dt/lodash#3.10.0+20160330154726",
+    "mocha": "registry:dt/mocha#2.2.5+20160317120654"
   }
 }

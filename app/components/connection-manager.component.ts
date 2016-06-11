@@ -41,12 +41,17 @@ import { Connection } from '../models/connection';
                     <thead><caption style="white-space: pre" [innerHTML]="connectionsSubTitle"></caption></thead>
                     <tbody>
                         <tr *ngFor="let conn of connections">
-                            <td style="vertical-align: middle">
+                            <td style="vertical-align: middle;">
+                                <p *ngIf="!conn.editing" class="pull-right" style="margin-bottom: 0">
+                                    <span style="font-size: 80%;">
+                                        {{ conn.type === 'sqlserver' ? 'MS SQLServer' : 'PostgreSQL' }}
+                                    </span>
+                                </p>
                                 <p *ngIf="!conn.editing" style="margin-bottom: 0">
                                     <span (dblclick)="editConnection(conn)" 
                                         style="font-size: 80%;"
                                         title="Double-click to edit">{{conn.connectionString}}</span>
-                                    
+                                   
                                 </p>
                                 <p *ngIf="conn.editing" style="margin-bottom: 0">
                                     <input #editedconn class="form-control"
@@ -91,13 +96,6 @@ export class ConnectionManagerComponent {
     }
     
     private closeManager() {
-        // const isStart = location.hash.indexOf('/start') !== -1;
-        // if (isStart) {
-        //     const conn = this.connectionService.defaultConnection;
-        //     if (conn) {
-        //         this.tabService.newForeground(conn);
-        //     }
-        // }
         this.connectionManager.hideConnections();
     }
     

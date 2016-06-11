@@ -20,7 +20,19 @@ import { Connection } from '../models/connection';
                 <input type="string" class="form-control" 
                     id="connectringStringInp" placeholder="Type/paste connection string and press enter to add"
                     #newconnection [(ngModel)]="newConnectionStringText"
-                    (keyup.enter)="addNewConnection(newconnection.value)">
+                    (keyup.enter)="addNewConnection(newconnection.value, typesqlserver.checked, typenpgsql.checked)">
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" #typesqlserver name="sqltype" value="sqlserver" checked />
+                    MS SQLServer
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" #typenpgsql name="sqltype" value="npgsql" />
+                    PostgreSQL
+                </label>
             </div>
         </form>
         <div class="row">
@@ -89,9 +101,11 @@ export class ConnectionManagerComponent {
         this.connectionManager.hideConnections();
     }
     
-    private addNewConnection(value: string) {
+    private addNewConnection(value: string, sqlserver: boolean, npgsql: boolean) {
+        Assert(sqlserver && !npgsql || !sqlserver && npgsql, 'Either must be set');
         if (value.length > 0) {
-            this.conns.add(new Connection(value));
+            const type = sqlserver ? 'sqlserver' : 'npgsql';
+            this.conns.add(new Connection(value, type));
             this.newConnectionStringText = '';
         }
     }

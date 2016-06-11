@@ -40,7 +40,7 @@ namespace QueryEngine.Services
             var sw = new Stopwatch();
             sw.Start();
             var newInput = _fragmentService.Fix(input.Text);
-            var contextResult = _databaseContextService.GetDatabaseContext(input.ConnectionString);
+            var contextResult = _databaseContextService.GetDatabaseContext(input.ConnectionString, input.ServerType);
             var assmName = Guid.NewGuid().ToIdentifierWithPrefix("a");
             var programSource = _template
                 .Replace("##SOURCE##", newInput)
@@ -66,7 +66,7 @@ namespace QueryEngine.Services
         {
             var srcToken = "##SOURCE##";
             var assmName = Guid.NewGuid().ToIdentifierWithPrefix("a");
-            var schemaResult = _schemaService.GetSchemaSource(input.ConnectionString, assmName, withUsings: false);
+            var schemaResult = _schemaService.GetSchemaSource(input.ConnectionString, input.ServerType, assmName, withUsings: false);
             var schemaSrc = schemaResult.Schema;
             
             var src = _template

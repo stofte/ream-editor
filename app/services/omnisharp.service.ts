@@ -86,7 +86,11 @@ export class OmnisharpService {
                 return { conn, tabId };
             }, {})
             .flatMap((x: {conn: Connection, tabId: number }) => {
-                let req = { connectionString: x.conn.connectionString, text: '' };
+                let req = { 
+                    connectionString: x.conn.connectionString,
+                    serverType: x.conn.type,
+                    text: ''
+                };
                 return new Observable<QueryTemplateResult>((obs: Observer<QueryTemplateResult>) => {
                     http.post('http://localhost:8111/querytemplate', JSON.stringify(req))
                         .map(res => res.json())

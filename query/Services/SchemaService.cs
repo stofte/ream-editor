@@ -18,7 +18,24 @@ namespace QueryEngine.Services
             _tempFolder = Environment.GetEnvironmentVariable("TEMP");
         }
 
-        public SchemaResult GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
+        public SchemaResult GetSchemaSource(string connectionString, DatabaseProviderType type, string assemblyNamespace, bool withUsings = true) 
+        {
+            if (type == DatabaseProviderType.SqlServer) 
+            {
+                return GetSchemaSource(connectionString, assemblyNamespace, withUsings);
+            } 
+            else 
+            {
+                return GetNpgSqlSchemaSource();
+            }
+        }
+
+        SchemaResult GetNpgSqlSchemaSource() 
+        {
+            throw new NotImplementedException();
+        }
+
+        SchemaResult GetSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
         {
             var loggerFactory = new LoggerFactory().AddConsole();
 

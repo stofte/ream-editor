@@ -29,6 +29,8 @@
         "Microsoft.Extensions.DependencyInjection": "1.0.0-*",
         "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-*",
         "Newtonsoft.Json": "7.0.1",
+        "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.0-*",
+        "Npgsql.EntityFrameworkCore.PostgreSQL.Design": "1.0.0-*",
         "Microsoft.NETCore.App": "1.0.0-*"
     },
     "frameworks": {

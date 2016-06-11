@@ -24,7 +24,7 @@ namespace QueryEngine.Handlers
 
         protected override string Execute(QueryInput input)
         {
-            var t = _dbContextService.GetDatabaseContext(input.ConnectionString);
+            var t = _dbContextService.GetDatabaseContext(input.ConnectionString, input.ServerType);
             // var schema = _schemaService.GetSchemaSource(input.ConnectionString, "debug");
             // var transformed = _compileService.TransformSource(input.Text, schema, "debug");
             // var x = new List<DebugHandler>();

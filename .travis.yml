@@ -25,6 +25,7 @@ env:
     - DOTNET_INSTALL_DIR=~/.dotnetcli
 
 before_install:
+ - ulimit -n 1024
  - nvm install 6.2
  - echo $DOTNET_INSTALL_DIR
  - curl -O $OMNISHARP_URL
@@ -42,4 +43,4 @@ install:
 
 script:
  - chmod -x build_script.sh
- - bash build_script.sh
+ - sudo bash build_script.sh

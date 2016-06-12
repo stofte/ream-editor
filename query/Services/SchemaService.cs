@@ -20,6 +20,9 @@ namespace QueryEngine.Services
 
         public SchemaResult GetSchemaSource(string connectionString, DatabaseProviderType type, string assemblyNamespace, bool withUsings = true) 
         {
+            Console.WriteLine("connectionString {0}", connectionString);
+            Console.WriteLine("databaseProviderType {0}", type);
+
             // todo code is identical
             if (type == DatabaseProviderType.SqlServer) 
             {

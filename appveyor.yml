@@ -38,6 +38,8 @@ before_build:
   - ps: $sqlInstance = "(local)\SQL2014"
   - ps: $db_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\sql-script-testdb.sql")
   - ps: $db2_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\sql-script-testdb2.sql")
+  - ps: $db_script
+  - ps: $db2_script
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb2;"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $db_script

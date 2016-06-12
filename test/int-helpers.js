@@ -18,13 +18,13 @@ const appPath = path.normalize(`${path.dirname(__dirname)
 
 const connectionString = 
     isAppveyor  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb' :
-    isTravis ?    'Server=localhost; User Id=postgres; Database=testdb' :
+    isTravis ?    'Server=localhost; User Id=postgres; Password=; Database=testdb' :
     isWin ?       'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb' :
                   'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb';
 
 const connectionString2 = 
     isAppveyor  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb2' :
-    isTravis ?    'Server=localhost; User Id=postgres; Database=testdb2' :
+    isTravis ?    'Server=localhost; User Id=postgres; Password=; Database=testdb2' :
     isWin ?       'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb2' :
                   'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb2';
 

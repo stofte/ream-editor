@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const dbJson = path.join(__dirname, 'db.sql.json');
 const outDirname = path.dirname(__dirname);
-const createPath = path.join(outDirname, 'create-generated.sql');
-const insertPath = path.join(outDirname, 'insert-generated.sql');
+const sqlScriptPath = path.join(outDirname, 'sql-script');
 
 // these are auto generated
 const insertColumnFilter = x => x !== 'rowversioncol' && x !== 'IdAuto';
@@ -40,22 +39,35 @@ function loadMapper(t) {
     return [tableCols].concat(tableRows);    
 }
 
-function load() {
+function load(serverType) {
     return new Promise((done, err) => {
         fs.readFile(dbJson, 'utf8', (err, text) => {
             if (err) throw err;
             const data = JSON.parse(text.replace(/\/\/(.*)/g, ''));
-            done(data.map(loadMapper));
+            done(patchDataForServerType(data, serverType).map(loadMapper));
         });        
     });
 }
 
-function generate() {
+// data is an array, where the first element is a generic sql table, suitable for all server types.
+// following tables tests table types, but is provider specific, so must be filtered out before 
+// executing any tests or generating sql for the db.
+function patchDataForServerType(data, serverType) {
+    let l= [
+        data[0],
+        data.find(x => x[1].toLowerCase().indexOf(serverType) !== -1)
+    ];
+    l[1][1] = 'TypeTest';
+    return l;
+}
+
+function generate(serverType) {
+    console.log('generate for', serverType);
     return new Promise((done, err) => {
         fs.readFile(dbJson, 'utf8', (err, text) => {
             if (err) throw err;
             const data = JSON.parse(text.replace(/\/\/(.*)/g, ''));
-            const sqlData = data.map(definition => {
+            const scripts = patchDataForServerType(data, serverType).map(definition => {
                 let useName = definition[0];
                 let tableName = definition[1];
                 let def = definition.slice(2);
@@ -83,33 +95,27 @@ function generate() {
                 let insertData = rowsVals[0].map((_, idx) => {
                     return rowsVals.map(row => row[idx]);
                 });
-                const create = createTemplate(useName, tableName, createCols);
+                const create = createTemplate(useName, tableName, createCols, serverType);
                 const insert = insertTemplate(useName, tableName, insertCols, insertData);
-                return [create, insert];
+                return [useName, tableName.toLowerCase(), create + insert];
             });
-
-            let sqlScripts = sqlData.reduce((prev, curr) => {
-                return {
-                    create: prev.create + curr[0],
-                    insert: prev.insert + curr[1]
-                };
-            }, { create: "", insert: "" });
-            
-            fs.writeFile(createPath, sqlScripts.create, function(err) {
-                if (err) throw err;
-                console.log(`Wrote ${createPath}`);
-                fs.writeFile(insertPath, sqlScripts.insert, function(err) {
+            scripts.forEach((script, idx) => {
+                let fileName = `${sqlScriptPath}-${script[0]}.sql`;
+                fs.writeFile(fileName, script[2], function(err) {
                     if (err) throw err;
-                    console.log(`Wrote ${insertPath}`);
-                    done();
+                    console.log(`Wrote ${fileName}`);
+                    if (idx === scripts.length) {
+                        done();
+                    }
                 });
             });
         });        
     });
 }
 
-function createTemplate(useName, tableName, columns) {
-    return `use ${useName};
+function createTemplate(useName, tableName, columns, serverType) {
+    return `
+${serverType === 'sqlserver' ? `use ${useName};` : ''}
 create table "${tableName}" (
 ${columns}
 );
@@ -127,9 +133,9 @@ ${data}
 );
 `;
     });
-    return `use ${useName};
-set nocount on;
-delete ${tableName}; -- dump any previous data
+    return `
+
+truncate table "${tableName}"; -- dump any previous data
 ${inserts.join('\n')}
 `;
 }

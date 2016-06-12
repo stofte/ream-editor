@@ -23,7 +23,8 @@
 	],
 	[
 		"testdb2",
-		"TypeTest",
+		// typetest for mssqlserver
+		"TypeTest_sqlserver",
 		{ "Id": "int PRIMARY KEY", "data": ["0"] },
 		{ "bitcol": "bit", "data": [true] },
 		// ranges from
@@ -71,5 +72,12 @@
 		{ "uniqueidentifiercol": "uniqueidentifier", "data": ["newid()"] },
 		// rowversion is auto filled, no data
 		{ "rowversioncol": "rowversion" }
+	],
+	[
+		"testdb2",
+		// todo https://www.postgresql.org/docs/9.3/static/datatype.html
+		"TypeTest_npgsql",
+		{ "Id": "int PRIMARY KEY", "data": ["0"] },
+		{ "intcol": "int", "data": ["2147483647"] }
 	]
 ]

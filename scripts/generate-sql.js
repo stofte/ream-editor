@@ -1,2 +1,2 @@
 const helper = require('./sql-helper');
-helper.generate();
+helper.generate(process.argv[2]);

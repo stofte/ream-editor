@@ -34,14 +34,14 @@ install:
 
 before_build:
   # generates the scripts in the working folder
-  - npm run generate-sql
+  - npm run generate-for-sqlserver
   - ps: $sqlInstance = "(local)\SQL2014"
-  - ps: $create_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\create-generated.sql")
-  - ps: $insert_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\insert-generated.sql")
+  - ps: $db_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\sql-script-testdb.sql")
+  - ps: $db2_script = [IO.File]::ReadAllText("$env:APPVEYOR_BUILD_FOLDER\sql-script-testdb2.sql")
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb2;"
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $create_script
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $insert_script
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $db_script
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $db2_script
   - dotnet --info
           
 build_script:

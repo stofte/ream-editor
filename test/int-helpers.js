@@ -32,8 +32,10 @@ const objectMethods = [
     'GetHashCode'  
 ];
 
+const serverType = process.argv[3] && process.argv[3].indexOf('sqlserver') ?
+    'sqlserver' : 'npgsql';  
 const sqlData = new Promise((done, err) => {
-    helper.load().then(data => {
+    helper.load(serverType).then(data => {
         done(data);
     });
 });

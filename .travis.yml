@@ -1,7 +1,6 @@
 sudo: required
 dist: trusty
 install:
- - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
- - sudo apt-get install -y nodejs
+ - nvm install 6.2
 script:
  - node -v

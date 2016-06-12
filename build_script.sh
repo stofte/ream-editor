@@ -19,8 +19,11 @@ mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
 ls $OMNISHARP_ZIP
 file $OMNISHARP_ZIP
-tar xvf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
+tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm install
+# makes tslint ignore the typings folder ...
+echo {} > typings/tslint.json
+cat typings/tslint.json
 npm run-script gulp-build
 npm run-script bundle
 cp index.static.html $PACKAGE_BASE/index.html

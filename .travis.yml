@@ -40,7 +40,7 @@ install:
  - npm run generate-for-npgsql
  - psql -d testdb -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb.sql
  - psql -d testdb2 -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb2.sql
+ - chmod -x build_script.sh
 
 script:
- - chmod -x build_script.sh
  - bash build_script.sh

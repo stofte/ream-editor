@@ -11,6 +11,8 @@ rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
 call npm run-script gulp-build
 call npm run-script bundle
 copy index.static.html %PACKAGE_BASE%\index.html
+rem electron adds a LICSENSE as well
+copy LICENSE %PACKAGE_BASE%\linq-editor-license.txt
 copy electron-main.js %PACKAGE_BASE%\electron-main.js
 copy omnisharp-setup.js %PACKAGE_BASE%\omnisharp-setup.js
 copy package.json %PACKAGE_BASE%\package.json

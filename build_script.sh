@@ -19,6 +19,7 @@ npm run-script ts-build
 npm run-script bundle $PACKAGE_BASE
 npm run-script gulp-build
 cp index.static.html $PACKAGE_BASE/index.html
+cp LICENSE $PACKAGE_BASE/linq-editor-license.txt
 cp electron-main.js $PACKAGE_BASE/electron-main.js
 cp omnisharp-setup.js $PACKAGE_BASE/omnisharp-setup.js
 cp package.json $PACKAGE_BASE/package.json

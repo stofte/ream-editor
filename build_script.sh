@@ -42,5 +42,6 @@ cp project.json $PACKAGE_BASE/project.json
 cp project.lock.json $PACKAGE_BASE/project.lock.json
 cp project.json $PACKAGE_BASE/query/project.json
 cp project.lock.json $PACKAGE_BASE/query/project.lock.json
+ls $OMNISHARP_ZIP
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm run-script package_electron_linux

@@ -48,7 +48,7 @@ build_script:
   - build_script.cmd
 
 test_script:
-  - npm run int-test
+  - npm run int-test-sqlserver
 
 after_test:
   - 7z a "%APP_FINAL%" "%ELECTRON_OUT%"

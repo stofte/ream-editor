@@ -1,6 +1,7 @@
 sudo: required
 dist: trusty
-
+services:
+  - postgresql
 addons:
   apt:
     packages:
@@ -33,7 +34,11 @@ before_install:
 install:
  - dotnet --info
  - node -v
+ - psql -c 'create database testdb;' -U postgres
+ - psql -c 'create database testdb2;' -U postgres
  - npm run generate-for-npgsql
+ - psql -d testdb -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb.sql
+ - psql -d testdb2 -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb2.sql
 
 script:
  - chmod -x ./build_script.sh

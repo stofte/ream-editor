@@ -42,8 +42,8 @@ before_build:
   - ps: $db2_script
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb2;"
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $db_script
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q $db2_script
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "$db_script"
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "$db2_script"
   - dotnet --info
           
 build_script:

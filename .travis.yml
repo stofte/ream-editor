@@ -1,5 +1,16 @@
 sudo: required
 dist: trusty
+
+addons:
+  apt:
+    packages:
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+    - zlib1g
+
 env:
   global:
     - CLI_VERSION=latest
@@ -17,12 +28,6 @@ before_install:
  - echo $DOTNET_INSTALL_DIR
  - curl -O $DOTNETCLI_URL
  - curl -O $OMNISHARP_URL
- - sudo add-apt-repository main
- - sudo add-apt-repository universe
- - sudo add-apt-repository restricted
- - sudo add-apt-repository multiverse
- - sudo apt-get update
- - sudo apt-get install libunwind
  - sudo bash ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
 
 install:

@@ -74,7 +74,11 @@ function generate(serverType) {
                 let createCols = def.map(column => {
                     const colName = Object.keys(column).filter(k => k !== 'data')[0];
                     let columnName = serverType === 'sqlserver' ? `[${colName}]` : `"${colName}"`;
-                    return `${columnName} ${column[colName]}`;
+                    let columnType = column[colName];
+                    if (columnType.indexOf('int IDENTITY(1,1)') !== -1 && serverType !== 'sqlserver') {
+                        columnType = columnType.replace('int IDENTITY(1,1)', 'bigserial');
+                    }
+                    return `${columnName} ${columnType}`;
                 }).join(',\n');
                 let insertCols = def
                     .map(column => Object.keys(column).filter(k => k !== 'data')[0])

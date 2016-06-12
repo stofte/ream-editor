@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
-echo hello world
-export PACKAGE_BASE=build
-export ELECTRON_OUT=linq-editor-ubuntu-x64
-export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
-rm -rf $PACKAGE_BASE
+if [ $TRAVIS? -eq 0 ] 
+then export PACKAGE_BASE=build;
+export ELECTRON_OUT=linq-editor-ubuntu-x64;
+export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz;
+rm -rf $PACKAGE_BASE;
+fi
 // todo must be an argument
 mkdir $PACKAGE_BASE
 mkdir $PACKAGE_BASE/omnisharp

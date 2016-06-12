@@ -12,12 +12,17 @@ env:
     - NODE_ENV=PRODUCTION
     - DOTNET_INSTALL_DIR=$TRAVIS_BUILD_DIR/.dotnetcli
 
-install:
+before_install:
  - nvm install 6.2
  - echo $DOTNET_INSTALL_DIR
  - curl -O $DOTNETCLI_URL
+ - curl -O $OMNISHARP_URL
  - sudo bash ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
 
-script:
+install:
  - dotnet --info
  - node -v
+ - npm run generate-for-npgsql
+
+script:
+ - sudo bash ./build_script.sh

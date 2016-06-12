@@ -28,8 +28,8 @@ before_install:
  - echo $DOTNET_INSTALL_DIR
  - curl -O $DOTNETCLI_URL
  - curl -O $OMNISHARP_URL
- - sudo chmod -x ./install.sh
- - ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
+ - sudo bash ./install.sh --channel "preview" --version "$CLI_VERSION" --architecture "$CLI_ARCH" --install-dir "$DOTNET_INSTALL_DIR" --no-path
+ - export PATH="$DOTNET_INSTALL_DIR:$PATH"
 
 install:
  - dotnet --info

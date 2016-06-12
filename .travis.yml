@@ -55,3 +55,4 @@ script:
  - bash build_script.sh
  - npm run int-test-npgsql
  - cat npm-debug.log
+ - cat $ELECTRON_OUT/linq-editor.log

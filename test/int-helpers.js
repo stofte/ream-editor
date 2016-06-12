@@ -100,5 +100,6 @@ module.exports = {
     checkTable,
     checkHints,
     sqlData,
-    objectMethods
+    objectMethods,
+    serverType
 };

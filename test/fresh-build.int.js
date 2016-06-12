@@ -13,7 +13,8 @@ const {
     connectionString,
     connectionString2,
     sqlData,
-    objectMethods
+    objectMethods,
+    serverType
 } = require('./int-helpers');
 
 const queryText = 'Foo.Select(x => new { SomeDesc = x.Description, Ident = x.IdAuto })';
@@ -81,9 +82,16 @@ describe('fresh build', function() {
     });
     
     it('can add a new connection and close connection manager', function () {        
-        return this.app.client
+        let c1 = this.app.client
             .click('.int-test-start-page .btn-default')
-            .waitForVisible('.int-test-conn-man form input')
+            .waitForVisible('.int-test-conn-man form input');
+        
+        if (serverType !== 'sqlserver') {
+            c1 = c1
+                .click(`input[value=npgsql]`)
+        }
+
+        return c1
             .pause(pauseTimeout)
             .click('.int-test-conn-man form input')
             .executeAsync(function(str, done) {
@@ -149,13 +157,22 @@ describe('fresh build', function() {
     });
     
     it('can add another connection string via the connection manager', function() {
-        return this.app.client 
+        let c1 = this.app.client 
             .timeoutsAsyncScript(executeJsTimeout)
             .click('.int-test-tab-list ul li:first-child')
             .keys('\uE009')
             .keys('d')
             .keys('\uE000')
             .pause(pauseTimeout)
+            ;
+        
+        if(serverType !== 'sqlserver') {
+            c1 = c1
+                .click(`input[value=npgsql]`)
+                .pause(pauseTimeout)
+        }
+
+        return c1
             .click('.int-test-conn-man form input')
             .executeAsync(function(str, done) {
                 document.querySelector('.int-test-conn-man form input').value = str;

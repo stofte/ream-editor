@@ -11,12 +11,12 @@ env:
     - ELECTRON_OUT=linq-editor-linux-x64
     - NODE_ENV=PRODUCTION
     - DOTNET_INSTALL_DIR=$TRAVIS_BUILD_DIR/.dotnetcli
+
 install:
  - nvm install 6.2
  - echo $DOTNET_INSTALL_DIR
  - curl -O $DOTNETCLI_URL
- - cat ./install.sh
- - ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
+ - sudo ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
 
 script:
  - dotnet --info

@@ -84,7 +84,10 @@ namespace QueryEngine.Services
             var resFiles = rGen.GenerateAsync(conf);
             resFiles.Wait();
             Console.WriteLine("resFiles.Result.ContextFile {0}", resFiles.Result.ContextFile);
+            var zz = fs.RetrieveFileContents(System.IO.Path.GetDirectoryName(resFiles.Result.ContextFile), System.IO.Path.GetFileName(resFiles.Result.ContextFile));
+            Console.WriteLine("fsContents: {0}", zz);
             var dbCtx = CreateContext(fs.RetrieveFileContents(_tempFolder, programName + ".cs"), isLibrary: withUsings);
+
             var ctx = dbCtx.Item1;
             if (!withUsings) 
             {

@@ -17,18 +17,17 @@ env:
     - CLI_ARCH=x64
     - OMNISHARP_URL=https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta5/omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     - OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
-    - DOTNETCLI_URL=https://raw.githubusercontent.com/dotnet/cli/v1.0.0-preview1/scripts/obtain/install.sh
+    - DOTNETCLI_URL=https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview1/scripts/obtain/dotnet-install.sh
     - PACKAGE_BASE=build
     - ELECTRON_OUT=linq-editor-linux-x64
     - NODE_ENV=PRODUCTION
-    - DOTNET_INSTALL_DIR=$TRAVIS_BUILD_DIR/.dotnetcli
+    - DOTNET_INSTALL_DIR=~/.dotnetcli
 
 before_install:
  - nvm install 6.2
  - echo $DOTNET_INSTALL_DIR
- - curl -O $DOTNETCLI_URL
  - curl -O $OMNISHARP_URL
- - sudo bash ./install.sh --channel "preview" --version "$CLI_VERSION" --architecture "$CLI_ARCH" --install-dir "$DOTNET_INSTALL_DIR" --no-path
+ - curl -sSL $DOTNETCLI_URL | bash /dev/stdin --version $CLI_VERSION --install-dir $DOTNET_INSTALL_DIR
  - export PATH="$DOTNET_INSTALL_DIR:$PATH"
 
 install:

@@ -73,12 +73,13 @@ function generate(serverType) {
                 let def = definition.slice(2);
                 let createCols = def.map(column => {
                     const colName = Object.keys(column).filter(k => k !== 'data')[0];
-                    return `"${colName}" ${column[colName]}`;
+                    let columnName = serverType === 'sqlserver' ? `[${colName}]` : `"${colName}"`;
+                    return `${columnName} ${column[colName]}`;
                 }).join(',\n');
                 let insertCols = def
                     .map(column => Object.keys(column).filter(k => k !== 'data')[0])
                     .filter(insertColumnFilter)
-                    .map(s => `"${s}"`)
+                    .map(s => serverType === 'sqlserver' ? `[${s}]` : `"${s}"`)
                     .join(',\n');
                 const rowsVals = def
                     .map(c => c.data)
@@ -96,7 +97,7 @@ function generate(serverType) {
                     return rowsVals.map(row => row[idx]);
                 });
                 const create = createTemplate(useName, tableName, createCols, serverType);
-                const insert = insertTemplate(useName, tableName, insertCols, insertData);
+                const insert = insertTemplate(useName, tableName, insertCols, insertData, serverType);
                 return [useName, tableName.toLowerCase(), create + insert];
             });
             scripts.forEach((script, idx) => {
@@ -114,17 +115,18 @@ function generate(serverType) {
 }
 
 function createTemplate(useName, tableName, columns, serverType) {
-    return `${serverType === 'sqlserver' ? `use ${useName};
-` : ''}create table "${tableName}" (
+    return `${serverType === 'sqlserver' ? `use [${useName}];
+` : ''}create table ${serverType === 'sqlserver' ? `[${tableName}]` : `"${tableName}"`} (
 ${columns}
 );
 `;
 }
 
-function insertTemplate(useName, tableName, insertCols, insertData) {
+function insertTemplate(useName, tableName, insertCols, insertData, serverType) {
+    let tblName = serverType === 'sqlserver' ? `[${tableName}]` : `"${tableName}"`;
     let inserts = insertData.map(data => {
         return `
-insert into "${tableName}"(
+insert into ${tblName}(
 ${insertCols}
 )
 values (
@@ -134,7 +136,7 @@ ${data}
     });
     return `
 
-truncate table "${tableName}"; -- dump any previous data
+truncate table ${tblName}; -- dump any previous data
 ${inserts.join('\n')}
 `;
 }

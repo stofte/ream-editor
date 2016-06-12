@@ -20,6 +20,8 @@ const queryText = 'Foo.Select(x => new { SomeDesc = x.Description, Ident = x.IdA
 const queryText2 = 'TypeTest.Take(10)';
 const queryText3 = 'TypeTest.Select(x => x.';
 
+console.log('fresh-build.appPath', appPath);
+
 let expectedData = null;
 let expectedCompletions = null;
 

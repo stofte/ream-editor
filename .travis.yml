@@ -48,3 +48,4 @@ install:
 script:
  - bash build_script.sh
  - npm run int-test-npgsql
+ - cat npm-debug.log

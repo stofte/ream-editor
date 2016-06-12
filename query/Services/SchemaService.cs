@@ -83,7 +83,7 @@ namespace QueryEngine.Services
             var output = new StringBuilder();
             var resFiles = rGen.GenerateAsync(conf);
             resFiles.Wait();
-            
+            Console.WriteLine("resFiles.Result.ContextFile {0}", resFiles.Result.ContextFile);
             var dbCtx = CreateContext(fs.RetrieveFileContents(_tempFolder, programName + ".cs"), isLibrary: withUsings);
             var ctx = dbCtx.Item1;
             if (!withUsings) 

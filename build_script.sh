@@ -20,7 +20,7 @@ mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
 ls $OMNISHARP_ZIP
-tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
+tar xvf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm install
 npm run-script gulp-build
 npm run-script bundle

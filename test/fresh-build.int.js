@@ -37,6 +37,8 @@ function setExpectedData(data) {
 
 const err = function waitErrorHandler(e) { throw e; };
 
+console.log('connectionString', connectionString, connectionString2);
+
 function pasteQueryToEditorAndCheckResultsAfterExecuting(query, expected) {
         let executingClient = this.app.client
             .moveToObject('.CodeMirror')

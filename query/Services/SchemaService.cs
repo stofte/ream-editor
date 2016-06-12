@@ -75,7 +75,7 @@ namespace QueryEngine.Services
             {
                 ConnectionString = connectionString,
                 ContextClassName = programName,
-                ProjectPath = "na",
+                ProjectPath = _tempFolder,
                 ProjectRootNamespace = assemblyNamespace,
                 OutputPath = _tempFolder
             };

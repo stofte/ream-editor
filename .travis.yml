@@ -36,4 +36,4 @@ install:
  - npm run generate-for-npgsql
 
 script:
- - sudo bash ./build_script.sh
+ - ./build_script.sh

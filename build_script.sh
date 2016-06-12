@@ -5,6 +5,8 @@ if [ "$TRAVIS" = "" ]; then
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     rm -rf $PACKAGE_BASE
 fi
+echo $PACKAGE_BASE
+ls $PACKAGE_BASE
 // todo must be an argument
 mkdir $PACKAGE_BASE
 mkdir $PACKAGE_BASE/omnisharp

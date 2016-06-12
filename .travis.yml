@@ -17,6 +17,7 @@ before_install:
  - echo $DOTNET_INSTALL_DIR
  - curl -O $DOTNETCLI_URL
  - curl -O $OMNISHARP_URL
+ - sudo apt-get install libunwind
  - sudo bash ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
 
 install:

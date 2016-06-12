@@ -11,6 +11,9 @@ addons:
     - libssl-dev
     - libunwind8
     - zlib1g
+cache:
+  directories:
+    - node_modules
 
 env:
   global:
@@ -19,7 +22,7 @@ env:
     - OMNISHARP_URL=https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta8/omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     - OMNISHARP_ZIP=$TRAVIS_BUILD_DIR/omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     - DOTNETCLI_URL=https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview1/scripts/obtain/dotnet-install.sh
-    - PACKAGE_BASE=$TRAVIS_BUILD_DIR/build
+    - PACKAGE_BASE=build
     - ELECTRON_OUT=$TRAVIS_BUILD_DIR/linq-editor-linux-x64
     - NODE_ENV=PRODUCTION
     - DOTNET_INSTALL_DIR=$TRAVIS_BUILD_DIR/.dotnetcli

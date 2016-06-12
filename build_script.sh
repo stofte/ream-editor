@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-if [ "$TRAVIS" = "" ]; then
+if [ "$TRAVIS" = "" ];
+then
     echo "went inside!"
     export PACKAGE_BASE=build
     export ELECTRON_OUT=linq-editor-ubuntu-x64

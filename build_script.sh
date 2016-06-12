@@ -7,7 +7,7 @@ if [ "$TRAVIS" = "" ]; then
 fi
 echo $PACKAGE_BASE
 ls $PACKAGE_BASE
-// todo must be an argument
+# todo must be an argument
 mkdir $PACKAGE_BASE
 mkdir $PACKAGE_BASE/omnisharp
 mkdir $PACKAGE_BASE/resources

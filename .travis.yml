@@ -43,4 +43,4 @@ install:
 
 script:
  - chmod -x build_script.sh
- - sudo bash build_script.sh
+ - bash build_script.sh

@@ -1,9 +1,10 @@
 const path = require('path');
 const helper = require('../scripts/sql-helper');
 
-const isCI = process.env['CI']; // set by appveyor
+const isAppveyor = process.env['APPVEYOR'];
+const isTravis = process.env['TRAVIS'];
 const isWin = process.env['APPDATA'];
-const ciMod = isCI ? 3 : 1;
+const ciMod = isAppveyor || isTravis ? 3 : 1;
 
 const suiteTimeout =  2 * 60 * 1000 * ciMod; // locally test runs at ~1 min
 const backendTimeout = 20 * 1000 * ciMod;
@@ -16,14 +17,16 @@ const appPath = path.normalize(`${path.dirname(__dirname)
     }/linq-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/linq-editor${!IS_LINUX ? '.exe' : '' }`);
 
 const connectionString = 
-    isCI  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb' :
-    isWin ? 'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb' :
-            'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb';
+    isAppveyor  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb' :
+    isTravis ?    'Data Source=127.0.01;     User Id=postgres; Password=;      Initial Catalog=testdb' :
+    isWin ?       'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb' :
+                  'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb';
 
 const connectionString2 = 
-    isCI  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb2' :
-    isWin ? 'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb2' :
-            'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb2';
+    isAppveyor  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb2' :
+    isTravis ?    'Data Source=127.0.01;     User Id=postgres; Password=;      Initial Catalog=testdb2' :
+    isWin ?       'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb2' :
+                  'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb2';
 
 const objectMethods = [
     'Equals',

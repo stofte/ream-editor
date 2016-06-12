@@ -14,7 +14,8 @@ install:
  - nvm install 6.2
  - echo $DOTNET_INSTALL_DIR
  - curl -O $DOTNETCLI_URL
- - sh ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
+ - cat ./install.sh
+ - ./install.sh -Channel "preview" -version "$CLI_VERSION" -Architecture "$CLI_ARCH" -InstallDir "$DOTNET_INSTALL_DIR"
 
 script:
  - dotnet --info

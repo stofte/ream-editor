@@ -116,6 +116,7 @@ function generate(serverType) {
 
 function createTemplate(useName, tableName, columns, serverType) {
     return `${serverType === 'sqlserver' ? `use [${useName}];
+set nocount on;
 ` : ''}create table ${serverType === 'sqlserver' ? `[${tableName}]` : `"${tableName}"`} (
 ${columns}
 );

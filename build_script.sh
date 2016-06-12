@@ -17,8 +17,6 @@ mkdir $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
-ls $OMNISHARP_ZIP
-file $OMNISHARP_ZIP
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm install
 # makes tslint ignore the typings folder ...

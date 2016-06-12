@@ -57,7 +57,7 @@ function pasteQueryToEditorAndCheckResultsAfterExecuting(query, expected) {
             ;
 }
 
-describe.skip('fresh build', function() {
+describe('fresh build', function() {
     this.timeout(suiteTimeout);
 
     before(function () {

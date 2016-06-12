@@ -105,7 +105,7 @@ function generate(serverType) {
                 return [useName, tableName.toLowerCase(), create + insert];
             });
             scripts.forEach((script, idx) => {
-                let fileName = `${sqlScriptPath}-${script[0]}.sql`;
+                let fileName = `${script[0]}-${serverType}.sql`;
                 fs.writeFile(fileName, script[2], function(err) {
                     if (err) throw err;
                     console.log(`Wrote ${fileName}`);

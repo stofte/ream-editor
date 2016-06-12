@@ -1,0 +1,24 @@
+{
+    "local": {
+        "sqlserver": [
+            "Data Source=.\\sqlexpress; Integrated Security=True; Initial Catalog=testdb",
+            "Data Source=.\\sqlexpress; Integrated Security=True; Initial Catalog=testdb2"
+        ],
+        "npgsql": [
+            "Server=192.168.56.2; User Id=testuser; Password=Password12!; Database=testdb",
+            "Server=192.168.56.2; User Id=testuser; Password=Password12!; Database=testdb2"
+        ]
+    },
+    "appveyor": {
+        "sqlserver": [
+            "Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb",
+            "Data Source=.\\SQL2014; User Id=sa; Password=Password12!; Initial Catalog=testdb2"
+        ]        
+    },
+    "travis": {
+        "npgsql": [
+            "Server=localhost; User Id=postgres; Password=; Database=testdb",
+            "Server=localhost; User Id=postgres; Password=; Database=testdb2"
+        ]
+    }
+}

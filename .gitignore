@@ -17,5 +17,7 @@ create-generated.sql
 insert-generated.sql
 bundle.css
 bundle.css.map
-sql-script-testdb.sql
-sql-script-testdb2.sql
+testdb-npgsql.sql
+testdb2-npgsql.sql
+testdb-sqlserver.sql
+testdb2-sqlserver.sql

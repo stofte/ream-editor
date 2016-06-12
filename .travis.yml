@@ -42,8 +42,8 @@ install:
  - psql -c 'create database testdb;' -U postgres
  - psql -c 'create database testdb2;' -U postgres
  - npm run generate-for-npgsql
- - psql -d testdb -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb.sql
- - psql -d testdb2 -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb2.sql
+ - psql -d testdb -U postgres -f $TRAVIS_BUILD_DIR/testdb-npgsql.sql
+ - psql -d testdb2 -U postgres -f $TRAVIS_BUILD_DIR/testdb2-npgsql.sql
  - chmod -x build_script.sh
 
 before_script:
@@ -54,6 +54,6 @@ before_script:
 
 script:
  - bash build_script.sh
- - npm run int-test-npgsql
+ - npm run int-test-travis
  - cat npm-debug.log
  - cat $ELECTRON_OUT/linq-editor.log

@@ -36,7 +36,7 @@ function setExpectedData(data) {
 }
 
 const err = function waitErrorHandler(e) { throw e; };
-
+console.log('serverType', serverType);
 console.log('connectionString', connectionString, connectionString2);
 
 function pasteQueryToEditorAndCheckResultsAfterExecuting(query, expected) {
@@ -57,7 +57,7 @@ function pasteQueryToEditorAndCheckResultsAfterExecuting(query, expected) {
             ;
 }
 
-describe('fresh build', function() {
+describe.skip('fresh build', function() {
     this.timeout(suiteTimeout);
 
     before(function () {
@@ -88,7 +88,7 @@ describe('fresh build', function() {
             .click('.int-test-start-page .btn-default')
             .waitForVisible('.int-test-conn-man form input');
         
-        if (serverType !== 'sqlserver') {
+        if (serverType === 'npgsql') {
             c1 = c1
                 .click(`input[value=npgsql]`)
         }
@@ -168,7 +168,7 @@ describe('fresh build', function() {
             .pause(pauseTimeout)
             ;
         
-        if(serverType !== 'sqlserver') {
+        if (serverType === 'npgsql') {
             c1 = c1
                 .click(`input[value=npgsql]`)
                 .pause(pauseTimeout)

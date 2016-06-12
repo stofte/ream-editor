@@ -1,32 +1,21 @@
 const path = require('path');
 const helper = require('../scripts/sql-helper');
+const connections = require('../scripts/connections.json');
 
-const isAppveyor = process.env['APPVEYOR'];
-const isTravis = process.env['TRAVIS'];
-const isWin = process.env['APPDATA'];
-const ciMod = isAppveyor || isTravis ? 3 : 1;
-
-const suiteTimeout =  2 * 60 * 1000 * ciMod; // locally test runs at ~1 min
-const backendTimeout = 20 * 1000 * ciMod;
-const executeJsTimeout = 2 * 1000 * ciMod;
-const pauseTimeout = 1000 * ciMod;
-
+// todo probably not the best, required for locating the electron output binary, and launching test
 const IS_LINUX = !process.env.PATHEXT;
+// appveyor/travisci sets this var
+const CI_MOD = process.env['CI'] ? 3 : 1;
+
+const suiteTimeout =  2 * 60 * 1000 * CI_MOD; // locally test runs at ~1 min
+const backendTimeout = 20 * 1000 * CI_MOD;
+const executeJsTimeout = 2 * 1000 * CI_MOD;
+const pauseTimeout = 1000 * CI_MOD;
 
 const appPath = path.normalize(`${path.dirname(__dirname)
     }/linq-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/linq-editor${!IS_LINUX ? '.exe' : '' }`);
 
-const connectionString = 
-    isAppveyor  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb' :
-    isTravis ?    'Server=localhost; User Id=postgres; Password=; Database=testdb' :
-    isWin ?       'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb' :
-                  'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb';
-
-const connectionString2 = 
-    isAppveyor  ? 'Data Source=.\\SQL2014;   User Id=sa; Password=Password12!; Initial Catalog=testdb2' :
-    isTravis ?    'Server=localhost; User Id=postgres; Password=; Database=testdb2' :
-    isWin ?       'Data Source=.\\sqlexpress; Integrated Security=True;        Initial Catalog=testdb2' :
-                  'Data Source=192.168.56.2; User Id=sa; Password=Password12!; Initial Catalog=testdb2';
+const [connectionString, connectionString2, serverType] = getContextInfo();
 
 const objectMethods = [
     'Equals',
@@ -35,13 +24,26 @@ const objectMethods = [
     'GetHashCode'  
 ];
 
-const serverType = process.argv[3] && process.argv[3].indexOf('sqlserver') ?
-    'sqlserver' : 'npgsql';  
 const sqlData = new Promise((done, err) => {
     helper.load(serverType).then(data => {
         done(data);
     });
 });
+
+function getContextInfo() {
+    let cmdLine = process.argv.join(' ');
+    let npgsql = cmdLine.indexOf('--npgsql') !== -1;
+    let sqlServer = cmdLine.indexOf('--sqlserver') !== -1;
+    let appveyor = cmdLine.indexOf('--appveyor') !== -1;
+    let travis = cmdLine.indexOf('--travis') !== -1;
+    let local = cmdLine.indexOf('--local') !== -1;
+    return [...connections[
+        local ? 'local' : 
+        appveyor ? 'appveyor' : 'travis'
+    ][
+        npgsql ? 'npgsql' : 'sqlserver'
+    ], npgsql ? 'npgsql' : 'sqlserver'];
+}
 
 // first create checks for all cell values, ensuring we keep passing the client around, 
 // and return it in the end, so it can be awaited
@@ -88,6 +90,7 @@ function checkHints(client, hints) {
             });
     }, client);
 }
+
 
 module.exports = {
     suiteTimeout,

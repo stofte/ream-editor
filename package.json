@@ -19,8 +19,10 @@
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",    
     "test": "mocha app/**/*.spec.js",
-    "int-test-sqlserver": "mocha test/**/*.int.js --sqlserver",
-    "int-test-npgsql": "mocha test/**/*.int.js --npgsql"
+    "int-test-appveyor": "mocha test/**/*.int.js --appveyor --sqlserver",
+    "int-test-travis": "mocha test/**/*.int.js --travis --npgsql",
+    "int-test-local-sqlserver": "mocha test/**/*.int.js --local --sqlserver",
+    "int-test-local-npgsql": "mocha test/**/*.int.js --local --npgsql"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",

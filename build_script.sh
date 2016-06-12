@@ -17,11 +17,10 @@ mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
 npm install
-npm run-script lint
-npm run-script ts-build
-npm run-script bundle $PACKAGE_BASE
 npm run-script gulp-build
+npm run-script bundle
 cp index.static.html $PACKAGE_BASE/index.html
+# electron adds a LICSENSE as well
 cp LICENSE $PACKAGE_BASE/linq-editor-license.txt
 cp electron-main.js $PACKAGE_BASE/electron-main.js
 cp omnisharp-setup.js $PACKAGE_BASE/omnisharp-setup.js

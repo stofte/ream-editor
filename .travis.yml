@@ -41,5 +41,5 @@ install:
  - psql -d testdb2 -U postgres -f $TRAVIS_BUILD_DIR/sql-script-testdb2.sql
 
 script:
- - chmod -x ./build_script.sh
+ - chmod -x build_script.sh
  - ./build_script.sh

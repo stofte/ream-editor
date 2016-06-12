@@ -83,6 +83,7 @@ namespace QueryEngine.Services
             var output = new StringBuilder();
             var resFiles = rGen.GenerateAsync(conf);
             resFiles.Wait();
+            Console.WriteLine("_tempFolder: {0}", _tempFolder);
             Console.WriteLine("resFiles.Result.ContextFile {0}", resFiles.Result.ContextFile);
             var zz = fs.RetrieveFileContents(System.IO.Path.GetDirectoryName(resFiles.Result.ContextFile), System.IO.Path.GetFileName(resFiles.Result.ContextFile));
             Console.WriteLine("fsContents: {0}", zz);

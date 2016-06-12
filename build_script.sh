@@ -18,6 +18,8 @@ mkdir $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
+ls $OMNISHARP_ZIP
+tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm install
 npm run-script gulp-build
 npm run-script bundle
@@ -42,6 +44,4 @@ cp project.json $PACKAGE_BASE/project.json
 cp project.lock.json $PACKAGE_BASE/project.lock.json
 cp project.json $PACKAGE_BASE/query/project.json
 cp project.lock.json $PACKAGE_BASE/query/project.lock.json
-ls $OMNISHARP_ZIP
-tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm run-script package_electron_linux

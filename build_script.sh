@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 if [ "$TRAVIS" = "" ];
 then
-    echo "went inside!"
+    echo "local build"
     export PACKAGE_BASE=build
     export ELECTRON_OUT=linq-editor-ubuntu-x64
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
@@ -22,7 +22,6 @@ tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm install
 # makes tslint ignore the typings folder ...
 echo {} > typings/tslint.json
-cat typings/tslint.json
 npm run-script gulp-build
 npm run-script bundle
 cp index.static.html $PACKAGE_BASE/index.html

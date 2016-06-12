@@ -16,7 +16,7 @@ mkdir $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
-# npm install
+npm install
 npm run-script lint
 npm run-script ts-build
 npm run-script bundle $PACKAGE_BASE

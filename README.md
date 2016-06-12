@@ -8,24 +8,50 @@ Builds
 
 Developing
 ----------
-- Install the latest `dotnet` using [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries)
+
+Prerequisites to run repository code locally
+
+- Latest `dotnet` using [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries) 
 - Download the latest [OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`
+- `gulp-cli` should be installed globally (`npm install -g gulp-cli`)
+- `typings` should be installed globally (`npm install -g typings`) 
+
+Restore depedencies
+
 - `dotnet restore`
 - `npm install`
+
+Build and watch the TypeScript and CSS, and start the shell.
+
+- `gulp` 
 - `npm start`
+
+The shell handles starting the Query and OmniSharp background processes
+as required.
+
+Tests
+-----
+
+Test integration scripts perform basic feature tests against a live database. The test assumes the target
+database server has databases `testdb` and `testdb2` available.
+
+- `npm run generate-for-sqlserver` scripts for MS SQL Server
+- `npm run generate-for-npgsql` scripts for PostgreSQL
+
+Once the database is updated, the tests can be run using
+
+- `npm run int-test-sqlserver`
+- `npm run int-test-npgsql`
+
+Connection strings are found in `test/int-helpers.js`
 
 TODO
 ----
-- TS Model persistence should be picky (ie no "editing" property)
 - Error handling
 - Culture handling
 - Multiple instance handling
 - EF fails if table has no primary key?
-- SQLite and Postgres EF Core database providers
+- SQLite EFCore database providers
 - OmniSharp hosting/custom build?
+- Store test connectionstrings in a json file (like db.sql.json)
 - [dotnet run in folder with spaces fails](https://github.com/dotnet/cli/issues/1189)
-
-VS Code
--------------
-- omnisharp/vscode for dotnet cli https://github.com/gregg-miskelly/omnisharp-vscode/blob/daily-build-docs/debugger.md
-- windows cannot debug pdbs https://github.com/OmniSharp/omnisharp-vscode/wiki/Portable-PDBs#downloading-a-net-cli-which-supports-debugtype-option

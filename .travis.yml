@@ -36,4 +36,5 @@ install:
  - npm run generate-for-npgsql
 
 script:
+- chmod -x ./build_script.sh
  - ./build_script.sh

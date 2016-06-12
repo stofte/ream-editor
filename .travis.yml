@@ -3,6 +3,7 @@ dist: trusty
 services:
   - postgresql
 addons:
+  postgresql: "9.4"
   apt:
     packages:
     - gettext

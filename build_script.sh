@@ -6,8 +6,6 @@ if [ "$TRAVIS" = "" ]; then
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     rm -rf $PACKAGE_BASE
 fi
-echo $PACKAGE_BASE
-ls $PACKAGE_BASE
 # todo must be an argument
 mkdir $PACKAGE_BASE
 mkdir $PACKAGE_BASE/omnisharp
@@ -20,6 +18,7 @@ mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
 ls $OMNISHARP_ZIP
+file $OMNISHARP_ZIP
 tar xvf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm install
 npm run-script gulp-build

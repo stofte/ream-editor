@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 if [ "$TRAVIS" = "" ]; then
+    echo "went inside!"
     export PACKAGE_BASE=build
     export ELECTRON_OUT=linq-editor-ubuntu-x64
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz

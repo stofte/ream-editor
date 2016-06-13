@@ -99,11 +99,9 @@ export class ConnectionManagerComponent {
         this.connectionManager.hideConnections();
     }
     
-    private addNewConnection(value: string, sqlserver: boolean, npgsql: boolean) {
-        Assert(sqlserver && !npgsql || !sqlserver && npgsql, 'Either must be set');
+    private addNewConnection(value: string, sqlserver: ConnectionType) {
         if (value.length > 0) {
-            const type = sqlserver ? 'sqlserver' : 'npgsql';
-            this.conns.add(new Connection(value, type));
+            this.conns.add(new Connection(value, sqlserver));
             this.newConnectionStringText = '';
         }
     }

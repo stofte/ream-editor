@@ -24,3 +24,5 @@ interface IStreamOperation extends Function {
 
 declare function Assert(cond: any): void;
 declare function Assert(cond: any, msg: string): void;
+
+type ConnectionType = 'sqlserver' | 'npgsql' | 'sqlite';

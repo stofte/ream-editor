@@ -1,12 +1,10 @@
-
-
 export class Connection {
     public id: number; 
     public editing = false;
     public connectionString: string = null;
     public temporary: string;
-    public type: string;
-    constructor(connectionString: string, connectionType: string) {
+    public type: ConnectionType;
+    constructor(connectionString: string, connectionType: ConnectionType) {
         this.connectionString = connectionString;
         this.type = connectionType;
     }

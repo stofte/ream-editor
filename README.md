@@ -55,6 +55,7 @@ Connection strings are found in `test/int-helpers.js`
 
 TODO
 ----
+- Table/cell selections
 - Error handling
 - Culture handling
 - Multiple instance handling

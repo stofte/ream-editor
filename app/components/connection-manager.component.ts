@@ -99,9 +99,10 @@ export class ConnectionManagerComponent {
         this.connectionManager.hideConnections();
     }
     
-    private addNewConnection(value: string, sqlserver: ConnectionType) {
+    private addNewConnection(value: string, sqlserver: boolean, npgsql: boolean) {
+        const serverType: ConnectionType = npgsql ? 'npgsql' : 'sqlserver';
         if (value.length > 0) {
-            this.conns.add(new Connection(value, sqlserver));
+            this.conns.add(new Connection(value, serverType));
             this.newConnectionStringText = '';
         }
     }

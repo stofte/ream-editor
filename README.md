@@ -40,8 +40,8 @@ as required.
 Tests
 -----
 
-Test integration scripts perform basic feature tests against a live database. The test assumes the target
-database server has databases `testdb` and `testdb2` available.
+Test integration scripts perform basic feature tests against a live database.
+The connectionstrings used can be found in `scripts/connections.json`.
 
 - `npm run generate-for-sqlserver` scripts for MS SQL Server
 - `npm run generate-for-npgsql` scripts for PostgreSQL
@@ -61,5 +61,5 @@ TODO
 - EF fails if table has no primary key?
 - SQLite EFCore database providers
 - OmniSharp hosting/custom build?
-- Store test connectionstrings in a json file (like db.sql.json)
+- Websocket/rx query backend
 - [dotnet run in folder with spaces fails](https://github.com/dotnet/cli/issues/1189)

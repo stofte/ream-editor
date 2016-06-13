@@ -5,6 +5,7 @@ if "%CI%" == "" (set ELECTRON_OUT=linq-editor-win32-x64)
 if "%CI%" == "" (set OMNISHARP_ZIP=omnisharp-win-x64-netcoreapp1.0.zip)
 if "%CI%" == "" (rmdir /q /s %PACKAGE_BASE%)
 if not "%CI%" == "" (call npm install)
+if not "%CI%" == "" (echo {} > typings/tslint.json)
 if not "%CI%" == "" (dotnet restore)
 mkdir %PACKAGE_BASE%
 rem https://github.com/npm/npm/issues/2938#issuecomment-11337463

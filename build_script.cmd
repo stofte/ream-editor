@@ -1,9 +1,11 @@
 @echo off
 setlocal
+if "%CI%" == "" (echo local build)
 if "%CI%" == "" (set PACKAGE_BASE=build)
 if "%CI%" == "" (set ELECTRON_OUT=linq-editor-win32-x64)
 if "%CI%" == "" (set OMNISHARP_ZIP=omnisharp-win-x64-netcoreapp1.0.zip)
-if "%CI%" == "" (rmdir /q /s %PACKAGE_BASE%)
+if "%CI%" == "" (rmdir /s /q %ELECTRON_OUT%)
+if "%CI%" == "" (rmdir /s /q %PACKAGE_BASE%)
 if not "%CI%" == "" (call npm install)
 if not "%CI%" == "" (echo {} > typings/tslint.json)
 if not "%CI%" == "" (dotnet restore)

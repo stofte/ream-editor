@@ -12,7 +12,7 @@ export class LogService {
     
     constructor() {
         ipc.on('application-event', this.applicationEventHandler.bind(this));
-        this.log('log.service', `mode=${MODE}`);
+        this.log('log.service', `${MODE}@${new Date()}`);
     }
     
     public log(stamp: string, msg: string) {

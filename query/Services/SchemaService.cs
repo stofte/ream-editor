@@ -15,14 +15,16 @@ namespace QueryEngine.Services
 
         public SchemaService() 
         {
+            // todo figure out something better
             _tempFolder = Environment.GetEnvironmentVariable("TEMP");
+            if (string.IsNullOrEmpty(_tempFolder)) 
+            {
+                _tempFolder = "/tmp";
+            }
         }
 
         public SchemaResult GetSchemaSource(string connectionString, DatabaseProviderType type, string assemblyNamespace, bool withUsings = true) 
         {
-            Console.WriteLine("connectionString {0}", connectionString);
-            Console.WriteLine("databaseProviderType {0}", type);
-
             // todo code is identical
             if (type == DatabaseProviderType.SqlServer) 
             {
@@ -33,6 +35,7 @@ namespace QueryEngine.Services
                 return GetNpgSqlSchemaSource(connectionString, assemblyNamespace, withUsings);
             }
         }
+
         SchemaResult GetNpgSqlSchemaSource(string connectionString, string assemblyNamespace, bool withUsings = true) 
         {
             var loggerFactory = new LoggerFactory().AddConsole();
@@ -83,10 +86,7 @@ namespace QueryEngine.Services
             var output = new StringBuilder();
             var resFiles = rGen.GenerateAsync(conf);
             resFiles.Wait();
-            Console.WriteLine("_tempFolder: {0}", _tempFolder);
-            Console.WriteLine("resFiles.Result.ContextFile {0}", resFiles.Result.ContextFile);
             var zz = fs.RetrieveFileContents(System.IO.Path.GetDirectoryName(resFiles.Result.ContextFile), System.IO.Path.GetFileName(resFiles.Result.ContextFile));
-            Console.WriteLine("fsContents: {0}", zz);
             var dbCtx = CreateContext(fs.RetrieveFileContents(_tempFolder, programName + ".cs"), isLibrary: withUsings);
 
             var ctx = dbCtx.Item1;

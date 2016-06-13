@@ -10,17 +10,9 @@ else
     npm install
     dotnet restore
 fi
-# todo must be an argument
-mkdir $PACKAGE_BASE
-mkdir $PACKAGE_BASE/omnisharp
-mkdir $PACKAGE_BASE/resources
-mkdir $PACKAGE_BASE/resources/fonts
-mkdir $PACKAGE_BASE/resources/fonts/source-code-pro
-mkdir $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2
-mkdir $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
-mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
-mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
-mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
+mkdir -p $PACKAGE_BASE/omnisharp
+mkdir -p $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
+mkdir -p $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 # makes tslint ignore the typings folder ...
 echo {} > typings/tslint.json

@@ -5,9 +5,6 @@ services:
   - postgresql
 
 addons:
-  artifacts:
-    paths:
-    - $ELECTRON_OUT
   postgresql: "9.4"
   apt:
     packages:

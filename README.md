@@ -1,7 +1,12 @@
 Linq Editor [![Windows build status](https://ci.appveyor.com/api/projects/status/s7adk4g4bu8dmh9k?svg=true)](https://ci.appveyor.com/project/stofte/linq-editor) [![Linux build Status](https://travis-ci.org/stofte/linq-editor.svg?branch=master)](https://travis-ci.org/stofte/linq-editor)
+======================
 
-===========
 Linq Editor is a desktop application that allows you to write C#/LINQ queries against SQL databases. Currently supports MS SQL Server and PostgreSQL.
+
+![Main query window](http://i.imgur.com/LGmMhVO.png "Main query window")
+![Property completion](http://i.imgur.com/ZmHJwrl.png "Property completion")
+![Connection manager](http://i.imgur.com/hYJcXMi.png "Connection manager")
+
 
 Builds
 ------

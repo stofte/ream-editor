@@ -1,7 +1,9 @@
 sudo: required
 dist: trusty
+
 services:
   - postgresql
+
 addons:
   artifacts: true
     paths:
@@ -15,6 +17,7 @@ addons:
     - libssl-dev
     - libunwind8
     - zlib1g
+
 cache:
   directories:
     - node_modules

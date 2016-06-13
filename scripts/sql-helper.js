@@ -62,7 +62,6 @@ function patchDataForServerType(data, serverType) {
 }
 
 function generate(serverType) {
-    console.log('generate for', serverType);
     return new Promise((done, err) => {
         fs.readFile(dbJson, 'utf8', (err, text) => {
             if (err) throw err;

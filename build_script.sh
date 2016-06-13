@@ -6,6 +6,9 @@ then
     export ELECTRON_OUT=linq-editor-ubuntu-x64
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     rm -rf $PACKAGE_BASE
+else
+    npm install
+    dotnet restore
 fi
 # todo must be an argument
 mkdir $PACKAGE_BASE
@@ -19,7 +22,6 @@ mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2
 mkdir $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
-npm install
 # makes tslint ignore the typings folder ...
 echo {} > typings/tslint.json
 npm run-script gulp-build
@@ -38,9 +40,8 @@ cp node_modules/bootstrap/dist/fonts/* $PACKAGE_BASE/resources/fonts
 # chrome only seems to load 
 cp -r resources/fonts/source-code-pro/WOFF2/TTF/* $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
 cp -r resources/fonts/source-sans-pro/WOFF2/TTF/* $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
-dotnet restore
-dotnet publish --configuration Release --output $PACKAGE_BASE/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
 #dotnet publish --configuration Release --output linq-editor-ubuntu-x64/resources/app/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
+dotnet publish --configuration Release --output $PACKAGE_BASE/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
 cp project.json $PACKAGE_BASE/project.json
 cp project.lock.json $PACKAGE_BASE/project.lock.json
 cp project.json $PACKAGE_BASE/query/project.json

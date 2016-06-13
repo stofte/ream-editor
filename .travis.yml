@@ -1,8 +1,13 @@
 sudo: required
 dist: trusty
+
 services:
   - postgresql
+
 addons:
+  artifacts:
+    paths:
+    - $ELECTRON_OUT
   postgresql: "9.4"
   apt:
     packages:
@@ -12,6 +17,7 @@ addons:
     - libssl-dev
     - libunwind8
     - zlib1g
+
 cache:
   directories:
     - node_modules

@@ -3,7 +3,7 @@ if [ "$TRAVIS" = "" ];
 then
     echo "local build"
     export PACKAGE_BASE=build
-    export ELECTRON_OUT=linq-editor-ubuntu-x64
+    export ELECTRON_OUT=linq-editor-linux-x64
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     rm -rf $PACKAGE_BASE
 else

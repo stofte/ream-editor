@@ -56,5 +56,5 @@ before_script:
   - sleep 3 # give xvfb some time to start
 
 script:
- - bash scripts\build_script.sh
+ - bash scripts/build_script.sh
  - npm run int-test-travis

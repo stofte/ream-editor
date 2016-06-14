@@ -43,7 +43,7 @@ before_build:
   - dotnet --info
           
 build_script:
-  - build_script.cmd
+  - .\scripts\build_script.cmd
 
 test_script:
   - npm run int-test-appveyor

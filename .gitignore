@@ -1,10 +1,7 @@
-*.suo
-*/**/bin
-*/**/obj
-*/**/*.csproj.user
-packages/*
-*.gpState
-*.vsp
-*.psess
-TestCoverage
-TestResult.xml
+bin
+obj
+node_modules
+typings
+project.json.lock
+build
+linq-editor-win32-x64

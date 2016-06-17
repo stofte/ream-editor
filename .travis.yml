@@ -47,7 +47,7 @@ install:
  - npm run generate-for-npgsql
  - psql -d testdb -U postgres -f $TRAVIS_BUILD_DIR/testdb-npgsql.sql
  - psql -d testdb2 -U postgres -f $TRAVIS_BUILD_DIR/testdb2-npgsql.sql
- - chmod -x scripts/build_script.sh
+ - chmod -x scripts/build.sh
 
 before_script:
   # https://docs.travis-ci.com/user/gui-and-headless-browsers/#Using-xvfb-to-Run-Tests-That-Require-a-GUI
@@ -56,5 +56,5 @@ before_script:
   - sleep 3 # give xvfb some time to start
 
 script:
- - bash scripts/build_script.sh
+ - bash ./scripts/build.sh
  - npm run int-test-travis

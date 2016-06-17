@@ -8,7 +8,7 @@ if "%CI%" == "" (rmdir /s /q %ELECTRON_OUT%)
 if "%CI%" == "" (rmdir /s /q %PACKAGE_BASE%)
 if not "%CI%" == "" (call npm install)
 if not "%CI%" == "" (echo {} > typings/tslint.json)
-if not "%CI%" == "" (dotnet restore)
+if not "%CI%" == "" (dotnet restore query\project.json)
 mkdir %PACKAGE_BASE%
 rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
 call npm run-script gulp-build
@@ -29,11 +29,11 @@ rem chrome only seems to load
 xcopy resources\fonts\source-code-pro\WOFF2\TTF %PACKAGE_BASE%\resources\fonts\source-code-pro\WOFF2\TTF /S /I /R
 xcopy resources\fonts\source-sans-pro\WOFF2\TTF %PACKAGE_BASE%\resources\fonts\source-sans-pro\WOFF2\TTF /S /I /R
 rem dotnet publish --configuration Release --output linq-editor-win32-x64\resources\app\query --runtime win7-x64 --framework netcoreapp1.0
-dotnet publish --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
-copy project.json %PACKAGE_BASE%\project.json
-copy project.lock.json %PACKAGE_BASE%\project.lock.json
-copy project.json %PACKAGE_BASE%\query\project.json
-copy project.lock.json %PACKAGE_BASE%\query\project.lock.json
+dotnet publish query\project.json --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
+copy query\project.json %PACKAGE_BASE%\project.json
+copy query\project.lock.json %PACKAGE_BASE%\project.lock.json
+copy query\project.json %PACKAGE_BASE%\query\project.json
+copy query\project.lock.json %PACKAGE_BASE%\query\project.lock.json
 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
 call npm run-script package_electron_win32
 endlocal

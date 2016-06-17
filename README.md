@@ -1,7 +1,7 @@
-Linq Editor [![Windows build status](https://ci.appveyor.com/api/projects/status/s7adk4g4bu8dmh9k?svg=true)](https://ci.appveyor.com/project/stofte/linq-editor) [![Linux build Status](https://travis-ci.org/stofte/linq-editor.svg?branch=master)](https://travis-ci.org/stofte/linq-editor)
+Ream [![Windows build status](https://ci.appveyor.com/api/projects/status/s7adk4g4bu8dmh9k?svg=true)](https://ci.appveyor.com/project/stofte/ream-editor) [![Linux build Status](https://travis-ci.org/stofte/linq-editor.svg?branch=master)](https://travis-ci.org/stofte/ream-editor)
 ======================
 
-Linq Editor is a cross-platform desktop application that allows you to write C#/LINQ queries against SQL databases. Currently supports MS SQL Server and PostgreSQL.
+Ream is a cross-platform desktop application that allows you to write C#/LINQ queries against SQL databases. Currently supports MS SQL Server and PostgreSQL.
 
 ![Main query window](http://i.imgur.com/LGmMhVO.png "Main query window")
 
@@ -12,7 +12,7 @@ Linq Editor is a cross-platform desktop application that allows you to write C#/
 
 Builds
 ------
-[Windows x64 builds](https://ci.appveyor.com/project/stofte/linq-editor/build/artifacts) courtesy of [AppVeyor](https://www.appveyor.com/) 
+[Windows x64 builds](https://ci.appveyor.com/project/stofte/ream-editor/build/artifacts) courtesy of [AppVeyor](https://www.appveyor.com/) 
 
 Developing
 ----------

@@ -39,3 +39,4 @@ cp query/project.lock.json $PACKAGE_BASE/project.lock.json
 cp query/project.json $PACKAGE_BASE/query/project.json
 cp query/project.lock.json $PACKAGE_BASE/query/project.lock.json
 npm run-script package_electron_linux
+

@@ -1,4 +1,3 @@
-
 import { enableProdMode } from '@angular/core';
 
 if (MODE === 'PRODUCTION') {
@@ -13,17 +12,19 @@ import { HTTP_PROVIDERS } from '@angular/http';
 import { ROUTER_PROVIDERS } from '@angular/router-deprecated';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { AppComponent } from './app.component';
-import { MonitorService } from './services/monitor.service';
-import { OverlayService } from './services/overlay.service';
-import { StorageService } from './services/storage.service';
-import { ConnectionService } from './services/connection.service';
-import { TabService } from './services/tab.service';
-import { EditorService } from './services/editor.service';
-import { QueryService } from './services/query.service';
-import { OmnisharpService } from './services/omnisharp.service';
-import { LogService } from './services/log.service';
-import { MirrorChangeStream } from './services/mirror-change.stream';
-import { HotkeyService } from './services/hotkey.service';
+import {
+        MonitorService,
+        OverlayService,
+        StorageService,
+        ConnectionService,
+        TabService,
+        EditorService,
+        QueryService,
+        OmnisharpService,
+        LogService,
+        MirrorChangeStream,
+        HotkeyService
+} from './services/index';
 
 bootstrap(AppComponent, [
     MonitorService,
@@ -36,9 +37,6 @@ bootstrap(AppComponent, [
     OmnisharpService,
     LogService,
     MirrorChangeStream,
-    TabService,
     HotkeyService,
     HTTP_PROVIDERS
-    // ROUTER_PROVIDERS,
-    // provide(LocationStrategy, { useClass: HashLocationStrategy })
 ]);

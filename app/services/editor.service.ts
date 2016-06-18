@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { EditorChange } from '../models/editor-change';
-import { TabService } from './tab.service';
-import { CodeCheckResult } from '../models/code-check-result';
-import { Tab } from '../models/tab';
 import { Subject, Observable } from 'rxjs/Rx';
+import { TabService } from './tab.service';
+import { Tab, EditorChange, CodeCheckResult } from '../models/index';
 
 @Injectable()
 export class EditorService {

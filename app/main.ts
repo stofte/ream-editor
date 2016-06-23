@@ -23,8 +23,14 @@ import {
         OmnisharpService,
         LogService,
         MirrorChangeStream,
-        HotkeyService
+        HotkeyService,
+        UserService
 } from './services/index';
+
+import {
+    UserStream,
+    EditorStream
+} from './streams/index';
 
 bootstrap(AppComponent, [
     MonitorService,
@@ -38,5 +44,8 @@ bootstrap(AppComponent, [
     LogService,
     MirrorChangeStream,
     HotkeyService,
+    UserService,
+    UserStream,
+    EditorStream,
     HTTP_PROVIDERS
 ]);

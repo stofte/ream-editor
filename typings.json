@@ -1,11 +1,15 @@
 {
   "name": "linq-editor",
-  "dependencies": {},
+  "dependencies": {
+    "chai": "registry:npm/chai#3.5.0+20160415060238",
+    "lodash": "registry:npm/lodash#4.0.0+20160416211519",
+    "sinon": "registry:npm/sinon#1.16.0+20160427193336",
+    "sinon-chai": "registry:npm/sinon-chai#2.8.0+20160310030142"
+  },
   "globalDependencies": {
-    "chai": "registry:dt/chai#3.4.0+20160317120654",
-    "codemirror": "registry:dt/codemirror#0.0.0+20160608063737",
+    "codemirror": "registry:dt/codemirror#0.0.0+20160619021621",
     "codemirror-showhint": "registry:dt/codemirror-showhint#0.0.0+20160317120654",
-    "lodash": "registry:dt/lodash#3.10.0+20160330154726",
-    "mocha": "registry:dt/mocha#2.2.5+20160317120654"
-  }
+    "mocha": "registry:dt/mocha#2.2.5+20160619032855"
+  },
+  "devDependencies": {}
 }

@@ -1,4 +1,4 @@
-Ream [![Windows build status](https://ci.appveyor.com/api/projects/status/s7adk4g4bu8dmh9k?svg=true)](https://ci.appveyor.com/project/stofte/ream-editor) [![Linux build Status](https://travis-ci.org/stofte/linq-editor.svg?branch=master)](https://travis-ci.org/stofte/ream-editor)
+Ream [![Windows build status](https://ci.appveyor.com/api/projects/status/x8h5dx8lhwv40h8b?svg=true)](https://ci.appveyor.com/project/stofte/ream-editor) [![Linux build Status](https://travis-ci.org/stofte/ream-editor.svg?branch=master)](https://travis-ci.org/stofte/ream-editor)
 ======================
 
 Ream is a cross-platform desktop application that allows you to write C#/LINQ queries against SQL databases. Currently supports MS SQL Server and PostgreSQL.

@@ -116,7 +116,7 @@ export class MonitorService {
     private queryCmd(): { dir: string, cmd: string } {
         let dir = isProduction ? `${dirname}/query` : dirname;
         let cmd = isProduction ? `"${dir}/query-engine${!IS_LINUX ? '.exe' : ''}"` :
-            `"${config.dotnetDebugPath}" run `;
+            `"${config.dotnetDebugPath}" run -p query`;
         return { dir, cmd };
     }
     

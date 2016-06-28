@@ -9,3 +9,4 @@ export * from './overlay.service';
 export * from './query.service';
 export * from './storage.service';
 export * from './tab.service';
+export * from './user.service';

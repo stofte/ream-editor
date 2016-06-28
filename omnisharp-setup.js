@@ -21,7 +21,7 @@ function copyFile(fileName, from, to, isDebug) {
     } catch (e) {{
         fs.readFile(path.join(from, fileName) , 'utf-8', (err, value) => {
             fs.writeFile(path.join(to, fileName), value);
-        });        
+        });
     }}
 }
 
@@ -32,8 +32,9 @@ module.exports = function omnisharpSetup(mode, folder) {
     } catch (e) {
         createPath(folder);
     }
-    let dotnetDir = __dirname;
+    let dotnetDir = __dirname + (isDebug ? '/query/src/QueryEngine' : '');
     [
+        'NuGet.config',
         'project.json',
         'project.lock.json'
     ].forEach(file => {

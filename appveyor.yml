@@ -23,6 +23,7 @@ cache:
   - '%OMNISHARP_ZIP%'
 
 install:
+  - git submodule update --init --recursive
   - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"
   # upgrades to latest node
   - ps: Install-Product node ''

@@ -4,7 +4,7 @@ const fs = electronRequire('fs');
 const path = electronRequire('path');
 const isProduction = MODE !== 'DEVELOPMENT';
 const dirname = isProduction ?  path.dirname(process.resourcesPath) : path.dirname(path.dirname(__dirname));
-const logFile = path.normalize(`${dirname}/linq-editor${isProduction ? '' : '.dev'}.log`);
+const logFile = path.normalize(`${dirname}/ream-editor${isProduction ? '' : '.dev'}.log`);
 
 @Injectable()
 export class LogService {

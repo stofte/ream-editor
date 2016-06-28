@@ -13,7 +13,7 @@ const executeJsTimeout = 2 * 1000 * CI_MOD;
 const pauseTimeout = 1000 * CI_MOD;
 
 const appPath = path.normalize(`${path.dirname(__dirname)
-    }/linq-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/linq-editor${!IS_LINUX ? '.exe' : '' }`);
+    }/ream-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/ream-editor${!IS_LINUX ? '.exe' : '' }`);
 
 const [connectionString, connectionString2, serverType] = getContextInfo();
 

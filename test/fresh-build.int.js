@@ -209,12 +209,12 @@ describe('fresh build', function() {
     });
 
 
-    it('can query TypeTest using new connection and receive expected results', function() {
+    it.skip('can query TypeTest using new connection and receive expected results', function() {
         return pasteQueryToEditorAndCheckResultsAfterExecuting
             .call(this, queryText2, expectedData[1]);
     });
     
-    it('can provide autocompletions for TypeTest table', function() {
+    it.skip('can provide autocompletions for TypeTest table', function() {
         // cursor index, given the query
         let cursorCol = queryText3.indexOf('x.') + 2;
         let cursorRow = 0;

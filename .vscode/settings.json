@@ -13,7 +13,7 @@
 		"omnisharp-ubuntu-x64-netcoreapp1*": true
 	},
 	"search.exclude": {
-		"linq-editor-win32-x64": true,
-		"linq-editor-linux-x64": true
+		"ream-editor-win32-x64": true,
+		"ream-editor-linux-x64": true
 	}
 }

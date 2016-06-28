@@ -8,10 +8,10 @@ bin
 obj
 omnisharp-win-x64-netcoreapp1.0.zip
 omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
-linq-editor-win32-x64
-linq-editor-linux-x64
+ream-editor-win32-x64
+ream-editor-linux-x64
 project.lock.json
-linq-editor.dev.log
+ream-editor.dev.log
 npm-debug.log
 create-generated.sql
 insert-generated.sql

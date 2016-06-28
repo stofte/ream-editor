@@ -1,7 +1,7 @@
 const path = electronRequire('path');
 
-const omnisharpPath = path.resolve((IS_LINUX ? `${process.env.HOME}/.linq-editor/` : 
-    `${process.env.LOCALAPPDATA}\\LinqEditor\\`) + 'omnisharp');
+const omnisharpPath = path.resolve((IS_LINUX ? `${process.env.HOME}/.ream-editor/` : 
+    `${process.env.LOCALAPPDATA}\\ReamEditor\\`) + 'omnisharp');
 
 export default {
     omnisharpPort: 2000,

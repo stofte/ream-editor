@@ -47,7 +47,6 @@ before_build:
   - dotnet --info
   - dotnet restore
   - cd query
-  - git pull
   - dir
   - cd ..
   - dotnet restore

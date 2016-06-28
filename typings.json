@@ -1,5 +1,5 @@
 {
-  "name": "linq-editor",
+  "name": "ream-editor",
   "dependencies": {
     "chai": "registry:npm/chai#3.5.0+20160415060238",
     "lodash": "registry:npm/lodash#4.0.0+20160416211519",

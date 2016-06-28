@@ -1,12 +1,12 @@
 {
-  "name": "linq-editor",
+  "name": "ream-editor",
   "version": "0.1.0",
   "description": "query databases by writing c# and linq",
   "private": true,
   "main": "electron-main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stofte/linq-editor.git"
+    "url": "https://github.com/stofte/ream-editor.git"
   },
   "scripts": {
     "start": "electron electron-main.js DEBUG",
@@ -15,7 +15,7 @@
     "package_electron_win32": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",
     "package_electron_linux": "electron-packager ./$PACKAGE_BASE --platform=linux --arch=x64 --overwrite --out=./",
     "lint": "tslint ./app/**/*.ts -t verbose",
-    "postinstall": "typings install",
+    "postinstall": "typings install & echo {} > typings/tslint.json",
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
     "test": "mocha --require reflect-metadata app/**/*.spec.js",

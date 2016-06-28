@@ -45,11 +45,6 @@ before_build:
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\testdb-sqlserver.sql
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\testdb2-sqlserver.sql
   - dotnet --info
-  - dotnet restore
-  - cd query
-  - dir
-  - cd ..
-  - dotnet restore
           
 build_script:
   - .\scripts\build.cmd

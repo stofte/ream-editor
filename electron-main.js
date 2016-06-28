@@ -11,8 +11,8 @@ const MODE = process.argv[2]; // passed by package.json, so absent when running 
 const omnisharpSetup = require('./omnisharp-setup');
 const path = require('path');
 
-const omnisharpPath = path.normalize((IS_LINUX ? `${process.env.HOME}/.linq-editor/` : 
-    `${process.env.LOCALAPPDATA}\\LinqEditor\\`) + 'omnisharp');
+const omnisharpPath = path.normalize((IS_LINUX ? `${process.env.HOME}/.ream-editor/` : 
+    `${process.env.LOCALAPPDATA}\\ReamEditor\\`) + 'omnisharp');
 
 omnisharpSetup(MODE, omnisharpPath);
 
@@ -27,7 +27,7 @@ let cleanedUpLogs = false;
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1100, height: 900, title: 'Linq Editor'});
+    mainWindow = new BrowserWindow({width: 1100, height: 900, title: 'Ream'});
     
     var template = [{
             label: 'File',

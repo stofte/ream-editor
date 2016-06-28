@@ -12,7 +12,7 @@ environment:
   OMNISHARP_ZIP: v1.9-beta5-omnisharp-win-x64-netcoreapp1.zip
   DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview2/scripts/obtain/dotnet-install.ps1
   PACKAGE_BASE: build
-  ELECTRON_OUT: linq-editor-win32-x64
+  ELECTRON_OUT: ream-editor-win32-x64
   NODE_ENV: PRODUCTION
 
 cache:
@@ -62,4 +62,4 @@ after_test:
 
 artifacts:
   - path: $(APP_FINAL)
-  - path: $(ELECTRON_OUT)\linq-editor.log
+  - path: $(ELECTRON_OUT)\ream-editor.log

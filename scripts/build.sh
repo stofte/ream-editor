@@ -29,11 +29,11 @@ cp node_modules/bootstrap/dist/fonts/* $PACKAGE_BASE/resources/fonts
 # chrome only seems to load 
 cp -r resources/fonts/source-code-pro/WOFF2/TTF/* $PACKAGE_BASE/resources/fonts/source-code-pro/WOFF2/TTF
 cp -r resources/fonts/source-sans-pro/WOFF2/TTF/* $PACKAGE_BASE/resources/fonts/source-sans-pro/WOFF2/TTF
-#dotnet publish --configuration Release --output ream-editor-ubuntu-x64/resources/app/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
-dotnet publish query/project.json --configuration Release --output $PACKAGE_BASE/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
+#dotnet publish query/src/QueryEngine/project.json --configuration Release --output ream-editor-linux-x64/resources/app/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
+dotnet publish query/src/QueryEngine/project.json --configuration Release --output $PACKAGE_BASE/query --runtime ubuntu.14.04-x64 --framework netcoreapp1.0
 cp query/NuGet.config $PACKAGE_BASE/query/NuGet.config
-cp query/project.json $PACKAGE_BASE/query/project.json
-cp query/project.lock.json $PACKAGE_BASE/query/project.lock.json
+cp query/src/QueryEngine/project.json $PACKAGE_BASE/query/project.json
+cp query/src/QueryEngine/project.lock.json $PACKAGE_BASE/query/project.lock.json
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm run-script package_electron_linux
 

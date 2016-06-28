@@ -22,6 +22,7 @@
     "int-test-appveyor": "mocha test/**/*.int.js --appveyor --sqlserver",
     "int-test-travis": "mocha test/**/*.int.js --travis --npgsql",
     "int-test-local-sqlserver": "mocha test/**/*.int.js --local --sqlserver",
+    "int-test-local-sqlserver2": "mocha test/**/*.int.js --local --sqlserver2",
     "int-test-local-npgsql": "mocha test/**/*.int.js --local --npgsql"
   },
   "dependencies": {

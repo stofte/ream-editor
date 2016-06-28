@@ -34,6 +34,7 @@ function getContextInfo() {
     let cmdLine = process.argv.join(' ');
     let npgsql = cmdLine.indexOf('--npgsql') !== -1;
     let sqlServer = cmdLine.indexOf('--sqlserver') !== -1;
+    let sqlServer2 = cmdLine.indexOf('--sqlserver2') !== -1;
     let appveyor = cmdLine.indexOf('--appveyor') !== -1;
     let travis = cmdLine.indexOf('--travis') !== -1;
     let local = cmdLine.indexOf('--local') !== -1;
@@ -41,7 +42,8 @@ function getContextInfo() {
         local ? 'local' : 
         appveyor ? 'appveyor' : 'travis'
     ][
-        npgsql ? 'npgsql' : 'sqlserver'
+        npgsql ? 'npgsql' : 
+        sqlServer2 ? 'sqlserver2' : 'sqlserver'
     ], npgsql ? 'npgsql' : 'sqlserver'];
 }
 

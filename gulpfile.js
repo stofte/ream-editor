@@ -10,9 +10,9 @@ const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
 const urlrewrite = require('postcss-urlrewrite');
 
-const DEBUG = process.env.PACKAGE_BASE;
-const output = DEBUG || '.';
-
+const DEBUG = !process.env.PACKAGE_BASE;
+const output = process.env.PACKAGE_BASE || '.';
+ 
 const cssFiles = [
     'node_modules/normalizecss/normalize.css',
     'node_modules/bootstrap/dist/css/bootstrap.css',

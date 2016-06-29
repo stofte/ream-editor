@@ -1,15 +1,18 @@
 version: 0.1.0.{build}
+branches:
+  only:
+    - master
 services:
   - mssql2014
-  
+
 environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
   OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta5/omnisharp-win-x64-netcoreapp1.0.zip
   OMNISHARP_ZIP: v1.9-beta5-omnisharp-win-x64-netcoreapp1.zip
-  DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/v1.0.0-preview1/scripts/obtain/install.ps1
+  DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview2/scripts/obtain/dotnet-install.ps1
   PACKAGE_BASE: build
-  ELECTRON_OUT: linq-editor-win32-x64
+  ELECTRON_OUT: ream-editor-win32-x64
   NODE_ENV: PRODUCTION
 
 cache:
@@ -20,6 +23,7 @@ cache:
   - '%OMNISHARP_ZIP%'
 
 install:
+  - git submodule update --init --recursive
   - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"
   # upgrades to latest node
   - ps: Install-Product node ''
@@ -53,4 +57,4 @@ after_test:
 
 artifacts:
   - path: $(APP_FINAL)
-  - path: $(ELECTRON_OUT)\linq-editor.log
+  - path: $(ELECTRON_OUT)\ream-editor.log

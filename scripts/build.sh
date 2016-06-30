@@ -34,6 +34,7 @@ dotnet publish query/src/QueryEngine/project.json --configuration Release --outp
 cp query/NuGet.config $PACKAGE_BASE/query/NuGet.config
 cp query/src/QueryEngine/project.json $PACKAGE_BASE/query/project.json
 cp query/src/QueryEngine/project.lock.json $PACKAGE_BASE/query/project.lock.json
+cp query/src/QueryEngine/appsettings.json $PACKAGE_BASE/query/appsettings.json
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 npm run-script package_electron_linux
 

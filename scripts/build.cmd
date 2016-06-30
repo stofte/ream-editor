@@ -32,6 +32,7 @@ dotnet publish query\src\QueryEngine\project.json --configuration Release --outp
 copy query\NuGet.config %PACKAGE_BASE%\query\NuGet.config
 copy query\src\QueryEngine\project.json %PACKAGE_BASE%\query\project.json
 copy query\src\QueryEngine\project.lock.json %PACKAGE_BASE%\query\project.lock.json
+copy query\src\QueryEngine\appsettings.json %PACKAGE_BASE%\query\appsettings.json
 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
 call npm run-script package_electron_win32
 endlocal

@@ -115,9 +115,9 @@ export class MonitorService {
     
     private queryCmd(): { dir: string, cmd: string } {
         let dir = isProduction ? `${dirname}/query` : 
-            `${dirname}/query/src/QueryEngine`;
-        let cmd = isProduction ? `"${dir}/QueryEngine${!IS_LINUX ? '.exe' : ''}"` :
-            `"${config.dotnetDebugPath}" run`;
+            `${dirname}`;
+        let cmd = isProduction ? `"${dir}/ReamQuery${!IS_LINUX ? '.exe' : ''}"` :
+            `"${config.dotnetDebugPath}" run -p query/query/src/ReamQuery --server.urls http://localhost:${config.queryEnginePort}`;
         return { dir, cmd };
     }
     

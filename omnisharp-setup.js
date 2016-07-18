@@ -32,7 +32,7 @@ module.exports = function omnisharpSetup(mode, folder) {
     } catch (e) {
         createPath(folder);
     }
-    let dotnetDir = __dirname + (isDebug ? '/query/src/QueryEngine' : '/query');
+    let dotnetDir = __dirname + (isDebug ? '/query/query/src/ReamQuery' : '/query');
     [
         'NuGet.config',
         'project.json',

@@ -1,6 +1,6 @@
 const path = require('path');
 const helper = require('../scripts/sql-helper');
-const connections = require('../query/test/QueryEngine.Test/connections.json');
+const connections = require('../query/query/test/ReamQuery.Test/connections.json');
 
 // todo probably not the best, required for locating the electron output binary, and launching test
 const IS_LINUX = !process.env.PATHEXT;

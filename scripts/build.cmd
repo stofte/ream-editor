@@ -28,11 +28,11 @@ rem chrome only seems to load
 xcopy resources\fonts\source-code-pro\WOFF2\TTF %PACKAGE_BASE%\resources\fonts\source-code-pro\WOFF2\TTF /S /I /R
 xcopy resources\fonts\source-sans-pro\WOFF2\TTF %PACKAGE_BASE%\resources\fonts\source-sans-pro\WOFF2\TTF /S /I /R
 rem dotnet publish --configuration Release --output linq-editor-win32-x64\resources\app\query --runtime win7-x64 --framework netcoreapp1.0
-dotnet publish query\src\QueryEngine\project.json --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
+dotnet publish query\src\ReamQuery\project.json --configuration Release --output %PACKAGE_BASE%\query --runtime win7-x64 --framework netcoreapp1.0
 copy query\NuGet.config %PACKAGE_BASE%\query\NuGet.config
-copy query\src\QueryEngine\project.json %PACKAGE_BASE%\query\project.json
-copy query\src\QueryEngine\project.lock.json %PACKAGE_BASE%\query\project.lock.json
-copy query\src\QueryEngine\appsettings.json %PACKAGE_BASE%\query\appsettings.json
+copy query\src\ReamQuery\project.json %PACKAGE_BASE%\query\project.json
+copy query\src\ReamQuery\project.lock.json %PACKAGE_BASE%\query\project.lock.json
+copy query\src\ReamQuery\appsettings.json %PACKAGE_BASE%\query\appsettings.json
 7z x %OMNISHARP_ZIP% -y -o"%PACKAGE_BASE%\omnisharp"
 call npm run-script package_electron_win32
 endlocal

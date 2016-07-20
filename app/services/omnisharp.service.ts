@@ -87,6 +87,7 @@ export class OmnisharpService {
             }, {})
             .flatMap((x: {conn: Connection, tabId: number }) => {
                 let req = { 
+                    id: uuid.v4(),
                     connectionString: x.conn.connectionString,
                     serverType: x.conn.type,
                     text: ''

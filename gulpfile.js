@@ -77,6 +77,14 @@ gulp.task('watch', () => {
     gulp.watch(tsFiles, ['ts:lint', 'ts']);
 });
 
+gulp.task('watch:ts', () => {
+    gulp.watch(tsFiles, ['ts']);
+});
+
+gulp.task('watch:ts:lint', ['ts:lint'], () => {
+    gulp.watch(tsFiles, ['ts:lint']);
+});
+
 const mainTasks = ['css', 'ts:lint', 'ts'];
 gulp.task('build', mainTasks);
 gulp.task('default', ['watch', ...mainTasks]);

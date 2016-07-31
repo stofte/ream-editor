@@ -9,6 +9,7 @@
     "url": "https://github.com/stofte/ream-editor.git"
   },
   "scripts": {
+    "tsc:w": "tsc -w",
     "start": "electron electron-main.js DEBUG",
     "bundle": "node bundle-sfx.js",
     "gulp-build": "gulp build",
@@ -18,7 +19,7 @@
     "postinstall": "typings install & echo {} > typings/tslint.json",
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
-    "test": "mocha --require reflect-metadata app/**/*.spec.js",
+    "test": "electron-mocha  --no-colors --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
     "int-test-appveyor": "mocha test/**/*.int.js --appveyor --sqlserver",
     "int-test-travis": "mocha test/**/*.int.js --travis --npgsql",
     "int-test-local-sqlserver": "mocha test/**/*.int.js --local --sqlserver",
@@ -52,6 +53,7 @@
   "devDependencies": {
     "chai": "3.5.0",
     "cssnano": "3.7.0",
+    "electron-mocha": "^2.3.1",
     "electron-packager": "7.0.3",
     "electron-prebuilt": "0.37.8",
     "gulp": "3.9.1",
@@ -77,6 +79,7 @@
     "typedoc": "0.4.4",
     "typescript": "1.8.10",
     "typings": "1.0.4",
-    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony"
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
+    "xmlhttprequest": "^1.8.0"
   }
 }

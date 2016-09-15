@@ -10,5 +10,3 @@ global.Assert = function Assert(cond, msg) {
 }
 // angular requirement
 global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
-// used by unit tests
-global.__nodeHttp = require('http');

@@ -6,16 +6,15 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { HTTP_PROVIDERS } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { QueryStream } from './query.stream';
+import { QueryMessage } from '../messages/index';
 import { ProcessStream } from './process.stream';
 import config from '../config';
 
+const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
-const executeJsTimeout = config.unitTestData.executeJsTimeout;
-const http = __nodeHttp;
 
 describe('query.stream int-test', function() {
-    this.timeout(30 * 1000);
-
+    this.timeout(backendTimeout * 3);
     let injector: ReflectiveInjector;
     let instance: QueryStream = null;
     
@@ -24,7 +23,7 @@ describe('query.stream int-test', function() {
         chai.use(sinonChai);
     });
 
-    beforeEach(() => {
+    beforeEach(function() {
         injector = ReflectiveInjector.resolveAndCreate([
             HTTP_PROVIDERS,
             QueryStream,
@@ -33,30 +32,20 @@ describe('query.stream int-test', function() {
         instance = injector.get(QueryStream);
     });
 
-    describe('when closing', function() {
-        before(function() {
-            this.timeout(backendTimeout * 1.3);
+    it('handles shutdown', function(done) {
+        this.timeout(backendTimeout);
+        instance.events.subscribe(msg => {
+            if (msg.type === 'closed') {
+                setTimeout(() => {
+                    let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
+                    http.get(url, res => { done(new Error('response received')); })
+                        .on('error', () => { done(); });
+                }, 1000);
+            }
+        });
+        // some startup time
+        setTimeout(function() {
             instance.shutdown();
-            return new Promise((succ, err) => {
-                // give it a bit more time before we check services
-                setTimeout(succ, backendTimeout);
-            });
-        });
-
-        // check via http if services are still up and going.
-        it('also closes background omnisharp process', function(done) {
-            this.timeout(backendTimeout);
-            let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
-            http.get(url, res => { done(new Error('response received')); })
-                .on('error', () => { done(); });
-        });
-        
-        it('also closes background query process', function(done) {
-            this.timeout(backendTimeout);
-            let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
-            http.get(url, res => { done(new Error('response received')); })
-                .on('error', () => { done(); });
-        });
-
+        }, 2000);
     });
 });

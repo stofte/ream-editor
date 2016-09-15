@@ -21,9 +21,6 @@ describe('query.stream int-test', function() {
     before(function() {
         chai.expect();
         chai.use(sinonChai);
-    });
-
-    beforeEach(function() {
         injector = ReflectiveInjector.resolveAndCreate([
             HTTP_PROVIDERS,
             QueryStream,

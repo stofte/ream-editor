@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css">
+<script src="../node_modules/codemirror/lib/codemirror.js"></script>
+</head>
+<body>
+<textarea id="code"></textarea>
+<textarea id="json" style="width: 99%; margin-top: 10px; height: calc(100vh - 350px)"></textarea>
+<script>
+let start = null;
+const events = [];
+const output = document.getElementById('json');
+CodeMirror.fromTextArea(document.getElementById("code"), {
+    lineNumbers: true
+}).on('change', (_, event) => {
+    if (!start) start = performance.now();
+    events.push({
+        event,
+        time: performance.now() - start
+    });
+    output.value = `[
+${events.map(e => '    ' + JSON.stringify(e)).join(',\n')}
+]`;JSON.stringify(events);
+});    
+</script>
+</body>
+</html>

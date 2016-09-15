@@ -54,20 +54,6 @@ describe('process.stream int-test', function() {
 
     it('emits expected application lifecycle events for query', function(done) {
         this.timeout(15 * 1000);
-        let query = processHelper.query(2000);
-        let receivedStarting = false;
-        let types = ['starting', 'ready', 'closing', 'closed'];
-        let idx = 0;
-        let sub = instance.status.subscribe(msg => {
-            expect(msg.type).to.equal(types[idx++]);
-
-            if (msg.type === 'ready') {
-                instance.close();
-            }
-            if (msg.type === 'closed' || msg.type === 'failed') {
-                sub.unsubscribe();
-            }
-        }).add(done);
-        instance.start(query.command, query.directory, 2000);
+        lifecycleTest('query', done);
     });
 });

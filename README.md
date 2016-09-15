@@ -26,7 +26,7 @@ Prerequisites to run repository code locally
 
 Restore depedencies
 
-- `dotnet restore`
+- Follow setup instructions for [ream-query](https://github.com/stofte/ream-query/blob/master/README.md#development)
 - `npm install`
 
 Build and watch the TypeScript and CSS, and start the shell.

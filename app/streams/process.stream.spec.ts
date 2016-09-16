@@ -3,11 +3,12 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import { ReflectiveInjector, enableProdMode } from '@angular/core';
-import { HTTP_PROVIDERS } from '@angular/http';
+import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { ProcessStream } from './process.stream';
 import { ProcessHelper } from '../utils/process-helper';
 import config from '../config';
+import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 
 describe('process.stream int-test', function() {
     this.timeout(30 * 1000);
@@ -23,7 +24,10 @@ describe('process.stream int-test', function() {
 
     beforeEach(() => {
         injector = ReflectiveInjector.resolveAndCreate([
-            HTTP_PROVIDERS,
+            Http, BrowserXhr, XSRFStrategyMock,
+            { provide: ConnectionBackend, useClass: XHRBackend },
+            { provide: ResponseOptions, useClass: BaseResponseOptions },
+            { provide: RequestOptions, useClass: BaseRequestOptions },
             ProcessStream
         ]);
         instance = injector.get(ProcessStream);

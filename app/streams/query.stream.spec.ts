@@ -3,12 +3,13 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import { ReflectiveInjector, enableProdMode } from '@angular/core';
-import { HTTP_PROVIDERS } from '@angular/http';
+import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { QueryStream } from './query.stream';
 import { QueryMessage } from '../messages/index';
 import { ProcessStream } from './process.stream';
 import config from '../config';
+import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
@@ -22,7 +23,10 @@ describe('query.stream int-test', function() {
         chai.expect();
         chai.use(sinonChai);
         injector = ReflectiveInjector.resolveAndCreate([
-            HTTP_PROVIDERS,
+            Http, BrowserXhr, XSRFStrategyMock,
+            { provide: ConnectionBackend, useClass: XHRBackend },
+            { provide: ResponseOptions, useClass: BaseResponseOptions },
+            { provide: RequestOptions, useClass: BaseRequestOptions },
             QueryStream,
             ProcessStream
         ]);

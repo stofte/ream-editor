@@ -9,7 +9,11 @@ export class SessionStream {
         
     }
 
-    public new(connection: string, serverType: string) {
+    public createSqlSession(connection: string, serverType: string) {
+        
+    }
+
+    public createCodeSession() {
         
     }
 }

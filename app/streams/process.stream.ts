@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Subject } from 'rxjs/Rx';
 import { ProcessMessage } from '../messages/index';
-import { LogService } from '../services/index';
-
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 

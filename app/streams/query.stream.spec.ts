@@ -33,7 +33,7 @@ describe('query.stream int-test', function() {
         instance = injector.get(QueryStream);
     });
 
-    it('handles shutdown', function(done) {
+    it('stops dotnet process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
         instance.events.subscribe(msg => {
             if (msg.type === 'closed') {
@@ -46,7 +46,7 @@ describe('query.stream int-test', function() {
         });
         // some startup time
         setTimeout(function() {
-            instance.shutdown();
+            instance.stopServer();
         }, 2000);
     });
 });

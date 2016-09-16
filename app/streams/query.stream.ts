@@ -15,7 +15,7 @@ export class QueryStream {
         this.events = this.process.status.map(msg => new QueryMessage(msg.type, msg.value));
     }
 
-    public shutdown() {
+    public stopServer() {
         this.process.close();
     }
 }

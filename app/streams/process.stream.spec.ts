@@ -34,7 +34,8 @@ describe('process.stream int-test', function() {
     });
 
     function lifecycleTest(name, done) {
-        let cmd = processHelper[name](2000);
+        const port = name === 'query' ? config.queryEnginePort : config.omnisharpPort;
+        let cmd = processHelper[name](port);
         let receivedStarting = false;
         let types = ['starting', 'ready', 'closing', 'closed'];
         let idx = 0;
@@ -48,7 +49,7 @@ describe('process.stream int-test', function() {
                 sub.unsubscribe();
             }
         }).add(done);
-        instance.start(cmd.command, cmd.directory, 2000);
+        instance.start(cmd.command, cmd.directory, port);
     }
 
     it('emits expected application lifecycle events for omnisharp', function(done) {

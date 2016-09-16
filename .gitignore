@@ -23,3 +23,4 @@ testdb-sqlserver.sql
 testdb2-sqlserver.sql
 reamquery-log-*
 reamquery.log
+internal-nlog.txt

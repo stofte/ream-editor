@@ -1,7 +1,7 @@
 type eventType = 'new';
 type databaseType = 'sqlserver' | 'npgsql' | 'sqlite';
 
-export class SessionMessage {
+export class SocketMessage {
     constructor(
         public type: eventType,
         public connection: string = null,

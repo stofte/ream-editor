@@ -10,19 +10,18 @@ import { QueryMessage } from '../messages/index';
 import { ProcessStream } from './process.stream';
 import config from '../config';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
-
+import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
 
 describe('query.stream int-test', function() {
     this.timeout(backendTimeout * 3);
-    let injector: ReflectiveInjector;
-    let instance: QueryStream = null;
+    let queryStream: QueryStream = null;
     
     before(function() {
         chai.expect();
         chai.use(sinonChai);
-        injector = ReflectiveInjector.resolveAndCreate([
+        const injector = ReflectiveInjector.resolveAndCreate([
             Http, BrowserXhr, XSRFStrategyMock,
             { provide: ConnectionBackend, useClass: XHRBackend },
             { provide: ResponseOptions, useClass: BaseResponseOptions },
@@ -30,12 +29,30 @@ describe('query.stream int-test', function() {
             QueryStream,
             ProcessStream
         ]);
-        instance = injector.get(QueryStream);
+        queryStream = injector.get(QueryStream);
     });
+
+//     it('does stuff', function(done) {
+//         this.timeout(backendTimeout);
+//         const text = `
+//                     var x = 10;
+//                     x + 1
+// `;
+//         setTimeout(function() {
+//             queryStream
+//                 .executeCode({ id: uuid.v4(), text })
+//                 .subscribe(res => {
+//                     console.log(`HTTP RESPONSE: ${res}`);
+//                 });
+//             setTimeout(() => {
+//                 done();
+//             }, 3000); // let the query execute a bit
+//         }, 2000); // startup time
+//     });
 
     it('stops dotnet process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
-        instance.events.subscribe(msg => {
+        queryStream.events.subscribe(msg => {
             if (msg.type === 'closed') {
                 setTimeout(() => {
                     let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
@@ -44,9 +61,8 @@ describe('query.stream int-test', function() {
                 }, 1000);
             }
         });
-        // some startup time
         setTimeout(function() {
-            instance.stopServer();
+            queryStream.stopServer();
         }, 2000);
     });
 });

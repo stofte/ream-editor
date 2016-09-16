@@ -49,7 +49,7 @@ describe('process.stream int-test', function() {
                 sub.unsubscribe();
             }
         }).add(done);
-        instance.start(cmd.command, cmd.directory, port);
+        instance.start(name, cmd.command, cmd.directory, port);
     }
 
     it('emits expected application lifecycle events for omnisharp', function(done) {

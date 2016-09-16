@@ -1,5 +1,6 @@
 // global consts
-declare const MODE: string;
+type Configuration = 'PRODUCTION' | 'DEVELOPMENT';
+declare const MODE: Configuration;
 declare const IS_LINUX: boolean;
 declare const IS_WINDOWS: boolean;
 

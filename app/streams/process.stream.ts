@@ -5,6 +5,8 @@ import { ProcessMessage } from '../messages/index';
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 
+type ProcessType = 'omnisharp' | 'query';
+
 @Injectable()
 export class ProcessStream {
     public status: Subject<ProcessMessage> = new Subject<ProcessMessage>();
@@ -15,11 +17,11 @@ export class ProcessStream {
     private cancelCheck: boolean = false;
     constructor(private http: Http) { }
 
-    public start(command: string, directory: string, httpPort: number) {
+    public start(processType: ProcessType, command: string, directory: string, httpPort: number) {
         this.command = command;
         this.directory = directory;
         this.httpPort = httpPort;
-        this.options = directory ? { cwd: directory } : { };
+        this.options = processType === 'query' ? { cwd: directory } : { };
         this.status.next(new ProcessMessage('starting'));
         let start = new Date().getTime();
         let statusSub = this.status.subscribe(msg => {

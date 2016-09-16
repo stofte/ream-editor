@@ -8,5 +8,7 @@ global.Assert = function Assert(cond, msg) {
         throw (msg ? msg : 'assert failed');
     }
 }
-// angular requirement
+// I would assume electron-mocha should provide this,
+// but somehow not able to run in renderer with this available
 global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+global.WebSocket = require('websocket').client;

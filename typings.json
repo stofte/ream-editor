@@ -1,15 +1,15 @@
 {
   "name": "ream-editor",
   "dependencies": {
-    "chai": "registry:npm/chai#3.5.0+20160415060238",
-    "lodash": "registry:npm/lodash#4.0.0+20160416211519",
-    "sinon": "registry:npm/sinon#1.16.0+20160427193336",
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
+    "lodash": "registry:npm/lodash#4.0.0+20160723033700",
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700",
     "sinon-chai": "registry:npm/sinon-chai#2.8.0+20160310030142"
   },
   "globalDependencies": {
     "codemirror": "registry:dt/codemirror#0.0.0+20160619021621",
     "codemirror-showhint": "registry:dt/codemirror-showhint#0.0.0+20160317120654",
-    "mocha": "registry:dt/mocha#2.2.5+20160619032855"
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353"
   },
   "devDependencies": {}
 }

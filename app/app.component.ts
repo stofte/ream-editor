@@ -6,9 +6,9 @@ import { TabViewComponent } from './components/tab-view.component';
 
 @Component({
     selector: 'f-app',
-    directives: [
-        TabListComponent, ConnectionManagerComponent, TabViewComponent 
-    ],
+    // directives: [
+    //     TabListComponent, ConnectionManagerComponent, TabViewComponent 
+    // ],
     template: `
 <div class="main-layer">
     <f-tab-list></f-tab-list>

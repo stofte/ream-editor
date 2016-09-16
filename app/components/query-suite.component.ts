@@ -9,7 +9,7 @@ import { EditorDirective } from '../directives/editor.directive';
 
 @Component({
     selector: 'f-query-suite',
-    directives: [EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent, ResultListComponent],
+    //directives: [EditorDirective, ExecuteQueryComponent, ConnectionSelectorComponent, ResultListComponent],
     template: `
 <div class="container-fluid query-editor-suite">
     <div class="row">

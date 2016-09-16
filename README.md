@@ -64,3 +64,4 @@ TODO
 - OmniSharp hosting/custom build?
 - Websocket/rx query backend
 - [dotnet run in folder with spaces fails](https://github.com/dotnet/cli/issues/1189)
+- tsconfig.js/es5 blocked on https://github.com/angular/angular/issues/7740

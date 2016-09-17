@@ -20,7 +20,7 @@ describe('user.editor', function() {
     it('emits no events when initially subscribing', function(done) {
         this.timeout(1000);
         const cb = sinon.spy();
-        instance.editor.subscribe(cb);
+        instance.events.subscribe(cb);
         setTimeout(function() {
             expect(cb).to.not.have.been.called;
             done();

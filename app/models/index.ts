@@ -11,3 +11,4 @@ export * from './result-store';
 export * from './tab';
 export * from './template-result';
 export * from './editor-event';
+export * from './text-update';

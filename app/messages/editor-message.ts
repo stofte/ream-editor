@@ -1,8 +1,11 @@
-type eventType = 'text' | 'edit';
+import { TextUpdate } from '../models/index';
+
+type eventType = 'edit';
 
 export class EditorMessage {
     constructor(
         public type: eventType,
-        public value: string = null
+        public data: TextUpdate,
+        public timestamp: number
     ) {}
 }

@@ -15,10 +15,8 @@ CodeMirror.fromTextArea(document.getElementById("code"), {
     lineNumbers: true
 }).on('change', (_, event) => {
     if (!start) start = performance.now();
-    events.push({
-        event,
-        time: performance.now() - start
-    });
+    event.time = performance.now() - start;
+    events.push(event);
     output.value = `[
 ${events.map(e => '    ' + JSON.stringify(e)).join(',\n')}
 ]`;JSON.stringify(events);

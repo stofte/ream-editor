@@ -3,3 +3,4 @@ export * from './query-message';
 export * from './editor-message';
 export * from './template-message';
 export * from './web-socket-message';
+export * from './user-message';

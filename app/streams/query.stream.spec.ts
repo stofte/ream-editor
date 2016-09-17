@@ -67,6 +67,8 @@ describe('query.stream int-test', function() {
                     .on('error', () => { done(); });
             }, 500);
         });
-        queryStream.stopServer();
+        setTimeout(() => {
+            queryStream.stopServer();
+        }, 0);
     });
 });

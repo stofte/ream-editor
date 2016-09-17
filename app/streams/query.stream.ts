@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Subscription, Subject } from 'rxjs/Rx';
 import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/index';
-import { ProcessStream } from '../streams/index';
+import { ProcessStream, EditorStream, UserStream } from '../streams/index';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest } from './interfaces';
 import config from '../config';
@@ -11,7 +11,12 @@ import config from '../config';
 export class QueryStream {
     public events: Observable<QueryMessage>;
     private socket: Subject<QueryMessage> = new Subject<QueryMessage>();
-    constructor(private process: ProcessStream, private http: Http) {
+    constructor(
+        private process: ProcessStream,
+        // private editor: EditorStream,
+        // private user: UserStream,
+        private http: Http
+    ) {
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.events = this.process

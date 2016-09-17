@@ -19,18 +19,24 @@ export class QueryStream {
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
         const statusSub = this.events.subscribe(msg => {
             if (msg.type === 'ready') {
-                const ws = Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`);
-                ws.next({ foo: 42 });
-                ws.subscribe(msg => {
-                    console.log('ws:msg', msg);
-                }, err => {
-                    console.log('ws:err', err);
-                }, () => {
-                    console.log('ws:done');
-                });
                 statusSub.unsubscribe();
+                const ws = Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`);
+                ws.subscribe(
+                    this.socketMessageHandler,
+                    this.socketErrorHandler,
+                    this.socketDoneHandler
+                );
             }
         });
+    }
+
+    public once(pred: (QueryMessage) => boolean, handler: () => void) {
+        const sub = this.events.subscribe(msg => {
+            if (pred(msg)) {
+                sub.unsubscribe();
+                handler();
+            }
+        })
     }
 
     public stopServer() {
@@ -44,4 +50,17 @@ export class QueryStream {
     private action(name: string) {
         return `http://localhost:${config.queryEnginePort}/${name}`;
     }
+
+    private socketMessageHandler(msg) {
+        console.log('socket', msg);
+    }
+
+    private socketErrorHandler(err) {
+        console.error('socket error', err);
+    }
+
+    private socketDoneHandler() {
+
+    }
+
 }

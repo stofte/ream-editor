@@ -38,14 +38,10 @@ describe('query.stream int-test', function() {
                     var x = 10;
                     x + 1
 `;
-        const sub = queryStream.events.subscribe(msg => {
-            console.log('does-stuff subber', msg.type);
-            if (msg.type === 'ready') {
-                queryStream
-                    .executeCode({ id: uuid.v4(), text })
-                    .subscribe();
-                sub.unsubscribe();
-            }
+        queryStream.once(msg => msg.type === 'ready', () => {
+            queryStream
+                .executeCode({ id: uuid.v4(), text })
+                .subscribe();
         });
         setTimeout(() => {
             done();
@@ -54,17 +50,13 @@ describe('query.stream int-test', function() {
 
     it('stops dotnet process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
-        queryStream.events.subscribe(msg => {
-            if (msg.type === 'closed' || msg.type === 'failed') {
-                setTimeout(() => {
-                    let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
-                    http.get(url, res => { done(new Error('response received')); })
-                        .on('error', () => { done(); });
-                }, 1000);
-            }
+        queryStream.once(msg => msg.type === 'closed' || msg.type === 'failed', () => {
+            setTimeout(() => {
+                let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
+                http.get(url, res => { done(new Error('response received')); })
+                    .on('error', () => { done(); });
+            }, 500);
         });
-        setTimeout(function() {
-            queryStream.stopServer();
-        }, 1000);
+        queryStream.stopServer();
     });
 });

@@ -7,7 +7,6 @@ const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
 
 const REAMQUERY_BASEDIR = path.normalize(`${process.cwd()}/query/query/src/ReamQuery`);
-console.log('REAMQUERY_BASEDIR', REAMQUERY_BASEDIR);
 type ProcessType = 'omnisharp' | 'query';
 
 @Injectable()

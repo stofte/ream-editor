@@ -17,10 +17,20 @@ export class QueryStream {
             .status
             .map(msg => new QueryMessage(msg.type, msg.value));
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
-        // const ws = Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`);
-        // ws.subscribe(msg => {
-        //     console.log('ws:', msg);
-        // });
+        const statusSub = this.events.subscribe(msg => {
+            if (msg.type === 'ready') {
+                const ws = Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`);
+                ws.next({ foo: 42 });
+                ws.subscribe(msg => {
+                    console.log('ws:msg', msg);
+                }, err => {
+                    console.log('ws:err', err);
+                }, () => {
+                    console.log('ws:done');
+                });
+                statusSub.unsubscribe();
+            }
+        });
     }
 
     public stopServer() {

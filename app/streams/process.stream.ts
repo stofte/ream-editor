@@ -4,7 +4,10 @@ import { Subject } from 'rxjs/Rx';
 import { ProcessMessage } from '../messages/index';
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
+const path = electronRequire('path');
 
+const REAMQUERY_BASEDIR = path.normalize(`${process.cwd()}/query/query/src/ReamQuery`);
+console.log('REAMQUERY_BASEDIR', REAMQUERY_BASEDIR);
 type ProcessType = 'omnisharp' | 'query';
 
 @Injectable()
@@ -21,7 +24,11 @@ export class ProcessStream {
         this.command = command;
         this.directory = directory;
         this.httpPort = httpPort;
-        this.options = processType === 'query' ? { cwd: directory } : { };
+        // this.options = processType === 'query' ? { cwd: directory } : { };
+        this.options = processType === 'omnisharp' ? {} : { cwd: directory };
+        if (processType === 'query') {
+            process.env['REAMQUERY_BASEDIR'] = REAMQUERY_BASEDIR;
+        }
         this.status.next(new ProcessMessage('starting'));
         let start = new Date().getTime();
         let statusSub = this.status.subscribe(msg => {
@@ -31,7 +38,7 @@ export class ProcessStream {
         });
         child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
             if (error) { // expected when starting command fails, otherwise only stdout/err should be filled
-                console.log('error', error);
+                console.log('process.stream error', error);
                 this.status.next(new ProcessMessage('failed', error));
             } else {
                 this.status.next(new ProcessMessage('closed'));

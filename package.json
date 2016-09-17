@@ -19,7 +19,7 @@
     "postinstall": "typings install & echo {} > typings/tslint.json",
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
-    "test": "electron-mocha --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
+    "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
     "int-test-appveyor": "mocha test/**/*.int.js --appveyor --sqlserver",
     "int-test-travis": "mocha test/**/*.int.js --travis --npgsql",
     "int-test-local-sqlserver": "mocha test/**/*.int.js --local --sqlserver",

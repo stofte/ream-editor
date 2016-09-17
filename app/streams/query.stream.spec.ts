@@ -32,28 +32,30 @@ describe('query.stream int-test', function() {
         queryStream = injector.get(QueryStream);
     });
 
-//     it('does stuff', function(done) {
-//         this.timeout(backendTimeout);
-//         const text = `
-//                     var x = 10;
-//                     x + 1
-// `;
-//         setTimeout(function() {
-//             queryStream
-//                 .executeCode({ id: uuid.v4(), text })
-//                 .subscribe(res => {
-//                     console.log(`HTTP RESPONSE: ${res}`);
-//                 });
-//             setTimeout(() => {
-//                 done();
-//             }, 3000); // let the query execute a bit
-//         }, 2000); // startup time
-//     });
+    it('does stuff', function(done) {
+        this.timeout(backendTimeout);
+        const text = `
+                    var x = 10;
+                    x + 1
+`;
+        const sub = queryStream.events.subscribe(msg => {
+            console.log('does-stuff subber', msg.type);
+            if (msg.type === 'ready') {
+                queryStream
+                    .executeCode({ id: uuid.v4(), text })
+                    .subscribe();
+                sub.unsubscribe();
+            }
+        });
+        setTimeout(() => {
+            done();
+        }, backendTimeout - 1000); // assume test finishes within this span
+    });
 
     it('stops dotnet process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
         queryStream.events.subscribe(msg => {
-            if (msg.type === 'closed') {
+            if (msg.type === 'closed' || msg.type === 'failed') {
                 setTimeout(() => {
                     let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
                     http.get(url, res => { done(new Error('response received')); })
@@ -63,6 +65,6 @@ describe('query.stream int-test', function() {
         });
         setTimeout(function() {
             queryStream.stopServer();
-        }, 2000);
+        }, 1000);
     });
 });

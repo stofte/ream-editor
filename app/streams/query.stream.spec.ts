@@ -32,20 +32,30 @@ describe('query.stream int-test', function() {
         queryStream = injector.get(QueryStream);
     });
 
-    it('does stuff', function(done) {
+    it('receives expected value when executeCode is called', function(done) {
         this.timeout(backendTimeout);
-        const text = `
-                    var x = 10;
-                    x + 1
-`;
-        queryStream.once(msg => msg.type === 'ready', () => {
+        let sawValue = false;
+        const queryId = uuid.v4();
+        const text = `var x = 21;\nx*2`;
+        queryStream.once((msg: QueryMessage) => msg.type === 'ready', () => {
             queryStream
-                .executeCode({ id: uuid.v4(), text })
+                .executeCode({ id: queryId, text })
                 .subscribe();
         });
-        setTimeout(() => {
-            done();
-        }, backendTimeout - 1000); // assume test finishes within this span
+        queryStream.once((msg: QueryMessage) => 
+            msg.type === 'message' &&
+            msg.data.session === queryId &&
+            msg.data.type === 'singleAtomic',
+            (msg: QueryMessage) => {
+                sawValue = msg.data.values[1] === 42;
+            });
+        queryStream.once((msg: QueryMessage) =>
+            msg.type === 'message' &&
+            msg.data.session === queryId &&
+            msg.data.type === 'close',
+            () => {
+                sawValue ? done() : done(new Error('No value received'));
+            });
     });
 
     it('stops dotnet process when stopServer is called', function(done) {

@@ -51,7 +51,7 @@ export class EditorStream {
         private session: SessionStream
     ) {
         const runCodeText = session.events.filter(msg => msg.type === 'run-code')
-            .combineLatest(session
+            .withLatestFrom(session
                 .events
                 .filter(msg => msg.type === 'create')
                 .flatMap(msg => this.subject.filter(e => e.type === 'edit' && e.id === msg.id))

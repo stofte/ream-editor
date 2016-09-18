@@ -13,7 +13,3 @@ enum StatusCode {
 export interface CodeRequest extends BaseRequest {
     text: string
 }
-
-export interface CodeResponse extends BaseResponse {
-
-}

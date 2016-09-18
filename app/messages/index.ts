@@ -5,3 +5,4 @@ export * from './template-message';
 export * from './web-socket-message';
 export * from './user-message';
 export * from './session-message';
+export * from './result-message';

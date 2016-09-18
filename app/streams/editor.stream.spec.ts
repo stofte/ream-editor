@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Rx';
 import { EditorStream, SessionStream } from './index';
 import { TextUpdate } from '../models/index';
 import { ProcessHelper } from '../utils/process-helper';
+import * as uuid from 'node-uuid';
 import config from '../config';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 const backendTimeout = config.unitTestData.backendTimeout;
@@ -49,7 +50,8 @@ describe('editor.stream int-test', function() {
                     expect(msg.text).to.equal(test.output);
                 }
             });
-            const id = session.new();
+            const id = uuid.v4();
+            session.new(id);
             test.events.forEach(data => {
                 editor.edit(id, data);
             });

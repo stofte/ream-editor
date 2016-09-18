@@ -1,3 +1,12 @@
+export const cSharpTestDataExpectedResult = [
+    {
+        title: 'int',
+        rows: [42],
+        columns: ['int'],
+        columnTypes: ['System.Int32'],
+    }
+];
+
 export const cSharpTestData = [
     {"output":"var x = 21;\nx*2\n","events":[{"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["v"],"removed":[""],"origin":"+input","time":0},{"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["a"],"removed":[""],"origin":"+input","time":281.0450000000001},{"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["r"],"removed":[""],"origin":"+input","time":368.4699999999998},{"from":{"line":0,"ch":3},"to":{"line":0,"ch":3},"text":[" "],"removed":[""],"origin":"+input","time":496.09500000000025},{"from":{"line":0,"ch":4},"to":{"line":0,"ch":4},"text":["x"],"removed":[""],"origin":"+input","time":952.46},{"from":{"line":0,"ch":5},"to":{"line":0,"ch":5},"text":[" "],"removed":[""],"origin":"+input","time":1089.255},{"from":{"line":0,"ch":6},"to":{"line":0,"ch":6},"text":["="],"removed":[""],"origin":"+input","time":1301.13},{"from":{"line":0,"ch":7},"to":{"line":0,"ch":7},"text":[" "],"removed":[""],"origin":"+input","time":1396.7000000000003},{"from":{"line":0,"ch":8},"to":{"line":0,"ch":8},"text":["2"],"removed":[""],"origin":"+input","time":2226.0000000000005},{"from":{"line":0,"ch":9},"to":{"line":0,"ch":9},"text":["1"],"removed":[""],"origin":"+input","time":2320.1700000000005},{"from":{"line":0,"ch":10},"to":{"line":0,"ch":10},"text":[";"],"removed":[""],"origin":"+input","time":2637.605},{"from":{"line":0,"ch":11},"to":{"line":0,"ch":11},"text":["",""],"removed":[""],"origin":"+input","time":3154.0900000000006},{"from":{"line":1,"ch":0},"to":{"line":1,"ch":0},"text":["x"],"removed":[""],"origin":"+input","time":3737.645},{"from":{"line":1,"ch":1},"to":{"line":1,"ch":1},"text":["*"],"removed":[""],"origin":"+input","time":4653.720000000001},{"from":{"line":1,"ch":2},"to":{"line":1,"ch":2},"text":["2"],"removed":[""],"origin":"+input","time":5061.935000000001},{"from":{"line":1,"ch":3},"to":{"line":1,"ch":3},"text":["",""],"removed":[""],"origin":"+input","time":6090.575000000001}]},
 ];

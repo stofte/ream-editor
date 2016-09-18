@@ -20,7 +20,8 @@ export class QueryStream {
         let cmd = helper.query(config.queryEnginePort);
 
         const responses = editor.events
-            .filter(msg => msg.type === 'run-code-request')
+            .filter(msg => {
+                return msg.type === 'run-code-request'})
             .map(msg => {
                 const mapped: CodeRequest = {
                     id: msg.id,
@@ -29,8 +30,9 @@ export class QueryStream {
                 return mapped;
             })
             .flatMap(req => {
+                console.log('calling executecode with', req);
                 return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
-                    http.post(this.action('executequery'), JSON.stringify(req))
+                    http.post(this.action('executecode'), JSON.stringify(req))
                         .subscribe(data => {
                             obs.next(new QueryMessage('run-code-response'));
                             obs.complete();

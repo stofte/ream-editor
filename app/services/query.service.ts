@@ -116,7 +116,8 @@ export class QueryService {
                 });
             });
             page.title = key;
-            page.active = idx === 0; // mark the first as active
+            // todo 
+            // page.active = idx === 0; // mark the first as active
             page.id = `${idx}-${result.id}`;
             result.pages.push(page);
         });

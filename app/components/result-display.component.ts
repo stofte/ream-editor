@@ -76,7 +76,8 @@ export class ResultDisplayComponent {
     }
     
     private get activePage(): ResultPage {
-        return this.result.pages.find(p => p.active);
+        // todo
+        return null; // this.result.pages.find(p => p.active);
     }
     
     private columnWidth(idx: number, isHeader: boolean): string {

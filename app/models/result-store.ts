@@ -26,7 +26,8 @@ export class ResultStore {
                 qr.pages = qr.pages.map(p => {
                     const match = p.id === pageId;
                     // if we mark the current active, it will invert
-                    p.active = match && p.active ? false : match;
+                    // todo
+                    //p.active = match && p.active ? false : match;
                     return p; 
                 });
             }

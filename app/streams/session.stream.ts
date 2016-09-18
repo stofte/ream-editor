@@ -5,10 +5,7 @@ import * as uuid from 'node-uuid';
 
 @Injectable()
 export class SessionStream {
-    public events: Subject<SessionMessage>;
-    constructor() {
-        this.events = new Subject<SessionMessage>();
-    }
+    public events: Subject<SessionMessage> = new Subject<SessionMessage>();
 
     public new(): string {
         const id = uuid.v4();

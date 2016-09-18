@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Subscription, Subject } from 'rxjs/Rx';
 import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/index';
-import { ProcessStream, EditorStream, UserStream } from '../streams/index';
+import { ProcessStream, EditorStream, UserStream } from './index';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest } from './interfaces';
 import config from '../config';

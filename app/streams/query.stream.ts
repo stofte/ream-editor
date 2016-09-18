@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Observable, Subscription, Subject } from 'rxjs/Rx';
+import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
 import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/index';
 import { ProcessStream, EditorStream, UserStream } from './index';
 import { ProcessHelper } from '../utils/process-helper';
@@ -13,16 +13,37 @@ export class QueryStream {
     private socket: Subject<QueryMessage> = new Subject<QueryMessage>();
     constructor(
         private process: ProcessStream,
-        // private editor: EditorStream,
-        // private user: UserStream,
+        private editor: EditorStream,
         private http: Http
     ) {
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
+
+        const responses = editor.events
+            .filter(msg => msg.type === 'run-code-request')
+            .map(msg => {
+                const mapped: CodeRequest = {
+                    id: msg.id,
+                    text: msg.text
+                }
+                return mapped;
+            })
+            .flatMap(req => {
+                return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
+                    http.post(this.action('executequery'), JSON.stringify(req))
+                        .subscribe(data => {
+                            obs.next(new QueryMessage('run-code-response'));
+                            obs.complete();
+                        });
+                });
+            });
+
         this.events = this.process
             .status
             .map(msg => new QueryMessage(msg.type))
-            .merge(this.socket);
+            .merge(this.socket)
+            .merge(responses);
+
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
         const statusSub = this.events.subscribe(msg => {
             if (msg.type === 'ready') {

@@ -18,8 +18,8 @@ CodeMirror.fromTextArea(document.getElementById("code"), {
     event.time = performance.now() - start;
     events.push(event);
     const str = `{
-    output: ${JSON.stringify(mirror.doc.getValue())},
-    events: [
+    "output": ${JSON.stringify(mirror.doc.getValue())},
+    "events": [
 ${events.map(e => '        ' + JSON.stringify(e)).join(',\n')}
 ]}`;
     output.value = str;

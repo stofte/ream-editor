@@ -6,16 +6,19 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { QueryMessage } from '../messages/index';
-import { ProcessStream, QueryStream } from './index';
+import { ProcessStream, QueryStream, SessionStream, EditorStream } from './index';
 import config from '../config';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
+import { cSharpTestData } from '../test/editor-testdata';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
 
 describe('query.stream int-test', function() {
     this.timeout(backendTimeout * 3);
-    let queryStream: QueryStream = null;
+    let query: QueryStream = null;
+    let session: SessionStream = null;
+    let editor: EditorStream = null;
     
     before(function() {
         chai.expect();
@@ -26,32 +29,36 @@ describe('query.stream int-test', function() {
             { provide: ResponseOptions, useClass: BaseResponseOptions },
             { provide: RequestOptions, useClass: BaseRequestOptions },
             QueryStream,
-            ProcessStream
+            ProcessStream,
+            SessionStream,
+            EditorStream
         ]);
-        queryStream = injector.get(QueryStream);
+        session = injector.get(SessionStream);
+        editor = injector.get(EditorStream);
+        query = injector.get(QueryStream);
     });
 
-    it('receives expected value when executeCode is called', function(done) {
+    it('receives expected values when runCode is called after feeding legal text', function(done) {
         this.timeout(backendTimeout);
         let sawValue = false;
         const queryId = uuid.v4();
         const text = `var x = 21;\nx*2`;
-        queryStream.once((msg: QueryMessage) => msg.type === 'ready', () => {
-            queryStream
+        query.once((msg: QueryMessage) => msg.type === 'ready', () => {
+            query
                 .executeCode({ id: queryId, text })
                 .subscribe();
         });
-        queryStream.once((msg: QueryMessage) => 
+        query.once((msg: QueryMessage) => 
             msg.type === 'message' &&
-            msg.data.session === queryId &&
-            msg.data.type === 'singleAtomic',
+            msg.socket.session === queryId &&
+            msg.socket.type === 'singleAtomic',
             (msg: QueryMessage) => {
-                sawValue = msg.data.values[1] === 42;
+                sawValue = msg.socket.values[1] === 42;
             });
-        queryStream.once((msg: QueryMessage) =>
+        query.once((msg: QueryMessage) =>
             msg.type === 'message' &&
-            msg.data.session === queryId &&
-            msg.data.type === 'close',
+            msg.socket.session === queryId &&
+            msg.socket.type === 'close',
             () => {
                 sawValue ? done() : done(new Error('No value received'));
             });
@@ -59,7 +66,7 @@ describe('query.stream int-test', function() {
 
     it('stops dotnet process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
-        queryStream.once(msg => msg.type === 'closed', () => {
+        query.once(msg => msg.type === 'closed', () => {
             setTimeout(() => {
                 let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
                 http.get(url, res => { done(new Error('response received')); })
@@ -67,7 +74,7 @@ describe('query.stream int-test', function() {
             }, 500);
         });
         setTimeout(() => {
-            queryStream.stopServer();
+            query.stopServer();
         }, 0);
     });
 });

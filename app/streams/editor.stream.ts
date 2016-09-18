@@ -65,7 +65,7 @@ export class EditorStream {
                 }, []))
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new EditorMessage('run-code-text', val[0].id, null, b.getText())
+                return new EditorMessage('run-code-request', val[0].id, null, b.getText())
             });
         this.events = this.subject.merge(runCodeText);
     }

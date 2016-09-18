@@ -6,11 +6,11 @@ import { Connection } from '../models/connection';
 import { Observable } from 'rxjs/Observable';
 import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
-//import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
+// import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 
 @Component({
     selector: 'f-tab-list',
-    //directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
+    // directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     template: `
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid int-test-tab-list">

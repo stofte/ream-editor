@@ -20,13 +20,12 @@ export class QueryStream {
         let cmd = helper.query(config.queryEnginePort);
 
         const responses = editor.events
-            .filter(msg => {
-                return msg.type === 'run-code-request'})
+            .filter(msg => msg.type === 'run-code-request')
             .map(msg => {
                 const mapped: CodeRequest = {
                     id: msg.id,
                     text: msg.text
-                }
+                };
                 return mapped;
             })
             .flatMap(req => {
@@ -69,7 +68,7 @@ export class QueryStream {
         this.process.close();
     }
 
-    public executeCode(request: CodeRequest) : Observable<Response> {
+    public executeCode(request: CodeRequest): Observable<Response> {
         return this.http.post(this.action('executecode'), request);
     }
 
@@ -83,7 +82,7 @@ export class QueryStream {
             session: msg.Session,
             id: msg.Id,
             parent: msg.Parent,
-            type: msg.Type.substring(0,1).toLowerCase() + msg.Type.substring(1),
+            type: msg.Type.substring(0, 1).toLowerCase() + msg.Type.substring(1),
             values: msg.Values
         };
         this.socket.next(new QueryMessage('message', message));

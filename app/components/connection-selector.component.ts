@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-//import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
+// import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 import { ConnectionService } from '../services/connection.service';
 import { Connection } from '../models/connection';
 import { TabService } from '../services/tab.service';
 
 @Component({
     selector: 'f-connection-selector',
-    //directives: [DROPDOWN_DIRECTIVES],
+    // directives: [DROPDOWN_DIRECTIVES],
     template: `
 <div class="input-group int-test-conn-sel" (click)="$event.preventDefault()">
     <div class="input-group-btn btn-group" dropdown keyboardNav="true">

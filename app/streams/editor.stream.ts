@@ -6,8 +6,8 @@ import { EditorMessage } from '../messages/index';
 import { SessionStream } from './session.stream';
 
 class BufferText {
-    constructor(public id: string) { }
     public lines: string[] = [''];
+    constructor(public id: string) { }
     public edit(update: TextUpdate) {
         const from = update.from;
         const to = update.to;
@@ -28,7 +28,7 @@ class BufferText {
             }
         }
         if (update.text.length !== 1) {
-            for(let i = 1; i < update.text.length; i++) {
+            for (let i = 1; i < update.text.length; i++) {
                 this.lines.splice(from.line + i, 0, update.text[i]);        
             }
         } else if (update.text[0] !== '') {
@@ -65,7 +65,7 @@ export class EditorStream {
                 }, []))
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new EditorMessage('run-code-request', val[0].id, null, b.getText())
+                return new EditorMessage('run-code-request', val[0].id, null, b.getText());
             });
         this.events = this.subject.merge(runCodeText);
     }

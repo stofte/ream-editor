@@ -27,7 +27,7 @@ export class ResultStore {
                     const match = p.id === pageId;
                     // if we mark the current active, it will invert
                     // todo
-                    //p.active = match && p.active ? false : match;
+                    // p.active = match && p.active ? false : match;
                     return p; 
                 });
             }

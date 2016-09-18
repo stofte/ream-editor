@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'f-tab-view',
-    //directives: [QuerySuiteComponent, StartPageComponent],
+    // directives: [QuerySuiteComponent, StartPageComponent],
     template: `
 <div *ngIf="editorVisible" class="my-editor">
     <f-query-suite></f-query-suite>

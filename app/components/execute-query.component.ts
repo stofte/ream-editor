@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-//import { BUTTON_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
+// import { BUTTON_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 import { EditorService } from '../services/editor.service';
 import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { MonitorService } from '../services/monitor.service';

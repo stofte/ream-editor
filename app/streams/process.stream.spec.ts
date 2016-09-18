@@ -3,7 +3,8 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import { ReflectiveInjector, enableProdMode } from '@angular/core';
-import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
+import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions,
+    BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { ProcessStream } from './process.stream';
 import { ProcessHelper } from '../utils/process-helper';

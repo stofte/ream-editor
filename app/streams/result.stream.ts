@@ -38,7 +38,7 @@ export class ResultStream {
 
     private mapSingleAtomic = (msg: WebSocketMessage): ResultPage => {
         // todo make server json camelCased
-        const obj: ResultPage= {
+        const obj: ResultPage = {
             id: msg.session,
             title: msg.values[0].Name,
             columns: [msg.values[0].Name],

@@ -7,9 +7,8 @@ import * as uuid from 'node-uuid';
 export class SessionStream {
     public events: Subject<SessionMessage> = new Subject<SessionMessage>();
 
-    public new(id: string): string {
-        this.events.next(new SessionMessage('create', id))
-        return id;
+    public new(id: string) {
+        this.events.next(new SessionMessage('create', id));
     }
 
     public runCode(id: string) {

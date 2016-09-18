@@ -20,7 +20,7 @@ class BufferText {
                 } else if (i < update.removed.length) {
                     this.lines.splice(line, 1);
                 } else {
-                    Assert(this.lines[line - 1], 'Has previous line');
+                    Assert(this.lines[line - 1], 'Expected previous line');
                     const newLineVal = `${this.lines[line - 1]}${
                         this.lines[line].substring(to.ch)}`;
                     this.lines.splice(line - 1, 2, newLineVal);

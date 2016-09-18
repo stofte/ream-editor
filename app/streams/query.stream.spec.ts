@@ -60,7 +60,7 @@ describe('query.stream int-test', function() {
 
     it('stops dotnet process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
-        queryStream.once(msg => msg.type === 'closed' || msg.type === 'failed', () => {
+        queryStream.once(msg => msg.type === 'closed', () => {
             setTimeout(() => {
                 let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
                 http.get(url, res => { done(new Error('response received')); })

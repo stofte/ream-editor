@@ -13,14 +13,17 @@ const events = [];
 const output = document.getElementById('json');
 CodeMirror.fromTextArea(document.getElementById("code"), {
     lineNumbers: true
-}).on('change', (_, event) => {
+}).on('change', (mirror, event) => {
     if (!start) start = performance.now();
     event.time = performance.now() - start;
     events.push(event);
-    output.value = `[
-${events.map(e => '    ' + JSON.stringify(e)).join(',\n')}
-]`;JSON.stringify(events);
-});    
+    const str = `{
+    output: ${JSON.stringify(mirror.doc.getValue())},
+    events: [
+${events.map(e => '        ' + JSON.stringify(e)).join(',\n')}
+]}`;
+    output.value = str;
+});
 </script>
 </body>
 </html>

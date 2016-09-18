@@ -37,12 +37,10 @@ export class QueryStream {
     }
 
     public once(pred: (msg: QueryMessage) => boolean, handler: (msg: QueryMessage) => void) {
-        const sub = this.events.subscribe(msg => {
-            if (pred(msg)) {
-                sub.unsubscribe();
-                handler(msg);
-            }
-        })
+        const sub = this.events.filter(msg => pred(msg)).subscribe(msg => {
+            sub.unsubscribe();
+            handler(msg);
+        });
     }
 
     public stopServer() {

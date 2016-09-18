@@ -41,24 +41,28 @@ describe('everything int-test', function() {
         result = injector.get(ResultStream);
     });
 
-    it('receives result pages for legal csharp', function(done) {
+    it('emits result pages for legal csharp', function(done) {
         this.timeout(backendTimeout * cSharpTestData.length);
         cSharpTestData.forEach((test, idx: number) => {
             const expectedPage = cSharpTestDataExpectedResult[idx];
             const id = uuid.v4();
-            const sub = result.events.subscribe(msg => { // .filter(msg => msg.id === id)
+            let verifyCount = 0;
+            const sub = result.events.map(x => {
+                return x;
+            }).filter(msg => msg.id === id).subscribe(msg => { // 
                 if (msg.type === 'done') {
                     sub.unsubscribe();
                     if (idx === cSharpTestData.length - 1) {
+                        expect(verifyCount).to.equal(cSharpTestData.length);
                         done();
                     }
                 } else if (msg.type === 'update') {
-                    console.log('result page', JSON.stringify(msg));
                     expect(msg.data.id).to.equal(id);
                     expect(msg.data.title).to.equal(expectedPage.title);
                     expect(msg.data.columns).to.deep.equal(expectedPage.columns);
                     expect(msg.data.columnTypes).to.deep.equal(expectedPage.columnTypes);
                     expect(msg.data.rows).to.deep.equal(expectedPage.rows);
+                    verifyCount++;
                 }
             });
             session.new(id);

@@ -30,7 +30,6 @@ export class QueryStream {
                 return mapped;
             })
             .flatMap(req => {
-                console.log('calling executecode with', req);
                 return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
                     http.post(this.action('executecode'), JSON.stringify(req))
                         .subscribe(data => {

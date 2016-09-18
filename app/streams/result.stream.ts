@@ -15,25 +15,20 @@ export class ResultStream {
     }
 
     private handleRunCode = (req: SessionMessage): Observable<ResultMessage> => {
-        console.log('creating handleRunCode');
         return new Observable<ResultMessage>((obs: Observer<ResultMessage>) => {
-            console.log('handleRunCode observer ctor')
             obs.next(new ResultMessage('start', req.id));
             this.query.events
-                .filter(msg => msg.type === 'message') // && msg.socket.session === req.id
+                .filter(msg => msg.type === 'message' && msg.socket.session === req.id)
                 .map(msg => msg.socket)
                 .subscribe(socket => {
-                    console.log('seeing message', socket);
                     let msg: ResultMessage = null;
                     let page: ResultPage = null;
                     switch (socket.type) {
                         case 'singleAtomic':
-                            console.log('singleAtomic switch');
-                            obs.next(new ResultMessage('update', socket.id, this.mapSingleAtomic(socket)));
+                            obs.next(new ResultMessage('update', socket.session, this.mapSingleAtomic(socket)));
                             break;
                         case 'close':
-                            console.log('close switch');
-                            obs.next(new ResultMessage('done', socket.id));
+                            obs.next(new ResultMessage('done', socket.session));
                             obs.complete();
                             break;
                     }

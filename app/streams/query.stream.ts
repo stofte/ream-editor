@@ -30,7 +30,7 @@ export class QueryStream {
             })
             .flatMap(req => {
                 return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
-                    http.post(this.action('executecode'), JSON.stringify(req))
+                    this.http.post(this.action('executecode'), JSON.stringify(req))
                         .subscribe(data => {
                             obs.next(new QueryMessage('run-code-response'));
                             obs.complete();
@@ -49,9 +49,9 @@ export class QueryStream {
             if (msg.type === 'ready') {
                 statusSub.unsubscribe();
                 Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(
-                    this.socketMessageHandler.bind(this),
-                    this.socketErrorHandler.bind(this),
-                    this.socketDoneHandler.bind(this)
+                    this.socketMessageHandler,
+                    this.socketErrorHandler,
+                    this.socketDoneHandler
                 );
             }
         });
@@ -76,7 +76,7 @@ export class QueryStream {
         return `http://localhost:${config.queryEnginePort}/${name}`;
     }
 
-    private socketMessageHandler(msg: any) {
+    private socketMessageHandler = (msg: any) => {
         // todo make json camelCased from backend
         const message: WebSocketMessage = {
             session: msg.Session,
@@ -88,9 +88,9 @@ export class QueryStream {
         this.socket.next(new QueryMessage('message', message));
     }
 
-    private socketErrorHandler(err) {
+    private socketErrorHandler = (err) => {
         console.error('socket error', err);
     }
 
-    private socketDoneHandler() { }
+    private socketDoneHandler = () => { }
 }

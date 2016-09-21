@@ -16,9 +16,6 @@ export class QueryStream {
         private editor: EditorStream,
         private http: Http
     ) {
-        let helper = new ProcessHelper();
-        let cmd = helper.query(config.queryEnginePort);
-
         const responses = editor.events
             .filter(msg => msg.type === 'run-code-request')
             .map(msg => {
@@ -36,7 +33,8 @@ export class QueryStream {
                             obs.complete();
                         });
                 });
-            });
+            })
+            .publish();
 
         this.events = this.process
             .status
@@ -44,9 +42,12 @@ export class QueryStream {
             .merge(this.socket)
             .merge(responses);
 
+        let helper = new ProcessHelper();
+        let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
         const statusSub = this.events.subscribe(msg => {
             if (msg.type === 'ready') {
+                responses.connect();
                 statusSub.unsubscribe();
                 Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(
                     this.socketMessageHandler,
@@ -85,7 +86,7 @@ export class QueryStream {
             type: msg.Type.substring(0, 1).toLowerCase() + msg.Type.substring(1),
             values: msg.Values
         };
-        this.socket.next(new QueryMessage('message', message));
+        this.socket.next(new QueryMessage('message', msg.Session, message));
     }
 
     private socketErrorHandler = (err) => {

@@ -51,23 +51,30 @@ export class EditorStream {
         private session: SessionStream
     ) {
         const runCodeText = session.events.filter(msg => msg.type === 'run-code')
-            .withLatestFrom(session
-                .events
-                .filter(msg => msg.type === 'create')
-                .flatMap(msg => this.subject.filter(e => e.type === 'edit' && e.id === msg.id))
-                .scan((buffers: BufferText[], editor: EditorMessage, index: number) => {
-                    if (!buffers.find(x => x.id === editor.id)) {
-                        buffers.push(new BufferText(editor.id));
-                    }
-                    const b = buffers.find(x => x.id === editor.id);
-                    b.edit(editor.data);
-                    return buffers;
-                }, []))
+            .withLatestFrom(
+                session
+                    .events
+                    .filter(msg => msg.type === 'create')
+                    .flatMap(msg => this.subject.filter(e => e.type === 'edit' && e.id === msg.id))
+                    .scan((buffers: BufferText[], editor: EditorMessage, index: number) => {
+                        if (!buffers.find(x => x.id === editor.id)) {
+                            buffers.push(new BufferText(editor.id));
+                        }
+                        const b = buffers.find(x => x.id === editor.id);
+                        b.edit(editor.data);
+                        return buffers;
+                    }, []))
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
                 return new EditorMessage('run-code-request', val[0].id, null, b.getText());
             });
-        this.events = this.subject.merge(runCodeText);
+
+        var obs = this.subject
+            .merge(runCodeText)
+            .publish();
+
+        this.events = obs;
+        obs.connect();
     }
 
     public edit(id: string, data: TextUpdate) {

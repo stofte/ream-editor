@@ -42,7 +42,9 @@ export class ProcessStream {
             } else {
                 this.status.next(new ProcessMessage('closed'));
             }
-            statusSub.unsubscribe();
+            setTimeout(() => {
+                statusSub.unsubscribe();
+            }, 100);
         });
         this.checkreadystatus();
     }

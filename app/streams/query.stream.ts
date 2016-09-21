@@ -28,8 +28,12 @@ export class QueryStream {
             .flatMap(req => {
                 return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
                     this.http.post(this.action('executecode'), JSON.stringify(req))
+                        .map(x => x.json())
                         .subscribe(data => {
-                            obs.next(new QueryMessage('run-code-response'));
+                            obs.next(new QueryMessage('run-code-response', req.id, null, {
+                                code: data.Code,
+                                message: data.Message
+                            }));
                             obs.complete();
                         });
                 });

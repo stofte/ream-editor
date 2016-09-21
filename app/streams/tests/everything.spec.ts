@@ -46,46 +46,45 @@ describe('everything int-test', function() {
 
     it('emits result pages for legal csharp', function(done) {
         this.timeout(backendTimeout * cSharpTestData.length * 1000);
-        setTimeout(() => {
-            cSharpTestData.forEach((test, idx: number) => {
-                const expectedPage = cSharpTestDataExpectedResult[idx];
-                const id = uuid.v4();
-                let verifyCount = 0;
-                // todo, if events isn't hot, nothing will happen in query, so we need to also
-                // listen for something, so we check that we get no errors from the request
-                const querySub = query.events.filter(msg => msg.type === 'run-code-response').subscribe(x => {
-                    console.log('query res', x);
-                });
-                const resultSub = result.events
-                    .filter(msg => msg.id === id)
-                    .subscribe(msg => {
-                        if (msg.type === 'done') {
-                            resultSub.unsubscribe();
-                            if (idx === cSharpTestData.length - 1) {
-                                expect(verifyCount).to.equal(cSharpTestData.length);
-                                done();
-                            }
-                        } else if (msg.type === 'update') {
-                            expect(msg.data.id).to.equal(id);
-                            expect(msg.data.title).to.equal(expectedPage.title);
-                            expect(msg.data.columns).to.deep.equal(expectedPage.columns);
-                            expect(msg.data.columnTypes).to.deep.equal(expectedPage.columnTypes);
-                            expect(msg.data.rows).to.deep.equal(expectedPage.rows);
-                            verifyCount++;
-                        }
-                    }); 
-                
-                replaySteps([
-                    500, () => session.new(id),
-                    { 
-                        for: test.events,
-                        wait: 100,
-                        fn: (evt) => editor.edit(id, evt)
-                    },
-                    1000, () => session.runCode(id)
-                ]);
+        cSharpTestData.forEach((test, idx: number) => {
+            const expectedPage = cSharpTestDataExpectedResult[idx];
+            const id = uuid.v4();
+            let verifyCount = 0;
+            // todo, if events isn't hot, nothing will happen in query, so we need to also
+            // listen for something, so we check that we get no errors from the request
+            const querySub = query.events.filter(msg => msg.type === 'run-code-response').subscribe(x => {
+                // todo map enum to string instead of
+                expect(x.response.code).to.equal(0);
             });
-        }, 5000);
+            const resultSub = result.events
+                .filter(msg => msg.id === id)
+                .subscribe(msg => {
+                    if (msg.type === 'done') {
+                        resultSub.unsubscribe();
+                        if (idx === cSharpTestData.length - 1) {
+                            expect(verifyCount).to.equal(cSharpTestData.length);
+                            done();
+                        }
+                    } else if (msg.type === 'update') {
+                        expect(msg.data.id).to.equal(id);
+                        expect(msg.data.title).to.equal(expectedPage.title);
+                        expect(msg.data.columns).to.deep.equal(expectedPage.columns);
+                        expect(msg.data.columnTypes).to.deep.equal(expectedPage.columnTypes);
+                        expect(msg.data.rows).to.deep.equal(expectedPage.rows);
+                        verifyCount++;
+                    }
+                }); 
+            
+            replaySteps([
+                100, () => session.new(id),
+                { 
+                    for: test.events,
+                    wait: 100,
+                    fn: (evt) => editor.edit(id, evt)
+                },
+                500, () => session.runCode(id)
+            ]);
+        });
     });
 
     it('stops dotnet process when stopServer is called', function(done) {

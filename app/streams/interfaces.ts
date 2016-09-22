@@ -1,7 +1,4 @@
 // json interfaces for query backend api
-interface BaseRequest { id: string; }
-export interface BaseResponse { code: string; message: string; }
-
 enum StatusCode {
     Ok = 0,
     CompilationError,
@@ -13,10 +10,13 @@ enum StatusCode {
 
 type databaseProviderType = 'SqlServer' | 'Npgsql' | 'Sqlite';
 
+export interface BaseRequest { id: string; }
+
+export interface BaseResponse { code: string; message: string; }
+
 export interface CodeRequest extends BaseRequest {
     text: string;
 }
-
 
 export interface QueryTemplateRequest extends BaseRequest {
     serverType: databaseProviderType;

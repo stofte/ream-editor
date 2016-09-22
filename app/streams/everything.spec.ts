@@ -6,13 +6,13 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, 
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { QueryMessage } from '../../messages/index';
-import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from '../index';
-import config from '../../config';
-import XSRFStrategyMock from '../../test/xsrf-strategy-mock';
+import { QueryMessage } from '../messages/index';
+import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from './index';
+import config from '../config';
+import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 import { cSharpTestData, cSharpTestDataExpectedResult,
-    cSharpTestDataExpectedCodeChecks } from '../../test/editor-testdata';
-import replaySteps from '../../test/replay-steps';
+    cSharpTestDataExpectedCodeChecks } from '../test/editor-testdata';
+import replaySteps from '../test/replay-steps';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
@@ -84,7 +84,7 @@ describe('everything int-test', function() {
                 expect(msg.codeTemplate.namespace).to.not.be.empty;
                 expect(msg.codeTemplate.lineOffset).to.not.be.undefined;
                 expect(msg.codeTemplate.columnOffset).to.not.be.undefined;
-                expect(msg.codeTemplate.template).to.contain(`namespace ${msg.codeTemplate.namespace}`)
+                expect(msg.codeTemplate.template).to.contain(`namespace ${msg.codeTemplate.namespace}`);
                 sawCodeTemplateResponse = true;
             });
             const resultSub = result.events

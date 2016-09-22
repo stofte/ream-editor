@@ -21,8 +21,4 @@ export class SessionStream {
     public runCode(id: string) {
         this.subject.next(new SessionMessage('run-code', id));
     }
-
-    public completions(id: string, line: number, column: number) {
-        this.subject()
-    }
 }

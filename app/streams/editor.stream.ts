@@ -69,7 +69,7 @@ export class EditorStream {
                 return new EditorMessage('run-code-request', val[0].id, null, b.getText());
             });
 
-        var obs = this.subject
+        const obs = this.subject
             .merge(runCodeText)
             .publish();
 

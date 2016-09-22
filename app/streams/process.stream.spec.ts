@@ -28,10 +28,9 @@ describe('process.stream int-test', function() {
             Http, BrowserXhr, XSRFStrategyMock,
             { provide: ConnectionBackend, useClass: XHRBackend },
             { provide: ResponseOptions, useClass: BaseResponseOptions },
-            { provide: RequestOptions, useClass: BaseRequestOptions },
-            ProcessStream
+            { provide: RequestOptions, useClass: BaseRequestOptions }
         ]);
-        instance = injector.get(ProcessStream);
+        instance = new ProcessStream(injector.get(Http));
     });
 
     function lifecycleTest(name, done) {

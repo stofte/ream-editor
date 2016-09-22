@@ -7,10 +7,11 @@ import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions,
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { QueryMessage } from '../../messages/index';
-import { ProcessStream, QueryStream, SessionStream, EditorStream, ResultStream } from '../index';
+import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from '../index';
 import config from '../../config';
 import XSRFStrategyMock from '../../test/xsrf-strategy-mock';
-import { cSharpTestData, cSharpTestDataExpectedResult } from '../../test/editor-testdata';
+import { cSharpTestData, cSharpTestDataExpectedResult,
+    cSharpTestDataExpectedCodeChecks } from '../../test/editor-testdata';
 import replaySteps from '../../test/replay-steps';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
@@ -23,6 +24,7 @@ describe('everything int-test', function() {
     let result: ResultStream = null;
     let injector: ReflectiveInjector = null;
     let query: QueryStream = null;
+    let omnisharp: OmnisharpStream = null;
     
     before(function() {
         chai.expect();
@@ -33,21 +35,33 @@ describe('everything int-test', function() {
             { provide: ResponseOptions, useClass: BaseResponseOptions },
             { provide: RequestOptions, useClass: BaseRequestOptions },
             QueryStream,
-            ProcessStream,
             SessionStream,
             EditorStream,
-            ResultStream
+            ResultStream,
+            OmnisharpStream
         ]);
         session = injector.get(SessionStream);
         editor = injector.get(EditorStream);
         result = injector.get(ResultStream);
         query = injector.get(QueryStream);
+        omnisharp = injector.get(OmnisharpStream);
     });
 
-    it('waits for backend to be ready', function(done) {
+    it('waits for backends to be ready', function(done) {
         this.timeout(backendTimeout);
+        let queryReady = false;
+        let omnisharpReady = false;
         query.once(msg => msg.type === 'ready', () => {
-            done();
+            queryReady = true;
+            if (omnisharpReady) {
+                done();
+            }
+        });
+        omnisharp.once(msg => msg.type === 'ready', () => {
+            omnisharpReady = true;
+            if (queryReady) {
+                done();
+            }
         });
     });
 
@@ -106,7 +120,32 @@ describe('everything int-test', function() {
         });
     });
 
-    it('stops backend process when stopServer is called', function(done) {
+    it.skip('omnisharp emits expected codecheck results for simple value expressions', function(done) {
+        this.timeout(backendTimeout * cSharpTestData.length + 1);
+        let verifyCount = 0;
+        cSharpTestData.forEach((testData, idx: number) => {
+            // only a single page
+            const expectedCompletions = cSharpTestDataExpectedCodeChecks[idx][0]; 
+            const id = uuid.v4();
+            // todo, if events isn't hot, nothing will happen in query, so we need to also
+            // listen for something, so we check that we get no errors from the request
+            omnisharp.once(msg => msg.type === 'completions' && msg.sessionId === id, msg => {
+                console.log('omnisharp completions', msg);
+                done();
+            });
+            replaySteps([
+                100, () => session.new(id),
+                { 
+                    for: testData.events,
+                    wait: 100,
+                    fn: (evt) => editor.edit(id, evt)
+                },
+                500, () => session.runCode(id)
+            ]);
+        });
+    });
+
+    it('stops query process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
         query.once(msg => msg.type === 'closed', () => {
             setTimeout(() => {
@@ -115,8 +154,22 @@ describe('everything int-test', function() {
                     .on('error', () => { done(); });
             }, 500);
         });
-        setTimeout(() => {
-            query.stopServer();
-        }, 0);
+        replaySteps([
+            500, () => query.stopServer()
+        ]);
+    });
+
+    it('stops omnisharp process when stopServer is called', function(done) {
+        this.timeout(backendTimeout);
+        omnisharp.once(msg => msg.type === 'closed', () => {
+            setTimeout(() => {
+                let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
+                http.get(url, res => { done(new Error('response received')); })
+                    .on('error', () => { done(); });
+            }, 500);
+        });
+        replaySteps([
+            500, () => omnisharp.stopServer()
+        ]);
     });
 });

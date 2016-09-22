@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, Provider } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
 import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/index';
@@ -12,12 +12,13 @@ import config from '../config';
 export class QueryStream {
     public events: Observable<QueryMessage>;
     private socket: Subject<QueryMessage> = new Subject<QueryMessage>();
+    private process: ProcessStream = null;
     constructor(
-        private process: ProcessStream,
         private editor: EditorStream,
         private session: SessionStream,
         private http: Http
     ) {
+        this.process = new ProcessStream(http);
         const executeCodeResponses = editor.events
             .filter(msg => msg.type === 'run-code-request')
             .map(msg => {

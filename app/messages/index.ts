@@ -6,3 +6,4 @@ export * from './web-socket-message';
 export * from './user-message';
 export * from './session-message';
 export * from './result-message';
+export * from './omnisharp-message';

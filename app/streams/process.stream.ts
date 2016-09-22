@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Subject } from 'rxjs/Rx';
+import { Http, Response } from '@angular/http';
+import { Subject, Observable } from 'rxjs/Rx';
 import { ProcessMessage } from '../messages/index';
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
@@ -9,7 +8,6 @@ const path = electronRequire('path');
 const REAMQUERY_BASEDIR = path.normalize(`${process.cwd()}/query/query/src/ReamQuery`);
 type ProcessType = 'omnisharp' | 'query';
 
-@Injectable()
 export class ProcessStream {
     public status: Subject<ProcessMessage> = new Subject<ProcessMessage>();
     private options: any;
@@ -57,11 +55,9 @@ export class ProcessStream {
     private checkreadystatus() {
         this.http.get(this.action('checkreadystatus'))
             .subscribe(ok => {
-                // console.log('checkreadystatus ok response', ok.text());
                 this.cancelCheck = true;
                 this.status.next(new ProcessMessage('ready'));
             }, error => {
-                // console.log('checkreadystatus timeouted')
                 if (!this.cancelCheck) {
                     setTimeout(() => { this.checkreadystatus(); }, 500);
                 }

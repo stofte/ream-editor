@@ -51,7 +51,7 @@ describe('everything int-test', function() {
         });
     });
 
-    it('emits messages for simple value expressions', function(done) {
+    it('query emits expected result and template messages for simple value expressions', function(done) {
         this.timeout(backendTimeout * cSharpTestData.length + 1);
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {

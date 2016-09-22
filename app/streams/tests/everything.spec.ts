@@ -44,18 +44,34 @@ describe('everything int-test', function() {
         query = injector.get(QueryStream);
     });
 
-    it('emits expected result pages for concurrent run-code requests', function(done) {
-        this.timeout(backendTimeout * cSharpTestData.length * 1000);
+    it('waits for backend to be ready', function(done) {
+        this.timeout(backendTimeout);
+        query.once(msg => msg.type === 'ready', () => {
+            done();
+        });
+    });
+
+    it('emits messages for simple value expressions', function(done) {
+        this.timeout(backendTimeout * cSharpTestData.length + 1);
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
             const expectedPage = cSharpTestDataExpectedResult[idx][0]; 
             const id = uuid.v4();
+            let sawRunCodeResponse = false;
+            let sawCodeTemplateResponse = false;
             // todo, if events isn't hot, nothing will happen in query, so we need to also
             // listen for something, so we check that we get no errors from the request
-            const querySub = query.events.filter(msg => msg.type === 'run-code-response').subscribe(x => {
-                // todo map enum to string instead of
-                expect(x.response.code).to.equal(0);
+            query.once(msg => msg.type === 'run-code-response' && msg.id === id, msg => {
+                expect(msg.response.code).to.equal(0);
+                sawRunCodeResponse = true;
+            });
+            query.once(msg => msg.type === 'code-template-response' && msg.id === id, msg => {
+                expect(msg.codeTemplate.namespace).to.not.be.empty;
+                expect(msg.codeTemplate.lineOffset).to.not.be.undefined;
+                expect(msg.codeTemplate.columnOffset).to.not.be.undefined;
+                expect(msg.codeTemplate.template).to.contain(`namespace ${msg.codeTemplate.namespace}`)
+                sawCodeTemplateResponse = true;
             });
             const resultSub = result.events
                 .filter(msg => msg.id === id)
@@ -64,6 +80,8 @@ describe('everything int-test', function() {
                         resultSub.unsubscribe();
                         if (idx === cSharpTestData.length - 1) {
                             expect(verifyCount).to.equal(cSharpTestData.length);
+                            expect(sawRunCodeResponse).to.be.true;
+                            expect(sawCodeTemplateResponse).to.be.true;
                             done();
                         }
                     } else if (msg.type === 'update') {
@@ -88,7 +106,7 @@ describe('everything int-test', function() {
         });
     });
 
-    it('stops dotnet process when stopServer is called', function(done) {
+    it('stops backend process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
         query.once(msg => msg.type === 'closed', () => {
             setTimeout(() => {

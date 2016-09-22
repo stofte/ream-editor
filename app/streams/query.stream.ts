@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
 import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/index';
-import { ProcessStream, EditorStream, UserStream } from './index';
+import { ProcessStream, EditorStream } from './index';
+import { SessionStream } from './session.stream';
 import { ProcessHelper } from '../utils/process-helper';
-import { CodeRequest } from './interfaces';
+import { CodeRequest, CodeTemplateRequest } from './interfaces';
 import config from '../config';
 
 @Injectable()
@@ -14,9 +15,10 @@ export class QueryStream {
     constructor(
         private process: ProcessStream,
         private editor: EditorStream,
+        private session: SessionStream,
         private http: Http
     ) {
-        const responses = editor.events
+        const executeCodeResponses = editor.events
             .filter(msg => msg.type === 'run-code-request')
             .map(msg => {
                 const mapped: CodeRequest = {
@@ -40,18 +42,51 @@ export class QueryStream {
             })
             .publish();
 
+        const codeTemplateResponses = session.events
+            .filter(msg => msg.type === 'create')
+            .map(msg => {
+                const mapped: CodeTemplateRequest = {
+                    text: '',
+                    id: msg.id
+                };
+                return mapped;
+            })
+            .flatMap(req => {
+                return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
+                    this.http.post(this.action('codetemplate'), JSON.stringify(req))
+                        .map(x => x.json())
+                        .subscribe(data => {
+                            obs.next(new QueryMessage('code-template-response', req.id, null, null, {
+                                code: data.Code,
+                                message: data.Message,
+                                namespace: data.Namespace,
+                                template: data.Template,
+                                header: data.Header,
+                                footer: data.Footer,
+                                columnOffset: data.ColumnOffset,
+                                lineOffset: data.LineOffset,
+                                defaultQuery: data.DefaultQuery
+                            }));
+                            obs.complete();
+                        });
+                });
+            })
+            .publish();
+
         this.events = this.process
             .status
             .map(msg => new QueryMessage(msg.type))
             .merge(this.socket)
-            .merge(responses);
+            .merge(executeCodeResponses)
+            .merge(codeTemplateResponses);
 
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
         const statusSub = this.events.subscribe(msg => {
             if (msg.type === 'ready') {
-                responses.connect();
+                executeCodeResponses.connect();
+                codeTemplateResponses.connect();
                 statusSub.unsubscribe();
                 Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(
                     this.socketMessageHandler,

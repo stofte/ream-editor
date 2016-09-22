@@ -47,7 +47,8 @@ describe('everything int-test', function() {
     it('emits result pages for legal csharp', function(done) {
         this.timeout(backendTimeout * cSharpTestData.length * 1000);
         const testData = cSharpTestData[0];
-        const expectedPage = cSharpTestDataExpectedResult[0]; 
+        // only a single page
+        const expectedPage = cSharpTestDataExpectedResult[0][0]; 
         const id = uuid.v4();
         let verifyCount = 0;
         // todo, if events isn't hot, nothing will happen in query, so we need to also
@@ -61,7 +62,7 @@ describe('everything int-test', function() {
             .subscribe(msg => {
                 if (msg.type === 'done') {
                     resultSub.unsubscribe();
-                    expect(verifyCount).to.equal(cSharpTestData.length);
+                    expect(verifyCount).to.equal(1);
                     done();
                 } else if (msg.type === 'update') {
                     expect(msg.data.id).to.equal(id);

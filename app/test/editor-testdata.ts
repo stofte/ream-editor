@@ -14,11 +14,27 @@ export const cSharpTestDataExpectedResult = [
 ];
 
 export const cSharpTestDataExpectedCodeChecks = [
-    
+    { }
 ];
 
 export const codecheckEditorTestData = [
-
+{
+    // we should see an error while paused after typing the "=" (~5 second gap) 
+    "output": "int x = 42;\n",
+    "events": [
+        {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["i"],"removed":[""],"origin":"+input","time":0.005000000000563887},
+        {"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["n"],"removed":[""],"origin":"+input","time":69.20000000000073},
+        {"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["t"],"removed":[""],"origin":"+input","time":186.01500000000033},
+        {"from":{"line":0,"ch":3},"to":{"line":0,"ch":3},"text":[" "],"removed":[""],"origin":"+input","time":336.37000000000035},
+        {"from":{"line":0,"ch":4},"to":{"line":0,"ch":4},"text":["x"],"removed":[""],"origin":"+input","time":457.37500000000045},
+        {"from":{"line":0,"ch":5},"to":{"line":0,"ch":5},"text":[" "],"removed":[""],"origin":"+input","time":659.4050000000007},
+        {"from":{"line":0,"ch":6},"to":{"line":0,"ch":6},"text":["="],"removed":[""],"origin":"+input","time":870.7500000000005},
+        {"from":{"line":0,"ch":7},"to":{"line":0,"ch":7},"text":[" "],"removed":[""],"origin":"+input","time":979.4500000000007},
+        {"from":{"line":0,"ch":8},"to":{"line":0,"ch":8},"text":["4"],"removed":[""],"origin":"+input","time":6001.935},
+        {"from":{"line":0,"ch":9},"to":{"line":0,"ch":9},"text":["2"],"removed":[""],"origin":"+input","time":6082.325000000001},
+        {"from":{"line":0,"ch":10},"to":{"line":0,"ch":10},"text":[";"],"removed":[""],"origin":"+input","time":6217.8150000000005},
+        {"from":{"line":0,"ch":11},"to":{"line":0,"ch":11},"text":["",""],"removed":[""],"origin":"+input","time":8646.215}
+]}
 ];
 
 export const cSharpTestData = [

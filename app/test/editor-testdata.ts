@@ -19,7 +19,7 @@ export const cSharpTestDataExpectedCodeChecks = [
 
 export const codecheckEditorTestData = [
 {
-    // we should see an error while paused after typing the "=" (~5 second gap) 
+    // we should see an error while paused after typing the "=" (~5 second gap), and none the second pause
     "output": "int x = 42;\n",
     "events": [
         {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["i"],"removed":[""],"origin":"+input","time":0.005000000000563887},

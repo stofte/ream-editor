@@ -73,10 +73,6 @@ export class QueryStream {
         this.process.close();
     }
 
-    public executeCode(request: CodeRequest): Observable<Response> {
-        return this.http.post(this.action('executecode'), request);
-    }
-
     private action(name: string) {
         return `http://localhost:${config.queryEnginePort}/${name}`;
     }

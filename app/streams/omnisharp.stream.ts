@@ -36,23 +36,20 @@ export class OmnisharpStream {
                     this.http.post(this.action('updatebuffer'), JSON.stringify(req))
                         .map(x => x.json())
                         .subscribe(data => {
+                            console.log('buffer-created', data)
                             obs.next(new OmnisharpMessage('buffer-created', req.SessionId, null, null, null));
                             obs.complete();
                         });
                 });
-            });
+            })
+            .publish();
 
-        // const bufferUpdated = session.events
-        //     .filter(msg => msg.type === 'create')
-        //     .do(msg => {
-        //         console.log('bufferUpdated.do', performance.now(), msg);
-        //     })
-        //     .delayWhen(msg => {
-        //         return Observable.timer(1000);
-        //     })
-        //     .subscribe(x => {
-        //         console.log('bufferUpdated.subscribe', performance.now(), x);
-        //     })
+        const bufferUpdated = session.events
+            .filter(msg => msg.type === 'create')
+            .delayWhen(msg => bufferCreated.filter(x => x.sessionId === msg.id))
+            .subscribe(x => {
+                console.log('bufferUpdated.subscribe', x);
+            });
         
         this.events = this.process
             .status
@@ -62,6 +59,9 @@ export class OmnisharpStream {
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);
         this.process.start('omnisharp', cmd.command, cmd.directory, config.omnisharpPort);
+        this.once(msg => msg.type === 'ready', () => {
+            bufferCreated.connect();
+        });
     }
 
     public once(pred: (msg: OmnisharpMessage) => boolean, handler: (msg: OmnisharpMessage) => void) {

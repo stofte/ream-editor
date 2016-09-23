@@ -28,19 +28,16 @@ export class QueryStream {
                 };
                 return mapped;
             })
-            .flatMap(req => {
-                return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
-                    this.http.post(this.action('executecode'), JSON.stringify(req))
-                        .map(x => x.json())
-                        .subscribe(data => {
-                            obs.next(new QueryMessage('run-code-response', req.id, null, {
-                                code: data.Code,
-                                message: data.Message
-                            }));
-                            obs.complete();
+            .flatMap(req => 
+                this.http
+                    .post(this.action('executecode'), JSON.stringify(req))
+                    .map(res => {
+                        const data = res.json();
+                        return new QueryMessage('run-code-response', req.id, null, {
+                            code: data.Code,
+                            message: data.Message
                         });
-                });
-            })
+                    }))
             .publish();
 
         const codeTemplateResponses = session.events
@@ -52,26 +49,22 @@ export class QueryStream {
                 };
                 return mapped;
             })
-            .flatMap(req => {
-                return new Observable<QueryMessage>((obs: Observer<QueryMessage>) => {
-                    this.http.post(this.action('codetemplate'), JSON.stringify(req))
-                        .map(x => x.json())
-                        .subscribe(data => {
-                            obs.next(new QueryMessage('code-template-response', req.id, null, null, {
-                                code: data.Code,
-                                message: data.Message,
-                                namespace: data.Namespace,
-                                template: data.Template,
-                                header: data.Header,
-                                footer: data.Footer,
-                                columnOffset: data.ColumnOffset,
-                                lineOffset: data.LineOffset,
-                                defaultQuery: data.DefaultQuery
-                            }));
-                            obs.complete();
+            .flatMap(req => 
+                this.http.post(this.action('codetemplate'), JSON.stringify(req))
+                    .map(res => {
+                        const data = res.json();
+                        return new QueryMessage('code-template-response', req.id, null, null, {
+                            code: data.Code,
+                            message: data.Message,
+                            namespace: data.Namespace,
+                            template: data.Template,
+                            header: data.Header,
+                            footer: data.Footer,
+                            columnOffset: data.ColumnOffset,
+                            lineOffset: data.LineOffset,
+                            defaultQuery: data.DefaultQuery
                         });
-                });
-            })
+                    }))
             .publish();
 
         this.events = this.process

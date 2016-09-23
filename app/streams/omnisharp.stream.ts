@@ -31,17 +31,13 @@ export class OmnisharpStream {
                 };
                 return mapped;
             })
-            .flatMap(req => {
-                return new Observable<OmnisharpMessage>((obs: Observer<OmnisharpMessage>) => {
-                    this.http.post(this.action('updatebuffer'), JSON.stringify(req))
-                        .map(x => x.json())
-                        .subscribe(data => {
-                            console.log('buffer-created', data)
-                            obs.next(new OmnisharpMessage('buffer-created', req.SessionId, null, null, null));
-                            obs.complete();
-                        });
-                });
-            })
+            .flatMap(req => 
+                this.http
+                    .post(this.action('updatebuffer'), JSON.stringify(req))
+                    .map(res => {
+                        // todo check result
+                        return new OmnisharpMessage('buffer-created', req.SessionId);
+                    }))
             .publish();
 
         const bufferUpdated = session.events

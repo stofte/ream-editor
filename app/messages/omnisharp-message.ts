@@ -1,6 +1,6 @@
 import { CodeCheckResult } from '../models/index';
 
-type eventType = 'starting' | 'failed' | 'ready' | 'closing' | 'closed' | 'completions' | 'codecheck';
+type eventType = 'starting' | 'failed' | 'ready' | 'closing' | 'closed' | 'completions' | 'codecheck' | 'buffer-created';
 
 export class OmnisharpMessage {
     constructor(

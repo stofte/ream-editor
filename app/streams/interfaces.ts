@@ -37,3 +37,11 @@ export interface CodeTemplateResponse extends BaseResponse {
         lineOffset: number;
         defaultQuery: string;
 }
+
+// omnisharp api
+export interface UpdateBufferRequest {
+    SessionId: string; // not used by omnisharp, internally used field
+    FileName: string;
+    FromDisk: boolean;
+    Buffer: string;
+}

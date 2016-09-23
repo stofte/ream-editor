@@ -21,4 +21,8 @@ export class SessionStream {
     public runCode(id: string) {
         this.subject.next(new SessionMessage('run-code', id));
     }
+
+    public codeCheck(id: string) {
+        this.subject.next(new SessionMessage('codecheck', id));
+    }
 }

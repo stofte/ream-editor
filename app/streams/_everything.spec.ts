@@ -6,12 +6,13 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, 
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { QueryMessage } from '../messages/index';
+import { QueryMessage, OmnisharpMessage } from '../messages/index';
 import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from './index';
 import config from '../config';
+import { CodeCheckResult } from '../models';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 import { cSharpTestData, cSharpTestDataExpectedResult,
-    cSharpTestDataExpectedCodeChecks } from '../test/editor-testdata';
+    cSharpTestDataExpectedCodeChecks, codecheckEditorTestData } from '../test/editor-testdata';
 import replaySteps from '../test/replay-steps';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
@@ -121,28 +122,36 @@ describe('everything int-test', function() {
     });
 
     it.skip('omnisharp emits expected codecheck results for simple value expressions', function(done) {
-        this.timeout(backendTimeout * cSharpTestData.length + 1);
-        let verifyCount = 0;
-        cSharpTestData.forEach((testData, idx: number) => {
-            // only a single page
-            const expectedCompletions = cSharpTestDataExpectedCodeChecks[idx][0]; 
-            const id = uuid.v4();
-            // todo, if events isn't hot, nothing will happen in query, so we need to also
-            // listen for something, so we check that we get no errors from the request
-            omnisharp.once(msg => msg.type === 'completions' && msg.sessionId === id, msg => {
-                console.log('omnisharp completions', msg);
+        this.timeout(backendTimeout * codecheckEditorTestData.length + 1);
+        const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
+        const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
+
+        const codechecks: OmnisharpMessage[] = [];
+        const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck').subscribe(msg => {
+            codechecks.push(msg);
+            console.log('codecheck msg', JSON.stringify(codechecks));
+            if (codechecks.length === 2) {
                 done();
-            });
-            replaySteps([
-                100, () => session.new(id),
-                { 
-                    for: testData.events,
-                    wait: 100,
-                    fn: (evt) => editor.edit(id, evt)
-                },
-                500, () => session.runCode(id)
-            ]);
+            }
         });
+
+        const id = uuid.v4();
+        const codecheckResults = [];
+        replaySteps([
+            100, () => session.new(id),
+            {
+                for: firstEdits,
+                wait: 100,
+                fn: (evt) => editor.edit(id, evt)
+            },
+            500, () => session.codeCheck(id),
+            {
+                for: secondEdits,
+                wait: 100,
+                fn: (evt) => editor.edit(id, evt)
+            },
+            500, () => session.codeCheck(id)
+        ]);
     });
 
     it('stops query process when stopServer is called', function(done) {

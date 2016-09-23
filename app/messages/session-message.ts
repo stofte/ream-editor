@@ -1,4 +1,4 @@
-type eventType = 'create' | 'run-code';
+type eventType = 'create' | 'run-code' | 'codecheck';
 
 export class SessionMessage {
     constructor(

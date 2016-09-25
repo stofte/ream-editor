@@ -39,6 +39,7 @@ class SessionReadyState {
 export class OmnisharpStream {
     public events: Observable<OmnisharpMessage>;
     private process: ProcessStream;
+    private templateMap: any = {};
     constructor(
         private editor: EditorStream,
         private query: QueryStream,
@@ -121,14 +122,9 @@ export class OmnisharpStream {
 
         sessionReady.connect();
         
-        const sessionFiles: any = {};
-        const templateMaps = {};
         sessionMaps.subscribe(map => {
-            if (!sessionFiles[map.sessionId]) {
-                sessionFiles[map.sessionId] = map.fileName;
-            }
-            if (!templateMaps[map.sessionId]) {
-                templateMaps[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null);
+            if (!this.templateMap[map.sessionId]) {
+                this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null);
             }
         });
 
@@ -188,13 +184,13 @@ export class OmnisharpStream {
                 });
             })
             .map(msg => {
-                return new SessionTemplateMap(null, null, sessionFiles[msg.id], msg.id, null, null, performance.now());
+                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, performance.now());
             })
             .flatMap(msg => 
                 this.http
                     .post(this.action('codecheck'), JSON.stringify({ FileName: msg.fileName }))
                     .map(res => res.json())
-                    .map(res => this.mapQuickFixes(res, msg.sessionId, templateMaps))
+                    .map(res => this.mapQuickFixes(res, msg.sessionId, this.templateMap))
                     .map(checks => {
                         return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks));
                     }));

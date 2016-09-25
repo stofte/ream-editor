@@ -4,7 +4,7 @@ import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
 import { QueryMessage, OmnisharpMessage, WebSocketMessage, SessionMessage } from '../messages/index';
 import { ProcessStream, EditorStream, QueryStream, SessionStream } from './index';
 import { ProcessHelper } from '../utils/process-helper';
-import { CodeRequest, UpdateBufferRequest } from './interfaces';
+import { CodeRequest, UpdateBufferRequest, AutoCompletionItem } from './interfaces';
 import { CodeCheckResult, EditorChange, AutocompletionQuery } from '../models/index';
 import * as uuid from 'node-uuid';
 import config from '../config';
@@ -54,7 +54,7 @@ export class OmnisharpStream {
         private session: SessionStream,
         private http: Http
     ) {
-        this.process = new ProcessStream(http);
+        
 
         const sessionMaps = query.events
             .filter(msg => msg.type === 'code-template-response')
@@ -78,6 +78,12 @@ export class OmnisharpStream {
                     .post(this.action('updatebuffer'), JSON.stringify(sessionMap.templateRequest))
                     .map(res => sessionMap)) // todo check result
             .publish();
+        
+        sessionMaps.subscribe(map => {
+            if (!this.templateMap[map.sessionId]) {
+                this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null);
+            }
+        });
 
         const sessionReady = session.events
             .filter(msg => msg.type === 'create')
@@ -128,14 +134,6 @@ export class OmnisharpStream {
                             sessionMap.edits[sessionMap.edits.length - 1].timestamp)))
             .publish();
 
-        sessionReady.connect();
-        
-        sessionMaps.subscribe(map => {
-            if (!this.templateMap[map.sessionId]) {
-                this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null);
-            }
-        });
-
         const sessionStatus = session.events.filter(msg => msg.type === 'create')
             .flatMap(msg => {
                 return new Observable<SessionReadyState>((obs: Observer<SessionReadyState>) => {
@@ -170,9 +168,6 @@ export class OmnisharpStream {
             }, [])
             .publishReplay();
 
-        sessionStatus
-            .connect();
-
         const waitForSession = (msg: SessionMessage) : Observable<number> => {
             return new Observable<number>((obs: Observer<number>) => {
                 let done = false;
@@ -203,7 +198,8 @@ export class OmnisharpStream {
                     .map(res => this.mapQuickFixes(res, msg.sessionId, this.templateMap))
                     .map(checks => {
                         return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks));
-                    }));
+                    }))
+            .publish();
 
         const autoCompletions = session.events
             .filter(msg => msg.type === 'autocomplete')
@@ -213,7 +209,7 @@ export class OmnisharpStream {
                 const request = msg.autoComplete;
                 request.fileName = tmpl.fileName;
                 request.column += (request.line === 0 ? tmpl.columnOffset : 0) + 1;
-                request.line += (request.line === 0 ? tmpl.lineOffset : 0) + 1;
+                request.line += tmpl.lineOffset + 1;
                 return new SessionAutocompleteMap(
                     msg.id,
                     performance.now(),
@@ -222,17 +218,25 @@ export class OmnisharpStream {
             })
             .flatMap(msg => 
                 this.http
-                    .post(this.action('autocomplete'), JSON.stringify({ FileName: msg.request.fileName }))
+                    .post(this.action('autocomplete'), JSON.stringify(msg.request))
                     .map(res => res.json())
-                    .map((completions: any[]) => {
+                    .map((completions: AutoCompletionItem[]) => {
                         return new OmnisharpMessage('autocompletion', msg.sessionId, null, completions, null);
-                    }));
+                    }))
+            .publish();
+
+        this.process = new ProcessStream(http);
 
         this.events = this.process
             .status
             .map(msg => new OmnisharpMessage(msg.type))
             .merge(codeChecks)
             .merge(autoCompletions);
+
+        sessionReady.connect();
+        sessionStatus.connect();
+        codeChecks.connect();
+        autoCompletions.connect();
 
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);

@@ -1,3 +1,48 @@
+import { AutocompletionQuery } from '../models/index';
+
+export const cSharpAutocompletionExpectedValues = [
+    // expected items in the completion list on accessing an int instance variable
+    [
+        "CompareTo",
+        "Equals",
+        "GetHashCode",
+        "ToString"
+    ]
+]
+
+export const cSharpAutocompletionRequestTestData: AutocompletionQuery[] = [
+    <AutocompletionQuery> {
+        column: 2,
+        line: 1,
+        wantKind: true,
+        wantDocumentationForEveryCompletionResult: true,
+        wordToComplete: null,
+        wantReturnType: true,
+        wantMethodHeader: true
+    }
+];
+
+export const cSharpAutocompletionEditorTestData = [
+{
+    "output": "int x = 42;\nx.",
+    "events": [
+        {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["i"],"removed":[""],"origin":"+input","time":0},
+        {"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["n"],"removed":[""],"origin":"+input","time":195.30999999999995},
+        {"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["t"],"removed":[""],"origin":"+input","time":274.905},
+        {"from":{"line":0,"ch":3},"to":{"line":0,"ch":3},"text":[" "],"removed":[""],"origin":"+input","time":657.4850000000001},
+        {"from":{"line":0,"ch":4},"to":{"line":0,"ch":4},"text":["x"],"removed":[""],"origin":"+input","time":843.2900000000002},
+        {"from":{"line":0,"ch":5},"to":{"line":0,"ch":5},"text":[" "],"removed":[""],"origin":"+input","time":1020.3},
+        {"from":{"line":0,"ch":6},"to":{"line":0,"ch":6},"text":["="],"removed":[""],"origin":"+input","time":1311.6850000000002},
+        {"from":{"line":0,"ch":7},"to":{"line":0,"ch":7},"text":[" "],"removed":[""],"origin":"+input","time":1405.2100000000003},
+        {"from":{"line":0,"ch":8},"to":{"line":0,"ch":8},"text":["4"],"removed":[""],"origin":"+input","time":1751.5650000000003},
+        {"from":{"line":0,"ch":9},"to":{"line":0,"ch":9},"text":["2"],"removed":[""],"origin":"+input","time":1781.305},
+        {"from":{"line":0,"ch":10},"to":{"line":0,"ch":10},"text":[";"],"removed":[""],"origin":"+input","time":2139.1500000000005},
+        {"from":{"line":0,"ch":11},"to":{"line":0,"ch":11},"text":["",""],"removed":[""],"origin":"+input","time":2439.0699999999997},
+        {"from":{"line":1,"ch":0},"to":{"line":1,"ch":0},"text":["x"],"removed":[""],"origin":"+input","time":2721.0150000000003},
+        {"from":{"line":1,"ch":1},"to":{"line":1,"ch":1},"text":["."],"removed":[""],"origin":"+input","time":3081.24}
+]}
+];
+
 export const cSharpTestDataExpectedResult = [
     [{
         title: 'int',

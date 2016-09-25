@@ -45,3 +45,14 @@ export interface UpdateBufferRequest {
     FromDisk: boolean;
     Buffer: string;
 }
+
+export interface AutoCompletionItem {
+    CompletionText: string;
+    Description: string;
+    DisplayText: string;
+    RequiredNamespaceImport: string;
+    MethodHeader: string;
+    ReturnType: string;
+    Snippet: string;
+    Kind: string;
+}

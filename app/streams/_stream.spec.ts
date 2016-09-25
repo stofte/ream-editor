@@ -69,28 +69,13 @@ describe('[int-test] streams', function() {
         });
     });
 
-    it('emits result and template messages for simple value expressions', function(done) {
+    it('emits result messages for simple value expressions', function(done) {
         this.timeout(backendTimeout * (cSharpTestData.length + 1));
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
             const expectedPage = cSharpTestDataExpectedResult[idx][0]; 
             const id = uuid.v4();
-            let sawRunCodeResponse = false;
-            let sawCodeTemplateResponse = false;
-            // todo, if events isn't hot, nothing will happen in query, so we need to also
-            // listen for something, so we check that we get no errors from the request
-            query.once(msg => msg.type === 'run-code-response' && msg.id === id, msg => {
-                expect(msg.response.code).to.equal(0);
-                sawRunCodeResponse = true;
-            });
-            query.once(msg => msg.type === 'code-template-response' && msg.id === id, msg => {
-                expect(msg.template.namespace).to.not.be.empty;
-                expect(msg.template.lineOffset).to.not.be.undefined;
-                expect(msg.template.columnOffset).to.not.be.undefined;
-                expect(msg.template.template).to.contain(`namespace ${msg.template.namespace}`);
-                sawCodeTemplateResponse = true;
-            });
             const resultSub = result.events
                 .filter(msg => msg.id === id)
                 .subscribe(msg => {
@@ -98,8 +83,6 @@ describe('[int-test] streams', function() {
                         resultSub.unsubscribe();
                         if (idx === cSharpTestData.length - 1) {
                             expect(verifyCount).to.equal(cSharpTestData.length);
-                            expect(sawRunCodeResponse).to.be.true;
-                            expect(sawCodeTemplateResponse).to.be.true;
                             done();
                         }
                     } else if (msg.type === 'update') {

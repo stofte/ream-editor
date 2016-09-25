@@ -14,8 +14,22 @@ export const cSharpTestDataExpectedResult = [
 ];
 
 export const cSharpTestDataExpectedCodeChecks = [
-    { }
-];
+{
+    text: 'Identifier expected',
+    logLevel: 'Error',
+    line: 0,
+    column: 4,
+    endLine: 0,
+    endColumn: 5 
+},
+{
+    text: 'The variable \'x\' is assigned but its value is never used',
+    logLevel: 'Warning',
+    line: 0,
+    column: 4,
+    endLine: 0,
+    endColumn: 5
+}];
 
 export const codecheckEditorTestData = [
 {

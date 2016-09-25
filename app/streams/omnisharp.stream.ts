@@ -261,7 +261,7 @@ export class OmnisharpStream {
             const line = x.Line - 1 - (map.lineOffset);
             const column = x.Column - 1 - (line === 0 ? map.columnOffset : 0);
             const endLine = x.EndLine - 1 - (map.lineOffset);
-            const endColumn = x.EndColumn - 1 - (endLine === 0 ? map.lineOffset : 0);
+            const endColumn = x.EndColumn - 1 - (endLine === 0 ? map.columnOffset : 0);
             return <CodeCheckResult> {
                 text: this.cleanupMessage(x.Text),
                 logLevel: x.LogLevel,

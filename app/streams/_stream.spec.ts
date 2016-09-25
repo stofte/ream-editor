@@ -125,20 +125,18 @@ describe('[int-test] streams', function() {
         this.timeout(backendTimeout * 2);
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
-        const codechecks: OmnisharpMessage[] = [];
+        let codechecks = 0;
         const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck').subscribe(msg => {
-            if (codechecks.length === 0) {
-                // first check should cause an error, with the incomplete statement
-                expect(msg.checks.length).to.equal(1);
-                expect(msg.checks[0].logLevel).to.equal('Error');
-            }
-            if (codechecks.length === 1) {
-                // second check should cause a warning about unused variables
-                expect(msg.checks.length).to.equal(1);
-                expect(msg.checks[0].logLevel).to.equal('Warning');
-            }
-            codechecks.push(msg);
-            if (codechecks.length === 2) {
+            const expectedCheck = cSharpTestDataExpectedCodeChecks[codechecks];
+            expect(msg.checks.length).to.equal(1);
+            expect(msg.checks[0].line).to.equal(expectedCheck.line);
+            expect(msg.checks[0].column).to.equal(expectedCheck.column);
+            expect(msg.checks[0].endLine).to.equal(expectedCheck.endLine);
+            expect(msg.checks[0].endColumn).to.equal(expectedCheck.endColumn);
+            expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel);
+            expect(msg.checks[0].text).to.equal(expectedCheck.text);
+            codechecks++;
+            if (codechecks === cSharpTestDataExpectedCodeChecks.length) {
                 done();
             }
         });

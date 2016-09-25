@@ -35,13 +35,6 @@ class SessionReadyState {
     ) {}
 }
 
-class CodeCheckMap {
-    sessionId: string;
-    fileName: string;
-    timestamp: number;
-    fixes: CodeCheckResult[];
-}
-
 @Injectable()
 export class OmnisharpStream {
     public events: Observable<OmnisharpMessage>;

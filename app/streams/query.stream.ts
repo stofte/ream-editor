@@ -77,7 +77,7 @@ export class QueryStream {
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
-        this.once(msg => msg.type === 'ready', () =>{
+        this.once(msg => msg.type === 'ready', () => {
             executeCodeResponses.connect();
             codeTemplateResponses.connect();
             Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(

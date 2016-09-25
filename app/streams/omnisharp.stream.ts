@@ -35,7 +35,6 @@ class SessionReadyState {
     ) {}
 }
 
-
 class CodeCheckMap {
     sessionId: string;
     fileName: string;
@@ -93,18 +92,18 @@ export class OmnisharpStream {
                 return editor.events
                     .filter(x => x.type === 'edit' && x.id === msg.id)
                     .delayWhen(x => Observable.fromPromise(ready))
-                    .map(msg => {
+                    .map(x => {
                         return <EditorChange> {
-                            newText: msg.data.text.join('\n'),
-                            startLine: msg.data.from.line + sessionMap.lineOffset + 1,
-                            startColumn: msg.data.from.ch + (msg.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                            endLine: msg.data.to.line + sessionMap.lineOffset + 1,
-                            endColumn: msg.data.to.ch + (msg.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                            timestamp: msg.data.timestamp
+                            newText: x.data.text.join('\n'),
+                            startLine: x.data.from.line + sessionMap.lineOffset + 1,
+                            startColumn: x.data.from.ch + (x.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
+                            endLine: x.data.to.line + sessionMap.lineOffset + 1,
+                            endColumn: x.data.to.ch + (x.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
+                            timestamp: x.data.timestamp
                         };
                     })
                     .bufferTime(500)
-                    .filter(msgs => msgs.length > 0)
+                    .filter(edits => edits.length > 0)
                     .map(edits => new SessionTemplateMap(
                         sessionMap.columnOffset,
                         sessionMap.lineOffset,
@@ -121,11 +120,10 @@ export class OmnisharpStream {
                         FileName: sessionMap.fileName,
                         Changes: sessionMap.edits
                     }))
-                    //.delay(1000)
                     .map(res =>
                         new SessionUpdated(
                             sessionMap.sessionId,
-                            sessionMap.edits[sessionMap.edits.length-1].timestamp)))
+                            sessionMap.edits[sessionMap.edits.length - 1].timestamp)))
             .publish();
 
         sessionReady.connect();
@@ -159,17 +157,17 @@ export class OmnisharpStream {
                     sessionReady.filter(x => x.sessionId === msg.id).subscribe(x => {
                         Assert(lastUpdate < x.timestamp, 'update timestamp did not increase');
                         lastUpdate = x.timestamp;
-                        if (lastState !=  lastEdit <= lastUpdate) {
+                        if (lastState !== (lastEdit <= lastUpdate)) {
                             lastState = lastEdit <= lastUpdate;
                             obs.next(new SessionReadyState(msg.id, lastState));
                         }
                     });
                 });
             })
-            .scan((validSessions: string[], session: SessionReadyState) => {
-                const without = validSessions.filter(x => x !== session.sessionId);
-                if (session.ready) {
-                    return [session.sessionId].concat(validSessions);
+            .scan((validSessions: string[], value: SessionReadyState) => {
+                const without = validSessions.filter(x => x !== value.sessionId);
+                if (value.ready) {
+                    return [value.sessionId].concat(validSessions);
                 }
                 return without;
             }, [])
@@ -191,7 +189,7 @@ export class OmnisharpStream {
                             // timing sensitive, if we dont wait, sub might be undefined
                             setTimeout(() => {
                                 sub.unsubscribe();
-                            },200);
+                            }, 200);
                         }
                     });
                 });
@@ -204,74 +202,10 @@ export class OmnisharpStream {
                     .post(this.action('codecheck'), JSON.stringify({ FileName: msg.fileName }))
                     .map(res => res.json())
                     .map(res => this.mapQuickFixes(res, msg.sessionId, templateMaps))
-                    // .map(checks => <CodeCheckMap> {
-                    //     sessionId: msg.sessionId,
-                    //     fileName: msg.fileName,
-                    //     timestamp: msg.timestamp,
-                    //     fixes: this.filterCodeChecks(checks)
-                    // })
                     .map(checks => {
                         return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks));
                     }));
 
-        // codechecks
-        //     .subscribe(x => {
-        //         console.log('codecheck response', x);
-        //     });
-
-        // codechecks.flatMap(msg => {
-        //     return this.http
-        //             .post(this.action('CodeFormat'), JSON.stringify({ FileName: msg.fileName }));
-        // }).subscribe(x => {
-        //     console.log('codeformat', x.json().Buffer)
-        // })
-
-        // editor.events.filter(msg => msg.type === 'edit')
-        //     .flatMap(msg => {
-        //         return sessionReady.filter(x => x.timestamp === msg.data.timestamp)
-        //     })
-        //     .subscribe(x => {
-        //         console.log('session')
-        //     });
-
-        // keep timestamps for all sessions, to simplify codecheck stream
-        // const sessionTimestamp = <any> {};
-
-        // const codechecks = session.events
-        //     .filter(msg => msg.type === 'codecheck')
-
-        //     .flatMap(msg => {
-        //         const ready = new Promise((done) => {
-        //             if (sessionTimestamp[msg.id] >= msg.timestamp) {
-        //                 done();
-        //             } else {
-        //                 console.log('waiting for state to catch up', msg.id, msg.timestamp, performance.now());
-        //                 const sub = sessionReady
-        //                     .do(x => {
-        //                         if (x.sessionId === msg.id) {
-        //                             console.log('while waiting', x.timestamp, performance.now());
-        //                         }
-        //                     })
-        //                     .filter(state => state.sessionId === msg.id && state.timestamp >= msg.timestamp)
-        //                     .subscribe(() => {
-        //                         sub.unsubscribe();
-        //                         done();
-        //                     });
-        //             }
-        //         });
-        //         return Observable.fromPromise(ready).map(() => msg);
-        //     })
-        //     .subscribe(x => {
-        //         console.log('codecheck response', x.id, performance.now() - x.timestamp);
-        //     });
-
-        // const codeCheckResults = session.events
-        //     .filter(msg => msg.type === 'codecheck')
-        //     .delayWhen(msg => sessionReadyStates.filter(x => x.sessionId === msg.id && x.timestamp >= msg.timestamp))
-        //     .subscribe(msg => {
-        //         console.log('codechecking now', performance.now())
-        //     });
-        
         this.events = this.process
             .status
             .map(msg => new OmnisharpMessage(msg.type))
@@ -282,7 +216,6 @@ export class OmnisharpStream {
         this.process.start('omnisharp', cmd.command, cmd.directory, config.omnisharpPort);
         this.once(msg => msg.type === 'ready', () => {
             sessionMaps.connect();
-            // sessionReadyStates.connect();
         });
     }
 

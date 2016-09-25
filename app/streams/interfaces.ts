@@ -28,7 +28,7 @@ export interface CodeTemplateRequest extends BaseRequest {
     text: string;
 }
 
-export interface CodeTemplateResponse extends BaseResponse {
+export interface TemplateResponse extends BaseResponse {
         namespace: string;
         template: string;
         header: string;

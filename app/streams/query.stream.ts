@@ -5,8 +5,17 @@ import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/inde
 import { ProcessStream, EditorStream } from './index';
 import { SessionStream } from './session.stream';
 import { ProcessHelper } from '../utils/process-helper';
-import { CodeRequest, CodeTemplateRequest } from './interfaces';
+import { CodeRequest, CodeTemplateRequest, QueryTemplateRequest, TemplateResponse } from './interfaces';
 import config from '../config';
+
+class TemplateRequest {
+    constructor(
+        public sessionId: string,
+        public codeTemplate: CodeTemplateRequest = null,
+        public queryTemplate: QueryTemplateRequest = null,
+        public template: TemplateResponse = null
+    ) {}
+}
 
 @Injectable()
 export class QueryStream {
@@ -41,7 +50,7 @@ export class QueryStream {
             .publish();
 
         const codeTemplateResponses = session.events
-            .filter(msg => msg.type === 'create')
+            .filter(msg => msg.type === 'create' || msg.type === 'context')
             .map(msg => {
                 const mapped: CodeTemplateRequest = {
                     text: '',

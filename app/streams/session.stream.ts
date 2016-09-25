@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs/Rx';
 import { SessionMessage } from '../messages/index';
-import { AutocompletionQuery } from '../models/index';
+import { AutocompletionQuery, Connection } from '../models/index';
 import * as uuid from 'node-uuid';
 
 @Injectable()
@@ -32,5 +32,9 @@ export class SessionStream {
 
     public autoComplete(id: string, query: AutocompletionQuery) {
         this.subject.next(new SessionMessage('autocomplete', id, performance.now(), query));
+    }
+
+    public setContext(id: string, connection: Connection) {
+        this.subject.next(new SessionMessage('context', id, performance.now(), null, connection));
     }
 }

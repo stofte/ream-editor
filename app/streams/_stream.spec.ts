@@ -9,15 +9,17 @@ import { Observable } from 'rxjs/Rx';
 import { QueryMessage, OmnisharpMessage } from '../messages/index';
 import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from './index';
 import config from '../config';
-import { CodeCheckResult, AutocompletionQuery } from '../models';
+import { CodeCheckResult, AutocompletionQuery, Connection } from '../models';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 import { cSharpTestData, cSharpTestDataExpectedResult, cSharpTestDataExpectedCodeChecks,
     codecheckEditorTestData, cSharpAutocompletionEditorTestData, cSharpAutocompletionRequestTestData,
-    cSharpAutocompletionExpectedValues } from '../test/editor-testdata';
+    cSharpAutocompletionExpectedValues, cSharpContextSwitchExpectedCodeChecks, 
+    cSharpContextSwitchEditorTestData } from '../test/editor-testdata';
 import replaySteps from '../test/replay-steps';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
+const sqliteConnectionString = config.unitTestData.sqliteWorlddbConnectionString; 
 
 describe('[int-test] streams', function() {
     this.timeout(backendTimeout * 3000);
@@ -83,10 +85,10 @@ describe('[int-test] streams', function() {
                 sawRunCodeResponse = true;
             });
             query.once(msg => msg.type === 'code-template-response' && msg.id === id, msg => {
-                expect(msg.codeTemplate.namespace).to.not.be.empty;
-                expect(msg.codeTemplate.lineOffset).to.not.be.undefined;
-                expect(msg.codeTemplate.columnOffset).to.not.be.undefined;
-                expect(msg.codeTemplate.template).to.contain(`namespace ${msg.codeTemplate.namespace}`);
+                expect(msg.template.namespace).to.not.be.empty;
+                expect(msg.template.lineOffset).to.not.be.undefined;
+                expect(msg.template.columnOffset).to.not.be.undefined;
+                expect(msg.template.template).to.contain(`namespace ${msg.template.namespace}`);
                 sawCodeTemplateResponse = true;
             });
             const resultSub = result.events
@@ -186,6 +188,55 @@ describe('[int-test] streams', function() {
                 fn: (evt) => editor.edit(id, evt)
             },
             100, () => session.autoComplete(id, cSharpAutocompletionRequestTestData[0])
+        ]);
+    });
+
+    it.skip('emits codecheck messages after switching buffer context', function(done) {
+        this.timeout(backendTimeout * 3);
+        const connection = new Connection(sqliteConnectionString, 'sqlite');
+        const id = uuid.v4();
+        const firstEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time < 5000);
+        const secondEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time >= 5000);
+        const expectedCheck = cSharpContextSwitchExpectedCodeChecks[0];
+        let codechecks = 0;
+        const codecheckSub = omnisharp.events
+            .filter(msg => msg.type === 'codecheck' && msg.sessionId === id)
+            .subscribe(msg => {
+                codechecks++;
+                if (codechecks === 1) {
+                    console.log('doing first check', msg)
+                    expect(msg.checks.length).to.equal(1);
+                    expect(msg.checks[0].text).to.equal(expectedCheck.text);
+                    expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel);
+                } else {
+                    codecheckSub.unsubscribe();
+                    // we should be in the correct context now, and not see any errors
+                    console.log('doing second check', msg)
+                    expect(msg.checks.length).to.equal(0);
+                    setTimeout(() => done(), 1000);
+                }
+            });
+
+        // timing sensitive. if we fire the codecheck too early, we might
+        // accidentally codecheck an unintended buffer. this leads to 
+        // unpredicted errors (eg "Identifier expected" if only the "int " has been processed)
+        replaySteps([
+            100, () => session.new(id),
+            {
+                for: firstEdits, // yields text "city", which is illegal in code buffer
+                wait: 100,
+                fn: (evt) => editor.edit(id, evt)
+            },
+            2500, () => session.codeCheck(id),
+            // switch
+            100, () => session.setContext(id, connection),
+            100, () => { },
+            {
+                for: secondEdits,
+                wait: 100,
+                fn: (evt) => editor.edit(id, evt)
+            },
+            2500, () => session.codeCheck(id)
         ]);
     });
 

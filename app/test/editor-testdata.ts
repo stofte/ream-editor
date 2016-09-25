@@ -1,5 +1,35 @@
 import { AutocompletionQuery } from '../models/index';
 
+
+export const cSharpContextSwitchExpectedCodeChecks = [
+{ text: 'The name \'city\' does not exist in the current context',
+       logLevel: 'Error',
+       fileName: 'C:\\Users\\svto\\AppData\\Local\\ReamEditor\\omnisharp\\ba07f240f726b4d3d838bd09ad5003cc4.cs',
+       line: 0,
+       column: 0,
+       endLine: 0,
+       endColumn: 4 }];
+
+export const cSharpContextSwitchEditorTestData = [
+{
+    "output": "city.Take(10)",
+    "events": [
+        {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["c"],"removed":[""],"origin":"+input","time":0},
+        {"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["i"],"removed":[""],"origin":"+input","time":256.43499999999995},
+        {"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["t"],"removed":[""],"origin":"+input","time":489.845},
+        {"from":{"line":0,"ch":3},"to":{"line":0,"ch":3},"text":["y"],"removed":[""],"origin":"+input","time":752.2250000000001},
+        {"from":{"line":0,"ch":4},"to":{"line":0,"ch":4},"text":["."],"removed":[""],"origin":"+input","time":5510.365000000001},
+        {"from":{"line":0,"ch":5},"to":{"line":0,"ch":5},"text":["T"],"removed":[""],"origin":"+input","time":6271.055},
+        {"from":{"line":0,"ch":6},"to":{"line":0,"ch":6},"text":["a"],"removed":[""],"origin":"+input","time":6475.030000000001},
+        {"from":{"line":0,"ch":7},"to":{"line":0,"ch":7},"text":["k"],"removed":[""],"origin":"+input","time":6577.755},
+        {"from":{"line":0,"ch":8},"to":{"line":0,"ch":8},"text":["e"],"removed":[""],"origin":"+input","time":6717.830000000001},
+        {"from":{"line":0,"ch":9},"to":{"line":0,"ch":9},"text":["("],"removed":[""],"origin":"+input","time":6995.645000000001},
+        {"from":{"line":0,"ch":10},"to":{"line":0,"ch":10},"text":["1"],"removed":[""],"origin":"+input","time":7364.795000000001},
+        {"from":{"line":0,"ch":11},"to":{"line":0,"ch":11},"text":["0"],"removed":[""],"origin":"+input","time":7533.715000000001},
+        {"from":{"line":0,"ch":12},"to":{"line":0,"ch":12},"text":[")"],"removed":[""],"origin":"+input","time":7840.990000000001}
+]}
+];
+
 export const cSharpAutocompletionExpectedValues = [
     // expected items in the completion list on accessing an int instance variable
     [

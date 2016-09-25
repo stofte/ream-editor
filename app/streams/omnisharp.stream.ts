@@ -63,11 +63,11 @@ export class OmnisharpStream {
                     SessionId: msg.id,
                     FileName: `${config.omnisharpProjectPath}\\b${msg.id.replace(/\-/g, '')}.cs`,
                     FromDisk: false,
-                    Buffer: msg.codeTemplate.template
+                    Buffer: msg.template.template
                 };
                 return new SessionTemplateMap(
-                    msg.codeTemplate.columnOffset,
-                    msg.codeTemplate.lineOffset,
+                    msg.template.columnOffset,
+                    msg.template.lineOffset,
                     update.FileName,
                     msg.id,
                     update

@@ -3,6 +3,7 @@ type eventType = 'create' | 'run-code' | 'codecheck';
 export class SessionMessage {
     constructor(
         public type: eventType,
-        public id: string
+        public id: string,
+        public timestamp: number = null
     ) {}
 }

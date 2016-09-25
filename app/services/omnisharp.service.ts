@@ -194,7 +194,7 @@ export class OmnisharpService {
             })
             .combineLatest(mirrorChangeStream.changes, (latest, change) => {
                 return <UpdateMap> {
-                    status: (change.created - latest) <= 0,
+                    status: (change.timestamp - latest) <= 0,
                     fileName: change.fileName
                 };
             })

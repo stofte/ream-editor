@@ -11,7 +11,7 @@ import { ProcessHelper } from '../utils/process-helper';
 import config from '../config';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 
-describe('process.stream int-test', function() {
+describe('[int-test] process.stream', function() {
     this.timeout(30 * 1000);
 
     let injector: ReflectiveInjector;

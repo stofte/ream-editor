@@ -18,7 +18,7 @@ import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
 
-describe('everything int-test', function() {
+describe('[int-test] streams', function() {
     this.timeout(backendTimeout * 3000);
     let session: SessionStream = null;
     let editor: EditorStream = null;
@@ -66,8 +66,8 @@ describe('everything int-test', function() {
         });
     });
 
-    it('query emits expected result and template messages for simple value expressions', function(done) {
-        this.timeout(backendTimeout * cSharpTestData.length + 1);
+    it('emits result and template messages for simple value expressions', function(done) {
+        this.timeout(backendTimeout * (cSharpTestData.length + 1));
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
@@ -121,15 +121,23 @@ describe('everything int-test', function() {
         });
     });
 
-    it.skip('omnisharp emits expected codecheck results for simple value expressions', function(done) {
-        this.timeout(backendTimeout * codecheckEditorTestData.length + 1);
+    it('emits codecheck messages for simple statement', function(done) {
+        this.timeout(backendTimeout * 2);
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
-
         const codechecks: OmnisharpMessage[] = [];
         const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck').subscribe(msg => {
+            if (codechecks.length === 0) {
+                // first check should cause an error, with the incomplete statement
+                expect(msg.checks.length).to.equal(1);
+                expect(msg.checks[0].logLevel).to.equal('Error');
+            }
+            if (codechecks.length === 1) {
+                // second check should cause a warning about unused variables
+                expect(msg.checks.length).to.equal(1);
+                expect(msg.checks[0].logLevel).to.equal('Warning');
+            }
             codechecks.push(msg);
-            console.log('codecheck msg', JSON.stringify(codechecks));
             if (codechecks.length === 2) {
                 done();
             }
@@ -144,7 +152,9 @@ describe('everything int-test', function() {
                 wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            500, () => session.codeCheck(id),
+            100, () => session.codeCheck(id),
+            // give omnisharp some time since this is a first real op
+            3000, () => { },
             {
                 for: secondEdits,
                 wait: 100,

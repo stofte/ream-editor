@@ -120,7 +120,7 @@ export class MirrorChangeStream {
                         this.sub.next(<EditorChange> {
                             newText: fromBuffer.value,
                             origin: 'totally-not-fake',
-                            created: performance.now(),
+                            timestamp: performance.now(),
                             startColumn: 0,
                             startLine: 0,
                             endColumn: 0 + endColumnOffset,
@@ -154,7 +154,7 @@ export class MirrorChangeStream {
             endColumn: val.to.ch,
             newText: val.text.join('\n'),
             origin: val.origin,
-            created: performance.now()
+            timestamp: performance.now()
         };
     }
 }

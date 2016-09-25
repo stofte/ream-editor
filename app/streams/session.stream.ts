@@ -10,7 +10,9 @@ export class SessionStream {
 
     constructor() {
         this.subject = new Subject<SessionMessage>();
-        this.events = this.subject.asObservable();
+        const stream = this.subject.publish();
+        this.events = stream;
+        stream.connect();
     }
 
     public new(id: string) {
@@ -23,6 +25,7 @@ export class SessionStream {
     }
 
     public codeCheck(id: string) {
-        this.subject.next(new SessionMessage('codecheck', id));
+        const now = performance.now();
+        this.subject.next(new SessionMessage('codecheck', id, now));
     }
 }

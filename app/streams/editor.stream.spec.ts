@@ -16,7 +16,7 @@ const backendTimeout = config.unitTestData.backendTimeout;
 const fs = electronRequire('fs');
 import { randomTestData } from '../test/editor-testdata';
 
-describe('editor.stream int-test', function() {
+describe('editor.stream', function() {
     this.timeout(30 * 1000);
 
     let injector: ReflectiveInjector;

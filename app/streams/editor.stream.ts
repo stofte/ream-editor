@@ -78,6 +78,7 @@ export class EditorStream {
     }
 
     public edit(id: string, data: TextUpdate) {
+        data.timestamp = performance.now();
         this.subject.next(new EditorMessage('edit', id, data));
     }
 }

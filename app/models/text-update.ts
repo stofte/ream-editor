@@ -8,4 +8,5 @@ export class TextUpdate {
     public to: LineColumn;
     public text: string[];
     public removed: string[];
+    public timestamp: number;
 }

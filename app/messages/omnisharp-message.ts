@@ -1,6 +1,6 @@
 import { CodeCheckResult } from '../models/index';
 
-type eventType = 'starting' | 'failed' | 'ready' | 'closing' | 'closed' | 'completions' | 'codecheck' | 'buffer-created';
+type eventType = 'starting' | 'failed' | 'ready' | 'closing' | 'closed' | 'codecheck' | 'buffer-created' | 'autocompletion';
 
 export class OmnisharpMessage {
     constructor(
@@ -8,6 +8,6 @@ export class OmnisharpMessage {
         public sessionId: string = null,
         public requestId: string = null,
         public completions: string[] = null,
-        public checks: CodeCheckResult[] = null,
+        public checks: CodeCheckResult[] = null
     ) {}
 }

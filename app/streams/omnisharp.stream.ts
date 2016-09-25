@@ -5,7 +5,7 @@ import { QueryMessage, OmnisharpMessage, WebSocketMessage, SessionMessage } from
 import { ProcessStream, EditorStream, QueryStream, SessionStream } from './index';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, UpdateBufferRequest } from './interfaces';
-import { CodeCheckResult, EditorChange } from '../models/index';
+import { CodeCheckResult, EditorChange, AutocompletionQuery } from '../models/index';
 import * as uuid from 'node-uuid';
 import config from '../config';
 
@@ -32,6 +32,14 @@ class SessionReadyState {
     constructor(
         public sessionId: string,
         public ready: boolean
+    ) {}
+}
+
+class SessionAutocompleteMap {
+    constructor(
+        public sessionId: string,
+        public timestamp: number,
+        public request: AutocompletionQuery
     ) {}
 }
 
@@ -165,24 +173,26 @@ export class OmnisharpStream {
         sessionStatus
             .connect();
 
+        const waitForSession = (msg: SessionMessage) : Observable<number> => {
+            return new Observable<number>((obs: Observer<number>) => {
+                let done = false;
+                const sub = sessionStatus.filter(s => s.indexOf(msg.id) !== -1).subscribe(() => {
+                    if (!done) {
+                        done = true;
+                        obs.next(1);
+                        obs.complete();
+                        // timing sensitive, if we dont wait, sub might be undefined
+                        setTimeout(() => {
+                            sub.unsubscribe();
+                        }, 200);
+                    }
+                });
+            });
+        };
+
         const codeChecks = session.events
             .filter(msg => msg.type === 'codecheck')
-            .delayWhen(msg => {
-                return new Observable<number>((obs: Observer<number>) => {
-                    let done = false;
-                    const sub = sessionStatus.filter(s => s.indexOf(msg.id) !== -1).subscribe(() => {
-                        if (!done) {
-                            done = true;
-                            obs.next(1);
-                            obs.complete();
-                            // timing sensitive, if we dont wait, sub might be undefined
-                            setTimeout(() => {
-                                sub.unsubscribe();
-                            }, 200);
-                        }
-                    });
-                });
-            })
+            .delayWhen(waitForSession)
             .map(msg => {
                 return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, performance.now());
             })
@@ -195,10 +205,34 @@ export class OmnisharpStream {
                         return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks));
                     }));
 
+        const autoCompletions = session.events
+            .filter(msg => msg.type === 'autocomplete')
+            .delayWhen(waitForSession)
+            .map(msg => {
+                const tmpl: SessionTemplateMap = this.templateMap[msg.id];
+                const request = msg.autoComplete;
+                request.fileName = tmpl.fileName;
+                request.column += (request.line === 0 ? tmpl.columnOffset : 0) + 1;
+                request.line += (request.line === 0 ? tmpl.lineOffset : 0) + 1;
+                return new SessionAutocompleteMap(
+                    msg.id,
+                    performance.now(),
+                    request
+                );
+            })
+            .flatMap(msg => 
+                this.http
+                    .post(this.action('autocomplete'), JSON.stringify({ FileName: msg.request.fileName }))
+                    .map(res => res.json())
+                    .map((completions: any[]) => {
+                        return new OmnisharpMessage('autocompletion', msg.sessionId, null, completions, null);
+                    }));
+
         this.events = this.process
             .status
             .map(msg => new OmnisharpMessage(msg.type))
-            .merge(codeChecks);
+            .merge(codeChecks)
+            .merge(autoCompletions);
 
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);

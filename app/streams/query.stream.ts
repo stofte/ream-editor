@@ -52,6 +52,7 @@ export class QueryStream {
         const codeTemplateResponses = session.events
             .filter(msg => msg.type === 'create' || msg.type === 'context')
             .map(msg => {
+                console.log('codeTemplateResponses', msg.type)
                 const mapped: CodeTemplateRequest = {
                     text: '',
                     id: msg.id

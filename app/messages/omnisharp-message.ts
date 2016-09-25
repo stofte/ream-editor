@@ -9,6 +9,7 @@ export class OmnisharpMessage {
         public sessionId: string = null,
         public requestId: string = null,
         public completions: AutoCompletionItem[] = null,
-        public checks: CodeCheckResult[] = null
+        public checks: CodeCheckResult[] = null,
+        public timestamp: number = null
     ) {}
 }

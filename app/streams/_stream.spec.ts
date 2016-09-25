@@ -130,6 +130,7 @@ describe('[int-test] streams', function() {
         let codechecks = 0;
         const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck' && msg.sessionId === id).subscribe(msg => {
             const expectedCheck = cSharpTestDataExpectedCodeChecks[codechecks];
+            codechecks++;
             expect(msg.checks.length).to.equal(1);
             expect(msg.checks[0].line).to.equal(expectedCheck.line, 'line');
             expect(msg.checks[0].column).to.equal(expectedCheck.column, 'column');
@@ -137,13 +138,15 @@ describe('[int-test] streams', function() {
             expect(msg.checks[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
             expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
             expect(msg.checks[0].text).to.equal(expectedCheck.text, 'text');
-            codechecks++;
-            if (codechecks === cSharpTestDataExpectedCodeChecks.length) {
+            if (codechecks >= cSharpTestDataExpectedCodeChecks.length) {
                 codecheckSub.unsubscribe();
                 done();
             }
         });
 
+        // timing sensitive. if we fire the codecheck too early, we might
+        // accidentally codecheck an unintended buffer. this leads to 
+        // unpredicted errors (eg "Identifier expected" if only the "int " has been processed)
         replaySteps([
             100, () => session.new(id),
             {
@@ -151,15 +154,15 @@ describe('[int-test] streams', function() {
                 wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            100, () => session.codeCheck(id),
+            2500, () => session.codeCheck(id),
             // give omnisharp some time since this is a first real op
-            3000, () => { },
+            1000, () => { },
             {
                 for: secondEdits,
                 wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            500, () => session.codeCheck(id)
+            2500, () => session.codeCheck(id)
         ]);
     });
 

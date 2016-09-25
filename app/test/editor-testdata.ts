@@ -60,12 +60,12 @@ export const cSharpTestDataExpectedResult = [
 
 export const cSharpTestDataExpectedCodeChecks = [
 {
-    text: 'Identifier expected',
+    text: 'Invalid expression term \'}\'',
     logLevel: 'Error',
     line: 0,
-    column: 4,
+    column: 8,
     endLine: 0,
-    endColumn: 5 
+    endColumn: 9 
 },
 {
     text: 'The variable \'x\' is assigned but its value is never used',

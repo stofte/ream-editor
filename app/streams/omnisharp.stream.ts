@@ -121,8 +121,8 @@ export class OmnisharpStream {
                         edits
                     ));
             })
-            .flatMap(sessionMap => 
-                this.http
+            .flatMap(sessionMap => {
+                return this.http
                     .post(this.action('updatebuffer'), JSON.stringify({
                         FromDisk: false,
                         FileName: sessionMap.fileName,
@@ -131,7 +131,8 @@ export class OmnisharpStream {
                     .map(res =>
                         new SessionUpdated(
                             sessionMap.sessionId,
-                            sessionMap.edits[sessionMap.edits.length - 1].timestamp)))
+                            sessionMap.edits[sessionMap.edits.length - 1].timestamp));
+            })
             .publish();
 
         const sessionStatus = session.events.filter(msg => msg.type === 'create')
@@ -189,7 +190,7 @@ export class OmnisharpStream {
             .filter(msg => msg.type === 'codecheck')
             .delayWhen(waitForSession)
             .map(msg => {
-                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, performance.now());
+                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, msg.timestamp);
             })
             .flatMap(msg => 
                 this.http
@@ -197,7 +198,7 @@ export class OmnisharpStream {
                     .map(res => res.json())
                     .map(res => this.mapQuickFixes(res, msg.sessionId, this.templateMap))
                     .map(checks => {
-                        return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks));
+                        return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks), msg.timestamp);
                     }))
             .publish();
 

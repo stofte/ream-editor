@@ -16,13 +16,13 @@ export class SessionStream {
         stream.connect();
     }
 
-    public new(id: string) {
-        this.subject.next(new SessionMessage('create', id));
+    public new(id: string, connection: Connection = null) {
+        this.subject.next(new SessionMessage('create', id, performance.now(), null, connection));
     }
 
     // todo this needs to be a simple run method, and not code specific. same with msg stuff
-    public runCode(id: string) {
-        this.subject.next(new SessionMessage('run-code', id));
+    public run(id: string) {
+        this.subject.next(new SessionMessage('run', id));
     }
 
     public codeCheck(id: string) {

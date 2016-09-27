@@ -46,7 +46,7 @@ describe('editor.stream', function() {
         this.timeout(backendTimeout);
         randomTestData.forEach((test, idx: number) => {
             const sub = editor.events.subscribe(msg => {
-                if (msg.type === 'run-code-request') {
+                if (msg.type === 'buffer-text') {
                     sub.unsubscribe();
                     expect(msg.text).to.equal(test.output);
                 }
@@ -56,7 +56,7 @@ describe('editor.stream', function() {
             test.events.forEach(data => {
                 editor.edit(id, data);
             });
-            session.runCode(id);
+            session.run(id);
             if (idx === randomTestData.length - 1) {
                 done();
             }

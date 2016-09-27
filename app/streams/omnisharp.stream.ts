@@ -54,10 +54,8 @@ export class OmnisharpStream {
         private session: SessionStream,
         private http: Http
     ) {
-        
-
         const sessionMaps = query.events
-            .filter(msg => msg.type === 'code-template-response')
+            .filter(msg => msg.type === 'create-template')
             .map(msg => {
                 const update: UpdateBufferRequest = {
                     SessionId: msg.id,
@@ -186,20 +184,20 @@ export class OmnisharpStream {
             });
         };
 
-        session.events
-            .filter(msg => msg.type === 'codecheck')
-            .delayWhen(waitForSession)
-            .map(msg => {
-                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, msg.timestamp);
-            })
-            .flatMap(msg => 
-                this.http
-                    .post(this.action('codeformat'), JSON.stringify({ FileName: msg.fileName }))
-                    .map(res => res.json().Buffer))
-            .subscribe(str => {
-                console.log('buffer text:')
-                console.log(str);
-            });
+        // session.events
+        //     .filter(msg => msg.type === 'codecheck')
+        //     .delayWhen(waitForSession)
+        //     .map(msg => {
+        //         return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, msg.timestamp);
+        //     })
+        //     .flatMap(msg => 
+        //         this.http
+        //             .post(this.action('codeformat'), JSON.stringify({ FileName: msg.fileName }))
+        //             .map(res => res.json().Buffer))
+        //     .subscribe(str => {
+        //         console.log('buffer text:')
+        //         console.log(str);
+        //     });
 
         const codeChecks = session.events
             .filter(msg => msg.type === 'codecheck')

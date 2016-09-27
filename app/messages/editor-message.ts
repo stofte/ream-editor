@@ -1,6 +1,6 @@
 import { TextUpdate } from '../models/index';
 
-type eventType = 'create' | 'edit' | 'run-code-request' | 'run-code-response' | 'codecheck-request';
+type eventType = 'create' | 'edit' | 'buffer-text' | 'codecheck-request';
 
 export class EditorMessage {
     constructor(

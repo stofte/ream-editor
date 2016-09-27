@@ -1,6 +1,6 @@
 import { AutocompletionQuery, Connection } from '../models/index';
 
-type eventType = 'create' | 'run-code' | 'codecheck' | 'autocomplete' | 'context';
+type eventType = 'create' | 'run' | 'codecheck' | 'autocomplete' | 'context';
 
 export class SessionMessage {
     constructor(

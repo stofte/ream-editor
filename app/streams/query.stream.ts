@@ -28,42 +28,54 @@ export class QueryStream {
         private http: Http
     ) {
         this.process = new ProcessStream(http);
-        const executeCodeResponses = editor.events
-            .filter(msg => msg.type === 'run-code-request')
-            .map(msg => {
-                const mapped: CodeRequest = {
-                    id: msg.id,
-                    text: msg.text
-                };
-                return mapped;
-            })
-            .flatMap(req => 
-                this.http
-                    .post(this.action('executecode'), JSON.stringify(req))
-                    .map(res => {
-                        const data = res.json();
-                        return new QueryMessage('run-code-response', req.id, null, {
-                            code: data.Code,
-                            message: data.Message
+        const executeCodeResponses = session.events.filter(msg => msg.type === 'create')
+            .flatMap(sessionMsg => {
+                return editor.events
+                    .filter(msg => msg.type === 'buffer-text' && msg.id === sessionMsg.id)
+                    .flatMap(msg => {
+                        let request: any = null;
+                        let actionName: string = null;
+                        if (!sessionMsg.connection) {
+                            request = { id: msg.id, text: msg.text };
+                            actionName = this.action('executecode');
+                        } else {
+                            actionName = this.action('executequery');
+                            request = {
+                                id: msg.id,
+                                text: msg.text,
+                                connectionString: sessionMsg.connection.connectionString,
+                                serverType: sessionMsg.connection.type
+                            };
+                        }
+                        return this.http
+                            .post(actionName, request)
+                            .map(res => {
+                                const data = res.json();
+                                return new QueryMessage('execute-response', msg.id, null, {
+                                    code: data.Code,
+                                    message: data.Message
+                                });
                         });
-                    }))
+                    });
+            })
             .publish();
 
-        const codeTemplateResponses = session.events
-            .filter(msg => msg.type === 'create' || msg.type === 'context')
-            .map(msg => {
-                console.log('codeTemplateResponses', msg.type)
-                const mapped: CodeTemplateRequest = {
-                    text: '',
-                    id: msg.id
-                };
-                return mapped;
-            })
-            .flatMap(req => 
-                this.http.post(this.action('codetemplate'), JSON.stringify(req))
+        const templateResponses = session.events
+            .filter(msg => msg.type === 'create')
+            .flatMap(msg => {
+                let req: any = null;
+                let method: string = null;
+                if (msg.connection) {
+                    method = this.action('querytemplate');
+                    req = { text: '', id: msg.id, serverType: msg.connection.type, connectionString: msg.connection.connectionString };
+                } else {
+                    method = this.action('codetemplate');
+                    req = { text: '', id: msg.id };
+                }
+                return this.http.post(method, JSON.stringify(req))
                     .map(res => {
                         const data = res.json();
-                        return new QueryMessage('code-template-response', req.id, null, null, {
+                        return new QueryMessage('create-template', req.id, null, null, {
                             code: data.Code,
                             message: data.Message,
                             namespace: data.Namespace,
@@ -74,7 +86,8 @@ export class QueryStream {
                             lineOffset: data.LineOffset,
                             defaultQuery: data.DefaultQuery
                         });
-                    }))
+                    })
+            })
             .publish();
 
         this.events = this.process
@@ -82,14 +95,14 @@ export class QueryStream {
             .map(msg => new QueryMessage(msg.type))
             .merge(this.socket)
             .merge(executeCodeResponses)
-            .merge(codeTemplateResponses);
+            .merge(templateResponses);
 
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
         this.once(msg => msg.type === 'ready', () => {
             executeCodeResponses.connect();
-            codeTemplateResponses.connect();
+            templateResponses.connect();
             Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(
                 this.socketMessageHandler,
                 this.socketErrorHandler,
@@ -114,7 +127,6 @@ export class QueryStream {
     }
 
     private socketMessageHandler = (msg: any) => {
-        // todo make json camelCased from backend
         const message: WebSocketMessage = {
             session: msg.Session,
             id: msg.Id,

@@ -50,7 +50,7 @@ export class EditorStream {
     constructor(
         private session: SessionStream
     ) {
-        const runCodeText = session.events.filter(msg => msg.type === 'run-code')
+        const runCodeText = session.events.filter(msg => msg.type === 'run')
             .withLatestFrom(
                 session
                     .events
@@ -66,7 +66,7 @@ export class EditorStream {
                     }, []))
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new EditorMessage('run-code-request', val[0].id, null, b.getText());
+                return new EditorMessage('buffer-text', val[0].id, null, b.getText());
             });
 
         const obs = this.subject

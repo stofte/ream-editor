@@ -1,5 +1,5 @@
 // ReamQuery API types for socket messages
-export type WebSocketMessageType = 'table'|'header'|'row'|
+export type WebSocketMessageType = 'table'|'header'|'row'|'tableClose'|
     'singleAtomic'|'singleTabular'|'empty'|'close';
 
 export interface WebSocketMessage {

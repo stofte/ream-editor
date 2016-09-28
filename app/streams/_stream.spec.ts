@@ -20,6 +20,8 @@ import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
 const sqliteConnectionString = config.unitTestData.sqliteWorlddbConnectionString; 
+const sqliteConnection = new Connection(sqliteConnectionString, 'sqlite');
+sqliteConnection.id = 42;
 
 describe('[int-test] streams', function() {
     this.timeout(backendTimeout * 100);
@@ -139,9 +141,9 @@ describe('[int-test] streams', function() {
                     headers = msg.data.columns;
                 }
             });
-        const connection = new Connection(sqliteConnectionString, 'sqlite');
+        
         replaySteps([
-            100, () => session.new(id, connection),
+            100, () => session.new(id, sqliteConnection),
             { 
                 for: cSharpCityFilteringQueryEditorTestData[0].events,
                 wait: 100,
@@ -218,9 +220,9 @@ describe('[int-test] streams', function() {
         ]);
     });
 
-    it.skip('emits codecheck messages after switching buffer context', function(done) {
+    it('emits codecheck messages after switching buffer context', function(done) {
         this.timeout(backendTimeout * 3);
-        const connection = new Connection(sqliteConnectionString, 'sqlite');
+        sqliteConnection.id = 42;
         const id = uuid.v4();
         const firstEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time < 5000);
         const secondEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time >= 5000);
@@ -254,7 +256,7 @@ describe('[int-test] streams', function() {
             },
             2500, () => session.codeCheck(id),
             // switch
-            100, () => session.setContext(id, connection),
+            100, () => session.setContext(id, sqliteConnection),
             100, () => { },
             {
                 for: secondEdits,

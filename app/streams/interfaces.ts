@@ -36,6 +36,7 @@ export interface TemplateResponse extends BaseResponse {
         columnOffset: number;
         lineOffset: number;
         defaultQuery: string;
+        connectionId: number;
 }
 
 // omnisharp api

@@ -61,7 +61,7 @@ export class QueryStream {
             .publish();
 
         const templateResponses = session.events
-            .filter(msg => msg.type === 'create')
+            .filter(msg => msg.type === 'create' || msg.type === 'context')
             .flatMap(msg => {
                 let req: any = null;
                 let method: string = null;
@@ -75,6 +75,8 @@ export class QueryStream {
                 return this.http.post(method, JSON.stringify(req))
                     .map(res => {
                         const data = res.json();
+                        const connectionId = msg.connection ? msg.connection.id : null;
+                        console.log(`query connId: ${connectionId}`);
                         return new QueryMessage('buffer-template', req.id, null, null, {
                             code: data.Code,
                             message: data.Message,
@@ -84,9 +86,10 @@ export class QueryStream {
                             footer: data.Footer,
                             columnOffset: data.ColumnOffset,
                             lineOffset: data.LineOffset,
-                            defaultQuery: data.DefaultQuery
+                            defaultQuery: data.DefaultQuery,
+                            connectionId
                         });
-                    })
+                    });
             })
             .publish();
 

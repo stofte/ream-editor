@@ -57,9 +57,11 @@ export class OmnisharpStream {
         const sessionMaps = query.events
             .filter(msg => msg.type === 'buffer-template')
             .map(msg => {
+                const bufferType = msg.template.connectionId ? `ctx${msg.template.connectionId}` : 'code';
+                console.log(`omnisharp "${bufferType}"`, msg.template.connectionId);
                 const update: UpdateBufferRequest = {
                     SessionId: msg.id,
-                    FileName: `${config.omnisharpProjectPath}\\b${msg.id.replace(/\-/g, '')}.cs`,
+                    FileName: `${config.omnisharpProjectPath}\\b${bufferType}${msg.id.replace(/\-/g, '')}.cs`,
                     FromDisk: false,
                     Buffer: msg.template.template
                 };

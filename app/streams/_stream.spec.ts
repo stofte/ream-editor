@@ -22,7 +22,7 @@ const backendTimeout = config.unitTestData.backendTimeout;
 const sqliteConnectionString = config.unitTestData.sqliteWorlddbConnectionString; 
 
 describe('[int-test] streams', function() {
-    this.timeout(backendTimeout * 3000);
+    this.timeout(backendTimeout * 100);
     let session: SessionStream = null;
     let editor: EditorStream = null;
     let result: ResultStream = null;

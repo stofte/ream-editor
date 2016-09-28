@@ -55,7 +55,7 @@ export class OmnisharpStream {
         private http: Http
     ) {
         const sessionMaps = query.events
-            .filter(msg => msg.type === 'create-template')
+            .filter(msg => msg.type === 'buffer-template')
             .map(msg => {
                 const update: UpdateBufferRequest = {
                     SessionId: msg.id,
@@ -95,29 +95,35 @@ export class OmnisharpStream {
                         sessionSub.unsubscribe();
                     });
                 });
-                return editor.events
-                    .filter(x => x.type === 'edit' && x.id === msg.id)
-                    .delayWhen(x => Observable.fromPromise(ready))
-                    .map(x => {
-                        return <EditorChange> {
-                            newText: x.data.text.join('\n'),
-                            startLine: x.data.from.line + sessionMap.lineOffset + 1,
-                            startColumn: x.data.from.ch + (x.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                            endLine: x.data.to.line + sessionMap.lineOffset + 1,
-                            endColumn: x.data.to.ch + (x.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                            timestamp: x.data.timestamp
-                        };
-                    })
-                    .bufferTime(500)
-                    .filter(edits => edits.length > 0)
-                    .map(edits => new SessionTemplateMap(
-                        sessionMap.columnOffset,
-                        sessionMap.lineOffset,
-                        sessionMap.fileName,
-                        sessionMap.sessionId,
-                        null,
-                        edits
-                    ));
+                const editorObs = new Observable<SessionTemplateMap>((obs: Observer<SessionTemplateMap>) => {
+                    const editorSub = editor.events
+                        .filter(x => x.type === 'edit' && x.id === msg.id)
+                        .delayWhen(x => Observable.fromPromise(ready))
+                        .map(x => {
+                            return <EditorChange> {
+                                newText: x.data.text.join('\n'),
+                                startLine: x.data.from.line + sessionMap.lineOffset + 1,
+                                startColumn: x.data.from.ch + (x.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
+                                endLine: x.data.to.line + sessionMap.lineOffset + 1,
+                                endColumn: x.data.to.ch + (x.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
+                                timestamp: x.data.timestamp
+                            };
+                        })
+                        .bufferTime(500)
+                        .filter(edits => edits.length > 0)
+                        .map(edits => new SessionTemplateMap(
+                            sessionMap.columnOffset,
+                            sessionMap.lineOffset,
+                            sessionMap.fileName,
+                            sessionMap.sessionId,
+                            null,
+                            edits
+                        ))
+                        .subscribe(msg => {
+                            obs.next(msg);
+                        });
+                });
+                return editorObs;
             })
             .flatMap(sessionMap => {
                 return this.http

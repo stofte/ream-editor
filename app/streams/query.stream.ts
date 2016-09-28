@@ -75,7 +75,7 @@ export class QueryStream {
                 return this.http.post(method, JSON.stringify(req))
                     .map(res => {
                         const data = res.json();
-                        return new QueryMessage('create-template', req.id, null, null, {
+                        return new QueryMessage('buffer-template', req.id, null, null, {
                             code: data.Code,
                             message: data.Message,
                             namespace: data.Namespace,

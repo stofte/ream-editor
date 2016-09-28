@@ -1,7 +1,7 @@
 import { WebSocketMessage } from './web-socket-message';
 import { BaseResponse, TemplateResponse } from '../streams/interfaces';
 
-type eventType = 'starting' | 'failed' | 'ready' | 'closing' | 'closed' | 'message' | 'execute-response' | 'create-template';
+type eventType = 'starting' | 'failed' | 'ready' | 'closing' | 'closed' | 'message' | 'execute-response' | 'buffer-template';
 export class QueryMessage {
     constructor(
         public type: eventType,

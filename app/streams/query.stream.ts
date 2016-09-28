@@ -31,7 +31,7 @@ export class QueryStream {
         const executeCodeResponses = session.events.filter(msg => msg.type === 'create')
             .flatMap(sessionMsg => {
                 return editor.events
-                    .filter(msg => msg.type === 'buffer-text' && msg.id === sessionMsg.id)
+                    .filter(msg => msg.type === 'buffer-text' && msg.bufferTextOrigin === 'run' && msg.id === sessionMsg.id)
                     .flatMap(msg => {
                         let request: any = null;
                         let actionName: string = null;

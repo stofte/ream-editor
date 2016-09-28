@@ -45,14 +45,13 @@ class BufferText {
 @Injectable()
 export class EditorStream {
     public events: Observable<EditorMessage>;
+    public bufferedTexts: Observable<EditorMessage>;
     private subject: Subject<EditorMessage> = new Subject<EditorMessage>();
 
     constructor(
         private session: SessionStream
     ) {
-        const runCodeText = session.events.filter(msg => msg.type === 'run')
-            .withLatestFrom(
-                session
+        const editMsgs = session
                     .events
                     .filter(msg => msg.type === 'create')
                     .flatMap(msg => this.subject.filter(e => e.type === 'edit' && e.id === msg.id))
@@ -63,18 +62,33 @@ export class EditorStream {
                         const b = buffers.find(x => x.id === editor.id);
                         b.edit(editor.data);
                         return buffers;
-                    }, []))
+                    }, [])
+                    .publish();
+        editMsgs.connect();
+        const runCodeText = session.events.filter(msg => msg.type === 'run')
+            .withLatestFrom(editMsgs)
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new EditorMessage('buffer-text', val[0].id, null, b.getText());
+                return new EditorMessage('buffer-text', val[0].id, null, b.getText(), val[0].type, val[0].timestamp);
             });
 
+        const contextText = session.events.filter(msg => msg.type === 'context')
+            .withLatestFrom(editMsgs)
+            .map(val => {
+                const b = val[1].find(x => x.id === val[0].id);
+                return new EditorMessage('buffer-text', val[0].id, null, b.getText(), val[0].type, val[0].timestamp);
+            })
+            .publishReplay(1);
+
+        // cleanup this stuff, either we mix or we dont. not this triple-type broadcast
         const obs = this.subject
             .merge(runCodeText)
             .publish();
-
+        
+        this.bufferedTexts = contextText;
         this.events = obs;
         obs.connect();
+        contextText.connect();
     }
 
     public edit(id: string, data: TextUpdate) {

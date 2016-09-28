@@ -244,9 +244,7 @@ describe('[int-test] streams', function() {
                 }
             });
 
-        // timing sensitive. if we fire the codecheck too early, we might
-        // accidentally codecheck an unintended buffer. this leads to 
-        // unpredicted errors (eg "Identifier expected" if only the "int " has been processed)
+        // timing sensitive.
         replaySteps([
             100, () => session.new(id),
             {

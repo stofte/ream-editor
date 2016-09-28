@@ -20,7 +20,6 @@ export class SessionStream {
         this.subject.next(new SessionMessage('create', id, performance.now(), null, connection));
     }
 
-    // todo this needs to be a simple run method, and not code specific. same with msg stuff
     public run(id: string) {
         this.subject.next(new SessionMessage('run', id));
     }

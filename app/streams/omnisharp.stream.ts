@@ -10,15 +10,19 @@ import * as uuid from 'node-uuid';
 import config from '../config';
 
 class SessionTemplateMap {
+    public created: number;
     constructor(
         public columnOffset: number,
         public lineOffset: number,
         public fileName: string,
         public sessionId: string,
+        public connectionId: number,
         public templateRequest: UpdateBufferRequest = null,
         public edits: EditorChange[] = null,
         public timestamp: number = null,
-    ) {}
+    ) {
+        this.created = performance.now();
+    }
 }
 
 class SessionUpdated {
@@ -57,8 +61,7 @@ export class OmnisharpStream {
         const sessionMaps = query.events
             .filter(msg => msg.type === 'buffer-template')
             .map(msg => {
-                const bufferType = msg.template.connectionId ? `id${msg.template.connectionId}ctx` : 'code';
-                console.log(`omnisharp "${bufferType}"`, msg.template.connectionId);
+                const bufferType = msg.template.connectionId ? `db${msg.template.connectionId}ctx` : 'code';
                 const update: UpdateBufferRequest = {
                     SessionId: msg.id,
                     FileName: `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`,
@@ -70,7 +73,10 @@ export class OmnisharpStream {
                     msg.template.lineOffset,
                     update.FileName,
                     msg.id,
-                    update
+                    msg.template.connectionId,
+                    update,
+                    null,
+                    performance.now()
                 );
             })
             .flatMap(sessionMap => 
@@ -81,23 +87,28 @@ export class OmnisharpStream {
         
         sessionMaps.subscribe(map => {
             if (!this.templateMap[map.sessionId]) {
-                this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null);
+                this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null, null);
             }
         });
 
         const sessionReady = session.events
-            .filter(msg => msg.type === 'create')
+            .filter(msg => msg.type === 'create' || msg.type === 'context')
             .flatMap(msg => {
+                console.log(`creating editor update stream "${msg.type}/${msg.id}"`);
                 // one time delay until session is ready
                 let sessionMap: SessionTemplateMap = null;
                 const ready = new Promise((done) => {
                     const sessionSub = sessionMaps.filter(x => x.sessionId === msg.id).subscribe(x => {
+                        console.log(`promise for editor update stream "${msg.type}/${msg.id}" saw sessionMap.created = ${x.created}`);
                         sessionMap = x;
                         done();
                         sessionSub.unsubscribe();
                     });
                 });
                 const editorObs = new Observable<SessionTemplateMap>((obs: Observer<SessionTemplateMap>) => {
+                    // if we're handling a context msg, we need to wait for the editor msg that contains the curent full buffer text
+                    
+
                     const editorSub = editor.events
                         .filter(x => x.type === 'edit' && x.id === msg.id)
                         .delayWhen(x => Observable.fromPromise(ready))
@@ -119,10 +130,20 @@ export class OmnisharpStream {
                             sessionMap.fileName,
                             sessionMap.sessionId,
                             null,
+                            null,
                             edits
                         ))
                         .subscribe(msg => {
                             obs.next(msg);
+                        });
+                    // todo do something less horrible here
+                    const sessionSub = sessionMaps
+                        .filter(x => sessionMap !== null && sessionMap.created !== x.created && x.sessionId === msg.id)
+                        .subscribe(x => {
+                            console.log('closing omnisharp update stream', x.connectionId);
+                            editorSub.unsubscribe();
+                            obs.complete();
+                            sessionSub.unsubscribe();
                         });
                 });
                 return editorObs;
@@ -211,7 +232,7 @@ export class OmnisharpStream {
             .filter(msg => msg.type === 'codecheck')
             .delayWhen(waitForSession)
             .map(msg => {
-                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, msg.timestamp);
+                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, null, msg.timestamp);
             })
             .flatMap(msg => 
                 this.http

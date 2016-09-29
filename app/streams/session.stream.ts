@@ -35,7 +35,6 @@ export class SessionStream {
 
     public setContext(id: string, connection: Connection) {
         const now = performance.now();
-        console.log('setContext timestamp', now);
         this.subject.next(new SessionMessage('context', id, now, null, connection));
     }
 }

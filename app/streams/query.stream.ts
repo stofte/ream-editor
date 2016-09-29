@@ -76,7 +76,6 @@ export class QueryStream {
                     .map(res => {
                         const data = res.json();
                         const connectionId = msg.connection ? msg.connection.id : null;
-                        console.log(`query connId: ${connectionId}`);
                         return new QueryMessage('buffer-template', req.id, null, null, {
                             code: data.Code,
                             message: data.Message,

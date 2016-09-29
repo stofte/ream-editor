@@ -68,10 +68,6 @@ export class OmnisharpStream {
                     FromDisk: false,
                     Buffer: msg.template.template
                 };
-                // console.log(`bufferType "${bufferType}", line offset: ${msg.template.lineOffset}`)
-                // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                // console.log(msg.template.template)
-                // console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                 return new SessionTemplateMap(
                     msg.template.columnOffset,
                     msg.template.lineOffset,
@@ -90,30 +86,16 @@ export class OmnisharpStream {
             .publish();
         
         sessionMaps.subscribe(map => {
-            // const lineHack =  `db${map.connectionId}ctx`
-            let hack = 0;
-            if (this.templateMap[map.sessionId]) {
-                hack = 5;
-            }
-            this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset + hack, map.fileName, null, null);
-            // if (!this.templateMap[map.sessionId]) {
-            // } else {
-
-            //     console.log('saw second sessionMap', map);
-            // }
+            this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null, null);
         });
 
         const sessionReady = session.events
             .filter(msg => msg.type === 'create' || msg.type === 'context')
             .flatMap(msg => {
-                // console.log(`creating editor update stream "${msg.type}/${msg.id}"`);
                 // one time delay until session is ready
                 let sessionMap: SessionTemplateMap = null;
                 const ready = new Promise((done) => {
-                    const sessionSub = sessionMaps.do(x => {
-                        //console.log('is this shit crashing?', x);
-                    }).filter(x => x.sessionId === msg.id).subscribe(x => {
-                        // console.log(`promise for editor update stream "${msg.type}/${msg.id}" saw sessionMap.created = ${x.created}`);
+                    const sessionSub = sessionMaps.filter(x => x.sessionId === msg.id).subscribe(x => {
                         sessionMap = x;
                         done();
                         sessionSub.unsubscribe();
@@ -150,7 +132,6 @@ export class OmnisharpStream {
                                         x.bufferTextOrigin === 'context' && x.originTimestamp === msg.timestamp)
                                     .delayWhen(x => Observable.fromPromise(ready))
                                     .subscribe(x => {
-                                        // console.log('omfg, saw buffer text', x.text, x.originTimestamp);
                                         const textUpdate: TextUpdate = {
                                             from: { line: 0, ch: 0 },
                                             to: { line: 0, ch: 0},
@@ -188,10 +169,10 @@ export class OmnisharpStream {
                             obs.next(msg);
                         });
                     // todo do something less horrible here
+                    // teardown stream when another context appears for this sessionId
                     const sessionSub = sessionMaps
                         .filter(x => sessionMap !== null && sessionMap.created !== x.created && x.sessionId === msg.id)
                         .subscribe(x => {
-                            // console.log('closing omnisharp update stream', x.connectionId);
                             editorSub.unsubscribe();
                             obs.complete();
                             sessionSub.unsubscribe();

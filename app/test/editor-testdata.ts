@@ -1,5 +1,62 @@
 import { AutocompletionQuery } from '../models/index';
 
+export const cSharpDatabaseCodeCheckExpectedErrors = [
+{ text: 'The name \'FOO\' does not exist in the current context',
+       logLevel: 'Error',
+       line: 0,
+       column: 0,
+       endLine: 0,
+       endColumn: 3 }
+];
+
+export const cSharpDatabaseCodeCheckEditorTestData = [
+{
+    "output": "city.Take(10).Select(x => x.Name);\n",
+    "events": [
+        {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["F"],"removed":[""],"origin":"+input","time":0},
+        {"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["O"],"removed":[""],"origin":"+input","time":231.64499999999998},
+        {"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["O"],"removed":[""],"origin":"+input","time":408.5750000000003},
+        {"from":{"line":0,"ch":2},"to":{"line":0,"ch":3},"text":[""],"removed":["O"],"origin":"+delete","time":8790.740000000002},
+        {"from":{"line":0,"ch":1},"to":{"line":0,"ch":2},"text":[""],"removed":["O"],"origin":"+delete","time":9042.735000000002},
+        {"from":{"line":0,"ch":0},"to":{"line":0,"ch":1},"text":[""],"removed":["F"],"origin":"+delete","time":9263.655000000002},
+        {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["c"],"removed":[""],"origin":"+input","time":10421.635000000002},
+        {"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["i"],"removed":[""],"origin":"+input","time":10564.810000000001},
+        {"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["t"],"removed":[""],"origin":"+input","time":10689.900000000001},
+        {"from":{"line":0,"ch":3},"to":{"line":0,"ch":3},"text":["y"],"removed":[""],"origin":"+input","time":10887.23},
+        {"from":{"line":0,"ch":4},"to":{"line":0,"ch":4},"text":["."],"removed":[""],"origin":"+input","time":11239.530000000002},
+        {"from":{"line":0,"ch":5},"to":{"line":0,"ch":5},"text":["T"],"removed":[""],"origin":"+input","time":11431.980000000001},
+        {"from":{"line":0,"ch":6},"to":{"line":0,"ch":6},"text":["a"],"removed":[""],"origin":"+input","time":11637.18},
+        {"from":{"line":0,"ch":7},"to":{"line":0,"ch":7},"text":["k"],"removed":[""],"origin":"+input","time":11748.265000000001},
+        {"from":{"line":0,"ch":8},"to":{"line":0,"ch":8},"text":["e"],"removed":[""],"origin":"+input","time":11855.005000000001},
+        {"from":{"line":0,"ch":9},"to":{"line":0,"ch":9},"text":["("],"removed":[""],"origin":"+input","time":12095.100000000002},
+        {"from":{"line":0,"ch":10},"to":{"line":0,"ch":10},"text":["1"],"removed":[""],"origin":"+input","time":12382.835000000001},
+        {"from":{"line":0,"ch":11},"to":{"line":0,"ch":11},"text":["0"],"removed":[""],"origin":"+input","time":12537.185000000001},
+        {"from":{"line":0,"ch":12},"to":{"line":0,"ch":12},"text":[")"],"removed":[""],"origin":"+input","time":12877.335000000003},
+        {"from":{"line":0,"ch":13},"to":{"line":0,"ch":13},"text":["."],"removed":[""],"origin":"+input","time":13270.785000000002},
+        {"from":{"line":0,"ch":14},"to":{"line":0,"ch":14},"text":["S"],"removed":[""],"origin":"+input","time":13536.880000000001},
+        {"from":{"line":0,"ch":15},"to":{"line":0,"ch":15},"text":["e"],"removed":[""],"origin":"+input","time":13790.33},
+        {"from":{"line":0,"ch":16},"to":{"line":0,"ch":16},"text":["l"],"removed":[""],"origin":"+input","time":13893.960000000001},
+        {"from":{"line":0,"ch":17},"to":{"line":0,"ch":17},"text":["e"],"removed":[""],"origin":"+input","time":13993.77},
+        {"from":{"line":0,"ch":18},"to":{"line":0,"ch":18},"text":["c"],"removed":[""],"origin":"+input","time":14206.94},
+        {"from":{"line":0,"ch":19},"to":{"line":0,"ch":19},"text":["t"],"removed":[""],"origin":"+input","time":14421.315000000004},
+        {"from":{"line":0,"ch":20},"to":{"line":0,"ch":20},"text":["("],"removed":[""],"origin":"+input","time":14681.68},
+        {"from":{"line":0,"ch":21},"to":{"line":0,"ch":21},"text":["x"],"removed":[""],"origin":"+input","time":14867.740000000002},
+        {"from":{"line":0,"ch":22},"to":{"line":0,"ch":22},"text":[" "],"removed":[""],"origin":"+input","time":15020.980000000003},
+        {"from":{"line":0,"ch":23},"to":{"line":0,"ch":23},"text":["="],"removed":[""],"origin":"+input","time":15256.720000000001},
+        {"from":{"line":0,"ch":24},"to":{"line":0,"ch":24},"text":[">"],"removed":[""],"origin":"+input","time":15373.84},
+        {"from":{"line":0,"ch":25},"to":{"line":0,"ch":25},"text":[" "],"removed":[""],"origin":"+input","time":15603.915},
+        {"from":{"line":0,"ch":26},"to":{"line":0,"ch":26},"text":["x"],"removed":[""],"origin":"+input","time":15821.575000000004},
+        {"from":{"line":0,"ch":27},"to":{"line":0,"ch":27},"text":["."],"removed":[""],"origin":"+input","time":16100.54},
+        {"from":{"line":0,"ch":28},"to":{"line":0,"ch":28},"text":["N"],"removed":[""],"origin":"+input","time":16434.345},
+        {"from":{"line":0,"ch":29},"to":{"line":0,"ch":29},"text":["a"],"removed":[""],"origin":"+input","time":16627.025},
+        {"from":{"line":0,"ch":30},"to":{"line":0,"ch":30},"text":["m"],"removed":[""],"origin":"+input","time":16738.06},
+        {"from":{"line":0,"ch":31},"to":{"line":0,"ch":31},"text":["e"],"removed":[""],"origin":"+input","time":16854.86},
+        {"from":{"line":0,"ch":32},"to":{"line":0,"ch":32},"text":[")"],"removed":[""],"origin":"+input","time":17076.975000000002},
+        {"from":{"line":0,"ch":33},"to":{"line":0,"ch":33},"text":[";"],"removed":[""],"origin":"+input","time":17466.08},
+        {"from":{"line":0,"ch":34},"to":{"line":0,"ch":34},"text":["",""],"removed":[""],"origin":"+input","time":18206.270000000004}
+]}
+];
+
 export const cSharpCityFilteringQueryEditorTestData = [
 {
     "output": "from c in this.city\nwhere c.Name.StartsWith(\"Ca\")\nselect c\n",

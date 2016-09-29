@@ -14,7 +14,8 @@ import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 import { cSharpTestData, cSharpTestDataExpectedResult, cSharpTestDataExpectedCodeChecks,
     codecheckEditorTestData, cSharpAutocompletionEditorTestData, cSharpAutocompletionRequestTestData,
     cSharpAutocompletionExpectedValues, cSharpContextSwitchExpectedCodeChecks, 
-    cSharpContextSwitchEditorTestData, cSharpCityFilteringQueryEditorTestData } from '../test/editor-testdata';
+    cSharpContextSwitchEditorTestData, cSharpCityFilteringQueryEditorTestData,
+    cSharpDatabaseCodeCheckEditorTestData, cSharpDatabaseCodeCheckExpectedErrors } from '../test/editor-testdata';
 import replaySteps from '../test/replay-steps';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
@@ -197,6 +198,57 @@ describe('[int-test] streams', function() {
         ]);
     });
 
+
+    it('emits codecheck messages for database query', function(done) {
+        this.timeout(backendTimeout * 2);
+        const id = uuid.v4();
+        const firstEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time < 6000);
+        const secondEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time >= 6000);
+        let codechecks = 0;
+        let isFirstCheck = true;
+        const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck' && msg.sessionId === id).subscribe(msg => {
+            const expectedCheck = cSharpDatabaseCodeCheckExpectedErrors[codechecks];
+            if (isFirstCheck) {
+                isFirstCheck = false;
+                check([done, codecheckSub], () => {
+                    expect(msg.checks.length).to.equal(1);
+                    expect(msg.checks[0].line).to.equal(expectedCheck.line, 'line');
+                    expect(msg.checks[0].column).to.equal(expectedCheck.column, 'column');
+                    expect(msg.checks[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
+                    expect(msg.checks[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
+                    expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
+                    expect(msg.checks[0].text).to.equal(expectedCheck.text, 'text');
+                });
+            } else {
+                codecheckSub.unsubscribe();
+                checkAndExit(done, () => {
+                    expect(msg.checks.length).to.equal(0);
+                });
+            }
+        });
+
+        // timing sensitive. if we fire the codecheck too early, we might
+        // accidentally codecheck an unintended buffer. this leads to 
+        // unpredicted errors (eg "Identifier expected" if only the "int " has been processed)
+        replaySteps([
+            100, () => session.new(id, sqliteConnection),
+            {
+                for: firstEdits,
+                wait: 100,
+                fn: (evt) => editor.edit(id, evt)
+            },
+            2500, () => session.codeCheck(id),
+            // give omnisharp some time since this is a first real op
+            1000, () => { },
+            {
+                for: secondEdits,
+                wait: 100,
+                fn: (evt) => editor.edit(id, evt)
+            },
+            2500, () => session.codeCheck(id)
+        ]);
+    });
+
     it('emits autocompletion messages for simple statement', function(done) {
         this.timeout(backendTimeout * 2);
         const completionSub = omnisharp.events.filter(msg => msg.type === 'autocompletion').subscribe(msg => {
@@ -233,16 +285,16 @@ describe('[int-test] streams', function() {
             .subscribe(msg => {
                 codechecks++;
                 if (codechecks === 1) {
-                    console.log('doing first check', msg)
-                    expect(msg.checks.length).to.equal(1);
-                    expect(msg.checks[0].text).to.equal(expectedCheck.text);
-                    expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel);
+                    check([done, codecheckSub], () => {
+                        expect(msg.checks.length).to.equal(1);
+                        expect(msg.checks[0].text).to.equal(expectedCheck.text);
+                        expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel);
+                    });
                 } else {
                     codecheckSub.unsubscribe();
-                    // we should be in the correct context now, and not see any errors
-                    console.log('doing second check', msg)
-                    // expect(msg.checks.length).to.equal(0);
-                    setTimeout(() => done(), 1000);
+                    checkAndExit(done, () => {
+                        expect(msg.checks.length).to.equal(0);
+                    });
                 }
             });
 
@@ -254,7 +306,7 @@ describe('[int-test] streams', function() {
                 wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            2500, () => session.codeCheck(id),
+            500, () => session.codeCheck(id),
             // switch
             100, () => session.setContext(id, sqliteConnection),
             100, () => { },
@@ -263,7 +315,7 @@ describe('[int-test] streams', function() {
                 wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            2500, () => session.codeCheck(id)
+            500, () => session.codeCheck(id)
         ]);
     });
 
@@ -299,10 +351,12 @@ describe('[int-test] streams', function() {
 // Since "expect" throws inside a subscription handler, the stream crashes as a result.
 // These helper functions aid in avoid crashing the suite
 
-function check(done, pred) {
+function check([done, subber], pred) {
     try {
         pred();
     } catch (exn) {
+        console.log('CHECK ERROR', exn);
+        subber.unsubscribe();
         done(exn);
     }
 }
@@ -312,6 +366,7 @@ function checkAndExit(done, pred) {
         pred();
         done();
     } catch (exn) {
+        console.log('CHECKANDEXIT ERROR', exn);
         done(exn);
     }
 }

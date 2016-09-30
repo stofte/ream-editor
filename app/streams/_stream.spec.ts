@@ -100,13 +100,12 @@ describe('[int-test] streams', function() {
                 }); 
             
             replaySteps([
-                100, () => session.new(id),
+                () => session.new(id),
                 { 
                     for: testData.events,
-                    wait: 100,
                     fn: (evt) => editor.edit(id, evt)
                 },
-                500, () => session.run(id)
+                () => session.run(id)
             ]);
         });
     });
@@ -144,13 +143,11 @@ describe('[int-test] streams', function() {
             });
         
         replaySteps([
-            100, () => session.new(id, sqliteConnection),
+            () => session.new(id, sqliteConnection),
             { 
                 for: cSharpCityFilteringQueryEditorTestData[0].events,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
-            },
-            500, () => session.run(id)
+            }, () => session.run(id)
         ]);
     });
 
@@ -160,41 +157,42 @@ describe('[int-test] streams', function() {
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
+        let gotFirstResolver = null; 
+        const gotFirst = new Promise((done) => { gotFirstResolver = done; });
         const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck' && msg.sessionId === id).subscribe(msg => {
             const expectedCheck = cSharpTestDataExpectedCodeChecks[codechecks];
             codechecks++;
             expect(msg.checks.length).to.equal(1);
+            expect(msg.checks[0].text).to.equal(expectedCheck.text, 'text');
+            expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
             expect(msg.checks[0].line).to.equal(expectedCheck.line, 'line');
             expect(msg.checks[0].column).to.equal(expectedCheck.column, 'column');
             expect(msg.checks[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
             expect(msg.checks[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
-            expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
-            expect(msg.checks[0].text).to.equal(expectedCheck.text, 'text');
             if (codechecks >= cSharpTestDataExpectedCodeChecks.length) {
                 codecheckSub.unsubscribe();
                 done();
+            } else {
+                gotFirstResolver();
             }
         });
 
-        // timing sensitive. if we fire the codecheck too early, we might
-        // accidentally codecheck an unintended buffer. this leads to 
-        // unpredicted errors (eg "Identifier expected" if only the "int " has been processed)
         replaySteps([
-            100, () => session.new(id),
+            () => session.new(id),
             {
                 for: firstEdits,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            2500, () => session.codeCheck(id),
-            // give omnisharp some time since this is a first real op
-            1000, () => { },
+            () => session.codeCheck(id),
             {
                 for: secondEdits,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            2500, () => session.codeCheck(id)
+            // if we don't wait for the first check, we risk queuing two codechecks on the same buffer timestamp.
+            // if for instance the first codecheck has not yet returned, the second edits
+            // have not been flushed, and since operations are prioritized over edits,
+            // the second codecheck gets queued on the first buffer, resulting in the same error twice.
+            () => gotFirst.then(() => session.codeCheck(id))
         ]);
     });
 
@@ -206,9 +204,12 @@ describe('[int-test] streams', function() {
         const secondEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
         let isFirstCheck = true;
+        let gotFirstResolver = null;
+        const gotFirst = new Promise((done) => { gotFirstResolver = done; });
         const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck' && msg.sessionId === id).subscribe(msg => {
             const expectedCheck = cSharpDatabaseCodeCheckExpectedErrors[codechecks];
             if (isFirstCheck) {
+                gotFirstResolver();
                 isFirstCheck = false;
                 check([done, codecheckSub], () => {
                     expect(msg.checks.length).to.equal(1);
@@ -227,25 +228,18 @@ describe('[int-test] streams', function() {
             }
         });
 
-        // timing sensitive. if we fire the codecheck too early, we might
-        // accidentally codecheck an unintended buffer. this leads to 
-        // unpredicted errors (eg "Identifier expected" if only the "int " has been processed)
         replaySteps([
-            100, () => session.new(id, sqliteConnection),
+            () => session.new(id, sqliteConnection),
             {
                 for: firstEdits,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            2500, () => session.codeCheck(id),
-            // give omnisharp some time since this is a first real op
-            1000, () => { },
+            () => session.codeCheck(id),
             {
                 for: secondEdits,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            2500, () => session.codeCheck(id)
+            () => gotFirst.then(() => session.codeCheck(id))
         ]);
     });
 
@@ -262,13 +256,12 @@ describe('[int-test] streams', function() {
         });
         const id = uuid.v4();
         replaySteps([
-            100, () => session.new(id),
+            () => session.new(id),
             {
                 for: cSharpAutocompletionEditorTestData[0].events,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            100, () => session.autoComplete(id, cSharpAutocompletionRequestTestData[0])
+            () => session.autoComplete(id, cSharpAutocompletionRequestTestData[0])
         ]);
     });
 
@@ -322,28 +315,24 @@ describe('[int-test] streams', function() {
     it('stops query process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
         query.once(msg => msg.type === 'closed', () => {
-            setTimeout(() => {
-                let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
-                http.get(url, res => { done(new Error('response received')); })
-                    .on('error', () => { done(); });
-            }, 500);
+            let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
+            http.get(url, res => { done(new Error('response received')); })
+                .on('error', () => { done(); });
         });
         replaySteps([
-            500, () => query.stopServer()
+            () => query.stopServer()
         ]);
     });
 
     it('stops omnisharp process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
         omnisharp.once(msg => msg.type === 'closed', () => {
-            setTimeout(() => {
-                let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
-                http.get(url, res => { done(new Error('response received')); })
-                    .on('error', () => { done(); });
-            }, 500);
+            let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
+            http.get(url, res => { done(new Error('response received')); })
+                .on('error', () => { done(); });
         });
         replaySteps([
-            500, () => omnisharp.stopServer()
+            () => omnisharp.stopServer()
         ]);
     });
 });

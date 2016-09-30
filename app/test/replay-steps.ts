@@ -4,7 +4,7 @@ export default function replaySteps(steps: any[]) {
         let head = steps[0];
         let headArg = undefined;
         let remaining = steps.slice(1);
-        let timeout = 500;
+        let timeout = Math.ceil(Math.random() * 90) + 10;
         if (typeof head === 'number') {
             timeout = head;
             head = remaining[0];

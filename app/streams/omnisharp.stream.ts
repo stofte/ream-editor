@@ -5,7 +5,7 @@ import { QueryMessage, OmnisharpMessage, WebSocketMessage, SessionMessage, Edito
 import { ProcessStream, EditorStream, QueryStream, SessionStream } from './index';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, UpdateBufferRequest, AutoCompletionItem } from './interfaces';
-import { CodeCheckResult, EditorChange, AutocompletionQuery, TextUpdate } from '../models/index';
+import { CodeCheckResult, EditorChange, AutocompletionQuery, CodeCheckQuery, TextUpdate } from '../models/index';
 import * as uuid from 'node-uuid';
 import config from '../config';
 
@@ -32,19 +32,76 @@ class SessionUpdated {
     ) {}    
 }
 
-class SessionReadyState {
-    constructor(
-        public sessionId: string,
-        public ready: boolean
-    ) {}
+class OperationInflightMap {
+    // indicates the latest timestamp that we've sent to omnisharp
+    public edits: any = {};
+    // indicates the latest timestamp that we've seen come back from omnisharp
+    public updated: any = {};
+    private count: any = {};
+    private resolvers: any[] = [];
+    public start(sessionId: string): number {
+        if (!this.count[sessionId]) {
+            this.count[sessionId] = 0;
+        }
+        this.count[sessionId]++;
+        return this.edits[sessionId];
+    }
+    public stop(sessionId: string) {
+        this.count[sessionId]--;
+        if (this.count[sessionId] === 0) {
+            const l = this.resolvers[sessionId];
+            this.resolvers[sessionId] = [];
+            if (l && l.length > 0) {
+                l.forEach(x => {
+                    x.fn(1);
+                    const prevTs = this.edits[sessionId];
+                    Assert(prevTs < x.ts, 'Timestamp strictly increasing');
+                    this.edits[sessionId] = x.ts;
+                }); // x is the resolver for promises so return whatever
+            }
+        }
+        Assert(this.count[sessionId] >= 0, 'Operation counter is positive');
+    }
+
+    public busy(sessionId: string, editTimestamp: number, resolve: any): boolean {
+        const isBusy = this.count[sessionId] > 0; 
+        if (isBusy) {
+            if (!this.resolvers[sessionId]) {
+                this.resolvers[sessionId] = [];
+            }
+            this.resolvers[sessionId].push({fn: resolve, ts: editTimestamp});
+        } else {
+            const prevTs = this.edits[sessionId];
+            if (prevTs) {
+                Assert(prevTs < editTimestamp, 'Timestamp strictly increasing');
+            }
+            this.edits[sessionId] = editTimestamp;
+        }
+        return isBusy;
+    }
+
+    public updateResponse(sessionId: string, editTimestamp: number) {
+        if (!this.updated[sessionId]) {
+            this.updated[sessionId] = 0;
+        }
+        const currentTs = this.updated[sessionId];
+        if (currentTs < editTimestamp) {
+            this.updated[sessionId] = editTimestamp;
+        } else {
+            // responses might get interleaved?
+            console.log('response timestamp decreased!!!!!!!!!!!');
+        }
+    }
 }
 
-class SessionAutocompleteMap {
+class SessionOperation {
     constructor(
         public sessionId: string,
+        public operation: string,
         public timestamp: number,
-        public request: AutocompletionQuery
-    ) {}
+        public waitForEdit: number,
+        public request: any
+    ) { }
 }
 
 @Injectable()
@@ -52,6 +109,7 @@ export class OmnisharpStream {
     public events: Observable<OmnisharpMessage>;
     private process: ProcessStream;
     private templateMap: any = {};
+    private operationMap: OperationInflightMap = new OperationInflightMap();
     constructor(
         private editor: EditorStream,
         private query: QueryStream,
@@ -89,7 +147,7 @@ export class OmnisharpStream {
             this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null, null);
         });
 
-        const sessionReady = session.events
+        const updateBufferTimestamps = session.events
             .filter(msg => msg.type === 'create' || msg.type === 'context')
             .flatMap(msg => {
                 // one time delay until session is ready
@@ -101,6 +159,16 @@ export class OmnisharpStream {
                         sessionSub.unsubscribe();
                     });
                 });
+                
+                const pausedForOperation = (msg: EditorMessage): Observable<number> => {
+                    const p = new Promise<number>((done) => {
+                        // todo add timestamp to EditorMessage itself, instead of riding along in TextUpdate
+                        if (!this.operationMap.busy(msg.id, msg.data.timestamp, done)) {
+                            done(1);
+                        }
+                    });
+                    return Observable.fromPromise(p);
+                };
 
                 const mapEditorMsg = (x: EditorMessage) => {
                     return <EditorChange> {
@@ -153,6 +221,7 @@ export class OmnisharpStream {
                     editor.events
                         .filter(x => x.type === 'edit' && x.id === msg.id)
                         .delayWhen(x => Observable.fromPromise(ready))
+                        .delayWhen(pausedForOperation)
                         .map(mapEditorMsg)
                         .bufferTime(500)
                         .filter(edits => edits.length > 0)
@@ -181,124 +250,68 @@ export class OmnisharpStream {
             })
             .publish();
 
-        const sessionStatus = session.events.filter(msg => msg.type === 'create')
-            .flatMap(msg => {
-                return new Observable<SessionReadyState>((obs: Observer<SessionReadyState>) => {
-                    let lastEdit = 0;
-                    let lastUpdate = 1;
-                    let lastState = false;
-                    editor.events.filter(x => x.type === 'edit' && x.id === msg.id).subscribe(x => {
-                        Assert(lastEdit < x.data.timestamp, 'edit timestamp did not increase');
-                        const wasFirst = lastEdit === 0;
-                        lastEdit = x.data.timestamp;
-                        if (lastState || wasFirst) {
-                            lastState = false;
-                            obs.next(new SessionReadyState(msg.id, false));
-                        }
+        const waitForBuffer: (op: SessionOperation) => Observable<number> = (op) => {
+            const p = new Promise<number>((done) => {
+                if (this.operationMap.updated[op.sessionId] >= op.waitForEdit) {
+                    done(1);
+                } else {
+                    const sub = updateBufferTimestamps.filter(x => x.sessionId === op.sessionId && x.timestamp >= op.waitForEdit).subscribe(x => {
+                        sub.unsubscribe();
+                        done(1);
                     });
-                    sessionReady.filter(x => x.sessionId === msg.id).subscribe(x => {
-                        Assert(lastUpdate < x.timestamp, 'update timestamp did not increase');
-                        lastUpdate = x.timestamp;
-                        if (lastState !== (lastEdit <= lastUpdate)) {
-                            lastState = lastEdit <= lastUpdate;
-                            obs.next(new SessionReadyState(msg.id, lastState));
-                        }
-                    });
-                });
-            })
-            .scan((validSessions: string[], value: SessionReadyState) => {
-                const without = validSessions.filter(x => x !== value.sessionId);
-                if (value.ready) {
-                    return [value.sessionId].concat(validSessions);
                 }
-                return without;
-            }, [])
-            .publishReplay();
-
-        const waitForSession = (msg: SessionMessage) : Observable<number> => {
-            return new Observable<number>((obs: Observer<number>) => {
-                let done = false;
-                const sub = sessionStatus.filter(s => s.indexOf(msg.id) !== -1).subscribe(() => {
-                    if (!done) {
-                        done = true;
-                        obs.next(1);
-                        obs.complete();
-                        // timing sensitive, if we dont wait, sub might be undefined
-                        setTimeout(() => {
-                            sub.unsubscribe();
-                        }, 200);
-                    }
-                });
             });
+            return Observable.fromPromise(p);
         };
-
-        // session.events
-        //     .filter(msg => msg.type === 'codecheck' || msg.type === 'run')
-        //     .delayWhen(waitForSession)
-        //     .map(msg => {
-        //         return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, null, msg.timestamp);
-        //     })
-        //     .flatMap(msg => 
-        //         this.http
-        //             .post(this.action('codeformat'), JSON.stringify({ FileName: msg.fileName }))
-        //             .map(res => res.json().Buffer))
-        //     .subscribe(str => {
-        //         console.log('buffer text:')
-        //         console.log(str);
-        //     });
-
-        const codeChecks = session.events
-            .filter(msg => msg.type === 'codecheck')
-            .delayWhen(waitForSession)
+        updateBufferTimestamps.subscribe(ts => {
+            this.operationMap.updateResponse(ts.sessionId, ts.timestamp);
+        });
+        const operationResponses = session.events
+            .filter(msg => msg.type === 'autocomplete' || msg.type === 'codecheck')
             .map(msg => {
-                return new SessionTemplateMap(null, null, this.templateMap[msg.id].fileName, msg.id, null, null, null, msg.timestamp);
-            })
-            .flatMap(msg => 
-                this.http
-                    .post(this.action('codecheck'), JSON.stringify({ FileName: msg.fileName }))
-                    .map(res => res.json())
-                    .map(res => this.mapQuickFixes(res, msg.sessionId, this.templateMap))
-                    .map(checks => {
-                        return new OmnisharpMessage('codecheck', msg.sessionId, null, null, this.filterCodeChecks(checks), msg.timestamp);
-                    }))
-            .publish();
-
-        const autoCompletions = session.events
-            .filter(msg => msg.type === 'autocomplete')
-            .delayWhen(waitForSession)
-            .map(msg => {
+                const waitForEdit = this.operationMap.start(msg.id);
+                let msgMap: SessionOperation = null;
                 const tmpl: SessionTemplateMap = this.templateMap[msg.id];
-                const request = msg.autoComplete;
-                request.fileName = tmpl.fileName;
-                request.column += (request.line === 0 ? tmpl.columnOffset : 0) + 1;
-                request.line += tmpl.lineOffset + 1;
-                return new SessionAutocompleteMap(
-                    msg.id,
-                    performance.now(),
-                    request
-                );
+                if (msg.type === 'autocomplete') {
+                    const request = msg.autoComplete;
+                    request.fileName = tmpl.fileName;
+                    request.column += (request.line === 0 ? tmpl.columnOffset : 0) + 1;
+                    request.line += tmpl.lineOffset + 1;
+                    msgMap = new SessionOperation(msg.id, 'autocomplete', msg.timestamp, waitForEdit, request);
+                } else if (msg.type === 'codecheck') {
+                    msgMap = new SessionOperation(msg.id, 'codecheck', msg.timestamp, waitForEdit, { fileName: tmpl.fileName });
+                }
+                return msgMap;
             })
-            .flatMap(msg => 
-                this.http
-                    .post(this.action('autocomplete'), JSON.stringify(msg.request))
-                    .map(res => res.json())
-                    .map((completions: AutoCompletionItem[]) => {
-                        return new OmnisharpMessage('autocompletion', msg.sessionId, null, completions, null);
-                    }))
+            .delayWhen(waitForBuffer)
+            .flatMap(msg => {
+                return this.http
+                    .post(this.action(msg.operation), JSON.stringify(msg.request))
+                    .map(res => {
+                        this.operationMap.stop(msg.sessionId); 
+                        let responseMsg: OmnisharpMessage = null;
+                        const json = res.json();
+                        if (msg.operation === 'autocomplete') {
+                            const completions: AutoCompletionItem[] = json;
+                            responseMsg = new OmnisharpMessage('autocompletion', msg.sessionId, null, completions, null, msg.timestamp);
+                        } else if (msg.operation === 'codecheck') {
+                            const mappedFixes = this.mapQuickFixes(json, msg.sessionId, this.templateMap);
+                            const fixes = this.filterCodeChecks(mappedFixes);
+                            responseMsg = new OmnisharpMessage('codecheck', msg.sessionId, null, null, fixes, msg.timestamp);
+                        }
+                        return responseMsg;
+                    });
+            })
             .publish();
 
         this.process = new ProcessStream(http);
-
         this.events = this.process
             .status
             .map(msg => new OmnisharpMessage(msg.type))
-            .merge(codeChecks)
-            .merge(autoCompletions);
+            .merge(operationResponses);
 
-        sessionReady.connect();
-        sessionStatus.connect();
-        codeChecks.connect();
-        autoCompletions.connect();
+        updateBufferTimestamps.connect();
+        operationResponses.connect();
 
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);

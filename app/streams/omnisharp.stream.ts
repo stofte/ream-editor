@@ -101,84 +101,71 @@ export class OmnisharpStream {
                         sessionSub.unsubscribe();
                     });
                 });
-                const editorObs = new Observable<SessionTemplateMap>((obs: Observer<SessionTemplateMap>) => {
-                    const mapEditorMsg = (x: EditorMessage) => {
-                        return <EditorChange> {
-                            newText: x.data.text.join('\n'),
-                            startLine: x.data.from.line + sessionMap.lineOffset + 1,
-                            startColumn: x.data.from.ch + (x.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                            endLine: x.data.to.line + sessionMap.lineOffset + 1,
-                            endColumn: x.data.to.ch + (x.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                            timestamp: x.data.timestamp
-                        };
-                    };
-                    const mapEditorChanges = (edits: EditorChange[]) => {
-                        return new SessionTemplateMap(
-                                sessionMap.columnOffset,
-                                sessionMap.lineOffset,
-                                sessionMap.fileName,
-                                sessionMap.sessionId,
-                                null,
-                                null,
-                                edits
-                        );
-                    };
 
-                    // if we're handling a context msg, we need to wait for the editor msg that contains the curent full buffer text
-                    const initialText = msg.type === 'create' ? Observable.empty<SessionTemplateMap>() :// Observable.empty<SessionTemplateMap>(); 
-                            new Observable<SessionTemplateMap>((innerObs: Observer<SessionTemplateMap>) => {
-                                const anotherSub = editor.bufferedTexts
-                                    .filter(x => x.type === 'buffer-text' && x.id === msg.id &&
-                                        x.bufferTextOrigin === 'context' && x.originTimestamp === msg.timestamp)
-                                    .delayWhen(x => Observable.fromPromise(ready))
-                                    .subscribe(x => {
-                                        const textUpdate: TextUpdate = {
-                                            from: { line: 0, ch: 0 },
-                                            to: { line: 0, ch: 0},
-                                            text: x.text.split('\n'),
-                                            removed: [""],
-                                            timestamp: x.originTimestamp
-                                        };
-                                        const mappedEdit = new EditorMessage('edit', x.id, textUpdate);
-                                        innerObs.next(mapEditorChanges([mapEditorMsg(mappedEdit)]));
-                                        innerObs.complete();
-                                        setTimeout(() => {
-                                            anotherSub.unsubscribe();
-                                        }, 200);
-                                    });
-                            })
-                            ;
+                const mapEditorMsg = (x: EditorMessage) => {
+                    return <EditorChange> {
+                        newText: x.data.text.join('\n'),
+                        startLine: x.data.from.line + sessionMap.lineOffset + 1,
+                        startColumn: x.data.from.ch + (x.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
+                        endLine: x.data.to.line + sessionMap.lineOffset + 1,
+                        endColumn: x.data.to.ch + (x.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
+                        timestamp: x.data.timestamp
+                    };
+                };
+                const mapEditorChanges = (edits: EditorChange[]) => {
+                    return new SessionTemplateMap(
+                            sessionMap.columnOffset,
+                            sessionMap.lineOffset,
+                            sessionMap.fileName,
+                            sessionMap.sessionId,
+                            null,
+                            null,
+                            edits
+                    );
+                };
 
-                    const editorSub = initialText.concat(
-                        editor.events
-                            .filter(x => x.type === 'edit' && x.id === msg.id)
-                            .delayWhen(x => Observable.fromPromise(ready))
-                            .map(mapEditorMsg)
-                            .bufferTime(500)
-                            .filter(edits => edits.length > 0)
-                            .map(edits => new SessionTemplateMap(
-                                sessionMap.columnOffset,
-                                sessionMap.lineOffset,
-                                sessionMap.fileName,
-                                sessionMap.sessionId,
-                                null,
-                                null,
-                                edits
-                        )))
-                        .subscribe(msg => {
-                            obs.next(msg);
-                        });
-                    // todo do something less horrible here
-                    // teardown stream when another context appears for this sessionId
-                    const sessionSub = sessionMaps
-                        .filter(x => sessionMap !== null && sessionMap.created !== x.created && x.sessionId === msg.id)
-                        .subscribe(x => {
-                            editorSub.unsubscribe();
-                            obs.complete();
-                            sessionSub.unsubscribe();
-                        });
-                });
-                return editorObs;
+                // if we're handling a context msg, we need to wait for the editor msg that contains the curent full buffer text
+                const initialText = msg.type === 'create' ? Observable.empty<SessionTemplateMap>() :// Observable.empty<SessionTemplateMap>(); 
+                        new Observable<SessionTemplateMap>((innerObs: Observer<SessionTemplateMap>) => {
+                            const anotherSub = editor.bufferedTexts
+                                .filter(x => x.type === 'buffer-text' && x.id === msg.id &&
+                                    x.bufferTextOrigin === 'context' && x.originTimestamp === msg.timestamp)
+                                .delayWhen(x => Observable.fromPromise(ready))
+                                .subscribe(x => {
+                                    const textUpdate: TextUpdate = {
+                                        from: { line: 0, ch: 0 },
+                                        to: { line: 0, ch: 0},
+                                        text: x.text.split('\n'),
+                                        removed: [""],
+                                        timestamp: x.originTimestamp
+                                    };
+                                    const mappedEdit = new EditorMessage('edit', x.id, textUpdate);
+                                    innerObs.next(mapEditorChanges([mapEditorMsg(mappedEdit)]));
+                                    innerObs.complete();
+                                    setTimeout(() => {
+                                        anotherSub.unsubscribe();
+                                    }, 200);
+                                });
+                        })
+                        ;
+                
+                const editorSub = initialText.concat(
+                    editor.events
+                        .filter(x => x.type === 'edit' && x.id === msg.id)
+                        .delayWhen(x => Observable.fromPromise(ready))
+                        .map(mapEditorMsg)
+                        .bufferTime(500)
+                        .filter(edits => edits.length > 0)
+                        .map(edits => new SessionTemplateMap(
+                            sessionMap.columnOffset,
+                            sessionMap.lineOffset,
+                            sessionMap.fileName,
+                            sessionMap.sessionId,
+                            null,
+                            null,
+                            edits))
+                        .takeUntil(sessionMaps.filter(x => sessionMap !== null && sessionMap.created !== x.created && x.sessionId === msg.id)));
+                return editorSub;
             })
             .flatMap(sessionMap => {
                 return this.http

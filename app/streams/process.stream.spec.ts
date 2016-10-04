@@ -8,6 +8,7 @@ import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions,
 import { Observable } from 'rxjs/Rx';
 import { ProcessStream } from './process.stream';
 import { ProcessHelper } from '../utils/process-helper';
+import { EventName, Message } from './api';
 import config from '../config';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 
@@ -37,15 +38,19 @@ describe('[int-test] process.stream', function() {
         const port = name === 'query' ? config.queryEnginePort : config.omnisharpPort;
         let cmd = processHelper[name](port);
         let receivedStarting = false;
-        let types = ['starting', 'ready', 'closing', 'closed'];
+        let types = [
+            EventName.ProcessStarting,
+            EventName.ProcessReady,
+            EventName.ProcessClosing,
+            EventName.ProcessClosed
+        ];
         let idx = 0;
         let sub = instance.status.subscribe(msg => {
-            expect(msg.type).to.equal(types[idx++]);
-
-            if (msg.type === 'ready') {
+            expect(msg.name).to.equal(types[idx++]);
+            if (msg.name === EventName.ProcessReady) {
                 instance.close();
             }
-            if (msg.type === 'closed' || msg.type === 'failed') {
+            if (msg.name === EventName.ProcessClosed || msg.name === EventName.ProcessFailed) {
                 sub.unsubscribe();
             }
         }).add(done);

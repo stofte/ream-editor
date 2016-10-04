@@ -1,6 +1,6 @@
 import { Http, Response } from '@angular/http';
 import { Subject, Observable } from 'rxjs/Rx';
-import { ProcessMessage } from '../messages/index';
+import { EventName, Message } from './api';
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
@@ -9,7 +9,7 @@ const REAMQUERY_BASEDIR = path.normalize(`${process.cwd()}/query/query/src/ReamQ
 type ProcessType = 'omnisharp' | 'query';
 
 export class ProcessStream {
-    public status: Subject<ProcessMessage> = new Subject<ProcessMessage>();
+    public status: Subject<Message> = new Subject<Message>();
     private options: any;
     private command: string;
     private directory: string;
@@ -26,10 +26,10 @@ export class ProcessStream {
         if (processType === 'query') {
             process.env['REAMQUERY_BASEDIR'] = REAMQUERY_BASEDIR;
         }
-        this.status.next(new ProcessMessage('starting'));
+        this.status.next(new Message(EventName.ProcessStarting));
         let start = new Date().getTime();
         let statusSub = this.status.subscribe(msg => {
-            if (msg.type === 'failed') {
+            if (msg.name === EventName.ProcessFailed) {
                 this.cancelCheck = true;
             }
         });
@@ -38,9 +38,9 @@ export class ProcessStream {
                 console.error('process.stream error', error);
                 console.error('stdout', stdout);
                 console.error('stderr', stderr);
-                this.status.next(new ProcessMessage('failed', error));
+                this.status.next(new Message(EventName.ProcessFailed));
             } else {
-                this.status.next(new ProcessMessage('closed'));
+                this.status.next(new Message(EventName.ProcessClosed));
             }
             setTimeout(() => {
                 statusSub.unsubscribe();
@@ -50,7 +50,7 @@ export class ProcessStream {
     }
 
     public close() {
-        this.status.next(new ProcessMessage('closing'));
+        this.status.next(new Message(EventName.ProcessClosing));
         this.http.get(this.action('stopserver')).subscribe();
     }
 
@@ -58,7 +58,7 @@ export class ProcessStream {
         this.http.get(this.action('checkreadystatus'))
             .subscribe(ok => {
                 this.cancelCheck = true;
-                this.status.next(new ProcessMessage('ready'));
+                this.status.next(new Message(EventName.ProcessReady));
             }, error => {
                 if (!this.cancelCheck) {
                     setTimeout(() => { this.checkreadystatus(); }, 500);

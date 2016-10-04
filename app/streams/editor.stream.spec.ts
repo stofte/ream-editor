@@ -9,6 +9,7 @@ import { Observable } from 'rxjs/Rx';
 import { EditorStream, SessionStream } from './index';
 import { TextUpdate } from '../models/index';
 import { ProcessHelper } from '../utils/process-helper';
+import { EventName, Message } from './api';
 import * as uuid from 'node-uuid';
 import config from '../config';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
@@ -46,9 +47,9 @@ describe('editor.stream', function() {
         this.timeout(backendTimeout);
         randomTestData.forEach((test, idx: number) => {
             const sub = editor.events.subscribe(msg => {
-                if (msg.type === 'buffer-text') {
+                if (msg.name === EventName.EditorExecuteText) {
                     sub.unsubscribe();
-                    expect(msg.text).to.equal(test.output);
+                    expect(msg.data).to.equal(test.output);
                 }
             });
             const id = uuid.v4();
@@ -56,7 +57,7 @@ describe('editor.stream', function() {
             test.events.forEach(data => {
                 editor.edit(id, data);
             });
-            session.run(id);
+            session.executeBuffer(id);
             if (idx === randomTestData.length - 1) {
                 done();
             }

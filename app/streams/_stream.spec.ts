@@ -6,7 +6,6 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, 
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { QueryMessage, OmnisharpMessage } from '../messages/index';
 import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from './index';
 import config from '../config';
 import { CodeCheckResult, AutocompletionQuery, Connection } from '../models';
@@ -17,6 +16,7 @@ import { cSharpTestData, cSharpTestDataExpectedResult, cSharpTestDataExpectedCod
     cSharpContextSwitchEditorTestData, cSharpCityFilteringQueryEditorTestData,
     cSharpDatabaseCodeCheckEditorTestData, cSharpDatabaseCodeCheckExpectedErrors } from '../test/editor-testdata';
 import replaySteps from '../test/replay-steps';
+import { EventName, Message } from './api';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
@@ -58,13 +58,13 @@ describe('[int-test] streams', function() {
         this.timeout(backendTimeout);
         let queryReady = false;
         let omnisharpReady = false;
-        query.once(msg => msg.type === 'ready', () => {
+        query.once(msg => msg.name === EventName.ProcessReady, () => {
             queryReady = true;
             if (omnisharpReady) {
                 done();
             }
         });
-        omnisharp.once(msg => msg.type === 'ready', () => {
+        omnisharp.once(msg => msg.name === EventName.ProcessReady, () => {
             omnisharpReady = true;
             if (queryReady) {
                 done();
@@ -72,7 +72,7 @@ describe('[int-test] streams', function() {
         });
     });
 
-    it('emits result messages for simple value expressions', function(done) {
+    it('emits result for simple value expressions', function(done) {
         this.timeout(backendTimeout * (cSharpTestData.length + 1));
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
@@ -82,14 +82,14 @@ describe('[int-test] streams', function() {
             const resultSub = result.events
                 .filter(msg => msg.id === id)
                 .subscribe(msg => {
-                    if (msg.type === 'done') {
+                    if (msg.name === EventName.ResultDone) {
                         resultSub.unsubscribe();
                         if (idx === cSharpTestData.length - 1) {
                             expect(verifyCount).to.equal(cSharpTestData.length, 
                                 `verifyCount (${verifyCount}) should match length of test data: ${cSharpTestData.length}`);
                             done();
                         }
-                    } else if (msg.type === 'update') {
+                    } else if (msg.name === EventName.ResultUpdate) {
                         expect(msg.data.id).to.equal(id);
                         expect(msg.data.title).to.equal(expectedPage.title);
                         expect(msg.data.columns).to.deep.equal(expectedPage.columns);
@@ -105,12 +105,12 @@ describe('[int-test] streams', function() {
                     for: testData.events,
                     fn: (evt) => editor.edit(id, evt)
                 },
-                () => session.run(id)
+                () => session.executeBuffer(id)
             ]);
         });
     });
 
-    it('emits results messages for linq based query against sqlite database', function(done) {
+    it('emits results for linq based query against sqlite database', function(done) {
         this.timeout(backendTimeout * 3);
         const expectedPage = cSharpCityFilteringQueryEditorTestData[0]; 
         const id = uuid.v4();
@@ -120,7 +120,7 @@ describe('[int-test] streams', function() {
         const resultSub = result.events
             .filter(msg => msg.id === id)
             .subscribe(msg => {
-                if (msg.type === 'done') {
+                if (msg.name === EventName.ResultDone) {
                     resultSub.unsubscribe();
                     checkAndExit(done, () => {
                         let cityColIdx = 0;
@@ -136,7 +136,7 @@ describe('[int-test] streams', function() {
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
                     });
-                } else if (msg.type === 'update') {
+                } else if (msg.name === EventName.ResultUpdate) {
                     rows = msg.data.rows;
                     headers = msg.data.columns;
                 }
@@ -147,11 +147,11 @@ describe('[int-test] streams', function() {
             { 
                 for: cSharpCityFilteringQueryEditorTestData[0].events,
                 fn: (evt) => editor.edit(id, evt)
-            }, () => session.run(id)
+            }, () => session.executeBuffer(id)
         ]);
     });
 
-    it('emits codecheck messages for simple statement', function(done) {
+    it('emits codecheck for simple statement', function(done) {
         this.timeout(backendTimeout * 2);
         const id = uuid.v4();
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
@@ -159,16 +159,16 @@ describe('[int-test] streams', function() {
         let codechecks = 0;
         let gotFirstResolver = null; 
         const gotFirst = new Promise((done) => { gotFirstResolver = done; });
-        const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck' && msg.sessionId === id).subscribe(msg => {
+        const codecheckSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
             const expectedCheck = cSharpTestDataExpectedCodeChecks[codechecks];
             codechecks++;
-            expect(msg.checks.length).to.equal(1);
-            expect(msg.checks[0].text).to.equal(expectedCheck.text, 'text');
-            expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
-            expect(msg.checks[0].line).to.equal(expectedCheck.line, 'line');
-            expect(msg.checks[0].column).to.equal(expectedCheck.column, 'column');
-            expect(msg.checks[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
-            expect(msg.checks[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
+            expect(msg.data.length).to.equal(1);
+            expect(msg.data[0].text).to.equal(expectedCheck.text, 'text');
+            expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
+            expect(msg.data[0].line).to.equal(expectedCheck.line, 'line');
+            expect(msg.data[0].column).to.equal(expectedCheck.column, 'column');
+            expect(msg.data[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
+            expect(msg.data[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
             if (codechecks >= cSharpTestDataExpectedCodeChecks.length) {
                 codecheckSub.unsubscribe();
                 done();
@@ -197,7 +197,7 @@ describe('[int-test] streams', function() {
     });
 
 
-    it('emits codecheck messages for database query', function(done) {
+    it('emits codecheck for database query', function(done) {
         this.timeout(backendTimeout * 2);
         const id = uuid.v4();
         const firstEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time < 6000);
@@ -206,24 +206,24 @@ describe('[int-test] streams', function() {
         let isFirstCheck = true;
         let gotFirstResolver = null;
         const gotFirst = new Promise((done) => { gotFirstResolver = done; });
-        const codecheckSub = omnisharp.events.filter(msg => msg.type === 'codecheck' && msg.sessionId === id).subscribe(msg => {
+        const codecheckSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
             const expectedCheck = cSharpDatabaseCodeCheckExpectedErrors[codechecks];
             if (isFirstCheck) {
                 gotFirstResolver();
                 isFirstCheck = false;
                 check([done, codecheckSub], () => {
-                    expect(msg.checks.length).to.equal(1);
-                    expect(msg.checks[0].line).to.equal(expectedCheck.line, 'line');
-                    expect(msg.checks[0].column).to.equal(expectedCheck.column, 'column');
-                    expect(msg.checks[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
-                    expect(msg.checks[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
-                    expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
-                    expect(msg.checks[0].text).to.equal(expectedCheck.text, 'text');
+                    expect(msg.data.length).to.equal(1);
+                    expect(msg.data[0].line).to.equal(expectedCheck.line, 'line');
+                    expect(msg.data[0].column).to.equal(expectedCheck.column, 'column');
+                    expect(msg.data[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
+                    expect(msg.data[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
+                    expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
+                    expect(msg.data[0].text).to.equal(expectedCheck.text, 'text');
                 });
             } else {
                 codecheckSub.unsubscribe();
                 checkAndExit(done, () => {
-                    expect(msg.checks.length).to.equal(0);
+                    expect(msg.data.length).to.equal(0);
                 });
             }
         });
@@ -243,10 +243,10 @@ describe('[int-test] streams', function() {
         ]);
     });
 
-    it('emits autocompletion messages for simple statement', function(done) {
+    it('emits autocompletion for simple statement', function(done) {
         this.timeout(backendTimeout * 2);
-        const completionSub = omnisharp.events.filter(msg => msg.type === 'autocompletion').subscribe(msg => {
-            const items = msg.completions.map(x => x.CompletionText);
+        const completionSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
+            const items = msg.data.map(x => x.CompletionText);
             Assert(cSharpAutocompletionExpectedValues[0].length > 0, 'Found no completion items');
             cSharpAutocompletionExpectedValues[0].forEach(expectedEntry => {
                 expect(items).to.contain(expectedEntry, `Expected completion item "${expectedEntry}"`);
@@ -274,19 +274,19 @@ describe('[int-test] streams', function() {
         const expectedCheck = cSharpContextSwitchExpectedCodeChecks[0];
         let codechecks = 0;
         const codecheckSub = omnisharp.events
-            .filter(msg => msg.type === 'codecheck' && msg.sessionId === id)
+            .filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
             .subscribe(msg => {
                 codechecks++;
                 if (codechecks === 1) {
                     check([done, codecheckSub], () => {
-                        expect(msg.checks.length).to.equal(1);
-                        expect(msg.checks[0].text).to.equal(expectedCheck.text);
-                        expect(msg.checks[0].logLevel).to.equal(expectedCheck.logLevel);
+                        expect(msg.data.length).to.equal(1);
+                        expect(msg.data[0].text).to.equal(expectedCheck.text);
+                        expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel);
                     });
                 } else {
                     codecheckSub.unsubscribe();
                     checkAndExit(done, () => {
-                        expect(msg.checks.length).to.equal(0);
+                        expect(msg.data.length).to.equal(0);
                     });
                 }
             });
@@ -314,7 +314,7 @@ describe('[int-test] streams', function() {
 
     it('stops query process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
-        query.once(msg => msg.type === 'closed', () => {
+        query.once(msg => msg.name === EventName.ProcessClosed, () => {
             let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
             http.get(url, res => { done(new Error('response received')); })
                 .on('error', () => { done(); });
@@ -326,7 +326,7 @@ describe('[int-test] streams', function() {
 
     it('stops omnisharp process when stopServer is called', function(done) {
         this.timeout(backendTimeout);
-        omnisharp.once(msg => msg.type === 'closed', () => {
+        omnisharp.once(msg => msg.name === EventName.ProcessClosed, () => {
             let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
             http.get(url, res => { done(new Error('response received')); })
                 .on('error', () => { done(); });

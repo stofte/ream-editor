@@ -1,7 +1,7 @@
 import { Inject, Injectable, Provider } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
-import { QueryMessage, ProcessMessage, WebSocketMessage } from '../messages/index';
+import { EventName, Message, WebSocketMessage } from './api';
 import { ProcessStream, EditorStream } from './index';
 import { SessionStream } from './session.stream';
 import { ProcessHelper } from '../utils/process-helper';
@@ -19,8 +19,8 @@ class TemplateRequest {
 
 @Injectable()
 export class QueryStream {
-    public events: Observable<QueryMessage>;
-    private socket: Subject<QueryMessage> = new Subject<QueryMessage>();
+    public events: Observable<Message>;
+    private socket: Subject<Message> = new Subject<Message>();
     private process: ProcessStream = null;
     constructor(
         private editor: EditorStream,
@@ -28,30 +28,30 @@ export class QueryStream {
         private http: Http
     ) {
         this.process = new ProcessStream(http);
-        const executeCodeResponses = session.events.filter(msg => msg.type === 'create')
+        const executeCodeResponses = session.events.filter(msg => msg.name === EventName.SessionCreate)
             .flatMap(sessionMsg => {
                 return editor.events
-                    .filter(msg => msg.type === 'buffer-text' && msg.bufferTextOrigin === 'run' && msg.id === sessionMsg.id)
+                    .filter(msg => msg.name === EventName.EditorExecuteText && msg.id === sessionMsg.id)
                     .flatMap(msg => {
                         let request: any = null;
                         let actionName: string = null;
-                        if (!sessionMsg.connection) {
-                            request = { id: msg.id, text: msg.text };
+                        if (!sessionMsg.data) { // data may be a connection
+                            request = { id: msg.id, text: msg.data };
                             actionName = this.action('executecode');
                         } else {
                             actionName = this.action('executequery');
                             request = {
                                 id: msg.id,
-                                text: msg.text,
-                                connectionString: sessionMsg.connection.connectionString,
-                                serverType: sessionMsg.connection.type
+                                text: msg.data,
+                                connectionString: sessionMsg.data.connectionString,
+                                serverType: sessionMsg.data.type
                             };
                         }
                         return this.http
                             .post(actionName, request)
                             .map(res => {
                                 const data = res.json();
-                                return new QueryMessage('execute-response', msg.id, null, {
+                                return new Message(EventName.QueryExecuteResponse, msg.id, {
                                     code: data.Code,
                                     message: data.Message
                                 });
@@ -61,13 +61,13 @@ export class QueryStream {
             .publish();
 
         const templateResponses = session.events
-            .filter(msg => msg.type === 'create' || msg.type === 'context')
+            .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
             .flatMap(msg => {
                 let req: any = null;
                 let method: string = null;
-                if (msg.connection) {
+                if (msg.data) {
                     method = this.action('querytemplate');
-                    req = { text: '', id: msg.id, serverType: msg.connection.type, connectionString: msg.connection.connectionString };
+                    req = { text: '', id: msg.id, serverType: msg.data.type, connectionString: msg.data.connectionString };
                 } else {
                     method = this.action('codetemplate');
                     req = { text: '', id: msg.id };
@@ -75,8 +75,8 @@ export class QueryStream {
                 return this.http.post(method, JSON.stringify(req))
                     .map(res => {
                         const data = res.json();
-                        const connectionId = msg.connection ? msg.connection.id : null;
-                        return new QueryMessage('buffer-template', req.id, null, null, {
+                        const connectionId = msg.data ? msg.data.id : null;
+                        return new Message(EventName.QueryTemplateResponse, req.id, {
                             code: data.Code,
                             message: data.Message,
                             namespace: data.Namespace,
@@ -94,7 +94,12 @@ export class QueryStream {
 
         this.events = this.process
             .status
-            .map(msg => new QueryMessage(msg.type))
+            // .map(msg => new QueryMessage(
+            //         msg.name === EventName.ProcessReady ? 'ready' :
+            //         msg.name === EventName.ProcessClosed ? 'closed' :
+            //         msg.name === EventName.ProcessClosing ? 'closing' :
+            //         msg.name === EventName.ProcessFailed ? 'failed' : 'starting'
+            //     ))
             .merge(this.socket)
             .merge(executeCodeResponses)
             .merge(templateResponses);
@@ -102,7 +107,7 @@ export class QueryStream {
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
-        this.once(msg => msg.type === 'ready', () => {
+        this.once(msg => msg.name === EventName.ProcessReady, () => {
             executeCodeResponses.connect();
             templateResponses.connect();
             Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(
@@ -113,7 +118,7 @@ export class QueryStream {
         });
     }
 
-    public once(pred: (msg: QueryMessage) => boolean, handler: (msg: QueryMessage) => void) {
+    public once(pred: (msg: Message) => boolean, handler: (msg: Message) => void) {
         const sub = this.events.filter(msg => pred(msg)).subscribe(msg => {
             sub.unsubscribe();
             handler(msg);
@@ -136,7 +141,7 @@ export class QueryStream {
             type: msg.Type.substring(0, 1).toLowerCase() + msg.Type.substring(1),
             values: msg.Values
         };
-        this.socket.next(new QueryMessage('message', msg.Session, message));
+        this.socket.next(new Message(EventName.QuerySocketOutput, msg.Session, message));
     }
 
     private socketErrorHandler = (err) => {

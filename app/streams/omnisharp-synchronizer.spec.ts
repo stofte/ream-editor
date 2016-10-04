@@ -1,6 +1,6 @@
 import * as chai from 'chai';
 import { expect } from 'chai';
-import { OmnisharpSessionMessage } from '../messages/index';
+import { OmnisharpSessionMessage } from './api';
 import { OmnisharpSynchronizer } from './omnisharp-synchronizer';
 import { Observable, Subject } from 'rxjs/Rx';
 import replaySteps from '../test/replay-steps';

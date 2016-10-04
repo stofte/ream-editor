@@ -1,40 +1,38 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs/Rx';
-import { SessionMessage } from '../messages/index';
+import { EventName, Message } from './api';
 import { AutocompletionQuery, Connection } from '../models/index';
 import * as uuid from 'node-uuid';
 
 @Injectable()
 export class SessionStream {
-    public events: Observable<SessionMessage>;
-    private subject: Subject<SessionMessage>;
+    public events: Observable<Message>;
+    private subject: Subject<Message>;
 
     constructor() {
-        this.subject = new Subject<SessionMessage>();
+        this.subject = new Subject<Message>();
         const stream = this.subject.publish();
         this.events = stream;
         stream.connect();
     }
 
     public new(id: string, connection: Connection = null) {
-        this.subject.next(new SessionMessage('create', id, performance.now(), null, connection));
+        this.subject.next(new Message(EventName.SessionCreate, id, connection));
     }
 
-    public run(id: string) {
-        this.subject.next(new SessionMessage('run', id));
+    public executeBuffer(id: string) {
+        this.subject.next(new Message(EventName.SessionExecuteBuffer, id));
     }
 
     public codeCheck(id: string) {
-        const now = performance.now();
-        this.subject.next(new SessionMessage('codecheck', id, now));
+        this.subject.next(new Message(EventName.SessionCodeCheck, id));
     }
 
     public autoComplete(id: string, query: AutocompletionQuery) {
-        this.subject.next(new SessionMessage('autocomplete', id, performance.now(), query));
+        this.subject.next(new Message(EventName.SessionAutocompletion, id, query));
     }
 
     public setContext(id: string, connection: Connection) {
-        const now = performance.now();
-        this.subject.next(new SessionMessage('context', id, now, null, connection));
+        this.subject.next(new Message(EventName.SessionContext, id, connection));
     }
 }

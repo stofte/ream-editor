@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
-import { QueryMessage, OmnisharpMessage, WebSocketMessage, SessionMessage, EditorMessage } from '../messages/index';
 import { ProcessStream, EditorStream, QueryStream, SessionStream } from './index';
+import { EventName, Message, OmnisharpSessionMessage } from './api';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, UpdateBufferRequest, AutoCompletionItem } from './interfaces';
 import { CodeCheckResult, EditorChange, AutocompletionQuery, CodeCheckQuery, TextUpdate } from '../models/index';
@@ -106,7 +106,7 @@ class SessionOperation {
 
 @Injectable()
 export class OmnisharpStream {
-    public events: Observable<OmnisharpMessage>;
+    public events: Observable<Message>;
     private process: ProcessStream;
     private templateMap: any = {};
     private operationMap: OperationInflightMap = new OperationInflightMap();
@@ -117,21 +117,21 @@ export class OmnisharpStream {
         private http: Http
     ) {
         const sessionMaps = query.events
-            .filter(msg => msg.type === 'buffer-template')
+            .filter(msg => msg.name === EventName.QueryTemplateResponse)
             .map(msg => {
-                const bufferType = msg.template.connectionId ? `db${msg.template.connectionId}ctx` : 'code';
+                const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
                 const update: UpdateBufferRequest = {
                     SessionId: msg.id,
                     FileName: `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`,
                     FromDisk: false,
-                    Buffer: msg.template.template
+                    Buffer: msg.data.template
                 };
                 return new SessionTemplateMap(
-                    msg.template.columnOffset,
-                    msg.template.lineOffset,
+                    msg.data.columnOffset,
+                    msg.data.lineOffset,
                     update.FileName,
                     msg.id,
-                    msg.template.connectionId,
+                    msg.data.connectionId,
                     update,
                     null,
                     performance.now()
@@ -148,7 +148,7 @@ export class OmnisharpStream {
         });
 
         const updateBufferTimestamps = session.events
-            .filter(msg => msg.type === 'create' || msg.type === 'context')
+            .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
             .flatMap(msg => {
                 // one time delay until session is ready
                 let sessionMap: SessionTemplateMap = null;
@@ -160,7 +160,7 @@ export class OmnisharpStream {
                     });
                 });
                 
-                const pausedForOperation = (msg: EditorMessage): Observable<number> => {
+                const pausedForOperation = (msg: Message): Observable<number> => {
                     const p = new Promise<number>((done) => {
                         // todo add timestamp to EditorMessage itself, instead of riding along in TextUpdate
                         if (!this.operationMap.busy(msg.id, msg.data.timestamp, done)) {
@@ -170,7 +170,7 @@ export class OmnisharpStream {
                     return Observable.fromPromise(p);
                 };
 
-                const mapEditorMsg = (x: EditorMessage) => {
+                const mapEditorMsg = (x: Message) => {
                     return <EditorChange> {
                         newText: x.data.text.join('\n'),
                         startLine: x.data.from.line + sessionMap.lineOffset + 1,
@@ -193,21 +193,20 @@ export class OmnisharpStream {
                 };
 
                 // if we're handling a context msg, we need to wait for the editor msg that contains the curent full buffer text
-                const initialText = msg.type === 'create' ? Observable.empty<SessionTemplateMap>() :// Observable.empty<SessionTemplateMap>(); 
+                const initialText = msg.name === EventName.SessionCreate ? Observable.empty<SessionTemplateMap>() :// Observable.empty<SessionTemplateMap>(); 
                         new Observable<SessionTemplateMap>((innerObs: Observer<SessionTemplateMap>) => {
                             const anotherSub = editor.bufferedTexts
-                                .filter(x => x.type === 'buffer-text' && x.id === msg.id &&
-                                    x.bufferTextOrigin === 'context' && x.originTimestamp === msg.timestamp)
+                                .filter(x => x.name === EventName.EditorBufferText && x.id === msg.id && x.originalTimestamp === msg.timestamp)
                                 .delayWhen(x => Observable.fromPromise(ready))
                                 .subscribe(x => {
                                     const textUpdate: TextUpdate = {
                                         from: { line: 0, ch: 0 },
                                         to: { line: 0, ch: 0},
-                                        text: x.text.split('\n'),
+                                        text: x.data.split('\n'),
                                         removed: [""],
-                                        timestamp: x.originTimestamp
+                                        timestamp: x.originalTimestamp
                                     };
-                                    const mappedEdit = new EditorMessage('edit', x.id, textUpdate);
+                                    const mappedEdit = new Message(EventName.EditorUpdate, x.id, textUpdate);
                                     innerObs.next(mapEditorChanges([mapEditorMsg(mappedEdit)]));
                                     innerObs.complete();
                                     setTimeout(() => {
@@ -219,7 +218,7 @@ export class OmnisharpStream {
                 
                 const editorSub = initialText.concat(
                     editor.events
-                        .filter(x => x.type === 'edit' && x.id === msg.id)
+                        .filter(x => x.name === EventName.EditorUpdate && x.id === msg.id)
                         .delayWhen(x => Observable.fromPromise(ready))
                         .delayWhen(pausedForOperation)
                         .map(mapEditorMsg)
@@ -267,18 +266,18 @@ export class OmnisharpStream {
             this.operationMap.updateResponse(ts.sessionId, ts.timestamp);
         });
         const operationResponses = session.events
-            .filter(msg => msg.type === 'autocomplete' || msg.type === 'codecheck')
+            .filter(msg => msg.name === EventName.SessionAutocompletion || msg.name === EventName.SessionCodeCheck)
             .map(msg => {
                 const waitForEdit = this.operationMap.start(msg.id);
                 let msgMap: SessionOperation = null;
                 const tmpl: SessionTemplateMap = this.templateMap[msg.id];
-                if (msg.type === 'autocomplete') {
-                    const request = msg.autoComplete;
+                if (msg.name === EventName.SessionAutocompletion) {
+                    const request = msg.data;
                     request.fileName = tmpl.fileName;
                     request.column += (request.line === 0 ? tmpl.columnOffset : 0) + 1;
                     request.line += tmpl.lineOffset + 1;
                     msgMap = new SessionOperation(msg.id, 'autocomplete', msg.timestamp, waitForEdit, request);
-                } else if (msg.type === 'codecheck') {
+                } else if (msg.name === EventName.SessionCodeCheck) {
                     msgMap = new SessionOperation(msg.id, 'codecheck', msg.timestamp, waitForEdit, { fileName: tmpl.fileName });
                 }
                 return msgMap;
@@ -289,15 +288,15 @@ export class OmnisharpStream {
                     .post(this.action(msg.operation), JSON.stringify(msg.request))
                     .map(res => {
                         this.operationMap.stop(msg.sessionId); 
-                        let responseMsg: OmnisharpMessage = null;
+                        let responseMsg: Message = null;
                         const json = res.json();
                         if (msg.operation === 'autocomplete') {
                             const completions: AutoCompletionItem[] = json;
-                            responseMsg = new OmnisharpMessage('autocompletion', msg.sessionId, null, completions, null, msg.timestamp);
+                            responseMsg = new Message(EventName.OmniSharpAutocompletion, msg.sessionId, completions, msg.timestamp);
                         } else if (msg.operation === 'codecheck') {
                             const mappedFixes = this.mapQuickFixes(json, msg.sessionId, this.templateMap);
                             const fixes = this.filterCodeChecks(mappedFixes);
-                            responseMsg = new OmnisharpMessage('codecheck', msg.sessionId, null, null, fixes, msg.timestamp);
+                            responseMsg = new Message(EventName.OmniSharpCodeCheck, msg.sessionId, fixes, msg.timestamp);
                         }
                         return responseMsg;
                     });
@@ -307,7 +306,6 @@ export class OmnisharpStream {
         this.process = new ProcessStream(http);
         this.events = this.process
             .status
-            .map(msg => new OmnisharpMessage(msg.type))
             .merge(operationResponses);
 
         updateBufferTimestamps.connect();
@@ -316,12 +314,12 @@ export class OmnisharpStream {
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);
         this.process.start('omnisharp', cmd.command, cmd.directory, config.omnisharpPort);
-        this.once(msg => msg.type === 'ready', () => {
+        this.once(msg => msg.name === EventName.ProcessReady, () => {
             sessionMaps.connect();
         });
     }
 
-    public once(pred: (msg: OmnisharpMessage) => boolean, handler: (msg: OmnisharpMessage) => void) {
+    public once(pred: (msg: Message) => boolean, handler: (msg: Message) => void) {
         const sub = this.events.filter(msg => pred(msg)).subscribe(msg => {
             sub.unsubscribe();
             handler(msg);
@@ -330,6 +328,45 @@ export class OmnisharpStream {
 
     public stopServer() {
         this.process.close();
+    }
+
+    private comboStream(): Observable<OmnisharpSessionMessage> {
+        const obs1 = this.session.events
+            .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
+            .map(msg => {
+                const msgType = msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext ? 'context' :
+                    msg.name === EventName.SessionCodeCheck ? 'codecheck' : 'autocompletion'; 
+                return <OmnisharpSessionMessage> {
+                    sessionId: msg.id,
+                    type: msgType,
+                    connectionId: msg.data && msg.data.id
+                };
+            });
+
+        const obs2 = this.query.events
+            .filter(msg => msg.name === EventName.QueryTemplateResponse)
+            .map(msg => {
+                const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
+                return <OmnisharpSessionMessage> {
+                    sessionId: msg.id,
+                    type: 'context',
+                    fileName: `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`,
+                    columnOffset: msg.data.columnOffset,
+                    lineOffset: msg.data.lineOffset,
+                    template: msg.data.template
+                };
+            });
+        
+        const obs3 = this.editor.events
+            .filter(msg => msg.name === EventName.EditorUpdate)
+            .map(msg => {
+                return <OmnisharpSessionMessage> {
+                    sessionId: msg.id,
+                    type: 'context',
+                };
+            });
+
+        return null;
     }
 
     private mapQuickFixes = (result: any, mapKey: string, maps: any): CodeCheckResult[] => {

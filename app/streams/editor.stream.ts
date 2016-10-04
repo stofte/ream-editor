@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs/Rx';
 import { TextUpdate } from '../models/index';
-import { EditorMessage } from '../messages/index';
 // todo: can't use index because we loose metadata?
 import { SessionStream } from './session.stream';
+import { EventName, Message } from './api';
 
 class BufferText {
     public lines: string[] = [''];
@@ -44,18 +44,18 @@ class BufferText {
 
 @Injectable()
 export class EditorStream {
-    public events: Observable<EditorMessage>;
-    public bufferedTexts: Observable<EditorMessage>;
-    private subject: Subject<EditorMessage> = new Subject<EditorMessage>();
+    public events: Observable<Message>;
+    public bufferedTexts: Observable<Message>;
+    private subject: Subject<Message> = new Subject<Message>();
 
     constructor(
         private session: SessionStream
     ) {
         const editMsgs = session
                     .events
-                    .filter(msg => msg.type === 'create')
-                    .flatMap(msg => this.subject.filter(e => e.type === 'edit' && e.id === msg.id))
-                    .scan((buffers: BufferText[], editor: EditorMessage, index: number) => {
+                    .filter(msg => msg.name === EventName.SessionCreate)
+                    .flatMap(msg => this.subject.filter(e => e.name === EventName.EditorUpdate && e.id === msg.id))
+                    .scan((buffers: BufferText[], editor: Message, index: number) => {
                         if (!buffers.find(x => x.id === editor.id)) {
                             buffers.push(new BufferText(editor.id));
                         }
@@ -65,18 +65,18 @@ export class EditorStream {
                     }, [])
                     .publish();
         editMsgs.connect();
-        const runCodeText = session.events.filter(msg => msg.type === 'run')
+        const runCodeText = session.events.filter(msg => msg.name === EventName.SessionExecuteBuffer)
             .withLatestFrom(editMsgs)
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new EditorMessage('buffer-text', val[0].id, null, b.getText(), val[0].type, val[0].timestamp);
+                return new Message(EventName.EditorExecuteText, val[0].id, b.getText(), val[0].timestamp);
             });
 
-        const contextText = session.events.filter(msg => msg.type === 'context')
+        const contextText = session.events.filter(msg => msg.name === EventName.SessionContext)
             .withLatestFrom(editMsgs)
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new EditorMessage('buffer-text', val[0].id, null, b.getText(), val[0].type, val[0].timestamp);
+                return new Message(EventName.EditorExecuteText, val[0].id, b.getText(), val[0].timestamp);
             })
             .publishReplay(1);
 
@@ -93,6 +93,6 @@ export class EditorStream {
 
     public edit(id: string, data: TextUpdate) {
         data.timestamp = performance.now();
-        this.subject.next(new EditorMessage('edit', id, data));
+        this.subject.next(new Message(EventName.EditorUpdate, id, data, performance.now()));
     }
 }

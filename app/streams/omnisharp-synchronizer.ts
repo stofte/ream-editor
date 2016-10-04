@@ -1,5 +1,5 @@
 import { Observable, Subject } from 'rxjs/Rx';
-import { OmnisharpSessionMessage } from '../messages/index';
+import { OmnisharpSessionMessage } from './api';
 
 class Queued {
     public msg: OmnisharpSessionMessage;

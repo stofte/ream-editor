@@ -265,7 +265,7 @@ describe('[int-test] streams', function() {
         ]);
     });
 
-    it('emits codecheck messages after switching buffer context', function(done) {
+    it('emits codecheck after switching buffer context', function(done) {
         this.timeout(backendTimeout * 3);
         sqliteConnection.id = 42;
         const id = uuid.v4();

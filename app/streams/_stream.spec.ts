@@ -157,23 +157,21 @@ describe('[int-test] streams', function() {
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
-        let gotFirstResolver = null; 
-        const gotFirst = new Promise((done) => { gotFirstResolver = done; });
         const codecheckSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
             const expectedCheck = cSharpTestDataExpectedCodeChecks[codechecks];
             codechecks++;
-            expect(msg.data.length).to.equal(1);
-            expect(msg.data[0].text).to.equal(expectedCheck.text, 'text');
-            expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
-            expect(msg.data[0].line).to.equal(expectedCheck.line, 'line');
-            expect(msg.data[0].column).to.equal(expectedCheck.column, 'column');
-            expect(msg.data[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
-            expect(msg.data[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
+            check([done, codecheckSub], () => {
+                expect(msg.data.length).to.equal(1, 'Expected number of codechecks');
+                expect(msg.data[0].text).to.equal(expectedCheck.text, 'text');
+                expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel, 'logLevel');
+                expect(msg.data[0].line).to.equal(expectedCheck.line, 'line');
+                expect(msg.data[0].column).to.equal(expectedCheck.column, 'column');
+                expect(msg.data[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
+                expect(msg.data[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
+            });
             if (codechecks >= cSharpTestDataExpectedCodeChecks.length) {
                 codecheckSub.unsubscribe();
                 done();
-            } else {
-                gotFirstResolver();
             }
         });
 
@@ -188,11 +186,7 @@ describe('[int-test] streams', function() {
                 for: secondEdits,
                 fn: (evt) => editor.edit(id, evt)
             },
-            // if we don't wait for the first check, we risk queuing two codechecks on the same buffer timestamp.
-            // if for instance the first codecheck has not yet returned, the second edits
-            // have not been flushed, and since operations are prioritized over edits,
-            // the second codecheck gets queued on the first buffer, resulting in the same error twice.
-            () => gotFirst.then(() => session.codeCheck(id))
+            () => session.codeCheck(id)
         ]);
     });
 
@@ -204,12 +198,9 @@ describe('[int-test] streams', function() {
         const secondEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
         let isFirstCheck = true;
-        let gotFirstResolver = null;
-        const gotFirst = new Promise((done) => { gotFirstResolver = done; });
         const codecheckSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
             const expectedCheck = cSharpDatabaseCodeCheckExpectedErrors[codechecks];
             if (isFirstCheck) {
-                gotFirstResolver();
                 isFirstCheck = false;
                 check([done, codecheckSub], () => {
                     expect(msg.data.length).to.equal(1);
@@ -239,7 +230,7 @@ describe('[int-test] streams', function() {
                 for: secondEdits,
                 fn: (evt) => editor.edit(id, evt)
             },
-            () => gotFirst.then(() => session.codeCheck(id))
+            () => session.codeCheck(id)
         ]);
     });
 
@@ -291,24 +282,21 @@ describe('[int-test] streams', function() {
                 }
             });
 
-        // timing sensitive.
         replaySteps([
-            100, () => session.new(id),
+            () => session.new(id),
             {
                 for: firstEdits, // yields text "city", which is illegal in code buffer
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            500, () => session.codeCheck(id),
+            () => session.codeCheck(id),
             // switch
-            100, () => session.setContext(id, sqliteConnection),
-            100, () => { },
+            () => session.setContext(id, sqliteConnection),
+            () => { },
             {
                 for: secondEdits,
-                wait: 100,
                 fn: (evt) => editor.edit(id, evt)
             },
-            500, () => session.codeCheck(id)
+            () => session.codeCheck(id)
         ]);
     });
 
@@ -344,7 +332,6 @@ function check([done, subber], pred) {
     try {
         pred();
     } catch (exn) {
-        console.log('CHECK ERROR', exn);
         subber.unsubscribe();
         done(exn);
     }
@@ -355,7 +342,6 @@ function checkAndExit(done, pred) {
         pred();
         done();
     } catch (exn) {
-        console.log('CHECKANDEXIT ERROR', exn);
         done(exn);
     }
 }

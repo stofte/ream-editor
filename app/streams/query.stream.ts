@@ -62,44 +62,48 @@ export class QueryStream {
 
         const templateResponses = session.events
             .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
-            .flatMap(msg => {
-                let req: any = null;
-                let method: string = null;
-                if (msg.data) {
-                    method = this.action('querytemplate');
-                    req = { text: '', id: msg.id, serverType: msg.data.type, connectionString: msg.data.connectionString };
-                } else {
-                    method = this.action('codetemplate');
-                    req = { text: '', id: msg.id };
-                }
-                return this.http.post(method, JSON.stringify(req))
-                    .map(res => {
-                        const data = res.json();
-                        const connectionId = msg.data ? msg.data.id : null;
-                        return new Message(EventName.QueryTemplateResponse, req.id, {
-                            code: data.Code,
-                            message: data.Message,
-                            namespace: data.Namespace,
-                            template: data.Template,
-                            header: data.Header,
-                            footer: data.Footer,
-                            columnOffset: data.ColumnOffset,
-                            lineOffset: data.LineOffset,
-                            defaultQuery: data.DefaultQuery,
-                            connectionId
-                        });
+            .flatMap(sessionMsg => {
+                const initialMessage = sessionMsg.name === EventName.SessionCreate ? 
+                    Observable.from<Message>([new Message(EventName.EditorBufferText, sessionMsg.id, '')]) :
+                    editor.bufferedTexts.filter(msg => msg.name === EventName.EditorBufferText && msg.id === sessionMsg.id);
+                return initialMessage
+                    .flatMap(msg => {
+                        let req: any = null;
+                        let method: string = null;
+                        // passed from initialMessage stream
+                        const initialText = msg.data;
+                        // inject possible connection info from sessionMsg
+                        if (sessionMsg.data) {
+                            method = this.action('querytemplate');
+                            req = { text: initialText, id: sessionMsg.id, serverType: sessionMsg.data.type, connectionString: sessionMsg.data.connectionString };
+                        } else {
+                            method = this.action('codetemplate');
+                            req = { text: initialText, id: sessionMsg.id };
+                        }
+                        return this.http
+                            .post(method, JSON.stringify(req))
+                            .map(res => {
+                                const data = res.json();
+                                const connectionId = sessionMsg.data ? sessionMsg.data.id : null;
+                                return new Message(EventName.QueryTemplateResponse, req.id, {
+                                    code: data.Code,
+                                    message: data.Message,
+                                    namespace: data.Namespace,
+                                    template: data.Template,
+                                    header: data.Header,
+                                    footer: data.Footer,
+                                    columnOffset: data.ColumnOffset,
+                                    lineOffset: data.LineOffset,
+                                    defaultQuery: data.DefaultQuery,
+                                    connectionId
+                                });
+                            });
                     });
             })
             .publish();
 
         this.events = this.process
             .status
-            // .map(msg => new QueryMessage(
-            //         msg.name === EventName.ProcessReady ? 'ready' :
-            //         msg.name === EventName.ProcessClosed ? 'closed' :
-            //         msg.name === EventName.ProcessClosing ? 'closing' :
-            //         msg.name === EventName.ProcessFailed ? 'failed' : 'starting'
-            //     ))
             .merge(this.socket)
             .merge(executeCodeResponses)
             .merge(templateResponses);

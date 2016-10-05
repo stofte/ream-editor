@@ -2,6 +2,7 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import { OmnisharpSessionMessage } from './api';
 import { OmnisharpSynchronizer } from './omnisharp-synchronizer';
+import { cSharpAutocompletionRequestTestData } from '../test/editor-testdata';
 import { Observable, Subject } from 'rxjs/Rx';
 import replaySteps from '../test/replay-steps';
 import * as uuid from 'node-uuid';
@@ -59,47 +60,56 @@ describe('omnisharp-synchronizer', function() {
 
 function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync: OmnisharpSynchronizer, done: Function) {
     this.timeout(((minDelayMs + maxDelayMs) * 2 * 20) + 5000);
-    const timestamps: any[] = [];
+    const testMsgs: any[] = [];
     const sessionId = uuid.v4();
     const subject = new Subject<OmnisharpSessionMessage>()
     let subjectCount = 0;
     let stepResolver = null;
     const stepsDone = new Promise((done) => stepResolver = done);
+    const auto1 = JSON.parse(JSON.stringify(cSharpAutocompletionRequestTestData[0]));
+    auto1.line = 10;
+    const auto2 = JSON.parse(JSON.stringify(cSharpAutocompletionRequestTestData[0]));
+    auto2.line = 20;
+    const auto3 = JSON.parse(JSON.stringify(cSharpAutocompletionRequestTestData[0]));
+    auto3.line = 30;
     const stepsToReplay = [
         () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'context' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
         // the template arrives a bit later
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'buffer-template' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'buffer-template', fileName: 'foo', lineOffset: 0 }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
         // these should be executed without blocking each other
         () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'codecheck' }),
-/* 5 */ () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'autocompletion' }),
+/* 5 */ () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'autocompletion', autocompletion: auto1 }),
         // these depend on each other sequentially
-/* 6 */ () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' }),
+/* 6 */ () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
         () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'codecheck' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'autocompletion' }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'autocompletion', autocompletion: auto2 }),
         // switch context
 /* 10 */() => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'context' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
         () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'codecheck' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'autocompletion' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'buffer-template' }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'autocompletion', autocompletion: auto3 }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'buffer-template', fileName: 'bar', lineOffset: 1 }),
         // switch context
 /* 16 */() => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'context' }),
         () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'codecheck' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'buffer-template' }),
-        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit' })
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'buffer-template', fileName: 'baz', lineOffset: 2 }),
+        () => subject.next(<OmnisharpSessionMessage> { sessionId, timestamp: performance.now(), type: 'edit', edits: [] })
     ];
     // setup stream
     let idx = 0;
     subject 
         .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
+        .map(msg => sync.mapMessage(msg))
         .subscribe(msg => {
             // context msgs should not be delayed, since it doesnt go to omnisharp
             const timeout = msg.type === 'context' ? 0 : (Math.random() * maxDelayMs) + minDelayMs;
-            timestamps.push({ timestamp: msg.timestamp, resolvedTimestamp: performance.now(), type: msg.type });
+            const autoline = msg.type === 'autocompletion' ? msg.autocompletion.line : -1;
+            testMsgs.push({ timestamp: msg.timestamp, resolvedTimestamp: performance.now(),
+                type: msg.type, fileName: msg.fileName, lineOffset: msg.lineOffset, autoline });
             subjectCount++;
             setTimeout(() => {
                 sync.resolveOperation(msg);
@@ -112,21 +122,28 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
     // check results
     stepsDone.then(() => {
         try {
-            const events = timestamps.map(x => x.type);
-            timestamps.forEach((x, idx) => {
+            const events = testMsgs.map(x => x.type);
+            testMsgs.forEach((x, idx) => {
                 if (idx > 1) {
-                    expect(x.resolvedTimestamp).to.be.greaterThan(timestamps[idx - 1].resolvedTimestamp);
+                    expect(x.resolvedTimestamp).to.be.greaterThan(testMsgs[idx - 1].resolvedTimestamp);
                 }
             })
-            expect(timestamps.length).to.equal(stepsToReplay.length);
-            expect(events.slice(0, 4)).to.deep.equal(['context', 'buffer-template', 'edit', 'edit'], 'Idx 0-3');
+            expect(testMsgs.length).to.equal(stepsToReplay.length);
+            expect(events.slice(0, 4)).to.deep.equal(['context', 'buffer-template', 'edit', 'edit'], 'Event order, idx 0-3');
             expect(events.slice(4, 6).sort()).to.deep.equal(['autocompletion','codecheck'], 'Idx 4-5'); // might be interleaved
-            expect(events.slice(6, 10)).to.deep.equal(['edit', 'codecheck', 'edit', 'autocompletion'], 'Idx 6-9');
-            expect(events.slice(10, 14)).to.deep.equal(['context', 'buffer-template', 'edit', 'edit'], 'Idx 10-13');
-            expect(events.slice(14, 16).sort()).to.deep.equal(['autocompletion','codecheck'], 'Idx 14-15'); // might be interleaved
-            expect(events.slice(16, 20)).to.deep.equal(['context','buffer-template', 'codecheck', 'edit'], 'Idx 16-19');
+            expect(events.slice(6, 10)).to.deep.equal(['edit', 'codecheck', 'edit', 'autocompletion'], 'Event order, idx 6-9');
+            expect(events.slice(10, 14)).to.deep.equal(['context', 'buffer-template', 'edit', 'edit'], 'Event order, idx 10-13');
+            expect(events.slice(14, 16).sort()).to.deep.equal(['autocompletion','codecheck'], 'Event order, idx 14-15'); // might be interleaved
+            expect(events.slice(16, 20)).to.deep.equal(['context','buffer-template', 'codecheck', 'edit'], 'Event order, idx 16-19');
 
-            const dependents = timestamps.filter(x => x.type === 'edit' || x.type === 'codecheck');
+            const dependents = testMsgs.filter(x => x.type === 'edit' || x.type === 'codecheck');
+            const completions = testMsgs.filter(x => x.type === 'autocompletion').map(x => x.autoline);
+            expect(completions).to.deep.equal([11,21,32], 'Correct lineOffset on autocompletions');
+
+            const fileNames = dependents.map(x => x.fileName);
+            expect(fileNames.slice(0, 6).join('')).to.match(/(foo){6}/, 'Filename, idx 0-5');
+            expect(fileNames.slice(6, 9).join('')).to.match(/(bar){3}/, 'Filename, idx 6-9');
+            expect(fileNames.slice(9, 11).join('')).to.match(/(baz){2}/, 'Filename, idx 9-11');
             const initTimestamps = dependents.map(x => x.timestamp);
             const doneTimestamps = dependents.map(x => x.resolvedTimestamp);
             // check that dependents were not reordered
@@ -138,9 +155,6 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
             });
             done();
         } catch (e) {
-            // console.log('BOOOOOOOOOOOOOOOOOOOOOOOOOOOM')
-            // console.log(e)
-            // process.exit();
             done(e);
         }
     });

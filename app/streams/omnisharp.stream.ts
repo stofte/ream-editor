@@ -6,6 +6,7 @@ import { EventName, Message, OmnisharpSessionMessage } from './api';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, UpdateBufferRequest, AutoCompletionItem } from './interfaces';
 import { CodeCheckResult, EditorChange, AutocompletionQuery, CodeCheckQuery, TextUpdate } from '../models/index';
+import { OmnisharpSynchronizer } from './omnisharp-synchronizer';
 import * as uuid from 'node-uuid';
 import config from '../config';
 
@@ -104,6 +105,11 @@ class SessionOperation {
     ) { }
 }
 
+class MessageMap {
+    public inner: OmnisharpSessionMessage;
+    public mapped: Message;
+}
+
 @Injectable()
 export class OmnisharpStream {
     public events: Observable<Message>;
@@ -116,206 +122,79 @@ export class OmnisharpStream {
         private session: SessionStream,
         private http: Http
     ) {
-        const sessionMaps = query.events
+        const sync = new OmnisharpSynchronizer();
+        const newStream = query.events
             .filter(msg => msg.name === EventName.QueryTemplateResponse)
+            .merge(session.events.filter(msg => 
+                msg.name === EventName.SessionCreate ||
+                msg.name === EventName.SessionContext ||
+                msg.name === EventName.SessionAutocompletion || 
+                msg.name === EventName.SessionCodeCheck
+            ))
+            .merge(editor.events.filter(msg => msg.name === EventName.EditorUpdate))
             .map(msg => {
-                const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
-                const update: UpdateBufferRequest = {
-                    SessionId: msg.id,
-                    FileName: `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`,
-                    FromDisk: false,
-                    Buffer: msg.data.template
-                };
-                return new SessionTemplateMap(
-                    msg.data.columnOffset,
-                    msg.data.lineOffset,
-                    update.FileName,
-                    msg.id,
-                    msg.data.connectionId,
-                    update,
-                    null,
-                    performance.now()
-                );
-            })
-            .flatMap(sessionMap => 
-                this.http
-                    .post(this.action('updatebuffer'), JSON.stringify(sessionMap.templateRequest))
-                    .map(res => sessionMap)) // todo check result
-            .publish();
-        
-        sessionMaps.subscribe(map => {
-            this.templateMap[map.sessionId] = new SessionTemplateMap(map.columnOffset, map.lineOffset, map.fileName, null, null);
-        });
+                // edits are merged next and have their own mapping scheme
+                const event = (msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext) ? 'context' :
+                    msg.name === EventName.QueryTemplateResponse ? 'buffer-template' :
+                    msg.name === EventName.SessionAutocompletion ? 'autocompletion' : 
+                    msg.name === EventName.SessionCodeCheck ? 'codecheck' : 'edit';
 
-        const updateBufferTimestamps = session.events
-            .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
+                Assert(event && event.length, 'Mapped Message to inner');
+
+                let fileName = null;
+                if (event === 'buffer-template') {
+                    const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
+                    fileName = `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`;
+                }
+                const lineOffset = msg.data && msg.data.lineOffset || null;
+                const columnOffset = msg.data && msg.data.columnOffset || null;
+                const template = msg.data && msg.data.template || null;
+                const connectionId = msg.data && msg.data.connectionId || null;
+
+                const mapped = <OmnisharpSessionMessage> {
+                    sessionId: msg.id,
+                    timestamp: msg.originalTimestamp || msg.timestamp,
+                    type: event,
+                    fileName,
+                    lineOffset,
+                    columnOffset,
+                    template,
+                    connectionId,
+                    autocompletion: msg.data,
+                    edit: msg.data
+                };
+                return mapped;
+            })
+            // obtain lock
+            .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
+            .map(msg => sync.mapMessage(msg))
             .flatMap(msg => {
-                // one time delay until session is ready
-                let sessionMap: SessionTemplateMap = null;
-                const ready = new Promise((done) => {
-                    const sessionSub = sessionMaps.filter(x => x.sessionId === msg.id).subscribe(x => {
-                        sessionMap = x;
-                        done();
-                        sessionSub.unsubscribe();
-                    });
-                });
-                
-                const pausedForOperation = (msg: Message): Observable<number> => {
-                    const p = new Promise<number>((done) => {
-                        // todo add timestamp to EditorMessage itself, instead of riding along in TextUpdate
-                        if (!this.operationMap.busy(msg.id, msg.data.timestamp, done)) {
-                            done(1);
-                        }
-                    });
-                    return Observable.fromPromise(p);
-                };
-
-                const mapEditorMsg = (x: Message) => {
-                    return <EditorChange> {
-                        newText: x.data.text.join('\n'),
-                        startLine: x.data.from.line + sessionMap.lineOffset + 1,
-                        startColumn: x.data.from.ch + (x.data.from.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                        endLine: x.data.to.line + sessionMap.lineOffset + 1,
-                        endColumn: x.data.to.ch + (x.data.to.line === 0 ? sessionMap.columnOffset : 0) + 1,
-                        timestamp: x.data.timestamp
-                    };
-                };
-                const mapEditorChanges = (edits: EditorChange[]) => {
-                    return new SessionTemplateMap(
-                            sessionMap.columnOffset,
-                            sessionMap.lineOffset,
-                            sessionMap.fileName,
-                            sessionMap.sessionId,
-                            null,
-                            null,
-                            edits
-                    );
-                };
-
-                // if we're handling a context msg, we need to wait for the editor msg that contains the curent full buffer text
-                const initialText = msg.name === EventName.SessionCreate ? Observable.empty<SessionTemplateMap>() :// Observable.empty<SessionTemplateMap>(); 
-                        new Observable<SessionTemplateMap>((innerObs: Observer<SessionTemplateMap>) => {
-                            const anotherSub = editor.bufferedTexts
-                                .filter(x => x.name === EventName.EditorBufferText && x.id === msg.id && x.originalTimestamp === msg.timestamp)
-                                .delayWhen(x => Observable.fromPromise(ready))
-                                .subscribe(x => {
-                                    const textUpdate: TextUpdate = {
-                                        from: { line: 0, ch: 0 },
-                                        to: { line: 0, ch: 0},
-                                        text: x.data.split('\n'),
-                                        removed: [""],
-                                        timestamp: x.originalTimestamp
-                                    };
-                                    const mappedEdit = new Message(EventName.EditorUpdate, x.id, textUpdate);
-                                    innerObs.next(mapEditorChanges([mapEditorMsg(mappedEdit)]));
-                                    innerObs.complete();
-                                    setTimeout(() => {
-                                        anotherSub.unsubscribe();
-                                    }, 200);
-                                });
-                        })
-                        ;
-                
-                const editorSub = initialText.concat(
-                    editor.events
-                        .filter(x => x.name === EventName.EditorUpdate && x.id === msg.id)
-                        .delayWhen(x => Observable.fromPromise(ready))
-                        .delayWhen(pausedForOperation)
-                        .map(mapEditorMsg)
-                        .bufferTime(500)
-                        .filter(edits => edits.length > 0)
-                        .map(edits => new SessionTemplateMap(
-                            sessionMap.columnOffset,
-                            sessionMap.lineOffset,
-                            sessionMap.fileName,
-                            sessionMap.sessionId,
-                            null,
-                            null,
-                            edits))
-                        .takeUntil(sessionMaps.filter(x => sessionMap !== null && sessionMap.created !== x.created && x.sessionId === msg.id)));
-                return editorSub;
-            })
-            .flatMap(sessionMap => {
-                return this.http
-                    .post(this.action('updatebuffer'), JSON.stringify({
-                        FromDisk: false,
-                        FileName: sessionMap.fileName,
-                        Changes: sessionMap.edits
-                    }))
-                    .map(res =>
-                        new SessionUpdated(
-                            sessionMap.sessionId,
-                            sessionMap.edits[sessionMap.edits.length - 1].timestamp));
-            })
-            .publish();
-
-        const waitForBuffer: (op: SessionOperation) => Observable<number> = (op) => {
-            const p = new Promise<number>((done) => {
-                if (this.operationMap.updated[op.sessionId] >= op.waitForEdit) {
-                    done(1);
+                if (msg.type === 'context') {
+                    sync.resolveOperation(msg);
+                    return Observable.empty<MessageMap>();
                 } else {
-                    const sub = updateBufferTimestamps.filter(x => x.sessionId === op.sessionId && x.timestamp >= op.waitForEdit).subscribe(x => {
-                        sub.unsubscribe();
-                        done(1);
-                    });
+                    const actionName = (msg.type === 'buffer-template' || msg.type === 'edit') ? this.action('updatebuffer') :
+                        msg.type === 'autocompletion' ? this.action('autocomplete') : this.action('codecheck');
+                    const request = this.mapToRequest(msg);
+                    return this.http.post(actionName, JSON.stringify(request))
+                        .map(x => this.mapResponse(msg, x.json()))
+                        .map(x => <MessageMap> { inner: msg, mapped: x });
                 }
-            });
-            return Observable.fromPromise(p);
-        };
-        updateBufferTimestamps.subscribe(ts => {
-            this.operationMap.updateResponse(ts.sessionId, ts.timestamp);
-        });
-        const operationResponses = session.events
-            .filter(msg => msg.name === EventName.SessionAutocompletion || msg.name === EventName.SessionCodeCheck)
-            .map(msg => {
-                const waitForEdit = this.operationMap.start(msg.id);
-                let msgMap: SessionOperation = null;
-                const tmpl: SessionTemplateMap = this.templateMap[msg.id];
-                if (msg.name === EventName.SessionAutocompletion) {
-                    const request = msg.data;
-                    request.fileName = tmpl.fileName;
-                    request.column += (request.line === 0 ? tmpl.columnOffset : 0) + 1;
-                    request.line += tmpl.lineOffset + 1;
-                    msgMap = new SessionOperation(msg.id, 'autocomplete', msg.timestamp, waitForEdit, request);
-                } else if (msg.name === EventName.SessionCodeCheck) {
-                    msgMap = new SessionOperation(msg.id, 'codecheck', msg.timestamp, waitForEdit, { fileName: tmpl.fileName });
-                }
-                return msgMap;
             })
-            .delayWhen(waitForBuffer)
-            .flatMap(msg => {
-                return this.http
-                    .post(this.action(msg.operation), JSON.stringify(msg.request))
-                    .map(res => {
-                        this.operationMap.stop(msg.sessionId); 
-                        let responseMsg: Message = null;
-                        const json = res.json();
-                        if (msg.operation === 'autocomplete') {
-                            const completions: AutoCompletionItem[] = json;
-                            responseMsg = new Message(EventName.OmniSharpAutocompletion, msg.sessionId, completions, msg.timestamp);
-                        } else if (msg.operation === 'codecheck') {
-                            const mappedFixes = this.mapQuickFixes(json, msg.sessionId, this.templateMap);
-                            const fixes = this.filterCodeChecks(mappedFixes);
-                            responseMsg = new Message(EventName.OmniSharpCodeCheck, msg.sessionId, fixes, msg.timestamp);
-                        }
-                        return responseMsg;
-                    });
-            })
+            // release lock
+            .do(msg => sync.resolveOperation(msg.inner))
+            // events that has no output gets filtered here
+            .filter(msg => msg.mapped.name !== null)
+            .map(msg => msg.mapped)
             .publish();
 
         this.process = new ProcessStream(http);
-        this.events = this.process
-            .status
-            .merge(operationResponses);
-
-        updateBufferTimestamps.connect();
-        operationResponses.connect();
-
+        this.events = this.process.status.merge(newStream);
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);
         this.process.start('omnisharp', cmd.command, cmd.directory, config.omnisharpPort);
         this.once(msg => msg.name === EventName.ProcessReady, () => {
-            sessionMaps.connect();
+            newStream.connect();
         });
     }
 
@@ -330,54 +209,74 @@ export class OmnisharpStream {
         this.process.close();
     }
 
-    private comboStream(): Observable<OmnisharpSessionMessage> {
-        const obs1 = this.session.events
-            .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
-            .map(msg => {
-                const msgType = msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext ? 'context' :
-                    msg.name === EventName.SessionCodeCheck ? 'codecheck' : 'autocompletion'; 
-                return <OmnisharpSessionMessage> {
-                    sessionId: msg.id,
-                    type: msgType,
-                    connectionId: msg.data && msg.data.id
-                };
-            });
-
-        const obs2 = this.query.events
-            .filter(msg => msg.name === EventName.QueryTemplateResponse)
-            .map(msg => {
-                const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
-                return <OmnisharpSessionMessage> {
-                    sessionId: msg.id,
-                    type: 'context',
-                    fileName: `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`,
-                    columnOffset: msg.data.columnOffset,
-                    lineOffset: msg.data.lineOffset,
-                    template: msg.data.template
-                };
-            });
-        
-        const obs3 = this.editor.events
-            .filter(msg => msg.name === EventName.EditorUpdate)
-            .map(msg => {
-                return <OmnisharpSessionMessage> {
-                    sessionId: msg.id,
-                    type: 'context',
-                };
-            });
-
-        return null;
+    private mapToRequest(msg: OmnisharpSessionMessage): any {
+        let request: any = {
+            FileName: msg.fileName
+        };
+        if (msg.type === 'buffer-template') {
+            request.fromDisk = false;
+            request.buffer = msg.template
+        } else if (msg.type === 'edit') {
+            request.changes = this.mapCodeMirrorEditsToOmnisharp(msg);
+            request.fromDisk = false;
+        } else if (msg.type === 'autocompletion') {
+            request = msg.autocompletion;
+        }
+        return request;
     }
 
-    private mapQuickFixes = (result: any, mapKey: string, maps: any): CodeCheckResult[] => {
+    private mapResponse(msg: OmnisharpSessionMessage, response: any): Message {
+        const name = msg.type === 'codecheck' ? EventName.OmniSharpCodeCheck :
+            msg.type === 'autocompletion' ? EventName.OmniSharpAutocompletion : null;
+        const data = msg.type === 'codecheck' ? this.mapQuickFixes(msg, response) : 
+            msg.type === 'autocompletion' ? response : {};
+        return <Message> {
+            id: msg.sessionId,
+            name,
+            data
+        };
+    }
+
+    private splitEditsBySession(msgs: Message[]): OmnisharpSessionMessage[] {
+        const sessionIds = msgs.map(x => x.id).reduce((ids, id: string) => {
+            return ids.find(z => z === id) ? ids : ids.concat([id]);
+        }, <string[]> []);
+        let mapped: OmnisharpSessionMessage[] = sessionIds.map(id => {
+            const edits = msgs.filter(x => x.id === id).map(x => <any[]> x.data).reduce((xs, x) => xs.concat(x), []);
+            const timestamps = msgs.filter(x => x.id === id).map(x => x.timestamp);
+            const msg = <OmnisharpSessionMessage> {
+                sessionId: id,
+                type: 'edit',
+                edits,
+                timestamp: timestamps[timestamps.length - 1]
+            };
+            return msg;
+        });
+        return mapped;
+    }
+
+    private mapCodeMirrorEditsToOmnisharp = (msg: OmnisharpSessionMessage) => {
+        Assert(msg.type === 'edit', `Found "${msg.type}" msg type, expecting "edit"`);
+        return[msg.edit].map(x => {
+            const mapped = <EditorChange> {
+                newText: x.text.join('\n'),
+                startLine: x.from.line,
+                startColumn: x.from.ch,
+                endLine: x.to.line,
+                endColumn: x.to.ch,
+                timestamp: x.timestamp
+            };
+            return mapped;
+        });
+    };
+
+    private mapQuickFixes = (msg: OmnisharpSessionMessage, result: any): CodeCheckResult[] => {
         let fixes: any[] = result.QuickFixes;
-        const map = maps[mapKey];
-        Assert(map != null, 'Did not find template map');
-        return fixes.map(x => {
-            const line = x.Line - 1 - (map.lineOffset);
-            const column = x.Column - 1 - (line === 0 ? map.columnOffset : 0);
-            const endLine = x.EndLine - 1 - (map.lineOffset);
-            const endColumn = x.EndColumn - 1 - (endLine === 0 ? map.columnOffset : 0);
+        return this.filterCodeChecks(fixes.map(x => {
+            const line = x.Line - 1 - (msg.lineOffset);
+            const column = x.Column - 1 - (line === 0 ? msg.columnOffset : 0);
+            const endLine = x.EndLine - 1 - (msg.lineOffset);
+            const endColumn = x.EndColumn - 1 - (endLine === 0 ? msg.columnOffset : 0);
             return <CodeCheckResult> {
                 text: this.cleanupMessage(x.Text),
                 logLevel: x.LogLevel,
@@ -387,7 +286,7 @@ export class OmnisharpStream {
                 endLine,
                 endColumn
             };
-        });
+        }));
     }
     
     private filterCodeChecks(checks: CodeCheckResult[]): CodeCheckResult[] {

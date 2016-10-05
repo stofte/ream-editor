@@ -76,7 +76,7 @@ export class EditorStream {
             .withLatestFrom(editMsgs)
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
-                return new Message(EventName.EditorExecuteText, val[0].id, b.getText(), val[0].timestamp);
+                return new Message(EventName.EditorBufferText, val[0].id, b.getText(), val[0].timestamp);
             })
             .publishReplay(1);
 
@@ -93,6 +93,6 @@ export class EditorStream {
 
     public edit(id: string, data: TextUpdate) {
         data.timestamp = performance.now();
-        this.subject.next(new Message(EventName.EditorUpdate, id, data, performance.now()));
+        this.subject.next(new Message(EventName.EditorUpdate, id, data));
     }
 }

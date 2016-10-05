@@ -1,5 +1,6 @@
 import { Observable, Subject } from 'rxjs/Rx';
 import { OmnisharpSessionMessage } from './api';
+import { AutocompletionQuery } from '../models/index';
 
 class Queued {
     public msg: OmnisharpSessionMessage;
@@ -159,9 +160,67 @@ export class OmnisharpSynchronizer {
         return session.queueOperation(msg);
     }
 
+    public mapMessage(msg: OmnisharpSessionMessage): OmnisharpSessionMessage {
+        const session = this.getSession(msg);
+        if (msg.type === 'edit') {
+            const mapEdit = (x) => {
+                return {
+                    from: { 
+                        line: x.from.line + session.lineOffset + 1,
+                        ch: x.from.ch + (x.from.line === 0 ? session.columnOffset : 0) + 1
+                    },
+                    to: { 
+                        line: x.to.line + session.lineOffset + 1,
+                        ch: x.to.ch + (x.to.line === 0 ? session.columnOffset : 0) + 1
+                    },
+                    text: x.text.concat([])
+                }
+            }
+            return <OmnisharpSessionMessage> {
+                sessionId: msg.sessionId,
+                edit: msg.edit && mapEdit(msg.edit),
+                edits: msg.edits && msg.edits.map(mapEdit),
+                type: msg.type,
+                timestamp: msg.timestamp,
+                fileName: session.fileName
+            };
+        } else if (msg.type === 'autocompletion') {
+            const ac = msg.autocompletion;
+            return <OmnisharpSessionMessage> {
+                sessionId: msg.sessionId,
+                type: msg.type,
+                timestamp: msg.timestamp,
+                fileName: session.fileName,
+                autocompletion: <AutocompletionQuery> {
+                    line: ac.line + 1 + session.lineOffset,
+                    column: ac.column + 1 + (ac.line === 0 ? session.columnOffset : 0),
+                    fileName: session.fileName,
+                    wantDocumentationForEveryCompletionResult: ac.wantDocumentationForEveryCompletionResult,
+                    wantReturnType: ac.wantReturnType,
+                    wantKind: ac.wantKind,
+                    wantImportableTypes: ac.wantImportableTypes,
+                    wantMethodHeader: ac.wantMethodHeader,
+                    wantSnippet: ac.wantSnippet,
+                    wordToComplete: ac.wordToComplete
+                }
+            };
+        } else if (msg.type === 'codecheck') {
+            return <OmnisharpSessionMessage> {
+                sessionId: msg.sessionId,
+                type: msg.type,
+                timestamp: msg.timestamp,
+                fileName: session.fileName,
+                // used to map line/col numbers
+                lineOffset: session.lineOffset,
+                columnOffset: session.columnOffset
+            };
+        }
+        return msg;
+    }
+
     private getSession(msg: OmnisharpSessionMessage) {
         if (!this.session.find(x => x.id === msg.sessionId)) {
-            Assert(msg.type === 'context', 'Type context msg when no session found');
+            Assert(msg.type === 'context', `Type context expected when no session found, found ${msg.type}`);
             const newSession = new SessionState(msg.sessionId)
             this.session.push(newSession);
         }

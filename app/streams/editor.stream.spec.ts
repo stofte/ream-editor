@@ -7,7 +7,7 @@ import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions,
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { EditorStream, SessionStream } from './index';
-import { TextUpdate } from '../models/index';
+import { TextUpdate, Connection } from '../models/index';
 import { ProcessHelper } from '../utils/process-helper';
 import { EventName, Message } from './api';
 import * as uuid from 'node-uuid';
@@ -58,6 +58,27 @@ describe('editor.stream', function() {
                 editor.edit(id, data);
             });
             session.executeBuffer(id);
+            if (idx === randomTestData.length - 1) {
+                done();
+            }
+        });
+    });
+
+    it('emits expected texts when context is invoked', function(done) {
+        this.timeout(backendTimeout);
+        randomTestData.forEach((test, idx: number) => {
+            const sub = editor.events.subscribe(msg => {
+                if (msg.name === EventName.EditorBufferText) {
+                    sub.unsubscribe();
+                    expect(msg.data).to.equal(test.output);
+                }
+            });
+            const id = uuid.v4();
+            session.new(id);
+            test.events.forEach(data => {
+                editor.edit(id, data);
+            });
+            session.setContext(id, new Connection('foo', 'sqlite'));
             if (idx === randomTestData.length - 1) {
                 done();
             }

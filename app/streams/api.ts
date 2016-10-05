@@ -1,21 +1,23 @@
 export enum EventName {
+    Unknown,
+
     ProcessStarting,
     ProcessFailed,
     ProcessReady,
     ProcessClosing,
     ProcessClosed,
 
-    SessionCreate,
+    SessionCreate, // 6
     SessionExecuteBuffer,
     SessionCodeCheck,
     SessionAutocompletion,
-    SessionContext,
+    SessionContext, // 10
     
     EditorExecuteText, // text intended for execution
     EditorBufferText, // full text of a given buffer, for templating a new session, with the current buffer contents in it
     EditorUpdate, // individual updates from editor
 
-    ResultStart,
+    ResultStart, // 14
     ResultUpdate,
     ResultDone,
 
@@ -24,7 +26,7 @@ export enum EventName {
     QuerySocketOutput,
 
     OmniSharpAutocompletion,
-    OmniSharpCodeCheck,
+    OmniSharpCodeCheck
 }
 
 export class Message {
@@ -62,7 +64,9 @@ export class OmnisharpSessionMessage {
         public lineOffset: number,
         public columnOffset: number,
         public template: string,
-        public request: any,
+        public edit: any,
+        public edits: any[],
+        public autocompletion: any,
         public connectionId: number
     ) { }
 }

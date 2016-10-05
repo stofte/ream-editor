@@ -25,7 +25,8 @@ export class SessionStream {
     }
 
     public codeCheck(id: string) {
-        this.subject.next(new Message(EventName.SessionCodeCheck, id));
+        const msg = new Message(EventName.SessionCodeCheck, id);
+        this.subject.next(msg);
     }
 
     public autoComplete(id: string, query: AutocompletionQuery) {

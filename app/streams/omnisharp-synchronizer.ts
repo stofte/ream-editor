@@ -58,10 +58,13 @@ class SessionState {
                 if (this.queue.length > 0) {
                     const multOpsIdx = this.getInitalOperationCount();
                     if (multOpsIdx) {
-                        Assert(this.queue[0].msg.type === 'codecheck' || this.queue[0].msg.type === 'autocompletion', 'First element is expected operation');
                         // we have multiple codecheck/autocompletion ops queued on the same buffer timestamp
+                        Assert(this.queue[0].msg.type === 'codecheck' ||
+                                this.queue[0].msg.type === 'autocompletion',
+                                'First element is expected operation');
                         const ops = this.queue.splice(0, multOpsIdx);
-                        Assert(ops.length > 0 && ops.map(x => x.msg.type === 'codecheck' || x.msg.type === 'autocompletion'), 'Found multiple ops');
+                        Assert(ops.length > 0 && ops.map(x => x.msg.type === 'codecheck' ||
+                            x.msg.type === 'autocompletion'), 'Found multiple ops');
                         ops.forEach(x => {
                             this.awaiting.push(x);
                             // console.log('multi dequeue', x.msg.type + ':' + x.msg.timestamp);
@@ -136,7 +139,7 @@ class SessionState {
 
     private getInitalOperationCount() {
         let index = undefined;
-        for(let i = 0; i < this.queue.length; i++) {
+        for (let i = 0; i < this.queue.length; i++) {
             if (['codecheck', 'autocompletion'].indexOf(this.queue[i].msg.type) === -1) {
                 break;
             } else {
@@ -174,8 +177,8 @@ export class OmnisharpSynchronizer {
                         ch: x.to.ch + (x.to.line === 0 ? session.columnOffset : 0) + 1
                     },
                     text: x.text.concat([])
-                }
-            }
+                };
+            };
             return <OmnisharpSessionMessage> {
                 sessionId: msg.sessionId,
                 edit: msg.edit && mapEdit(msg.edit),
@@ -221,7 +224,7 @@ export class OmnisharpSynchronizer {
     private getSession(msg: OmnisharpSessionMessage) {
         if (!this.session.find(x => x.id === msg.sessionId)) {
             Assert(msg.type === 'context', `Type context expected when no session found, found ${msg.type}`);
-            const newSession = new SessionState(msg.sessionId)
+            const newSession = new SessionState(msg.sessionId);
             this.session.push(newSession);
         }
         return this.session.find(x => x.id === msg.sessionId);

@@ -46,7 +46,6 @@ export class ResultStream {
                         case 'row':
                             Assert(tableResult != null, 'tableResult was null');
                             tableResult.rows.push(socket.values);
-                            //console.log('tableResult rows contents', JSON.stringify(tableResult.rows));
                             break;
                         case 'tableClose':
                             obs.next(new Message(EventName.ResultUpdate, socket.session, tableResult));

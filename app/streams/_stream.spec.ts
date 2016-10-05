@@ -125,13 +125,13 @@ describe('[int-test] streams', function() {
                     checkAndExit(done, () => {
                         let cityColIdx = 0;
                         expect(headers).to.contain('Name', '"Name" column on table');
-                        for(let i = 0; i < headers.length; i++) {
+                        for (let i = 0; i < headers.length; i++) {
                             if (headers[i] === 'Name') {
                                 cityColIdx = i;
                                 break;
                             }
                         }
-                        for(let i = 0; i < rows.length; i++) {
+                        for (let i = 0; i < rows.length; i++) {
                             expect(rows[0][cityColIdx].substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');

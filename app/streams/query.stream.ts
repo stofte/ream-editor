@@ -75,7 +75,12 @@ export class QueryStream {
                         // inject possible connection info from sessionMsg
                         if (sessionMsg.data) {
                             method = this.action('querytemplate');
-                            req = { text: initialText, id: sessionMsg.id, serverType: sessionMsg.data.type, connectionString: sessionMsg.data.connectionString };
+                            req = {
+                                text: initialText,
+                                id: sessionMsg.id,
+                                serverType: sessionMsg.data.type,
+                                connectionString: sessionMsg.data.connectionString
+                            };
                         } else {
                             method = this.action('codetemplate');
                             req = { text: initialText, id: sessionMsg.id };

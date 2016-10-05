@@ -1,5 +1,5 @@
 // rx streams require events to be replayed over time to make any sense.
-export default function replaySteps(steps: any[], timeoutMax: number = 100, timeoutMin: number = 10) {
+export default function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
     if (steps.length > 0) {
         let head = steps[0];
         let headArg = undefined;

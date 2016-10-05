@@ -215,7 +215,7 @@ export class OmnisharpStream {
         };
         if (msg.type === 'buffer-template') {
             request.fromDisk = false;
-            request.buffer = msg.template
+            request.buffer = msg.template;
         } else if (msg.type === 'edit') {
             request.changes = this.mapCodeMirrorEditsToOmnisharp(msg);
             request.fromDisk = false;

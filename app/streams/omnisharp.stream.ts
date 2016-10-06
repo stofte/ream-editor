@@ -9,6 +9,7 @@ import { CodeCheckResult, EditorChange, AutocompletionQuery, CodeCheckQuery, Tex
 import { OmnisharpSynchronizer } from './omnisharp-synchronizer';
 import * as uuid from 'node-uuid';
 import config from '../config';
+const path = electronRequire('path');
 
 class SessionTemplateMap {
     public created: number;
@@ -144,7 +145,7 @@ export class OmnisharpStream {
                 let fileName = null;
                 if (event === 'buffer-template') {
                     const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
-                    fileName = `${config.omnisharpProjectPath}\\${bufferType}${msg.id.replace(/\-/g, '')}.cs`;
+                    fileName = path.normalize(`${config.omnisharpProjectPath}/${bufferType}${msg.id.replace(/\-/g, '')}.cs`);
                 }
                 const lineOffset = msg.data && msg.data.lineOffset || null;
                 const columnOffset = msg.data && msg.data.columnOffset || null;

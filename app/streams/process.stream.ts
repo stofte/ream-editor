@@ -35,9 +35,9 @@ export class ProcessStream {
         });
         child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
             if (error) { // expected when starting command fails, otherwise only stdout/err should be filled
-                console.error('process.stream error', error);
-                console.error('stdout', stdout);
-                console.error('stderr', stderr);
+                console.log('process.stream error', error);
+                console.log('stdout', stdout);
+                console.log('stderr', stderr);
                 this.status.next(new Message(EventName.ProcessFailed));
             } else {
                 this.status.next(new Message(EventName.ProcessClosed));

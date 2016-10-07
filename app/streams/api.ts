@@ -41,17 +41,6 @@ export class Message {
     }
 }
 
-// ReamQuery API types for socket messages
-export type WebSocketMessageType = 'table'|'header'|'row'|'tableClose'|'singleAtomic'|'singleTabular'|'empty'|'close';
-
-export interface WebSocketMessage {
-    session: string;
-    id: any;
-    parent: any;
-    type: WebSocketMessageType;
-    values: any[];
-}
-
 // only used internally by omnisharp stream/synchronizer
 type sessionEventType = 'context' | 'buffer-template' | 'edit' | 'codecheck' | 'autocompletion';
 

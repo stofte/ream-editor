@@ -1,11 +1,12 @@
 import { Inject, Injectable, Provider } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
-import { EventName, Message, WebSocketMessage } from './api';
+import { EventName, Message } from './api';
 import { ProcessStream, EditorStream } from './index';
 import { SessionStream } from './session.stream';
 import { ProcessHelper } from '../utils/process-helper';
-import { CodeRequest, CodeTemplateRequest, QueryTemplateRequest, TemplateResponse } from './interfaces';
+import { CodeRequest, CodeTemplateRequest, QueryTemplateRequest,
+    TemplateResponse, WebSocketMessage } from './interfaces';
 import config from '../config';
 
 class TemplateRequest {

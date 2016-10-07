@@ -39,6 +39,17 @@ export interface TemplateResponse extends BaseResponse {
         connectionId: number;
 }
 
+// socket messages
+export type WebSocketMessageType = 'table'|'header'|'row'|'tableClose'|'singleAtomic'|'singleTabular'|'empty'|'close';
+
+export interface WebSocketMessage {
+    session: string;
+    id: any;
+    parent: any;
+    type: WebSocketMessageType;
+    values: any[];
+}
+
 // omnisharp api
 export interface UpdateBufferRequest {
     SessionId: string; // not used by omnisharp, internally used field

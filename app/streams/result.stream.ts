@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Observer } from 'rxjs/Rx';
 import { QueryStream, SessionStream } from './index';
-import { EventName, Message, WebSocketMessage } from './api';
+import { EventName, Message } from './api';
+import { WebSocketMessage } from './interfaces';
 import { ResultPage } from '../models/index';
 
 @Injectable()

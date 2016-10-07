@@ -11,101 +11,6 @@ import * as uuid from 'node-uuid';
 import config from '../config';
 const path = electronRequire('path');
 
-class SessionTemplateMap {
-    public created: number;
-    constructor(
-        public columnOffset: number,
-        public lineOffset: number,
-        public fileName: string,
-        public sessionId: string,
-        public connectionId: number,
-        public templateRequest: UpdateBufferRequest = null,
-        public edits: EditorChange[] = null,
-        public timestamp: number = null,
-    ) {
-        this.created = performance.now();
-    }
-}
-
-class SessionUpdated {
-    constructor(
-        public sessionId: string,
-        public timestamp: number
-    ) {}    
-}
-
-class OperationInflightMap {
-    // indicates the latest timestamp that we've sent to omnisharp
-    public edits: any = {};
-    // indicates the latest timestamp that we've seen come back from omnisharp
-    public updated: any = {};
-    private count: any = {};
-    private resolvers: any[] = [];
-    public start(sessionId: string): number {
-        if (!this.count[sessionId]) {
-            this.count[sessionId] = 0;
-        }
-        this.count[sessionId]++;
-        return this.edits[sessionId];
-    }
-    public stop(sessionId: string) {
-        this.count[sessionId]--;
-        if (this.count[sessionId] === 0) {
-            const l = this.resolvers[sessionId];
-            this.resolvers[sessionId] = [];
-            if (l && l.length > 0) {
-                l.forEach(x => {
-                    x.fn(1);
-                    const prevTs = this.edits[sessionId];
-                    Assert(prevTs < x.ts, 'Timestamp strictly increasing');
-                    this.edits[sessionId] = x.ts;
-                }); // x is the resolver for promises so return whatever
-            }
-        }
-        Assert(this.count[sessionId] >= 0, 'Operation counter is positive');
-    }
-
-    public busy(sessionId: string, editTimestamp: number, resolve: any): boolean {
-        const isBusy = this.count[sessionId] > 0; 
-        if (isBusy) {
-            if (!this.resolvers[sessionId]) {
-                this.resolvers[sessionId] = [];
-            }
-            this.resolvers[sessionId].push({fn: resolve, ts: editTimestamp});
-        } else {
-            const prevTs = this.edits[sessionId];
-            if (prevTs) {
-                Assert(prevTs < editTimestamp, 'Timestamp strictly increasing');
-            }
-            this.edits[sessionId] = editTimestamp;
-        }
-        return isBusy;
-    }
-
-    public updateResponse(sessionId: string, editTimestamp: number) {
-        if (!this.updated[sessionId]) {
-            this.updated[sessionId] = 0;
-        }
-        const currentTs = this.updated[sessionId];
-        if (currentTs < editTimestamp) {
-            this.updated[sessionId] = editTimestamp;
-        } else {
-            // responses might get interleaved?
-            console.log('response timestamp decreased!!!!!!!!!!!');
-        }
-    }
-}
-
-class SessionOperation {
-    constructor(
-        public sessionId: string,
-        public operation: string,
-        public timestamp: number,
-        public waitForEdit: number,
-        public request: any
-    ) { }
-}
-
 class MessageMap {
     public inner: OmnisharpSessionMessage;
     public mapped: Message;
@@ -115,8 +20,6 @@ class MessageMap {
 export class OmnisharpStream {
     public events: Observable<Message>;
     private process: ProcessStream;
-    private templateMap: any = {};
-    private operationMap: OperationInflightMap = new OperationInflightMap();
     constructor(
         private editor: EditorStream,
         private query: QueryStream,

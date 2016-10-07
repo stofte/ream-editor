@@ -85,7 +85,7 @@ class SessionState {
             } else {
                 // scan for a queued buffer-template and prioritize it to resolve the lock
                 const index = this.getBufferTemplateOffset();
-                if (index) {
+                if (index !== undefined) {
                     const nextOp = this.queue.splice(index, 1)[0];
                     this.awaiting.push(nextOp);
                     setTimeout(() => nextOp.dequeue());

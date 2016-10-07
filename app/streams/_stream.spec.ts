@@ -77,16 +77,17 @@ describe('[int-test] streams', function() {
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
-            const expectedPage = cSharpTestDataExpectedResult[idx][0]; 
+            const expectedPage = cSharpTestDataExpectedResult[idx][0];
             const id = uuid.v4();
             const resultSub = result.events
                 .filter(msg => msg.id === id)
                 .subscribe(msg => {
                     if (msg.name === EventName.ResultDone) {
                         resultSub.unsubscribe();
-                        if (idx === cSharpTestData.length - 1) {
+                        if (verifyCount === cSharpTestData.length) {
                             expect(verifyCount).to.equal(cSharpTestData.length, 
                                 `verifyCount (${verifyCount}) should match length of test data: ${cSharpTestData.length}`);
+                            verifyCount++; // to avoid running check in other thread
                             done();
                         }
                     } else if (msg.name === EventName.ResultUpdate) {
@@ -237,12 +238,12 @@ describe('[int-test] streams', function() {
     it('emits autocompletion for simple statement', function(done) {
         this.timeout(backendTimeout * 2);
         const completionSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
+            completionSub.unsubscribe();
             const items = msg.data.map(x => x.CompletionText);
             Assert(cSharpAutocompletionExpectedValues[0].length > 0, 'Found no completion items');
             cSharpAutocompletionExpectedValues[0].forEach(expectedEntry => {
                 expect(items).to.contain(expectedEntry, `Expected completion item "${expectedEntry}"`);
             });
-            completionSub.unsubscribe();
             done();
         });
         const id = uuid.v4();

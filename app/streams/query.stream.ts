@@ -102,7 +102,7 @@ export class QueryStream {
                                     lineOffset: data.LineOffset,
                                     defaultQuery: data.DefaultQuery,
                                     connectionId
-                                });
+                                }, sessionMsg.timestamp);
                             });
                     });
             })

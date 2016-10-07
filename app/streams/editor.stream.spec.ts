@@ -6,7 +6,8 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions,
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { EditorStream, SessionStream } from './index';
+import { EditorStream } from './index';
+import { InputStream } from './input.stream';
 import { TextUpdate, Connection } from '../models/index';
 import { ProcessHelper } from '../utils/process-helper';
 import { EventName, Message } from './api';
@@ -22,42 +23,40 @@ describe('editor.stream', function() {
 
     let injector: ReflectiveInjector;
     let editor: EditorStream = null;
-    let session: SessionStream = null;
+    let input: InputStream = null;
     let processHelper = new ProcessHelper();
     
-    before(function(done) {
-        setTimeout(() => {
-            chai.expect();
-            chai.use(sinonChai);
-            injector = ReflectiveInjector.resolveAndCreate([
-                Http, BrowserXhr, XSRFStrategyMock,
-                { provide: ConnectionBackend, useClass: XHRBackend },
-                { provide: ResponseOptions, useClass: BaseResponseOptions },
-                { provide: RequestOptions, useClass: BaseRequestOptions },
-                EditorStream,
-                SessionStream
-            ]);
-            session = injector.get(SessionStream);
-            editor = injector.get(EditorStream);
-            done();
-        }, 1000);
+    before(function() {
+        chai.expect();
+        chai.use(sinonChai);
+        injector = ReflectiveInjector.resolveAndCreate([
+            Http, BrowserXhr, XSRFStrategyMock,
+            { provide: ConnectionBackend, useClass: XHRBackend },
+            { provide: ResponseOptions, useClass: BaseResponseOptions },
+            { provide: RequestOptions, useClass: BaseRequestOptions },
+            EditorStream,
+            InputStream
+        ]);
+        input = injector.get(InputStream);
+        editor = injector.get(EditorStream);
     });
 
     it('emits expected texts when runCode is invoked', function(done) {
         this.timeout(backendTimeout);
+        input.connect();
         randomTestData.forEach((test, idx: number) => {
-            const sub = editor.events.subscribe(msg => {
+            const id = uuid.v4();
+            const sub = editor.events.filter(x => x.id === id).subscribe(msg => {
                 if (msg.name === EventName.EditorExecuteText) {
                     sub.unsubscribe();
                     expect(msg.data).to.equal(test.output);
                 }
             });
-            const id = uuid.v4();
-            session.new(id);
+            input.new(id);
             test.events.forEach(data => {
-                editor.edit(id, data);
+                input.edit(id, data);
             });
-            session.executeBuffer(id);
+            input.executeBuffer(id);
             if (idx === randomTestData.length - 1) {
                 done();
             }
@@ -74,11 +73,11 @@ describe('editor.stream', function() {
                 }
             });
             const id = uuid.v4();
-            session.new(id);
+            input.new(id);
             test.events.forEach(data => {
-                editor.edit(id, data);
+                input.edit(id, data);
             });
-            session.setContext(id, new Connection('foo', 'sqlite'));
+            input.setContext(id, new Connection('foo', 'sqlite'));
             if (idx === randomTestData.length - 1) {
                 done();
             }

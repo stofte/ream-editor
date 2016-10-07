@@ -3,7 +3,7 @@ import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
 import { EventName, Message } from './api';
 import { ProcessStream, EditorStream } from './index';
-import { SessionStream } from './session.stream';
+import { InputStream } from './input.stream'; // todo es6 class bs
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, CodeTemplateRequest, QueryTemplateRequest,
     TemplateResponse, WebSocketMessage } from './interfaces';
@@ -25,11 +25,11 @@ export class QueryStream {
     private process: ProcessStream = null;
     constructor(
         private editor: EditorStream,
-        private session: SessionStream,
+        private input: InputStream,
         private http: Http
     ) {
         this.process = new ProcessStream(http);
-        const executeCodeResponses = session.events.filter(msg => msg.name === EventName.SessionCreate)
+        const executeCodeResponses = input.events.filter(msg => msg.name === EventName.SessionCreate)
             .flatMap(sessionMsg => {
                 return editor.events
                     .filter(msg => msg.name === EventName.EditorExecuteText && msg.id === sessionMsg.id)
@@ -61,7 +61,7 @@ export class QueryStream {
             })
             .publish();
 
-        const templateResponses = session.events
+        const templateResponses = input.events
             .filter(msg => msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext)
             .flatMap(sessionMsg => {
                 const initialMessage = sessionMsg.name === EventName.SessionCreate ? 

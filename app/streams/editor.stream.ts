@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable } from 'rxjs/Rx';
+import { Subject, Observable, ConnectableObservable } from 'rxjs/Rx';
 import { TextUpdate } from '../models/index';
 // todo: can't use index because we loose metadata?
-import { SessionStream } from './session.stream';
+import { InputStream } from './input.stream';
 import { EventName, Message } from './api';
 
 class BufferText {
@@ -46,15 +46,18 @@ class BufferText {
 export class EditorStream {
     public events: Observable<Message>;
     public bufferedTexts: Observable<Message>;
-    private subject: Subject<Message> = new Subject<Message>();
+    public subject: Subject<Message> = new Subject<Message>(); // used from stream.ts
+    private eventsConnectable: ConnectableObservable<Message>;
+    private bufferedConnectable: ConnectableObservable<Message>;
+    private resolver: Function;
 
     constructor(
-        private session: SessionStream
+        private input: InputStream
     ) {
-        const editMsgs = session
+        const editMsgs = input
                     .events
                     .filter(msg => msg.name === EventName.SessionCreate)
-                    .flatMap(msg => this.subject.filter(e => e.name === EventName.EditorUpdate && e.id === msg.id))
+                    .flatMap(msg => input.events.filter(e => e.name === EventName.EditorUpdate && e.id === msg.id))
                     .scan((buffers: BufferText[], editor: Message, index: number) => {
                         if (!buffers.find(x => x.id === editor.id)) {
                             buffers.push(new BufferText(editor.id));
@@ -65,14 +68,15 @@ export class EditorStream {
                     }, [])
                     .publish();
         editMsgs.connect();
-        const runCodeText = session.events.filter(msg => msg.name === EventName.SessionExecuteBuffer)
+
+        const runCodeText = input.events.filter(msg => msg.name === EventName.SessionExecuteBuffer)
             .withLatestFrom(editMsgs)
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
                 return new Message(EventName.EditorExecuteText, val[0].id, b.getText(), val[0].timestamp);
             });
 
-        const contextText = session.events.filter(msg => msg.name === EventName.SessionContext)
+        const contextText = input.events.filter(msg => msg.name === EventName.SessionContext)
             .withLatestFrom(editMsgs)
             .map(val => {
                 const b = val[1].find(x => x.id === val[0].id);
@@ -81,7 +85,7 @@ export class EditorStream {
             .publishReplay(1);
 
         // cleanup this stuff, either we mix or we dont. not this triple-type broadcast
-        const obs = this.subject
+        const obs = input.events
             .merge(runCodeText)
             .publish();
         
@@ -89,10 +93,5 @@ export class EditorStream {
         this.events = obs;
         obs.connect();
         contextText.connect();
-    }
-
-    public edit(id: string, data: TextUpdate) {
-        data.timestamp = performance.now();
-        this.subject.next(new Message(EventName.EditorUpdate, id, data));
     }
 }

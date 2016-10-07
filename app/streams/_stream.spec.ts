@@ -6,7 +6,8 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, 
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { QueryStream, SessionStream, EditorStream, ResultStream, OmnisharpStream } from './index';
+import { QueryStream, EditorStream, ResultStream, OmnisharpStream, InputStream, StreamStarter } from './index';
+import { OutputStream } from './output.stream';
 import config from '../config';
 import { CodeCheckResult, AutocompletionQuery, Connection } from '../models';
 import XSRFStrategyMock from '../test/xsrf-strategy-mock';
@@ -26,60 +27,46 @@ sqliteConnection.id = 42;
 
 describe('[int-test] streams', function() {
     this.timeout(backendTimeout * 100);
-    let session: SessionStream = null;
-    let editor: EditorStream = null;
-    let result: ResultStream = null;
+    let input: InputStream = null;
+    // let editor: EditorStream = null;
+    // let result: ResultStream = null;
     let injector: ReflectiveInjector = null;
     let query: QueryStream = null;
     let omnisharp: OmnisharpStream = null;
+    let output: OutputStream = null;
     
     before(function() {
         chai.expect();
         chai.use(sinonChai);
-        injector = ReflectiveInjector.resolveAndCreate([
+        const injector = ReflectiveInjector.resolveAndCreate([
             Http, BrowserXhr, XSRFStrategyMock,
             { provide: ConnectionBackend, useClass: XHRBackend },
             { provide: ResponseOptions, useClass: BaseResponseOptions },
             { provide: RequestOptions, useClass: BaseRequestOptions },
-            QueryStream,
-            SessionStream,
+            InputStream,
+            OutputStream,
+            StreamStarter,
             EditorStream,
             ResultStream,
+            QueryStream,
             OmnisharpStream
         ]);
-        session = injector.get(SessionStream);
-        editor = injector.get(EditorStream);
-        result = injector.get(ResultStream);
+        input = injector.get(InputStream);
+        output = injector.get(OutputStream);
         query = injector.get(QueryStream);
         omnisharp = injector.get(OmnisharpStream);
-    });
-
-    it('waits for backends to be ready', function(done) {
-        this.timeout(backendTimeout);
-        let queryReady = false;
-        let omnisharpReady = false;
-        query.once(msg => msg.name === EventName.ProcessReady, () => {
-            queryReady = true;
-            if (omnisharpReady) {
-                done();
-            }
-        });
-        omnisharp.once(msg => msg.name === EventName.ProcessReady, () => {
-            omnisharpReady = true;
-            if (queryReady) {
-                done();
-            }
-        });
+        injector.get(StreamStarter);
     });
 
     it('emits result for simple value expressions', function(done) {
         this.timeout(backendTimeout * (cSharpTestData.length + 1));
+        // input.connect(); // needed to unbuffer events, only once
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
             const expectedPage = cSharpTestDataExpectedResult[idx][0];
             const id = uuid.v4();
-            const resultSub = result.events
+            const resultSub = output.events
                 .filter(msg => msg.id === id)
                 .subscribe(msg => {
                     if (msg.name === EventName.ResultDone) {
@@ -101,12 +88,12 @@ describe('[int-test] streams', function() {
                 }); 
             
             replaySteps([
-                () => session.new(id),
+                () => input.new(id),
                 { 
                     for: testData.events,
-                    fn: (evt) => editor.edit(id, evt)
+                    fn: (evt) => input.edit(id, evt)
                 },
-                () => session.executeBuffer(id)
+                () => input.executeBuffer(id)
             ]);
         });
     });
@@ -118,7 +105,7 @@ describe('[int-test] streams', function() {
         let rowCount = 0;
         let headers: any[] = null;
         let rows: any[] = null;
-        const resultSub = result.events
+        const resultSub = output.events
             .filter(msg => msg.id === id)
             .subscribe(msg => {
                 if (msg.name === EventName.ResultDone) {
@@ -144,11 +131,11 @@ describe('[int-test] streams', function() {
             });
         
         replaySteps([
-            () => session.new(id, sqliteConnection),
+            () => input.new(id, sqliteConnection),
             { 
                 for: cSharpCityFilteringQueryEditorTestData[0].events,
-                fn: (evt) => editor.edit(id, evt)
-            }, () => session.executeBuffer(id)
+                fn: (evt) => input.edit(id, evt)
+            }, () => input.executeBuffer(id)
         ]);
     });
 
@@ -158,7 +145,7 @@ describe('[int-test] streams', function() {
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
-        const codecheckSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
+        const codecheckSub = output.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
             const expectedCheck = cSharpTestDataExpectedCodeChecks[codechecks];
             codechecks++;
             check([done, codecheckSub], () => {
@@ -177,17 +164,17 @@ describe('[int-test] streams', function() {
         });
 
         replaySteps([
-            () => session.new(id),
+            () => input.new(id),
             {
                 for: firstEdits,
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.codeCheck(id),
+            () => input.codeCheck(id),
             {
                 for: secondEdits,
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.codeCheck(id)
+            () => input.codeCheck(id)
         ]);
     });
 
@@ -199,7 +186,7 @@ describe('[int-test] streams', function() {
         const secondEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
         let isFirstCheck = true;
-        const codecheckSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
+        const codecheckSub = output.events.filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id).subscribe(msg => {
             const expectedCheck = cSharpDatabaseCodeCheckExpectedErrors[codechecks];
             if (isFirstCheck) {
                 isFirstCheck = false;
@@ -221,23 +208,23 @@ describe('[int-test] streams', function() {
         });
 
         replaySteps([
-            () => session.new(id, sqliteConnection),
+            () => input.new(id, sqliteConnection),
             {
                 for: firstEdits,
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.codeCheck(id),
+            () => input.codeCheck(id),
             {
                 for: secondEdits,
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.codeCheck(id)
+            () => input.codeCheck(id)
         ]);
     });
 
     it('emits autocompletion for simple statement', function(done) {
         this.timeout(backendTimeout * 2);
-        const completionSub = omnisharp.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
+        const completionSub = output.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
             completionSub.unsubscribe();
             const items = msg.data.map(x => x.CompletionText);
             Assert(cSharpAutocompletionExpectedValues[0].length > 0, 'Found no completion items');
@@ -248,12 +235,12 @@ describe('[int-test] streams', function() {
         });
         const id = uuid.v4();
         replaySteps([
-            () => session.new(id),
+            () => input.new(id),
             {
                 for: cSharpAutocompletionEditorTestData[0].events,
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.autoComplete(id, cSharpAutocompletionRequestTestData[0])
+            () => input.autoComplete(id, cSharpAutocompletionRequestTestData[0])
         ]);
     });
 
@@ -265,7 +252,7 @@ describe('[int-test] streams', function() {
         const secondEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time >= 5000);
         const expectedCheck = cSharpContextSwitchExpectedCodeChecks[0];
         let codechecks = 0;
-        const codecheckSub = omnisharp.events
+        const codecheckSub = output.events
             .filter(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
             .subscribe(msg => {
                 codechecks++;
@@ -284,20 +271,20 @@ describe('[int-test] streams', function() {
             });
 
         replaySteps([
-            () => session.new(id),
+            () => input.new(id),
             {
                 for: firstEdits, // yields text "city", which is illegal in code buffer
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.codeCheck(id),
+            () => input.codeCheck(id),
             // switch
-            () => session.setContext(id, sqliteConnection),
+            () => input.setContext(id, sqliteConnection),
             () => { },
             {
                 for: secondEdits,
-                fn: (evt) => editor.edit(id, evt)
+                fn: (evt) => input.edit(id, evt)
             },
-            () => session.codeCheck(id)
+            () => input.codeCheck(id)
         ]);
     });
 

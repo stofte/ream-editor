@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
-import { ProcessStream, EditorStream, QueryStream, SessionStream } from './index';
+import { ProcessStream, EditorStream, QueryStream } from './index';
+import { InputStream } from './input.stream';
 import { EventName, Message, OmnisharpSessionMessage } from './api';
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, UpdateBufferRequest, AutoCompletionItem } from './interfaces';
@@ -23,13 +24,13 @@ export class OmnisharpStream {
     constructor(
         private editor: EditorStream,
         private query: QueryStream,
-        private session: SessionStream,
+        private input: InputStream,
         private http: Http
     ) {
         const sync = new OmnisharpSynchronizer();
         const newStream = query.events
             .filter(msg => msg.name === EventName.QueryTemplateResponse)
-            .merge(session.events.filter(msg => 
+            .merge(input.events.filter(msg => 
                 msg.name === EventName.SessionCreate ||
                 msg.name === EventName.SessionContext ||
                 msg.name === EventName.SessionAutocompletion || 

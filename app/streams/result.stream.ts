@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Observer } from 'rxjs/Rx';
-import { QueryStream, SessionStream } from './index';
+import { QueryStream } from './index';
+import { InputStream } from './input.stream';
 import { EventName, Message } from './api';
 import { WebSocketMessage } from './interfaces';
 import { ResultPage } from '../models/index';
@@ -8,8 +9,8 @@ import { ResultPage } from '../models/index';
 @Injectable()
 export class ResultStream {
     public events: Observable<Message>;
-    constructor(private query: QueryStream, session: SessionStream) {
-        this.events = session
+    constructor(private query: QueryStream, input: InputStream) {
+        this.events = input
             .events
             .filter(msg => msg.name === EventName.SessionExecuteBuffer)
             .flatMap(this.handleRunCode);

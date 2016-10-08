@@ -59,7 +59,7 @@ describe('[int-test] streams', function() {
     });
 
     [
-        [10, 50], [0, 0]
+        [0, 0], [0, 0]
         // steps below take about 1 hour
         // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
         // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],

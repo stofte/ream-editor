@@ -114,6 +114,11 @@ export class QueryStream {
             .merge(executeCodeResponses)
             .merge(templateResponses);
 
+        executeCodeResponses
+            .merge(templateResponses)
+            .first()
+            .subscribe(x => this.process.confirmedReady());
+
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);

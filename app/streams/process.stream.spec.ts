@@ -48,7 +48,8 @@ describe('[int-test] process.stream', function() {
         let sub = instance.status.subscribe(msg => {
             expect(msg.name).to.equal(types[idx++]);
             if (msg.name === EventName.ProcessReady) {
-                instance.close();
+                instance.confirmedReady();
+                setTimeout(() => instance.close(), 500);
             }
             if (msg.name === EventName.ProcessClosed || msg.name === EventName.ProcessFailed) {
                 sub.unsubscribe();

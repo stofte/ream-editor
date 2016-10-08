@@ -58,6 +58,42 @@ describe('[int-test] streams', function() {
         injector.get(StreamStarter);
     });
 
+    [
+        [10, 50], [0, 0]
+        // steps below take about 1 hour
+        // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+        // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+        // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
+        // [5, 30], [5, 30], [5, 30], [5, 30], [5, 30],
+        // [5, 30], [5, 30], [5, 30], [5, 30], [5, 30],
+        // [5, 30], [5, 30], [5, 30], [5, 30], [5, 30],
+        // [5, 60], [5, 60], [5, 60], [5, 60], [5, 60],
+        // [5, 60], [5, 60], [5, 60], [5, 60], [5, 60],
+        // [5, 60], [5, 60], [5, 60], [5, 60], [5, 60],
+        // [10, 50], [10, 50], [10, 50], [10, 50], [10, 50],
+        // [10, 50], [10, 50], [10, 50], [10, 50], [10, 50],
+        // [10, 50], [10, 50], [10, 50], [10, 50], [10, 50],
+        // [50, 50], [50, 50], [50, 50], [50, 50], [50, 50],
+        // [50, 50], [50, 50], [50, 50], [50, 50], [50, 50],
+        // [50, 50], [50, 50], [50, 50], [50, 50], [50, 50],
+        // [10, 100], [10, 100], [10, 100], [10, 100], [10, 100],
+        // [10, 100], [10, 100], [10, 100], [10, 100], [10, 100],
+        // [10, 100], [10, 100], [10, 100], [10, 100], [10, 100],
+        // [50, 100], [50, 100], [50, 100], [50, 100], [50, 100],
+        // [50, 100], [50, 100], [50, 100], [50, 100], [50, 100],
+        // [50, 100], [50, 100], [50, 100], [50, 100], [50, 100],
+        // [50, 150], [50, 150], [50, 150], [50, 150], [50, 150],
+        // [50, 150], [50, 150], [50, 150], [50, 150], [50, 150],
+        // [50, 150], [50, 150], [50, 150], [50, 150], [50, 150],
+        // [50, 200], [50, 200], [50, 200], [50, 200], [50, 200],
+        // [50, 200], [50, 200], [50, 200], [50, 200], [50, 200],
+        // [50, 200], [50, 200], [50, 200], [50, 200], [50, 200],
+        // [100, 200], [100, 200], [100, 200], [100, 200], [100, 200],
+        // [100, 200], [100, 200], [100, 200], [100, 200], [100, 200],
+        // [100, 200], [100, 200], [100, 200], [100, 200], [100, 200]
+    ].forEach(([replayMinDelay, replayMaxDelay]) => {
+    describe(`delay: ${replayMinDelay} -> ${replayMaxDelay}ms`, () => {
+
     it('emits result for simple value expressions', function(done) {
         this.timeout(backendTimeout * (cSharpTestData.length + 1));
         // input.connect(); // needed to unbuffer events, only once
@@ -94,7 +130,7 @@ describe('[int-test] streams', function() {
                     fn: (evt) => input.edit(id, evt)
                 },
                 () => input.executeBuffer(id)
-            ]);
+            ], replayMaxDelay, replayMinDelay);
         });
     });
 
@@ -136,7 +172,7 @@ describe('[int-test] streams', function() {
                 for: cSharpCityFilteringQueryEditorTestData[0].events,
                 fn: (evt) => input.edit(id, evt)
             }, () => input.executeBuffer(id)
-        ]);
+        ], replayMaxDelay, replayMinDelay);
     });
 
     it('emits codecheck for simple statement', function(done) {
@@ -175,7 +211,7 @@ describe('[int-test] streams', function() {
                 fn: (evt) => input.edit(id, evt)
             },
             () => input.codeCheck(id)
-        ]);
+        ], replayMaxDelay, replayMinDelay);
     });
 
 
@@ -219,7 +255,7 @@ describe('[int-test] streams', function() {
                 fn: (evt) => input.edit(id, evt)
             },
             () => input.codeCheck(id)
-        ]);
+        ], replayMaxDelay, replayMinDelay);
     });
 
     it('emits autocompletion for simple statement', function(done) {
@@ -241,7 +277,7 @@ describe('[int-test] streams', function() {
                 fn: (evt) => input.edit(id, evt)
             },
             () => input.autoComplete(id, cSharpAutocompletionRequestTestData[0])
-        ]);
+        ], replayMaxDelay, replayMinDelay);
     });
 
     it('emits codecheck after switching buffer context', function(done) {
@@ -285,31 +321,35 @@ describe('[int-test] streams', function() {
                 fn: (evt) => input.edit(id, evt)
             },
             () => input.codeCheck(id)
-        ]);
+        ], replayMaxDelay, replayMinDelay);
     });
 
-    it('stops query process when stopServer is called', function(done) {
-        this.timeout(backendTimeout);
-        query.once(msg => msg.name === EventName.ProcessClosed, () => {
-            let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
-            http.get(url, res => { done(new Error('response received')); })
-                .on('error', () => { done(); });
-        });
-        replaySteps([
-            () => query.stopServer()
-        ]);
-    });
+    })}); // end main test loop
 
-    it('stops omnisharp process when stopServer is called', function(done) {
-        this.timeout(backendTimeout);
-        omnisharp.once(msg => msg.name === EventName.ProcessClosed, () => {
-            let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
-            http.get(url, res => { done(new Error('response received')); })
-                .on('error', () => { done(); });
+    describe('shutdowns', () => {
+        it('stops query process when stopServer is called', function(done) {
+            this.timeout(backendTimeout);
+            query.once(msg => msg.name === EventName.ProcessClosed, () => {
+                let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
+                http.get(url, res => { done(new Error('response received')); })
+                    .on('error', () => { done(); });
+            });
+            replaySteps([
+                () => query.stopServer()
+            ]);
         });
-        replaySteps([
-            () => omnisharp.stopServer()
-        ]);
+
+        it('stops omnisharp process when stopServer is called', function(done) {
+            this.timeout(backendTimeout);
+            omnisharp.once(msg => msg.name === EventName.ProcessClosed, () => {
+                let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
+                http.get(url, res => { done(new Error('response received')); })
+                    .on('error', () => { done(); });
+            });
+            replaySteps([
+                () => omnisharp.stopServer()
+            ]);
+        });
     });
 });
 

@@ -75,8 +75,7 @@ export class OmnisharpStream {
             .map(msg => sync.mapMessage(msg))
             .flatMap(msg => {
                 if (msg.type === 'context') {
-                    sync.resolveOperation(msg);
-                    return Observable.empty<MessageMap>();
+                    return Observable.from<MessageMap>([{ inner: msg, mapped: new Message(null) }]);
                 } else {
                     const actionName = (msg.type === 'buffer-template' || msg.type === 'edit') ? this.action('updatebuffer') :
                         msg.type === 'autocompletion' ? this.action('autocomplete') : this.action('codecheck');
@@ -93,8 +92,10 @@ export class OmnisharpStream {
             .map(msg => msg.mapped)
             .publish();
 
+
         this.process = new ProcessStream(http);
         this.events = this.process.status.merge(newStream);
+        newStream.first().subscribe(x => this.process.confirmedReady());
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);
         this.process.start('omnisharp', cmd.command, cmd.directory, config.omnisharpPort);

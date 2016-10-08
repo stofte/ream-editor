@@ -15,6 +15,7 @@ export class ProcessStream {
     private directory: string;
     private httpPort: number;
     private cancelCheck: boolean = false;
+    private exitHandler = false;
     constructor(private http: Http) { }
 
     public start(processType: ProcessType, command: string, directory: string, httpPort: number) {
@@ -34,10 +35,12 @@ export class ProcessStream {
             }
         });
         child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
-            if (error) { // expected when starting command fails, otherwise only stdout/err should be filled
-                console.log('process.stream error', error);
-                console.log('stdout', stdout);
-                console.log('stderr', stderr);
+            if (!this.exitHandler) {
+                // once we've seen the server response, we disable this, since it's unpredictable otherwise,
+                // will return once stdout buffer fills, windows only?
+                return;
+            }
+            if (stderr) { 
                 this.status.next(new Message(EventName.ProcessFailed));
             } else {
                 this.status.next(new Message(EventName.ProcessClosed));
@@ -49,9 +52,15 @@ export class ProcessStream {
         this.checkreadystatus();
     }
 
+    public confirmedReady() {
+        this.cancelCheck = true;
+        this.exitHandler = false;
+    }
+
     public close() {
         this.status.next(new Message(EventName.ProcessClosing));
         this.http.get(this.action('stopserver')).subscribe();
+        setTimeout(() => this.checkstopstatus(), 500);
     }
 
     private checkreadystatus() {
@@ -61,8 +70,17 @@ export class ProcessStream {
                 this.status.next(new Message(EventName.ProcessReady));
             }, error => {
                 if (!this.cancelCheck) {
-                    setTimeout(() => { this.checkreadystatus(); }, 500);
+                    setTimeout(() => this.checkreadystatus(), 500);
                 }
+            });
+    }
+
+    private checkstopstatus() {
+        this.http.get(this.action('checkreadystatus'))
+            .subscribe(ok => {
+                setTimeout(() => { this.checkstopstatus(); }, 500);
+            }, error => {
+                this.status.next(new Message(EventName.ProcessClosed));
             });
     }
     

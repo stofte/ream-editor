@@ -119,12 +119,13 @@ export class QueryStream {
             .first()
             .subscribe(x => this.process.confirmedReady());
 
+        executeCodeResponses.connect();
+        templateResponses.connect();
+
         let helper = new ProcessHelper();
         let cmd = helper.query(config.queryEnginePort);
         this.process.start('query', cmd.command, cmd.directory, config.queryEnginePort);
         this.once(msg => msg.name === EventName.ProcessReady, () => {
-            executeCodeResponses.connect();
-            templateResponses.connect();
             Observable.webSocket(`ws://localhost:${config.queryEnginePort}/ws`).subscribe(
                 this.socketMessageHandler,
                 this.socketErrorHandler,

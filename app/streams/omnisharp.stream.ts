@@ -28,7 +28,7 @@ export class OmnisharpStream {
         private http: Http
     ) {
         const sync = new OmnisharpSynchronizer();
-        const newStream = query.events
+        const stream = query.events
             .filter(msg => msg.name === EventName.QueryTemplateResponse)
             .merge(input.events.filter(msg => 
                 msg.name === EventName.SessionCreate ||
@@ -94,14 +94,13 @@ export class OmnisharpStream {
 
 
         this.process = new ProcessStream(http);
-        this.events = this.process.status.merge(newStream);
-        newStream.first().subscribe(x => this.process.confirmedReady());
+        this.events = this.process.status.merge(stream);
+        stream.first().subscribe(x => this.process.confirmedReady());
+        stream.connect();
+        
         let helper = new ProcessHelper();
         let cmd = helper.omnisharp(config.omnisharpPort);
         this.process.start('omnisharp', cmd.command, cmd.directory, config.omnisharpPort);
-        this.once(msg => msg.name === EventName.ProcessReady, () => {
-            newStream.connect();
-        });
     }
 
     public once(pred: (msg: Message) => boolean, handler: (msg: Message) => void) {
@@ -141,24 +140,6 @@ export class OmnisharpStream {
             name,
             data
         };
-    }
-
-    private splitEditsBySession(msgs: Message[]): OmnisharpSessionMessage[] {
-        const sessionIds = msgs.map(x => x.id).reduce((ids, id: string) => {
-            return ids.find(z => z === id) ? ids : ids.concat([id]);
-        }, <string[]> []);
-        let mapped: OmnisharpSessionMessage[] = sessionIds.map(id => {
-            const edits = msgs.filter(x => x.id === id).map(x => <any[]> x.data).reduce((xs, x) => xs.concat(x), []);
-            const timestamps = msgs.filter(x => x.id === id).map(x => x.timestamp);
-            const msg = <OmnisharpSessionMessage> {
-                sessionId: id,
-                type: 'edit',
-                edits,
-                timestamp: timestamps[timestamps.length - 1]
-            };
-            return msg;
-        });
-        return mapped;
     }
 
     private mapCodeMirrorEditsToOmnisharp = (msg: OmnisharpSessionMessage) => {

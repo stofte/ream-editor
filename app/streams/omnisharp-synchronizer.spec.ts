@@ -12,56 +12,62 @@ describe('omnisharp-synchronizer', function() {
     
     before(function() {
         chai.expect();
-    });
-
-    beforeEach(function() {
         sync = new OmnisharpSynchronizer();
     });
-    // first number in list is min delay
+
     [
-        [  10, 1, 1, 2]
-        // these steps can take upward of an hour due to randomization in test
-        // [  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [200, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [200, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [200, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [200, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [200, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [250, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [250, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [250, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [250, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [250, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [500, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [500, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [500, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [500, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20],
-        // [500, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
-    ].forEach((runModifiers, idx) => {
-        const minDelayMs = runModifiers[0];
-        runModifiers.slice(1).forEach((modifier: number, idx2) => {
-            const maxDelayMs = 50 * modifier;
-            it(`resolves events in expected order (run ${idx < 10 ? '0' : ''}${idx}, step ${
-                    idx2 < 10 ? '0' : ''}${idx2}, delay ${minDelayMs}ms ~ ${maxDelayMs}ms)`,
-                function (done) {
-                    omnisharpSynchronizerSuite.bind(this)(minDelayMs, maxDelayMs, sync, done);
+        [0, 0, 2]
+    ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
+        describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
+            let idx = 0;
+            const l = [];
+            l[stepCount - 1] = 1;
+            for(let i = 0; i < l.length; i++) {
+                l[i] = i;
+            }
+            l.forEach(() => {
+                it('runs flows multiple times', function(done) {
+                    let run1Resolver = null;
+                    let run2Resolver = null;
+                    let run3Resolver = null;
+                    const run1Promise = new Promise((done) => run1Resolver = done);
+                    const run2Promise = new Promise((done) => run2Resolver = done);
+                    const run3Promise = new Promise((done) => run3Resolver = done);
+
+                    omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run1Resolver);
+                    omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run2Resolver);
+                    omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run3Resolver);
+
+                    const failures = [];
+                    // todo do something nicer
+                    const doneHandler = (val) => {
+                        if (val) {
+                            failures.push(val);
+                        }
+                    }
+                    run1Promise.then(doneHandler);
+                    run2Promise.then(doneHandler);
+                    run3Promise.then(doneHandler);
+                    run1Promise.then(() => 
+                        run2Promise.then(() =>  {
+                            run3Promise.then(() =>  {
+                                setTimeout(() => {
+                                    if (failures.length > 0) {
+                                        done(failures);
+                                    } else {
+                                        done();
+                                    }
+                                }, 100);
+                            })
+                        })
+                    );
                 });
+            });
         });
     });
 });
 
 function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync: OmnisharpSynchronizer, done: Function) {
-    this.timeout(((minDelayMs + maxDelayMs) * 2 * 20) + 5000);
     const testMsgs: any[] = [];
     const sessionId = uuid.v4();
     const subject = new Subject<OmnisharpSessionMessage>();

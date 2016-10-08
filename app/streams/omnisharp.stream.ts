@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
-import { ProcessStream, EditorStream, QueryStream } from './index';
+import { ProcessStream, QueryStream } from './index';
 import { InputStream } from './input.stream';
 import { EventName, Message, OmnisharpSessionMessage } from './api';
 import { ProcessHelper } from '../utils/process-helper';
@@ -12,22 +12,23 @@ import * as uuid from 'node-uuid';
 import config from '../config';
 const path = electronRequire('path');
 
-class MessageMap {
-    public inner: OmnisharpSessionMessage;
-    public mapped: Message;
-}
-
 @Injectable()
 export class OmnisharpStream {
     public events: Observable<Message>;
     private process: ProcessStream;
     constructor(
-        private editor: EditorStream,
         private query: QueryStream,
         private input: InputStream,
         private http: Http
     ) {
+        // Used to sync all requests to omnisharp backend.
         const sync = new OmnisharpSynchronizer();
+        
+        // Create the omnisharp stream, first by gather all the Messages types we care for,
+        // these are then mapped to OmnisharpSessionMessage for the synchronizer.
+        // Every msg funnels into the queueOperation call, causing that msg to block on a promise,
+        // which the synchronizer will resolve when appropriate.
+        // Todo msgs from all sessions are serialized, ideally, we only serialize by session.
         const stream = query.events
             .filter(msg => msg.name === EventName.QueryTemplateResponse)
             .merge(input.events.filter(msg => 
@@ -36,40 +37,25 @@ export class OmnisharpStream {
                 msg.name === EventName.SessionAutocompletion || 
                 msg.name === EventName.SessionCodeCheck
             ))
-            .merge(editor.events.filter(msg => msg.name === EventName.EditorUpdate))
-            .map(msg => {
-                // edits are merged next and have their own mapping scheme
-                const event = (msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext) ? 'context' :
-                    msg.name === EventName.QueryTemplateResponse ? 'buffer-template' :
-                    msg.name === EventName.SessionAutocompletion ? 'autocompletion' : 
-                    msg.name === EventName.SessionCodeCheck ? 'codecheck' : 'edit';
-
-                Assert(event && event.length, 'Mapped Message to inner');
-
-                let fileName = null;
-                if (event === 'buffer-template') {
-                    const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
-                    fileName = path.normalize(`${config.omnisharpProjectPath}/${bufferType}${msg.id.replace(/\-/g, '')}.cs`);
-                }
-                const lineOffset = msg.data && msg.data.lineOffset || null;
-                const columnOffset = msg.data && msg.data.columnOffset || null;
-                const template = msg.data && msg.data.template || null;
-                const connectionId = msg.data && msg.data.connectionId || null;
-
-                const mapped = <OmnisharpSessionMessage> {
-                    sessionId: msg.id,
-                    timestamp: msg.originalTimestamp || msg.timestamp,
-                    type: event,
-                    fileName,
-                    lineOffset,
-                    columnOffset,
-                    template,
-                    connectionId,
-                    autocompletion: msg.data,
-                    edit: msg.data
-                };
-                return mapped;
-            })
+            .merge(input.events.filter(msg => msg.name === EventName.EditorUpdate))
+            // Map to internal OmnisharpSessionMessage
+            .map(this.mapToInternal)
+            // To buffer the edits as much as possible, while preserving absolute order with the other events,
+            // we do some ghetto buffering here, which reduces updatebuffer calls significantly.
+            // 
+            // We use interval to generate timeout values, which are passed as type: 'timer'.
+            // this.bufferEdits uses BufferedMessage.ready to indicate to downstream
+            // if there's anything to process. BufferedMessage is only used for this purpose,
+            // and to maintain state inside the scan operator itself.
+            //
+            // If ready, we map to the list of msgs, which should contain
+            // - 1 or more edit messeges (1 per session found, if we had a timer event)
+            // - 1 edit msg, 1 operation (meaning the op flushed the edits for the given session)
+            // - 1 operation
+            .merge(Observable.interval(500).map(n => <OmnisharpSessionMessage> { type: 'timer' }))
+            .scan(this.bufferEdits, <BufferedMessage> { ready: false, list: [], edits: [] })
+            .filter(x => x.ready)
+            .concatMap(x => x.list) // map back to OmnisharpSessionMessage
             // obtain lock
             .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
             .map(msg => sync.mapMessage(msg))
@@ -114,7 +100,92 @@ export class OmnisharpStream {
         this.process.close();
     }
 
-    private mapToRequest(msg: OmnisharpSessionMessage): any {
+    private bufferEdits = (buffer: BufferedMessage, msg: OmnisharpSessionMessage): BufferedMessage => {
+        if (msg.type === 'timer') { // flush for all session
+            const ids = buffer.edits.reduce((ids, edit) => {
+                return ids.indexOf(edit.sessionId) > -1 ? ids : ids.concat(edit.sessionId);
+            }, []);
+            const edits = ids.map(x => {
+                const sessionEdits = buffer.edits.filter(y => y.sessionId === x);
+                const singleEdit = this.mapMultipleEditsToOne(sessionEdits);
+                return singleEdit;
+            });
+            return <BufferedMessage> {
+                ready: true,
+                list: edits,
+                edits: []
+            };
+        } else if (msg.type !== 'edit') { // flush any edits for msg.sessionId
+            const edit = this.mapMultipleEditsToOne(buffer.edits.filter(x => x.sessionId === msg.sessionId));
+            const otherEdits = buffer.edits.filter(x => x.sessionId !== msg.sessionId);
+            return <BufferedMessage> {
+                ready: true,
+                list: (edit ? [edit, msg] : [msg]),
+                edits: otherEdits
+            };
+        } else if (msg.type === 'edit') { // else just append edit
+            return <BufferedMessage> {
+                ready: false,
+                list: [],
+                edits: buffer.edits.concat([msg])
+            };
+        }
+    }
+
+    private mapMultipleEditsToOne = (edits: OmnisharpSessionMessage[]): OmnisharpSessionMessage => {
+        if (edits.length === 0) {
+            return null;
+        }
+        let i = 0;
+        let id = edits[i].sessionId;
+        do {
+            Assert(edits[i].type === 'edit', 'All messeges are "edits"');
+            Assert(edits[i].sessionId === id, 'All messages have same id');
+            i++;
+        } while (i < edits.length);
+        let ret = <OmnisharpSessionMessage> {
+            sessionId: id,
+            type: 'edit',
+            edits: edits.map(x => x.edit),
+            timestamp: edits[edits.length - 1].timestamp,
+        };
+        return ret;
+    }
+
+    private mapToInternal = (msg: Message): OmnisharpSessionMessage => {
+        const event = (msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext) ? 'context' :
+            msg.name === EventName.QueryTemplateResponse ? 'buffer-template' :
+            msg.name === EventName.SessionAutocompletion ? 'autocompletion' : 
+            msg.name === EventName.SessionCodeCheck ? 'codecheck' : 'edit';
+
+        Assert(event && event.length, 'Mapped Message to inner');
+
+        let fileName = null;
+        if (event === 'buffer-template') {
+            const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
+            fileName = path.normalize(`${config.omnisharpProjectPath}/${bufferType}${msg.id.replace(/\-/g, '')}.cs`);
+        }
+        const lineOffset = msg.data && msg.data.lineOffset || null;
+        const columnOffset = msg.data && msg.data.columnOffset || null;
+        const template = msg.data && msg.data.template || null;
+        const connectionId = msg.data && msg.data.connectionId || null;
+
+        const mapped = <OmnisharpSessionMessage> {
+            sessionId: msg.id,
+            timestamp: msg.originalTimestamp || msg.timestamp,
+            type: event,
+            fileName,
+            lineOffset,
+            columnOffset,
+            template,
+            connectionId,
+            autocompletion: msg.data,
+            edit: msg.data
+        };
+        return mapped;
+    }
+
+    private mapToRequest = (msg: OmnisharpSessionMessage): any => {
         let request: any = {
             FileName: msg.fileName
         };
@@ -130,7 +201,7 @@ export class OmnisharpStream {
         return request;
     }
 
-    private mapResponse(msg: OmnisharpSessionMessage, response: any): Message {
+    private mapResponse = (msg: OmnisharpSessionMessage, response: any): Message => {
         const name = msg.type === 'codecheck' ? EventName.OmniSharpCodeCheck :
             msg.type === 'autocompletion' ? EventName.OmniSharpAutocompletion : null;
         const data = msg.type === 'codecheck' ? this.mapQuickFixes(msg, response) : 
@@ -144,7 +215,7 @@ export class OmnisharpStream {
 
     private mapCodeMirrorEditsToOmnisharp = (msg: OmnisharpSessionMessage) => {
         Assert(msg.type === 'edit', `Found "${msg.type}" msg type, expecting "edit"`);
-        return[msg.edit].map(x => {
+        return msg.edits.map(x => {
             const mapped = <EditorChange> {
                 newText: x.text.join('\n'),
                 startLine: x.from.line,
@@ -176,7 +247,7 @@ export class OmnisharpStream {
         }));
     }
     
-    private filterCodeChecks(checks: CodeCheckResult[]): CodeCheckResult[] {
+    private filterCodeChecks = (checks: CodeCheckResult[]): CodeCheckResult[] => {
         let filt = checks
             .filter(c => {
                 const isMissingSemicolon = c.text === '; expected';
@@ -187,7 +258,7 @@ export class OmnisharpStream {
         return filt;
     }
     
-    private cleanupMessage(text: string) {
+    private cleanupMessage = (text: string) => {
         let fluf = [
             / \(are you missing a using directive or an assembly reference\?\)/
         ];
@@ -198,7 +269,18 @@ export class OmnisharpStream {
         return s;
     }
 
-    private action(name: string) {
+    private action = (name: string) => {
         return `http://localhost:${config.omnisharpPort}/${name}`;
     }
+}
+
+class MessageMap {
+    public inner: OmnisharpSessionMessage;
+    public mapped: Message;
+}
+
+class BufferedMessage {
+    public edits: OmnisharpSessionMessage[];
+    public list: OmnisharpSessionMessage[];
+    public ready: boolean;
 }

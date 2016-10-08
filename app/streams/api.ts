@@ -42,7 +42,7 @@ export class Message {
 }
 
 // only used internally by omnisharp stream/synchronizer
-type sessionEventType = 'context' | 'buffer-template' | 'edit' | 'codecheck' | 'autocompletion';
+type sessionEventType = 'context' | 'buffer-template' | 'edit' | 'codecheck' | 'autocompletion' | 'timer';
 
 export class OmnisharpSessionMessage {
     constructor(

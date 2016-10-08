@@ -28,8 +28,6 @@ sqliteConnection.id = 42;
 describe('[int-test] streams', function() {
     this.timeout(backendTimeout * 100);
     let input: InputStream = null;
-    // let editor: EditorStream = null;
-    // let result: ResultStream = null;
     let injector: ReflectiveInjector = null;
     let query: QueryStream = null;
     let omnisharp: OmnisharpStream = null;
@@ -96,7 +94,6 @@ describe('[int-test] streams', function() {
 
     it('emits result for simple value expressions', function(done) {
         this.timeout(backendTimeout * (cSharpTestData.length + 1));
-        // input.connect(); // needed to unbuffer events, only once
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page

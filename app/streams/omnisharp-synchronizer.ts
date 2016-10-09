@@ -1,10 +1,89 @@
 import { Observable, Subject } from 'rxjs/Rx';
 import { OmnisharpSessionMessage } from './api';
 import { AutocompletionQuery } from '../models/index';
+import config from '../config';
+import * as uuid from 'node-uuid';
+const path = electronRequire('path');
 
 class Queued {
     public msg: OmnisharpSessionMessage;
     public dequeue: Function;
+}
+
+class FileNames {
+    public used: string[] = [];
+    public free: string[] = [];
+
+    constructor(
+        public connectionId: number
+    ) { }
+
+    public belongs(fileName: string): boolean {
+        return !!(this.used.find(x => x === fileName) || this.free.find(x => x === fileName));
+    }
+    
+    public getFree(): string {
+        if (this.free.length === 0) {
+            const bufferType = this.connectionId ? `db${this.connectionId}` : 'code';
+            const newName = path.normalize(`${config.omnisharpProjectPath}/${bufferType}${uuid.v4().replace(/\-/g, '')}.cs`);
+            this.used.push(newName);
+            return newName;
+        } else {
+            const newName = this.free[0];
+            this.free = this.free.slice(1);
+            this.used.push(newName);
+            return newName;
+        }
+    }
+
+    public markFree(name: string): void {
+        Assert(this.used.indexOf(name) > -1, 'Was not in used list');
+        Assert(this.free.indexOf(name) === -1, 'Was already in free list');
+        this.used = this.used.filter(x => x !== name);
+        this.free = this.free.concat([name]);
+    }
+}
+
+// OmniSharp does not have a removal api, so we reuse the filenames, preferring to reuse a 
+// filename that already uses the same context as the new one (not sure if omnisharp cares)
+class FileNameService {
+    private connections: FileNames[] = [];
+    private codes = new FileNames(null);
+
+    public getFileCount() {
+        return this.connections.reduce((acc, val) => {
+            return acc + (val.free.length + val.used.length);
+        },<number> (this.codes.free.length + this.codes.used.length));
+    }
+
+    public get(connectionId: number): string {
+        if (connectionId) {
+            if (!this.connections.find(x => x.connectionId === connectionId)) {
+                this.connections = [new FileNames(connectionId)].concat(this.connections);
+            }
+            const fns = this.connections.find(x => x.connectionId === connectionId);
+            return fns.getFree();
+        } else {
+            return this.codes.getFree();
+        }
+    }
+
+    public release(fileName: string) {
+        let found = false;
+        if (this.codes.belongs(fileName)) {
+            this.codes.markFree(fileName);
+            found = true;
+        } else {
+            for(let i = 0; i < this.connections.length; i++) {
+                if (this.connections[i].belongs(fileName)) {
+                    this.connections[i].markFree(fileName);
+                    found = true;
+                    break;
+                }
+            }
+        }
+        Assert(found, 'Did not find owner of ' + fileName);
+    }
 }
 
 class SessionState {
@@ -15,6 +94,7 @@ class SessionState {
     public lineOffset: number = null;
     public queue: Queued[] = [];
     public awaiting: Queued[] = [];
+    public pendingDeletion = false;
 
     constructor(id: string) {
         this.id = id;
@@ -31,7 +111,9 @@ class SessionState {
             // console.log(`queueOperation PASS ${msg.type}:${msg.timestamp}`);
             if (msg.type === 'context') {
                 this.ready = false; // if we pass a context, we immediatly invalidate the session
-            } 
+            } else if (msg.type === 'destroy') {
+                this.pendingDeletion = true;
+            }
             this.awaiting.push({msg, dequeue: null});
             return new Promise((done) => done(1));
         }
@@ -78,6 +160,8 @@ class SessionState {
                         if (nextOp.msg.type === 'context') {
                             // if we dequeue a context, we instantly flag the session as invalid
                             this.ready = false;
+                        } else if (nextOp.msg.type === 'destroy') {
+                            this.pendingDeletion = true;
                         }
                         setTimeout(() => nextOp.dequeue());
                     }
@@ -107,8 +191,8 @@ class SessionState {
         } else if (msg.type === 'codecheck' || msg.type === 'autocompletion') {
             // these operations only block if there's an edit inflight/queued or if the session isnt ready
             return !this.ready || this.operationBlockedOnEdit();
-        } else if (msg.type === 'context') {
-            // context blocks on anything in the queues.
+        } else if (msg.type === 'context' || msg.type === 'destroy') {
+            // context/destroy blocks on anything in the queues.
             return this.queue.length > 0 || this.awaiting.length > 0;
         }
         return true;
@@ -151,11 +235,22 @@ class SessionState {
 }
 
 export class OmnisharpSynchronizer {
+    public fileNames = new FileNameService();
     private session: SessionState[] = [];
+    private deadSessions: string[] = [];
     
     public resolveOperation(msg: OmnisharpSessionMessage): void {
-        const session = this.getSession(msg);
-        session.resolveOperation(msg);
+        Assert(!this.deadSessions.find(x => x === msg.sessionId), 'Got message on dead session: ' + msg.sessionId);
+        if (msg.type === 'destroy') {
+            const toRemove = this.session.find(x => x.id === msg.sessionId); 
+            Assert(toRemove, 'Found no session to destroy');
+            this.deadSessions = [toRemove.id].concat(this.deadSessions);
+            this.fileNames.release(toRemove.fileName);
+            this.session = this.session.filter(x => x.id !== msg.sessionId);
+        } else {
+            const session = this.getSession(msg);
+            session.resolveOperation(msg);
+        }
     }
 
     public queueOperation(msg: OmnisharpSessionMessage): Promise<number> {
@@ -165,7 +260,11 @@ export class OmnisharpSynchronizer {
 
     public mapMessage(msg: OmnisharpSessionMessage): OmnisharpSessionMessage {
         const session = this.getSession(msg);
-        if (msg.type === 'edit') {
+        if (msg.type === 'context') {
+            if (session.fileName) {
+                this.fileNames.release(session.fileName);
+            }
+        } else if (msg.type === 'edit') {
             const mapEdit = (x) => {
                 return {
                     from: { 
@@ -216,6 +315,17 @@ export class OmnisharpSynchronizer {
                 // used to map line/col numbers
                 lineOffset: session.lineOffset,
                 columnOffset: session.columnOffset
+            };
+        } else if (msg.type === 'buffer-template') {
+            const fileName = this.fileNames.get(msg.connectionId);
+            return <OmnisharpSessionMessage> {
+                fileName,
+                sessionId: msg.sessionId,
+                type: msg.type,
+                timestamp: msg.timestamp,
+                template: msg.template,
+                lineOffset: msg.lineOffset,
+                columnOffset: msg.columnOffset
             };
         }
         return msg;

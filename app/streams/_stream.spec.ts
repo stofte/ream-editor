@@ -132,6 +132,7 @@ describe('[int-test] streams', function() {
                 .filter(msg => msg.id === id)
                 .subscribe(msg => {
                     if (msg.name === EventName.ResultDone) {
+                        input.destroy(id);
                         resultSub.unsubscribe();
                         if (verifyCount === cSharpTestData.length) {
                             expect(verifyCount).to.equal(cSharpTestData.length, 
@@ -171,6 +172,7 @@ describe('[int-test] streams', function() {
             .filter(msg => msg.id === id)
             .subscribe(msg => {
                 if (msg.name === EventName.ResultDone) {
+                    input.destroy(id);
                     resultSub.unsubscribe();
                     checkAndExit(done, () => {
                         let cityColIdx = 0;
@@ -220,6 +222,7 @@ describe('[int-test] streams', function() {
                 expect(msg.data[0].endColumn).to.equal(expectedCheck.endColumn, 'endColumn');
             });
             if (codechecks >= cSharpTestDataExpectedCodeChecks.length) {
+                input.destroy(id);
                 codecheckSub.unsubscribe();
                 done();
             }
@@ -262,6 +265,7 @@ describe('[int-test] streams', function() {
                     expect(msg.data[0].text).to.equal(expectedCheck.text, 'text');
                 });
             } else {
+                input.destroy(id);
                 codecheckSub.unsubscribe();
                 checkAndExit(done, () => {
                     expect(msg.data.length).to.equal(0);
@@ -286,6 +290,7 @@ describe('[int-test] streams', function() {
 
     function emitsAutocompletionForSimpleStatement(done) {
         const completionSub = output.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
+            input.destroy(id);
             completionSub.unsubscribe();
             const items = msg.data.map(x => x.CompletionText);
             Assert(cSharpAutocompletionExpectedValues[0].length > 0, 'Found no completion items');
@@ -325,6 +330,7 @@ describe('[int-test] streams', function() {
                         expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel);
                     });
                 } else {
+                    input.destroy(id);
                     codecheckSub.unsubscribe();
                     checkAndExit(done, () => {
                         expect(msg.data.length).to.equal(0);

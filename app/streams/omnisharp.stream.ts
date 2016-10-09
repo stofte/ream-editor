@@ -35,7 +35,8 @@ export class OmnisharpStream {
                 msg.name === EventName.SessionCreate ||
                 msg.name === EventName.SessionContext ||
                 msg.name === EventName.SessionAutocompletion || 
-                msg.name === EventName.SessionCodeCheck
+                msg.name === EventName.SessionCodeCheck || 
+                msg.name === EventName.SessionDestroy
             ))
             .merge(input.events.filter(msg => msg.name === EventName.EditorUpdate))
             // Map to internal OmnisharpSessionMessage
@@ -60,7 +61,7 @@ export class OmnisharpStream {
             .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
             .map(msg => sync.mapMessage(msg))
             .flatMap(msg => {
-                if (msg.type === 'context') {
+                if (msg.type === 'context' || msg.type === 'destroy') {
                     return Observable.from<MessageMap>([{ inner: msg, mapped: new Message(null) }]);
                 } else {
                     const actionName = (msg.type === 'buffer-template' || msg.type === 'edit') ? this.action('updatebuffer') :
@@ -156,15 +157,12 @@ export class OmnisharpStream {
         const event = (msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext) ? 'context' :
             msg.name === EventName.QueryTemplateResponse ? 'buffer-template' :
             msg.name === EventName.SessionAutocompletion ? 'autocompletion' : 
-            msg.name === EventName.SessionCodeCheck ? 'codecheck' : 'edit';
+            msg.name === EventName.SessionCodeCheck ? 'codecheck' : 
+            msg.name === EventName.SessionDestroy ? 'destroy' : 'edit';
 
         Assert(event && event.length, 'Mapped Message to inner');
 
         let fileName = null;
-        if (event === 'buffer-template') {
-            const bufferType = msg.data.connectionId ? `db${msg.data.connectionId}ctx` : 'code';
-            fileName = path.normalize(`${config.omnisharpProjectPath}/${bufferType}${msg.id.replace(/\-/g, '')}.cs`);
-        }
         const lineOffset = msg.data && msg.data.lineOffset || null;
         const columnOffset = msg.data && msg.data.columnOffset || null;
         const template = msg.data && msg.data.template || null;

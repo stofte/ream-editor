@@ -46,6 +46,10 @@ export class InputStream {
         this.subject.next(new Message(EventName.SessionContext, id, connection));
     }
 
+    public destroy(id: string) {
+        this.subject.next(new Message(EventName.SessionDestroy, id));
+    }
+
     public connect() {
         this.connectable.connect();
         this.resolver(true);

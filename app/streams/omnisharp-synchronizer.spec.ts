@@ -87,7 +87,7 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
             sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
         // the template arrives a bit later
         () => subject.next(<OmnisharpSessionMessage> {
-            sessionId, timestamp: performance.now(), type: 'buffer-template', fileName: 'foo', lineOffset: 0 }),
+            sessionId, timestamp: performance.now(), type: 'buffer-template', lineOffset: 0 }),
         () => subject.next(<OmnisharpSessionMessage> {
             sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
         // these should be executed without blocking each other
@@ -116,16 +116,18 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
         () => subject.next(<OmnisharpSessionMessage> {
             sessionId, timestamp: performance.now(), type: 'autocompletion', autocompletion: auto3 }),
         () => subject.next(<OmnisharpSessionMessage> {
-            sessionId, timestamp: performance.now(), type: 'buffer-template', fileName: 'bar', lineOffset: 1 }),
+            sessionId, timestamp: performance.now(), type: 'buffer-template', lineOffset: 1 }),
         // switch context
 /* 16 */() => subject.next(<OmnisharpSessionMessage> {
             sessionId, timestamp: performance.now(), type: 'context' }),
         () => subject.next(<OmnisharpSessionMessage> {
             sessionId, timestamp: performance.now(), type: 'codecheck' }),
         () => subject.next(<OmnisharpSessionMessage> {
-            sessionId, timestamp: performance.now(), type: 'buffer-template', fileName: 'baz', lineOffset: 2 }),
+            sessionId, timestamp: performance.now(), type: 'buffer-template', lineOffset: 2 }),
         () => subject.next(<OmnisharpSessionMessage> {
-            sessionId, timestamp: performance.now(), type: 'edit', edits: [] })
+            sessionId, timestamp: performance.now(), type: 'edit', edits: [] }),
+        () => subject.next(<OmnisharpSessionMessage> {
+            sessionId, timestamp: performance.now(), type: 'destroy' })
     ];
     // setup stream
     let idx = 0;
@@ -172,10 +174,6 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
             const completions = testMsgs.filter(x => x.type === 'autocompletion').map(x => x.autoline);
             expect(completions).to.deep.equal([11, 21, 32], 'Correct lineOffset on autocompletions');
 
-            const fileNames = dependents.map(x => x.fileName);
-            expect(fileNames.slice(0, 6).join('')).to.match(/(foo){6}/, 'Filename, idx 0-5');
-            expect(fileNames.slice(6, 9).join('')).to.match(/(bar){3}/, 'Filename, idx 6-9');
-            expect(fileNames.slice(9, 11).join('')).to.match(/(baz){2}/, 'Filename, idx 9-11');
             const initTimestamps = dependents.map(x => x.timestamp);
             const doneTimestamps = dependents.map(x => x.resolvedTimestamp);
             // check that dependents were not reordered

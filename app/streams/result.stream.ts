@@ -23,7 +23,8 @@ export class ResultStream {
             // todo: this will fail with interleaving table dumps from the same session, index by table id property 
             let tableResult: ResultPage = null;
             obs.next(new Message(EventName.ResultStart, req.id));
-            this.query.events
+            // this sub is dependents on the close msg to complete.
+            const socketSub = this.query.events
                 .filter(msg => msg.name === EventName.QuerySocketOutput && msg.data.session === req.id)
                 .map(msg => msg.data)
                 .subscribe(socket => {
@@ -57,6 +58,7 @@ export class ResultStream {
                             obs.next(new Message(EventName.ResultUpdate, socket.session, this.mapSingleAtomic(socket)));
                             break;
                         case 'close':
+                            socketSub.unsubscribe();
                             obs.next(new Message(EventName.ResultDone, socket.session));
                             obs.complete();
                             break;

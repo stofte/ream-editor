@@ -57,14 +57,23 @@ export class EditorStream {
         const editMsgs = input
                     .events
                     .filter(msg => msg.name === EventName.SessionCreate)
-                    .flatMap(msg => input.events.filter(e => e.name === EventName.EditorUpdate && e.id === msg.id))
-                    .scan((buffers: BufferText[], editor: Message, index: number) => {
-                        if (!buffers.find(x => x.id === editor.id)) {
-                            buffers.push(new BufferText(editor.id));
+                    .flatMap(msg => {
+                        return input.events
+                            .filter(e => e.name === EventName.EditorUpdate && e.id === msg.id)
+                            .takeUntil(input.events.first(x => x.name === EventName.SessionDestroy && x.id === msg.id));
+                    })
+                    .merge(input.events.filter(x => x.name === EventName.SessionDestroy))
+                    .scan((buffers: BufferText[], msg: Message, index: number) => {
+                        if (msg.name === EventName.SessionDestroy) {
+                            return buffers.filter(x => x.id !== msg.id);
+                        } else {
+                            if (!buffers.find(x => x.id === msg.id)) {
+                                buffers.push(new BufferText(msg.id));
+                            }
+                            const b = buffers.find(x => x.id === msg.id);
+                            b.edit(msg.data);
+                            return buffers;
                         }
-                        const b = buffers.find(x => x.id === editor.id);
-                        b.edit(editor.data);
-                        return buffers;
                     }, [])
                     .publish();
         editMsgs.connect();

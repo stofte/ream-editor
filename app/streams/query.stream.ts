@@ -66,7 +66,7 @@ export class QueryStream {
             .flatMap(sessionMsg => {
                 const initialMessage = sessionMsg.name === EventName.SessionCreate ? 
                     Observable.from<Message>([new Message(EventName.EditorBufferText, sessionMsg.id, '')]) :
-                    editor.bufferedTexts.filter(msg => msg.name === EventName.EditorBufferText && msg.id === sessionMsg.id);
+                    editor.bufferedTexts.first(msg => msg.name === EventName.EditorBufferText && msg.id === sessionMsg.id);
                 return initialMessage
                     .flatMap(msg => {
                         let req: any = null;
@@ -135,8 +135,7 @@ export class QueryStream {
     }
 
     public once(pred: (msg: Message) => boolean, handler: (msg: Message) => void) {
-        const sub = this.events.filter(msg => pred(msg)).subscribe(msg => {
-            sub.unsubscribe();
+        this.events.first(msg => pred(msg)).subscribe(msg => {
             handler(msg);
         });
     }

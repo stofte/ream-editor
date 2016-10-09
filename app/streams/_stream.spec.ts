@@ -68,7 +68,7 @@ describe('[int-test] streams', function() {
     }
     l.forEach(() => {
         it('runs all flows at once /' + (idx++), function(done) {
-            this.timeout(backendTimeout * 100);
+            this.timeout(backendTimeout);
 
             let step1Resolver = null;
             let step2Resolver = null;

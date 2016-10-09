@@ -57,48 +57,77 @@ describe('[int-test] streams', function() {
     });
 
     [
-        [0, 0], [0, 0]
-        // steps below take about 1 hour
-        // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
-        // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
-        // [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
-        // [5, 30], [5, 30], [5, 30], [5, 30], [5, 30],
-        // [5, 30], [5, 30], [5, 30], [5, 30], [5, 30],
-        // [5, 30], [5, 30], [5, 30], [5, 30], [5, 30],
-        // [5, 60], [5, 60], [5, 60], [5, 60], [5, 60],
-        // [5, 60], [5, 60], [5, 60], [5, 60], [5, 60],
-        // [5, 60], [5, 60], [5, 60], [5, 60], [5, 60],
-        // [10, 50], [10, 50], [10, 50], [10, 50], [10, 50],
-        // [10, 50], [10, 50], [10, 50], [10, 50], [10, 50],
-        // [10, 50], [10, 50], [10, 50], [10, 50], [10, 50],
-        // [50, 50], [50, 50], [50, 50], [50, 50], [50, 50],
-        // [50, 50], [50, 50], [50, 50], [50, 50], [50, 50],
-        // [50, 50], [50, 50], [50, 50], [50, 50], [50, 50],
-        // [10, 100], [10, 100], [10, 100], [10, 100], [10, 100],
-        // [10, 100], [10, 100], [10, 100], [10, 100], [10, 100],
-        // [10, 100], [10, 100], [10, 100], [10, 100], [10, 100],
-        // [50, 100], [50, 100], [50, 100], [50, 100], [50, 100],
-        // [50, 100], [50, 100], [50, 100], [50, 100], [50, 100],
-        // [50, 100], [50, 100], [50, 100], [50, 100], [50, 100],
-        // [50, 150], [50, 150], [50, 150], [50, 150], [50, 150],
-        // [50, 150], [50, 150], [50, 150], [50, 150], [50, 150],
-        // [50, 150], [50, 150], [50, 150], [50, 150], [50, 150],
-        // [50, 200], [50, 200], [50, 200], [50, 200], [50, 200],
-        // [50, 200], [50, 200], [50, 200], [50, 200], [50, 200],
-        // [50, 200], [50, 200], [50, 200], [50, 200], [50, 200],
-        // [100, 200], [100, 200], [100, 200], [100, 200], [100, 200],
-        // [100, 200], [100, 200], [100, 200], [100, 200], [100, 200],
-        // [100, 200], [100, 200], [100, 200], [100, 200], [100, 200]
-    ].forEach(([replayMinDelay, replayMaxDelay]) => {
-    describe(`delay: ${replayMinDelay} -> ${replayMaxDelay}ms`, () => {
+        [0, 10, 2]
+    ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
+    describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
+        let idx = 0;
+    const l = [];
+    l[stepCount - 1] = 1;
+    for(let i = 0; i < l.length; i++) {
+        l[i] = i;
+    }
+    l.forEach(() => {
+        it('runs all flows at once /' + (idx++), function(done) {
+            this.timeout(backendTimeout * 100);
 
-    it('emits result for simple value expressions', function(done) {
-        this.timeout(backendTimeout * (cSharpTestData.length + 1));
+            let step1Resolver = null;
+            let step2Resolver = null;
+            let step3Resolver = null;
+            let step4Resolver = null;
+            let step5Resolver = null;
+            let step6Resolver = null;
+            const step1Promise = new Promise((done) => step1Resolver = done);
+            const step2Promise = new Promise((done) => step2Resolver = done);
+            const step3Promise = new Promise((done) => step3Resolver = done);
+            const step4Promise = new Promise((done) => step4Resolver = done);
+            const step5Promise = new Promise((done) => step5Resolver = done);
+            const step6Promise = new Promise((done) => step6Resolver = done);
+
+            emitsResultsForSimpleValueExpressions(step1Resolver);
+            emitsResultsForLinqBasedQueryAgainstSqliteDatabase(step2Resolver);
+            emitsCodecheckForSimpleStatement(step3Resolver);
+            emitsCodecheckForDatabaseQuery(step4Resolver);
+            emitsAutocompletionForSimpleStatement(step5Resolver);
+            emitsCodecheckAfterSwitchingBufferContext(step6Resolver);
+
+            const failures = [];
+            // todo do something nicer
+            const doneHandler = (val) => {
+                if (val) {
+                    failures.push(val);
+                }
+            }
+            step1Promise.then(doneHandler);
+            step2Promise.then(doneHandler);
+            step3Promise.then(doneHandler);
+            step4Promise.then(doneHandler);
+            step5Promise.then(doneHandler);
+            step6Promise.then(doneHandler);
+
+            step1Promise.then(() => step2Promise.then(() => step3Promise.then(() => {
+                step4Promise.then(() => step5Promise.then(() => step6Promise.then(() => {
+                    setTimeout(() => {
+                        if (failures.length > 0) {
+                            done(failures);
+                        } else {
+                            done();
+                        }
+                    }, 100);
+                })));
+            })));
+        });
+    });
+
+
+    function emitsResultsForSimpleValueExpressions(done) {
+    // it('emits result for simple value expressions', function(done) {
+        // this.timeout(backendTimeout * (cSharpTestData.length + 1));
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
             const expectedPage = cSharpTestDataExpectedResult[idx][0];
             const id = uuid.v4();
+            // console.log(id, 'emitsResultsForSimpleValueExpressions');
             const resultSub = output.events
                 .filter(msg => msg.id === id)
                 .subscribe(msg => {
@@ -129,12 +158,12 @@ describe('[int-test] streams', function() {
                 () => input.executeBuffer(id)
             ], replayMaxDelay, replayMinDelay);
         });
-    });
+    }
 
-    it('emits results for linq based query against sqlite database', function(done) {
-        this.timeout(backendTimeout * 3);
+    function emitsResultsForLinqBasedQueryAgainstSqliteDatabase(done) {
         const expectedPage = cSharpCityFilteringQueryEditorTestData[0]; 
         const id = uuid.v4();
+        // console.log(id, 'emitsResultsForLinqBasedQueryAgainstSqliteDatabase');
         let rowCount = 0;
         let headers: any[] = null;
         let rows: any[] = null;
@@ -170,11 +199,11 @@ describe('[int-test] streams', function() {
                 fn: (evt) => input.edit(id, evt)
             }, () => input.executeBuffer(id)
         ], replayMaxDelay, replayMinDelay);
-    });
+    }
 
-    it('emits codecheck for simple statement', function(done) {
-        this.timeout(backendTimeout * 2);
+    function emitsCodecheckForSimpleStatement(done) {
         const id = uuid.v4();
+        // console.log(id, 'emitsCodecheckForSimpleStatement');
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
@@ -209,12 +238,12 @@ describe('[int-test] streams', function() {
             },
             () => input.codeCheck(id)
         ], replayMaxDelay, replayMinDelay);
-    });
+    }
 
 
-    it('emits codecheck for database query', function(done) {
-        this.timeout(backendTimeout * 2);
+    function emitsCodecheckForDatabaseQuery(done) {
         const id = uuid.v4();
+        // console.log(id, 'emitsCodecheckForDatabaseQuery');
         const firstEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time >= 6000);
         let codechecks = 0;
@@ -253,10 +282,9 @@ describe('[int-test] streams', function() {
             },
             () => input.codeCheck(id)
         ], replayMaxDelay, replayMinDelay);
-    });
+    }
 
-    it('emits autocompletion for simple statement', function(done) {
-        this.timeout(backendTimeout * 2);
+    function emitsAutocompletionForSimpleStatement(done) {
         const completionSub = output.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
             completionSub.unsubscribe();
             const items = msg.data.map(x => x.CompletionText);
@@ -267,6 +295,7 @@ describe('[int-test] streams', function() {
             done();
         });
         const id = uuid.v4();
+        // console.log(id, 'emitsAutocompletionForSimpleStatement');
         replaySteps([
             () => input.new(id),
             {
@@ -275,12 +304,12 @@ describe('[int-test] streams', function() {
             },
             () => input.autoComplete(id, cSharpAutocompletionRequestTestData[0])
         ], replayMaxDelay, replayMinDelay);
-    });
+    }
 
-    it('emits codecheck after switching buffer context', function(done) {
-        this.timeout(backendTimeout * 3);
+    function emitsCodecheckAfterSwitchingBufferContext(done) {
         sqliteConnection.id = 42;
         const id = uuid.v4();
+        // console.log(id, 'emitsCodecheckAfterSwitchingBufferContext');
         const firstEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time < 5000);
         const secondEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time >= 5000);
         const expectedCheck = cSharpContextSwitchExpectedCodeChecks[0];
@@ -319,7 +348,7 @@ describe('[int-test] streams', function() {
             },
             () => input.codeCheck(id)
         ], replayMaxDelay, replayMinDelay);
-    });
+    }
 
     })}); // end main test loop
 

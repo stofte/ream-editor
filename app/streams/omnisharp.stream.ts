@@ -28,7 +28,6 @@ export class OmnisharpStream {
         // these are then mapped to OmnisharpSessionMessage for the synchronizer.
         // Every msg funnels into the queueOperation call, causing that msg to block on a promise,
         // which the synchronizer will resolve when appropriate.
-        // Todo msgs from all sessions are serialized, ideally, we only serialize by session.
         const stream = query.events
             .filter(msg => msg.name === EventName.QueryTemplateResponse)
             .merge(input.events.filter(msg => 

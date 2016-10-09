@@ -7,17 +7,18 @@ export enum EventName {
     ProcessClosing,
     ProcessClosed,
 
-    SessionCreate, // 6
+    SessionCreate,
     SessionExecuteBuffer,
     SessionCodeCheck,
     SessionAutocompletion,
-    SessionContext, // 10
+    SessionContext,
+    SessionDestroy,
     
     EditorExecuteText, // text intended for execution
     EditorBufferText, // full text of a given buffer, for templating a new session, with the current buffer contents in it
     EditorUpdate, // individual updates from editor
 
-    ResultStart, // 14
+    ResultStart,
     ResultUpdate,
     ResultDone,
 
@@ -42,7 +43,7 @@ export class Message {
 }
 
 // only used internally by omnisharp stream/synchronizer
-type sessionEventType = 'context' | 'buffer-template' | 'edit' | 'codecheck' | 'autocompletion' | 'timer';
+type sessionEventType = 'context' | 'buffer-template' | 'edit' | 'codecheck' | 'autocompletion' | 'timer' | 'destroy';
 
 export class OmnisharpSessionMessage {
     constructor(

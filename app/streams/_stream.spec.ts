@@ -56,77 +56,109 @@ describe('[int-test] streams', function() {
         injector.get(StreamStarter);
     });
 
-    [
-        [0, 10, 2]
-    ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
-    describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
-        let idx = 0;
-    const l = [];
-    l[stepCount - 1] = 1;
-    for(let i = 0; i < l.length; i++) {
-        l[i] = i;
+    describe('single flows', function() {
+        it('emits results for simple value expressions', done => {
+            emitsResultsForSimpleValueExpressions(done, 10, 0);
+        });
+        it('emits results for linq based query against sqlite database', done => {
+            emitsResultsForLinqBasedQueryAgainstSqliteDatabase(done, 10, 0);
+        });
+        it('emits codechecks for simple value expressions', done => {
+            emitsCodecheckForSimpleStatement(done, 10, 0);
+        });
+        it('emits codechecks for database query', done => {
+            emitsCodecheckForDatabaseQuery(done, 10, 0);
+        });
+        it('emits autocompletions for simple expression', done => {
+            emitsAutocompletionForSimpleStatement(done, 10, 0);
+        });
+        it('emits autocompletions after switching buffer context', done => {
+            emitsCodecheckAfterSwitchingBufferContext(done, 10, 0);
+        });
+    });
+
+    let runTimings = {  };
+
+    function getAllTimings() {
+        return `all: ` + JSON.stringify(runTimings);
     }
-    l.forEach(() => {
-        it('runs all flows at once /' + (idx++), function(done) {
-            this.timeout(backendTimeout);
 
-            let step1Resolver = null;
-            let step2Resolver = null;
-            let step3Resolver = null;
-            let step4Resolver = null;
-            let step5Resolver = null;
-            let step6Resolver = null;
-            const step1Promise = new Promise((done) => step1Resolver = done);
-            const step2Promise = new Promise((done) => step2Resolver = done);
-            const step3Promise = new Promise((done) => step3Resolver = done);
-            const step4Promise = new Promise((done) => step4Resolver = done);
-            const step5Promise = new Promise((done) => step5Resolver = done);
-            const step6Promise = new Promise((done) => step6Resolver = done);
+    [
+        [0, 10, 20]
+    ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
+        describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
+            function runAllAtOnce(done) {
+                this.timeout(backendTimeout * 2);
 
-            emitsResultsForSimpleValueExpressions(step1Resolver);
-            emitsResultsForLinqBasedQueryAgainstSqliteDatabase(step2Resolver);
-            emitsCodecheckForSimpleStatement(step3Resolver);
-            emitsCodecheckForDatabaseQuery(step4Resolver);
-            emitsAutocompletionForSimpleStatement(step5Resolver);
-            emitsCodecheckAfterSwitchingBufferContext(step6Resolver);
+                let step1Resolver = null;
+                let step2Resolver = null;
+                let step3Resolver = null;
+                let step4Resolver = null;
+                let step5Resolver = null;
+                let step6Resolver = null;
+                const step1Promise = new Promise((done) => step1Resolver = done);
+                const step2Promise = new Promise((done) => step2Resolver = done);
+                const step3Promise = new Promise((done) => step3Resolver = done);
+                const step4Promise = new Promise((done) => step4Resolver = done);
+                const step5Promise = new Promise((done) => step5Resolver = done);
+                const step6Promise = new Promise((done) => step6Resolver = done);
 
-            const failures = [];
-            // todo do something nicer
-            const doneHandler = (val) => {
-                if (val) {
-                    failures.push(val);
+                emitsResultsForSimpleValueExpressions(step1Resolver, replayMaxDelay, replayMinDelay);
+                emitsResultsForLinqBasedQueryAgainstSqliteDatabase(step2Resolver, replayMaxDelay, replayMinDelay);
+                emitsCodecheckForSimpleStatement(step3Resolver, replayMaxDelay, replayMinDelay);
+                emitsCodecheckForDatabaseQuery(step4Resolver, replayMaxDelay, replayMinDelay);
+                emitsAutocompletionForSimpleStatement(step5Resolver, replayMaxDelay, replayMinDelay);
+                emitsCodecheckAfterSwitchingBufferContext(step6Resolver, replayMaxDelay, replayMinDelay);
+
+                const failures = [];
+                // todo do something nicer
+                const doneHandler = (val) => {
+                    if (val) {
+                        failures.push(val);
+                    }
                 }
-            }
-            step1Promise.then(doneHandler);
-            step2Promise.then(doneHandler);
-            step3Promise.then(doneHandler);
-            step4Promise.then(doneHandler);
-            step5Promise.then(doneHandler);
-            step6Promise.then(doneHandler);
+                step1Promise.then(doneHandler);
+                step2Promise.then(doneHandler);
+                step3Promise.then(doneHandler);
+                step4Promise.then(doneHandler);
+                step5Promise.then(doneHandler);
+                step6Promise.then(doneHandler);
 
-            step1Promise.then(() => step2Promise.then(() => step3Promise.then(() => {
-                step4Promise.then(() => step5Promise.then(() => step6Promise.then(() => {
-                    setTimeout(() => {
-                        if (failures.length > 0) {
-                            done(failures);
-                        } else {
-                            done();
-                        }
-                    }, 100);
+                step1Promise.then(() => step2Promise.then(() => step3Promise.then(() => {
+                    step4Promise.then(() => step5Promise.then(() => step6Promise.then(() => {
+                        setTimeout(() => {
+                            runTimings = {};
+                            if (failures.length > 0) {
+                                done(failures);
+                            } else {
+                                
+                                done();
+                            }
+                        }, 100);
+                    })));
                 })));
-            })));
+            }
+
+            let idx = 0;
+            const l = [];
+            l[stepCount - 1] = 1;
+            for(let i = 0; i < l.length; i++) {
+                l[i] = i;
+            }
+            l.forEach(() => {
+                it('runs all flows at once /' + (idx++), runAllAtOnce);
+            });
         });
     });
 
 
-    function emitsResultsForSimpleValueExpressions(done) {
-    // it('emits result for simple value expressions', function(done) {
-        // this.timeout(backendTimeout * (cSharpTestData.length + 1));
+    function emitsResultsForSimpleValueExpressions(done, replayMaxDelay, replayMinDelay) {
         let verifyCount = 0;
         cSharpTestData.forEach((testData, idx: number) => {
             // only a single page
             const expectedPage = cSharpTestDataExpectedResult[idx][0];
             const id = uuid.v4();
+            const ts = performance.now();
             // console.log(id, 'emitsResultsForSimpleValueExpressions');
             const resultSub = output.events
                 .filter(msg => msg.id === id)
@@ -137,7 +169,10 @@ describe('[int-test] streams', function() {
                         if (verifyCount === cSharpTestData.length) {
                             expect(verifyCount).to.equal(cSharpTestData.length, 
                                 `verifyCount (${verifyCount}) should match length of test data: ${cSharpTestData.length}`);
+                                
                             verifyCount++; // to avoid running check in other thread
+                            runTimings['emitsResultsForSimpleValueExpressions'] =  performance.now() - ts;
+                            // console.log('emitsResultsForSimpleValueExpressions duration', runTimings['emitsResultsForSimpleValueExpressions']);
                             done();
                         }
                     } else if (msg.name === EventName.ResultUpdate) {
@@ -161,9 +196,10 @@ describe('[int-test] streams', function() {
         });
     }
 
-    function emitsResultsForLinqBasedQueryAgainstSqliteDatabase(done) {
+    function emitsResultsForLinqBasedQueryAgainstSqliteDatabase(done, replayMaxDelay, replayMinDelay) {
         const expectedPage = cSharpCityFilteringQueryEditorTestData[0]; 
         const id = uuid.v4();
+        const ts = performance.now();
         // console.log(id, 'emitsResultsForLinqBasedQueryAgainstSqliteDatabase');
         let rowCount = 0;
         let headers: any[] = null;
@@ -187,6 +223,8 @@ describe('[int-test] streams', function() {
                             expect(rows[0][cityColIdx].substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
+                        runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
+                        // console.log('emitsResultsForLinqBasedQueryAgainstSqliteDatabase', runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase']);
                     });
                 } else if (msg.name === EventName.ResultUpdate) {
                     rows = msg.data.rows;
@@ -203,8 +241,9 @@ describe('[int-test] streams', function() {
         ], replayMaxDelay, replayMinDelay);
     }
 
-    function emitsCodecheckForSimpleStatement(done) {
+    function emitsCodecheckForSimpleStatement(done, replayMaxDelay, replayMinDelay) {
         const id = uuid.v4();
+        const ts = performance.now();
         // console.log(id, 'emitsCodecheckForSimpleStatement');
         const firstEdits = codecheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = codecheckEditorTestData[0].events.filter(x => x.time >= 6000);
@@ -224,6 +263,8 @@ describe('[int-test] streams', function() {
             if (codechecks >= cSharpTestDataExpectedCodeChecks.length) {
                 input.destroy(id);
                 codecheckSub.unsubscribe();
+                runTimings['emitsCodecheckForSimpleStatement'] =  performance.now() - ts;
+                // console.log('emitsCodecheckForSimpleStatement', runTimings['emitsCodecheckForSimpleStatement']);
                 done();
             }
         });
@@ -243,9 +284,9 @@ describe('[int-test] streams', function() {
         ], replayMaxDelay, replayMinDelay);
     }
 
-
-    function emitsCodecheckForDatabaseQuery(done) {
+    function emitsCodecheckForDatabaseQuery(done, replayMaxDelay, replayMinDelay) {
         const id = uuid.v4();
+        const ts = performance.now();
         // console.log(id, 'emitsCodecheckForDatabaseQuery');
         const firstEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time < 6000);
         const secondEdits = cSharpDatabaseCodeCheckEditorTestData[0].events.filter(x => x.time >= 6000);
@@ -256,7 +297,7 @@ describe('[int-test] streams', function() {
             if (isFirstCheck) {
                 isFirstCheck = false;
                 check([done, codecheckSub], () => {
-                    expect(msg.data.length).to.equal(1);
+                    expect(msg.data.length).to.equal(1, 'first codecheck on db context should be one');
                     expect(msg.data[0].line).to.equal(expectedCheck.line, 'line');
                     expect(msg.data[0].column).to.equal(expectedCheck.column, 'column');
                     expect(msg.data[0].endLine).to.equal(expectedCheck.endLine, 'endLine');
@@ -268,7 +309,9 @@ describe('[int-test] streams', function() {
                 input.destroy(id);
                 codecheckSub.unsubscribe();
                 checkAndExit(done, () => {
-                    expect(msg.data.length).to.equal(0);
+                    expect(msg.data.length).to.equal(0, 'Second codecheck on db context should have zero errors');
+                    runTimings['emitsCodecheckForDatabaseQuery'] =  performance.now() - ts;
+                    // console.log('emitsCodecheckForDatabaseQuery', runTimings['emitsCodecheckForDatabaseQuery']);
                 });
             }
         });
@@ -288,7 +331,10 @@ describe('[int-test] streams', function() {
         ], replayMaxDelay, replayMinDelay);
     }
 
-    function emitsAutocompletionForSimpleStatement(done) {
+    function emitsAutocompletionForSimpleStatement(done, replayMaxDelay, replayMinDelay) {
+        const ts = performance.now();
+        const id = uuid.v4();
+        // console.log(id, 'emitsAutocompletionForSimpleStatement');
         const completionSub = output.events.filter(msg => msg.name === EventName.OmniSharpAutocompletion).subscribe(msg => {
             input.destroy(id);
             completionSub.unsubscribe();
@@ -297,10 +343,10 @@ describe('[int-test] streams', function() {
             cSharpAutocompletionExpectedValues[0].forEach(expectedEntry => {
                 expect(items).to.contain(expectedEntry, `Expected completion item "${expectedEntry}"`);
             });
+            runTimings['emitsAutocompletionForSimpleStatement'] =  performance.now() - ts;
+            // console.log('emitsAutocompletionForSimpleStatement', runTimings['emitsAutocompletionForSimpleStatement']);
             done();
         });
-        const id = uuid.v4();
-        // console.log(id, 'emitsAutocompletionForSimpleStatement');
         replaySteps([
             () => input.new(id),
             {
@@ -311,8 +357,9 @@ describe('[int-test] streams', function() {
         ], replayMaxDelay, replayMinDelay);
     }
 
-    function emitsCodecheckAfterSwitchingBufferContext(done) {
+    function emitsCodecheckAfterSwitchingBufferContext(done, replayMaxDelay, replayMinDelay) {
         sqliteConnection.id = 42;
+        const ts = performance.now();
         const id = uuid.v4();
         // console.log(id, 'emitsCodecheckAfterSwitchingBufferContext');
         const firstEdits = cSharpContextSwitchEditorTestData[0].events.filter(x => x.time < 5000);
@@ -325,7 +372,7 @@ describe('[int-test] streams', function() {
                 codechecks++;
                 if (codechecks === 1) {
                     check([done, codecheckSub], () => {
-                        expect(msg.data.length).to.equal(1);
+                        expect(msg.data.length).to.equal(1, 'First code check should have one item');
                         expect(msg.data[0].text).to.equal(expectedCheck.text);
                         expect(msg.data[0].logLevel).to.equal(expectedCheck.logLevel);
                     });
@@ -333,7 +380,9 @@ describe('[int-test] streams', function() {
                     input.destroy(id);
                     codecheckSub.unsubscribe();
                     checkAndExit(done, () => {
-                        expect(msg.data.length).to.equal(0);
+                        expect(msg.data.length).to.equal(0, 'After switching ctx, no errors should appear');
+                        runTimings['emitsCodecheckAfterSwitchingBufferContext'] =  performance.now() - ts;
+                        // console.log('emitsCodecheckAfterSwitchingBufferContext', runTimings['emitsCodecheckAfterSwitchingBufferContext']);
                     });
                 }
             });
@@ -356,8 +405,6 @@ describe('[int-test] streams', function() {
         ], replayMaxDelay, replayMinDelay);
     }
 
-    })}); // end main test loop
-
     describe('shutdowns', () => {
         it('stops query process when stopServer is called', function(done) {
             this.timeout(backendTimeout);
@@ -367,7 +414,7 @@ describe('[int-test] streams', function() {
                     .on('error', () => { done(); });
             });
             replaySteps([
-                () => query.stopServer()
+                100, () => query.stopServer()
             ]);
         });
 
@@ -379,7 +426,7 @@ describe('[int-test] streams', function() {
                     .on('error', () => { done(); });
             });
             replaySteps([
-                () => omnisharp.stopServer()
+                100, () => omnisharp.stopServer()
             ]);
         });
     });

@@ -7,6 +7,7 @@ import { InputStream } from './input.stream'; // todo es6 class bs
 import { ProcessHelper } from '../utils/process-helper';
 import { CodeRequest, CodeTemplateRequest, QueryTemplateRequest,
     TemplateResponse, WebSocketMessage } from './interfaces';
+import { TemplateInfo, TemplateCache } from './template-cache';
 import config from '../config';
 
 class TemplateRequest {
@@ -23,6 +24,7 @@ export class QueryStream {
     public events: Observable<Message>;
     private socket: Subject<Message> = new Subject<Message>();
     private process: ProcessStream = null;
+    private templateCache = new TemplateCache();
     constructor(
         private editor: EditorStream,
         private input: InputStream,
@@ -69,41 +71,54 @@ export class QueryStream {
                     editor.bufferedTexts.first(msg => msg.name === EventName.EditorBufferText && msg.id === sessionMsg.id);
                 return initialMessage
                     .flatMap(msg => {
-                        let req: any = null;
-                        let method: string = null;
-                        // passed from initialMessage stream
                         const initialText = msg.data;
-                        // inject possible connection info from sessionMsg
-                        if (sessionMsg.data) {
-                            method = this.action('querytemplate');
-                            req = {
-                                text: initialText,
-                                id: sessionMsg.id,
-                                serverType: sessionMsg.data.type,
-                                connectionString: sessionMsg.data.connectionString
-                            };
-                        } else {
-                            method = this.action('codetemplate');
-                            req = { text: initialText, id: sessionMsg.id };
-                        }
-                        return this.http
-                            .post(method, JSON.stringify(req))
-                            .map(res => {
-                                const data = res.json();
-                                const connectionId = sessionMsg.data ? sessionMsg.data.id : null;
-                                return new Message(EventName.QueryTemplateResponse, req.id, {
-                                    code: data.Code,
-                                    message: data.Message,
-                                    namespace: data.Namespace,
-                                    template: data.Template,
-                                    header: data.Header,
-                                    footer: data.Footer,
-                                    columnOffset: data.ColumnOffset,
-                                    lineOffset: data.LineOffset,
-                                    defaultQuery: data.DefaultQuery,
+                        const connectionId = sessionMsg.data ? sessionMsg.data.id : null;
+                        const cachedTemplated = this.templateCache.query(connectionId, initialText);
+                        if (cachedTemplated) {
+                            return Observable.from([
+                                new Message(EventName.QueryTemplateResponse, sessionMsg.id, <TemplateResponse> {
+                                    template: cachedTemplated.template,
+                                    columnOffset: cachedTemplated.columnOffset,
+                                    lineOffset: cachedTemplated.lineOffset,
                                     connectionId
-                                }, sessionMsg.timestamp);
-                            });
+                                }, sessionMsg.timestamp)
+                            ]).delay(100); // todo something nasty
+                        } else {
+                            let req: any = null;
+                            let method: string = null;
+                            // inject possible connection info from sessionMsg
+                            if (sessionMsg.data) {
+                                method = this.action('querytemplate');
+                                req = {
+                                    text: initialText,
+                                    id: sessionMsg.id,
+                                    serverType: sessionMsg.data.type,
+                                    connectionString: sessionMsg.data.connectionString
+                                };
+                            } else {
+                                method = this.action('codetemplate');
+                                req = { text: initialText, id: sessionMsg.id };
+                            }
+                            return this.http
+                                .post(method, JSON.stringify(req))
+                                .map(res => {
+                                    const data = res.json();
+                                    this.templateCache.add(connectionId, data.Template, initialText, data.LineOffset, data.ColumnOffset, data.Namespace);
+                                    let x = new Message(EventName.QueryTemplateResponse, req.id, <TemplateResponse> {
+                                        code: data.Code,
+                                        message: data.Message,
+                                        namespace: data.Namespace,
+                                        template: data.Template,
+                                        header: data.Header,
+                                        footer: data.Footer,
+                                        columnOffset: data.ColumnOffset,
+                                        lineOffset: data.LineOffset,
+                                        defaultQuery: data.DefaultQuery,
+                                        connectionId
+                                    }, sessionMsg.timestamp);
+                                    return x;
+                                });
+                        }
                     });
             })
             .publish();

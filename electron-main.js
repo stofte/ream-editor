@@ -27,7 +27,7 @@ let cleanedUpLogs = false;
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1100, height: 900, title: 'Ream'});
+    mainWindow = new BrowserWindow({width: 1100, height: 900, title: 'Ream', frame: false });
     
     var template = [{
             label: 'File',

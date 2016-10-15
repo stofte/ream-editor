@@ -5,23 +5,17 @@ import { AppComponent } from './app.component';
 import { TabListComponent, TabViewComponent, QuerySuiteComponent, ResultDisplayComponent,
     ResultListComponent, ExecuteQueryComponent, ConnectionSelectorComponent,
     ConnectionManagerComponent, StartPageComponent } from './components/index';
+import { MdlModule } from 'angular2-mdl';
 
 @NgModule({
     declarations: [
         AppComponent,
-        // TabListComponent,
-        // TabViewComponent,
-        // QuerySuiteComponent,
-        // ResultDisplayComponent,
-        // ResultListComponent,
-        // ExecuteQueryComponent,
-        // ConnectionSelectorComponent,
-        // ConnectionManagerComponent,
-        // StartPageComponent
+        TabListComponent
     ],
     imports: [
         BrowserModule,
-        HttpModule
+        HttpModule,
+        MdlModule
     ],
     bootstrap: [AppComponent],
 })

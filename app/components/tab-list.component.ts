@@ -15,19 +15,7 @@ import { MonitorService } from '../services/monitor.service';
         <mdl-tabs mdl-ripple mdl-tab-active-index="0">
             <mdl-tab-panel>
                 <mdl-tab-panel-title>
-                    <span>Starks</span>
-                </mdl-tab-panel-title>
-                <mdl-tab-panel-content></mdl-tab-panel-content>
-            </mdl-tab-panel>
-            <mdl-tab-panel>
-                <mdl-tab-panel-title>
-                    <span>Lannisters</span>
-                </mdl-tab-panel-title>
-                <mdl-tab-panel-content></mdl-tab-panel-content>
-            </mdl-tab-panel>
-            <mdl-tab-panel>
-                <mdl-tab-panel-title>
-                    <span>Targaryens</span>
+                    <span>Untitled 1</span>
                 </mdl-tab-panel-title>
                 <mdl-tab-panel-content></mdl-tab-panel-content>
             </mdl-tab-panel>
@@ -37,7 +25,6 @@ import { MonitorService } from '../services/monitor.service';
                 </mdl-tab-panel-title>
                 <mdl-tab-panel-content></mdl-tab-panel-content>
             </mdl-tab-panel>
-            <div class="foo"></div>
         </mdl-tabs>
 `
 })

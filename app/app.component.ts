@@ -25,8 +25,8 @@ import { TabViewComponent } from './components/tab-view.component';
     <mdl-layout-drawer>
         <mdl-layout-title>Ream</mdl-layout-title>
         <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" >Connections</a>
-            <a class="mdl-navigation__link" >About</a>
+            <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer()">Connections</a>
+            <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer()">About</a>
         </nav>
     </mdl-layout-drawer>
     <mdl-layout-content>

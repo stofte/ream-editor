@@ -87,8 +87,23 @@
     justify-content: flex-start;
 }
 
+.mdl-tabs__tab-bar > div:last-child .material-icons {
+    vertical-align: -7px;
+}
+
+.mdl-tabs__tab-bar > div:last-child .mdl-tabs__tab {
+    padding: 0 12px;
+}
+
 /* OVERLAY *******************************************************************/
 
 .mdl-layout__obfuscator.is-visible {
     -webkit-app-region: no-drag;
+}
+
+/* OVERLAY MENU **************************************************************/
+
+.mdl-layout__drawer {
+    -webkit-user-select: none;
+    cursor: default;
 }

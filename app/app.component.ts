@@ -7,7 +7,7 @@ import { TabViewComponent } from './components/tab-view.component';
 @Component({
     selector: 'rm-app',
     template: `
-<mdl-layout mdl-layout-fixed-header #mdlLayout1="mdlLayout">
+<mdl-layout mdl-layout-fixed-header mdl-layout-header-seamed #mdlLayout1="mdlLayout">
     <mdl-layout-header>
         <mdl-layout-header-row>
             <mdl-layout-spacer></mdl-layout-spacer>

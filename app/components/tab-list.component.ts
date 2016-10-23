@@ -30,7 +30,7 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
                 <mdl-icon
                     class="rm-tab-list__tab-closebtn"
                     title="Close"
-                    (click)="closeTab(tab.id)">clear</mdl-icon>
+                    (click)="closeTab(tab.id)">close</mdl-icon>
             </div>
             <div class="rm-tablist__newbtn">
                 <button mdl-button mdl-ripple mdl-button-type="icon" (click)="newTab()" title="New tab">

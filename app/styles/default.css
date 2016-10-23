@@ -12,7 +12,7 @@
     min-height: 30px;
     padding: 0 0 0 60px;
     -webkit-app-region: drag;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .mdl-layout-title {
@@ -100,13 +100,14 @@
     cursor: default;
     display: flex;
     min-height: 36px;
+    background: #eee;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
         0 3px 1px -2px rgba(0,0,0,.2),
         0 1px 5px 0 rgba(0,0,0,.12);
 }
 
 .rm-tablist__newbtn {
-    margin-left: 5px;
+    margin-left: 7px;
     align-self: center;
 }
 
@@ -130,15 +131,19 @@
 
 /* txt label/button */
 .rm-tab-list__tab .mdl-button {
-    padding-right: 25px;
+    padding-right: 34px;
     text-transform: initial;
     border-radius: 0;
     cursor: inherit;
     overflow: initial;
+    color: #333;
     white-space: nowrap;
 }
 .rm-tab-list__tab .mdl-button:hover {
     background: initial;
+}
+.rm-tab-list__tab.is-active .mdl-button {
+    background-color: white;
 }
 
 /* close btn on tab */
@@ -146,10 +151,11 @@
     position: absolute;
     opacity: 0;
     top: 10px;
-    right: 5px;
+    right: 10px;
     font-size: 15px;
     font-weight: normal;
     cursor: inherit;
+    color: #333;
     z-index: 2; /* puts it above the ripple layer for events */
 }
 

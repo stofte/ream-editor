@@ -8,55 +8,60 @@ import { TabService } from '../services/tab.service';
 import { MonitorService } from '../services/monitor.service';
 // import { DROPDOWN_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 
+let tabId = 0;
+
+function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
+    if (cond(elm)) {
+        return elm;
+    } else {
+        return findParent(elm.parentElement, cond);
+    }
+}
+
 @Component({
     selector: 'rm-tab-list',
-    // directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     template: `
-        <mdl-tabs mdl-ripple mdl-tab-active-index="0">
-            <mdl-tab-panel>
-                <mdl-tab-panel-title>
-                    <span>Untitled 1</span>
-                </mdl-tab-panel-title>
-                <mdl-tab-panel-content></mdl-tab-panel-content>
-            </mdl-tab-panel>
-            <mdl-tab-panel>
-                <mdl-tab-panel-title>
+        <div class="rm-tablist">
+            <div *ngFor="let tab of currentTabs; let idx = index"
+                class="rm-tab-list__tab {{ idx === activeIndex ? 'is-active' : '' }}">
+                <button mdl-button mdl-ripple (click)="handleTabs(idx, tab.id)">
+                    {{tab.title}}
+                </button>
+                <mdl-icon
+                    class="rm-tab-list__tab-closebtn"
+                    title="Close"
+                    (click)="closeTab(tab.id)">clear</mdl-icon>
+            </div>
+            <div class="rm-tablist__newbtn">
+                <button mdl-button mdl-ripple mdl-button-type="icon" (click)="newTab()" title="New tab">
                     <mdl-icon>add</mdl-icon>
-                </mdl-tab-panel-title>
-                <mdl-tab-panel-content></mdl-tab-panel-content>
-            </mdl-tab-panel>
-        </mdl-tabs>
+                </button>
+            </div>
+        </div>
 `
 })
 export class TabListComponent {
-    private title = '';
     private currentTabs: Tab[] = [];
-    private tabsEnabled = false;
+    private activeIndex = 0;
+    
     constructor() {
-        // tabs.tabs
-        //     .subscribe(ts => {
-        //         this.currentTabs = ts;
-        //         this.tabsEnabled = ts.length > 0;
-        //     });
+        this.newTab();
     }
     
-    private newTab() {
-        // this.tabs.newTab();
+    private closeTab(id: number) {
+        this.currentTabs = this.currentTabs.filter(x => x.id !== id);
+        if (this.activeIndex >= this.currentTabs.length) {
+            this.activeIndex = this.currentTabs.length - 1;
+        }
     }
 
-    public ngOnInit() {
-        // componentHandler.upgradeElement(this.element.nativeElement);
+    private newTab() {
+        const newId = tabId++;
+        this.currentTabs.push(<Tab> { id: newId, title: `Untitled ${newId}` });
+        this.activeIndex = this.currentTabs.length - 1;
     }
-    
-    private goto(id: number) {
-        // this.tabs.goto(id);
-    }
-    
-    private get viewTitle(): string {
-        return this.tabsEnabled ? '' : 'Hello!';
-    }
-    
-    private get viewTitleClass(): string {
-        return this.tabsEnabled ? 'hidden' : '';
+
+    private handleTabs(index: number, tabId: number) {
+        this.activeIndex = index;
     }
 }

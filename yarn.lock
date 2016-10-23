@@ -72,8 +72,8 @@ angular-in-memory-web-api@0.1.5:
   resolved "https://registry.yarnpkg.com/angular-in-memory-web-api/-/angular-in-memory-web-api-0.1.5.tgz#b4b3a0a2903faed2b154d106837550e03100a628"
 
 angular2-mdl:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/angular2-mdl/-/angular2-mdl-2.1.0.tgz#57c3acb9a6ce1e87119ad4459407dc1e0c906d59"
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/angular2-mdl/-/angular2-mdl-2.2.2.tgz#b1288a84ef8530f02cf1d4fb147e86ae8a188465"
 
 ansi-align@^1.1.0:
   version "1.1.0"

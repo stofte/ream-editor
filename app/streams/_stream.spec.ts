@@ -6,7 +6,7 @@ import { ReflectiveInjector, enableProdMode } from '@angular/core';
 import { Http, XHRBackend, ConnectionBackend, BrowserXhr, ResponseOptions, 
     BaseResponseOptions, RequestOptions, BaseRequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { QueryStream, EditorStream, ResultStream, OmnisharpStream, InputStream, StreamStarter } from './index';
+import { QueryStream, EditorStream, ResultStream, OmnisharpStream, InputStream, StreamManager } from './index';
 import { OutputStream } from './output.stream';
 import config from '../config';
 import { CodeCheckResult, AutocompletionQuery, Connection } from '../models';
@@ -32,6 +32,7 @@ describe('[int-test] streams', function() {
     let query: QueryStream = null;
     let omnisharp: OmnisharpStream = null;
     let output: OutputStream = null;
+    let streamManager: StreamManager = null;
     
     before(function() {
         chai.expect();
@@ -43,7 +44,7 @@ describe('[int-test] streams', function() {
             { provide: RequestOptions, useClass: BaseRequestOptions },
             InputStream,
             OutputStream,
-            StreamStarter,
+            StreamManager,
             EditorStream,
             ResultStream,
             QueryStream,
@@ -53,7 +54,7 @@ describe('[int-test] streams', function() {
         output = injector.get(OutputStream);
         query = injector.get(QueryStream);
         omnisharp = injector.get(OmnisharpStream);
-        injector.get(StreamStarter);
+        streamManager = injector.get(StreamManager);
     });
 
     describe('single flows', function() {
@@ -406,28 +407,21 @@ describe('[int-test] streams', function() {
     }
 
     describe('shutdowns', () => {
-        it('stops query process when stopServer is called', function(done) {
+        it('can close processes when shutting down', function(done) {
             this.timeout(backendTimeout);
-            query.once(msg => msg.name === EventName.ProcessClosed, () => {
-                let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
-                http.get(url, res => { done(new Error('response received')); })
-                    .on('error', () => { done(); });
-            });
-            replaySteps([
-                100, () => query.stopServer()
-            ]);
+            streamManager.close().then(() => done());
         });
-
-        it('stops omnisharp process when stopServer is called', function(done) {
+        it('stops query process when closed', function(done) {
             this.timeout(backendTimeout);
-            omnisharp.once(msg => msg.name === EventName.ProcessClosed, () => {
-                let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
-                http.get(url, res => { done(new Error('response received')); })
-                    .on('error', () => { done(); });
-            });
-            replaySteps([
-                100, () => omnisharp.stopServer()
-            ]);
+            let url = `http://localhost:${config.queryEnginePort}/checkreadystate`;
+            http.get(url, res => { done(new Error('response received')); })
+                .on('error', () => { done(); });
+        });
+        it('stops omnisharp process when closed', function(done) {
+            this.timeout(backendTimeout);
+            let url = `http://localhost:${config.omnisharpPort}/checkreadystate`;
+            http.get(url, res => { done(new Error('response received')); })
+                .on('error', () => { done(); });
         });
     });
 });

@@ -80,14 +80,13 @@ app.on('ready', function() {
 
     // msg app that we're closing and wait for the response
     mainWindow.on('close', function(event) {
-        // console.log('electron-main saw close event');
         // todo enable this logic again
-        // if (!(cleanedUpQueryEngine && cleanedUpOmnisharp && cleanedUpLogs)) {
-        //     mainWindow.webContents.send('application-event', 'close');
-        //     mainWindow.hide();
-        //     event.preventDefault();
-        //     return false;
-        // }
+        if (!(cleanedUpQueryEngine && cleanedUpOmnisharp)) {
+            mainWindow.webContents.send('application-event', 'close');
+            mainWindow.hide();
+            event.preventDefault();
+            return false;
+        }
     });
 
     // Emitted when the window is closed.
@@ -106,7 +105,7 @@ app.on('ready', function() {
         } else if (msg === 'close-log') {
             cleanedUpLogs = true;
         }
-        if (cleanedUpQueryEngine && cleanedUpOmnisharp && cleanedUpLogs) {
+        if (cleanedUpQueryEngine && cleanedUpOmnisharp) {
             mainWindow.close();
         }
     });

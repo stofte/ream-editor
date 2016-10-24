@@ -4,4 +4,5 @@ export * from './query.stream';
 export * from './result.stream';
 export * from './omnisharp.stream';
 export * from './input.stream';
-export * from './stream-starter';
+export * from './stream-manager';
+export * from './output.stream'

@@ -5,12 +5,23 @@ import { AppComponent } from './app.component';
 import { TabListComponent, TabViewComponent, QuerySuiteComponent, ResultDisplayComponent,
     ResultListComponent, ExecuteQueryComponent, ConnectionSelectorComponent,
     ConnectionManagerComponent, StartPageComponent } from './components/index';
+import { InputStream, OutputStream, StreamManager, EditorStream,
+    ResultStream, QueryStream, OmnisharpStream } from './streams/index';
 import { MdlModule } from 'angular2-mdl';
 
 @NgModule({
     declarations: [
         AppComponent,
         TabListComponent
+    ],
+    providers: [
+        InputStream,
+        OutputStream,
+        StreamManager,
+        EditorStream,
+        ResultStream,
+        QueryStream,
+        OmnisharpStream
     ],
     imports: [
         BrowserModule,

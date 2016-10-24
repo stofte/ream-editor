@@ -169,21 +169,7 @@
 .rm-tab-list__tab:hover .rm-tab-list__tab-closebtn,
 .rm-tab-list__tab.is-active .rm-tab-list__tab-closebtn {
     opacity: 1;
-    transition: opacity 0.6s cubic-bezier(1,0,1,.85);
 }
-
-/*rm-tab-list .is-active button:after {
-    height: 2px;
-    width: 100%;
-    display: block;
-    content: ' ';
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    background: #2196f3;
-    animation: border-expand .2s cubic-bezier(.4,0,.4,1) .01s alternate forwards;
-    transition: all 1s cubic-bezier(.4,0,1,1);
-}*/
 
 /* OVERLAY *******************************************************************/
 

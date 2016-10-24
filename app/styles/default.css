@@ -183,3 +183,49 @@
     -webkit-user-select: none;
     cursor: default;
 }
+
+/* QUERY PANEL ***************************************************************/
+
+rm-query-panel {
+    position: absolute;
+    top: 37px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+}
+
+.rm-query-panel {
+    display: flex;
+    flex-direction: row;
+}
+
+.rm-query-panel rm-context-selector {
+    margin-left: 10px;
+    flex-grow: 1;
+}
+
+/* CONTEXT SELECTOR **********************************************************/
+
+.rm-context-selector {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+.rm-context-selector button {
+    flex-grow: 1;
+    text-align: left;
+    text-transform: initial;
+}
+
+.rm-context-selector__dropdown {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+}
+
+.rm-context-selector__dropdown.is-active {
+    display: block;
+}

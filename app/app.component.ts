@@ -40,6 +40,7 @@ const electron = electronRequire('electron').remote
     </mdl-layout-drawer>
     <mdl-layout-content>
         <rm-tab-list></rm-tab-list>
+        <rm-query-panel></rm-query-panel>
     </mdl-layout-content>
 </mdl-layout>
 `

@@ -100,10 +100,10 @@
     cursor: default;
     display: flex;
     min-height: 36px;
+    height: 36px;
     background: #eee;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
-        0 3px 1px -2px rgba(0,0,0,.2),
-        0 1px 5px 0 rgba(0,0,0,.12);
+    overflow: visible;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .rm-tablist__newbtn {
@@ -138,6 +138,8 @@
     overflow: initial;
     color: #333;
     white-space: nowrap;
+    height: 37px;
+    border-right: 1px solid #e0e0e0;
 }
 .rm-tab-list__tab .mdl-button:hover {
     background: initial;
@@ -153,14 +155,14 @@
     top: 10px;
     right: 10px;
     font-size: 15px;
-    font-weight: normal;
+    font-weight: bold;
     cursor: inherit;
     color: #333;
     z-index: 2; /* puts it above the ripple layer for events */
 }
 
 .rm-tab-list__tab-closebtn:hover {
-    font-weight: bold;
+    background-color: #e0e0e0;
 }
 
 
@@ -169,7 +171,8 @@
     opacity: 1;
     transition: opacity 0.6s cubic-bezier(1,0,1,.85);
 }
-rm-tab-list .is-active button:after {
+
+/*rm-tab-list .is-active button:after {
     height: 2px;
     width: 100%;
     display: block;
@@ -180,7 +183,7 @@ rm-tab-list .is-active button:after {
     background: #2196f3;
     animation: border-expand .2s cubic-bezier(.4,0,.4,1) .01s alternate forwards;
     transition: all 1s cubic-bezier(.4,0,1,1);
-}
+}*/
 
 /* OVERLAY *******************************************************************/
 

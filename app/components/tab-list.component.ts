@@ -24,7 +24,7 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
         <div class="rm-tablist">
             <div *ngFor="let tab of currentTabs; let idx = index"
                 class="rm-tab-list__tab {{ idx === activeIndex ? 'is-active' : '' }}">
-                <button mdl-button mdl-ripple (click)="handleTabs(idx, tab.id)">
+                <button mdl-button (click)="handleTabs(idx, tab.id)">
                     {{tab.title}}
                 </button>
                 <mdl-icon
@@ -33,7 +33,7 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
                     (click)="closeTab(tab.id)">close</mdl-icon>
             </div>
             <div class="rm-tablist__newbtn">
-                <button mdl-button mdl-ripple mdl-button-type="icon" (click)="newTab()" title="New tab">
+                <button mdl-button mdl-button-type="icon" (click)="newTab()" title="New tab">
                     <mdl-icon>add</mdl-icon>
                 </button>
             </div>

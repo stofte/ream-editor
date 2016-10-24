@@ -4,6 +4,7 @@
     min-height: 30px;
     height: 30px;
     -webkit-user-select: none;
+    user-select: none;
     background-color: #fff;
 }
 
@@ -27,6 +28,7 @@
     min-height: 38px;
     -webkit-app-region: no-drag;
     -webkit-user-select: none;
+    user-select: none;
 }
 
 .mdl-layout__drawer-button:hover {
@@ -96,7 +98,7 @@
 /* TABS **********************************************************************/
 
 .rm-tablist {
-    -webkit-user-select: none;
+    user-select: none;
     cursor: default;
     display: flex;
     min-height: 36px;
@@ -104,6 +106,10 @@
     background: #eee;
     overflow: visible;
     border-bottom: 1px solid #e0e0e0;
+}
+
+.rm-tab-list__tab {
+    position: relative;
 }
 
 .rm-tablist__newbtn {
@@ -141,11 +147,21 @@
     height: 37px;
     border-right: 1px solid #e0e0e0;
 }
+
+.rm-tab-list__tab .mdl-button {
+    background-color: #eee;
+}
+
 .rm-tab-list__tab .mdl-button:hover {
     background: initial;
 }
 .rm-tab-list__tab.is-active .mdl-button {
     background-color: white;
+}
+
+.rm-tab-list__tab.rm-tablist__current-droptarget .mdl-button,
+.rm-tab-list__tab.is-active.rm-tablist__current-droptarget .mdl-button {
+    background-color: #DDECFF;
 }
 
 /* close btn on tab */
@@ -165,10 +181,30 @@
     background-color: #e0e0e0;
 }
 
-
-.rm-tab-list__tab:hover .rm-tab-list__tab-closebtn,
+.rm-tab-list__tab.is-visible .rm-tab-list__tab-closebtn,
 .rm-tab-list__tab.is-active .rm-tab-list__tab-closebtn {
     opacity: 1;
+}
+
+/* drag/drop styles */
+
+.rm-tab-list__tab-droptarget {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 3; /* place it above icons to allow dropping anywhere */
+}
+
+.rm-tablist__tab-droptarget {
+    margin-left: -35px;
+    flex-grow: 1;
+    z-index: 3; /* place it above icons to allow dropping anywhere */
+}
+
+.rm-tablist__current-droptarget {
+    background-color: #DDECFF;
 }
 
 /* OVERLAY *******************************************************************/
@@ -181,6 +217,7 @@
 
 .mdl-layout__drawer {
     -webkit-user-select: none;
+    user-select: none;
     cursor: default;
 }
 

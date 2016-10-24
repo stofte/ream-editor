@@ -1,7 +1,7 @@
 import { Connection } from './connection';
 
 export class Tab {
-    public id: number; // primary key for tab
+    public id: string; // primary key for tab
     public connectionId: number; // stores a connection reference for the given tab
     public title: string; // not used
     // public active: boolean; // is the visible tab

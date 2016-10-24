@@ -7,6 +7,7 @@ import { TabListComponent, TabViewComponent, QueryPanelComponent, ResultDisplayC
     ConnectionManagerComponent, StartPageComponent } from './components/index';
 import { InputStream, OutputStream, StreamManager, EditorStream,
     ResultStream, QueryStream, OmnisharpStream } from './streams/index';
+import { TabService } from './services/index';
 import { MdlModule } from 'angular2-mdl';
 
 @NgModule({
@@ -23,7 +24,8 @@ import { MdlModule } from 'angular2-mdl';
         EditorStream,
         ResultStream,
         QueryStream,
-        OmnisharpStream
+        OmnisharpStream,
+        TabService
     ],
     imports: [
         BrowserModule,

@@ -71,6 +71,10 @@ angular-in-memory-web-api@0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/angular-in-memory-web-api/-/angular-in-memory-web-api-0.1.5.tgz#b4b3a0a2903faed2b154d106837550e03100a628"
 
+angular2-mdl:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/angular2-mdl/-/angular2-mdl-2.2.2.tgz#b1288a84ef8530f02cf1d4fb147e86ae8a188465"
+
 ansi-align@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/ansi-align/-/ansi-align-1.1.0.tgz#2f0c1658829739add5ebb15e6b0c6e3423f016ba"
@@ -2948,6 +2952,10 @@ map-stream@~0.1.0:
 marked@^0.3.5:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
+
+material-design-lite:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/material-design-lite/-/material-design-lite-1.2.1.tgz#09e5caab2575af8ee21b2630bff175c5a822c662"
 
 math-expression-evaluator@^1.2.14:
   version "1.2.14"

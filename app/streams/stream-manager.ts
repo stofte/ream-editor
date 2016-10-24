@@ -31,17 +31,25 @@ export class StreamManager {
 
     public close() : Promise<boolean> {
         return new Promise<boolean>(done => {
-            this.query.once(msg => msg.name === EventName.ProcessClosed, () => {
-                ipc.send('application-event', 'close-query-engine');
-                new Promise<boolean>(done2 => {
-                    this.omnisharp.once(msg => msg.name === EventName.ProcessClosed, () => {
-                        ipc.send('application-event', 'close-omnisharp');
-                        done2(true);
-                    });
-                    this.omnisharp.stopServer();
-                }).then(res => done(res));
+            const queryP = new Promise<boolean>(done => {
+                this.query.once(msg => msg.name === EventName.ProcessClosed, () => {
+                    ipc.send('application-event', 'close-query-engine');
+                    done(true);
+                });
+                this.query.stopServer();
             });
-            this.query.stopServer();
+            const omnisharpP = new Promise<boolean>(done => {
+                this.omnisharp.once(msg => msg.name === EventName.ProcessClosed, () => {
+                    ipc.send('application-event', 'close-omnisharp');
+                    done(true);
+                });
+                this.omnisharp.stopServer();
+            });
+            queryP.then(() => {
+                omnisharpP.then(() => {
+                    done(true);
+                });
+            });
         });
     }
 

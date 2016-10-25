@@ -5,6 +5,7 @@ const postcss = require('gulp-postcss');
 const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 const tslint = require('gulp-tslint');
+const filter = require('gulp-filter');
 const tsProject = ts.createProject('tsconfig.json');
 const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
@@ -40,20 +41,20 @@ const urlRewrites = {
     ]
 };
 
-const tslintOptions = require('./tslint.json');
-
 gulp.task('ts:lint', () => {
+    // this file contains lots of copy-pastaed data, so we ignore it all
+    const f = filter(file => !(/editor-testdata.ts$/.test(file.path)));
     return tsProject.src()
-        .pipe(tslint(tslintOptions))
-        .pipe(tslint.report('prose', { emitError: false }))
+        .pipe(f)
+        .pipe(tslint({ formatter: 'prose' }))
+        .pipe(tslint.report({ emitError: false }))
         ;
 });
 
 gulp.task('ts', () => {
     return tsProject.src()
-        .pipe(ts(tsProject))
-        .js
-        .pipe(gulp.dest('app'))
+        .pipe(tsProject())
+        .js.pipe(gulp.dest('app'))
         ;
 });
 
@@ -85,6 +86,6 @@ gulp.task('watch:ts:lint', ['ts:lint'], () => {
     gulp.watch(tsFiles, ['ts:lint']);
 });
 
-const mainTasks = ['css'];
+const mainTasks = ['css', 'ts', 'ts:lint'];
 gulp.task('build', mainTasks);
 gulp.task('default', ['watch', ...mainTasks]);

@@ -12,8 +12,14 @@
     height: 30px;
     min-height: 30px;
     padding: 0 0 0 60px;
-    -webkit-app-region: drag;
     border-bottom: 1px solid #e0e0e0;
+}
+/* make the space element act as titlebar */
+
+.mdl-layout__header-row .mdl-layout-spacer {
+    height: 25px;
+    align-self: flex-end;
+    -webkit-app-region: drag;
 }
 
 .mdl-layout-title {
@@ -233,6 +239,11 @@ rm-query-panel {
 }
 
 .rm-query-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.rm-query-panel__top {
     display: flex;
     flex-direction: row;
 }

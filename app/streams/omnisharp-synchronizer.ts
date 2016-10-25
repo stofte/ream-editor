@@ -53,7 +53,7 @@ class FileNameService {
     public getFileCount() {
         return this.connections.reduce((acc, val) => {
             return acc + (val.free.length + val.used.length);
-        },<number> (this.codes.free.length + this.codes.used.length));
+        }, <number> (this.codes.free.length + this.codes.used.length));
     }
 
     public get(connectionId: number): string {
@@ -74,7 +74,7 @@ class FileNameService {
             this.codes.markFree(fileName);
             found = true;
         } else {
-            for(let i = 0; i < this.connections.length; i++) {
+            for (let i = 0; i < this.connections.length; i++) {
                 if (this.connections[i].belongs(fileName)) {
                     this.connections[i].markFree(fileName);
                     found = true;

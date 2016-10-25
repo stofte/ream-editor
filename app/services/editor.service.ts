@@ -22,7 +22,7 @@ export class EditorService {
     public set(tab: Tab, text: string, isDirective = true) {
         let change = new EditorChange();
         change.newText = text;
-        change.tabId = tab.id;
+        // change.tabId = tab.id;
         if (!isDirective) {
             this.changes.next(change);            
         }

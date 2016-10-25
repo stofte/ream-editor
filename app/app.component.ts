@@ -4,7 +4,7 @@ import { TabListComponent } from './components/tab-list.component';
 import { ConnectionManagerComponent } from './components/connection-manager.component';
 import { TabViewComponent } from './components/tab-view.component';
 import { StreamManager } from './streams/index';
-const electron = electronRequire('electron').remote
+const electron = electronRequire('electron').remote;
 
 @Component({
     selector: 'rm-app',
@@ -74,10 +74,8 @@ export class AppComponent {
     toggleMaximizeApp() {
         const win = electron.getCurrentWindow();
         if (this.isMaximized) {
-            console.log('calling unmaximize')
             win.unmaximize();
         } else {
-            console.log('calling maximize')
             win.maximize();
         }
         this.isMaximized = !this.isMaximized;

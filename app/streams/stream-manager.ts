@@ -29,8 +29,8 @@ export class StreamManager {
         ipc.on('application-event', this.applicationEventHandler);
     }
 
-    public close() : Promise<boolean> {
-        return new Promise<boolean>(done => {
+    public close(): Promise<boolean> {
+        return new Promise<boolean>(closeDone => {
             const queryP = new Promise<boolean>(done => {
                 this.query.once(msg => msg.name === EventName.ProcessClosed, () => {
                     ipc.send('application-event', 'close-query-engine');
@@ -47,7 +47,7 @@ export class StreamManager {
             });
             queryP.then(() => {
                 omnisharpP.then(() => {
-                    done(true);
+                    closeDone(true);
                 });
             });
         });

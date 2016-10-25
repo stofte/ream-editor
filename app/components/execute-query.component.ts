@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
 // import { BUTTON_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 import { EditorService } from '../services/editor.service';
-import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { MonitorService } from '../services/monitor.service';
 import { ConnectionService } from '../services/connection.service';
-import { QueryService } from '../services/query.service';
 import { TabService } from '../services/tab.service';
 import { HotkeyService } from '../services/hotkey.service';
 import { Tab } from '../models/tab';
@@ -26,7 +24,7 @@ export class ExecuteQueryComponent {
     private isDisabled = true;
     private isExecuting = false;
     constructor(
-        private mirrors: MirrorChangeStream,
+        private mirrors,
         monitorService: MonitorService,
         hotkeys: HotkeyService
     ) {

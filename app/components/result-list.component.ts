@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-import { QueryService } from '../services/query.service';
 import { TabService } from '../services/tab.service';
 import { Tab } from '../models/tab';
 import { QueryResult } from '../models/query-result';
@@ -26,20 +25,7 @@ export class ResultListComponent {
     private offset = 84;
     
     constructor(
-        query: QueryService,
-        tabs: TabService
     ) {
-        tabs.active
-            .combineLatest(query.activeResult, (tab, store) => {
-                let results = store.tab(tab.id);
-                return <ResultMap> {
-                    tab,
-                    results
-                };
-            })
-            .subscribe((x: ResultMap) => {
-                this.currentResults = x.results;
-            });
     }
     
     private editorOffset() {

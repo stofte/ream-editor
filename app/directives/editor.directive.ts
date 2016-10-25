@@ -2,8 +2,6 @@ import { Directive, ElementRef, Renderer, OnInit } from '@angular/core';
 import { EditorService } from '../services/editor.service';
 import { TabService } from '../services/tab.service';
 import { EditorChange } from '../models/editor-change';
-import { OmnisharpService } from '../services/omnisharp.service';
-import { MirrorChangeStream } from '../services/mirror-change.stream';
 import { AutocompletionQuery } from '../models/autocompletion-query';
 import { AutocompletionResult } from '../models/autocompletion-result';
 import { Tab } from '../models/tab';
@@ -22,7 +20,7 @@ const mac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
 CodeMirror.keyMap.default[(mac ? 'Cmd' : 'Ctrl') + '-Space'] = 'autocomplete';
 
 let omnisharpResolver = null;
-const omnisharpInject = new Promise<OmnisharpService>((res) => {
+const omnisharpInject = new Promise<Object>((res) => {
     omnisharpResolver = res;
 });
 
@@ -31,7 +29,7 @@ CodeMirror.registerHelper('lint', 'text/x-csharp', (text, callback) => {
         let endLine = text.split(/$/g).length - 1;
         let endColumn = endLine >= 0 ? text.split(/$/g)[endLine].length : text.length;
         endLine = endLine < 0 ? 0 : endLine;
-        svc.lintRequests.next({callback, endLine, endColumn });
+        // svc.lintRequests.next({callback, endLine, endColumn });
     });
 });
 CodeMirror.lint['text/x-csharp'].async = true;
@@ -69,14 +67,14 @@ CodeMirror.registerHelper('hint', 'ajax', (mirror, callback) => {
     };
     omnisharpInject
         .then(svc => {
-            svc.autocomplete(request)
-                .subscribe(list => {
-                    callback({
-                        list,
-                        from: range.anchor,
-                        to: range.head
-                    });
-                });               
+            // svc.autocomplete(request)
+            //     .subscribe(list => {
+            //         callback({
+            //             list,
+            //             from: range.anchor,
+            //             to: range.head
+            //         });
+            //     });               
         });
 });
 CodeMirror.hint.ajax.async = true;
@@ -92,9 +90,9 @@ export class EditorDirective implements OnInit {
     editor: CodeMirror.Editor;
     constructor(
         private editorService: EditorService,
-        private omnisharpService: OmnisharpService,
+        private omnisharpService,
         private tabService: TabService,
-        private mirrorChangeStream: MirrorChangeStream,
+        private mirrorChangeStream /*: MirrorChangeStream*/,
         public element: ElementRef, 
         public renderer: Renderer
     ) {

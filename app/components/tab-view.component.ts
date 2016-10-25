@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { TabService } from '../services/tab.service';
-import { QuerySuiteComponent } from './query-suite.component';
 import { StartPageComponent } from './start-page.component';
 import { Observable } from 'rxjs/Observable';
 
@@ -23,10 +22,5 @@ export class TabViewComponent {
     constructor(
         private tabs: TabService
     ) {
-        tabs.hasTabs
-            .subscribe(hasTabs => {
-                this.startVisible = !hasTabs;
-                this.editorVisible = hasTabs;
-            });
     }
 }

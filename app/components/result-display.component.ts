@@ -1,5 +1,4 @@
 import { Component, Input, ElementRef } from '@angular/core';
-import { QueryService } from '../services/query.service';
 import { QueryResult } from '../models/query-result';
 import { ResultPage } from '../models/result-page';
 
@@ -68,7 +67,7 @@ export class ResultDisplayComponent {
     private layoutFor: string = null;
     private outputOverflowing = false;
     
-    constructor(private query: QueryService) {
+    constructor(private query) {
     }
     
     private showResult(page: ResultPage) {

@@ -28,7 +28,6 @@ sqliteConnection.id = 42;
 describe('[int-test] streams', function() {
     this.timeout(backendTimeout * 100);
     let input: InputStream = null;
-    let injector: ReflectiveInjector = null;
     let query: QueryStream = null;
     let omnisharp: OmnisharpStream = null;
     let output: OutputStream = null;
@@ -88,7 +87,7 @@ describe('[int-test] streams', function() {
         [0, 10, 20]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
-            function runAllAtOnce(done) {
+            function runAllAtOnce(allDone) {
                 this.timeout(backendTimeout * 2);
 
                 let step1Resolver = null;
@@ -117,7 +116,7 @@ describe('[int-test] streams', function() {
                     if (val) {
                         failures.push(val);
                     }
-                }
+                };
                 step1Promise.then(doneHandler);
                 step2Promise.then(doneHandler);
                 step3Promise.then(doneHandler);
@@ -130,10 +129,9 @@ describe('[int-test] streams', function() {
                         setTimeout(() => {
                             runTimings = {};
                             if (failures.length > 0) {
-                                done(failures);
+                                allDone(failures);
                             } else {
-                                
-                                done();
+                                allDone();
                             }
                         }, 100);
                     })));
@@ -143,7 +141,7 @@ describe('[int-test] streams', function() {
             let idx = 0;
             const l = [];
             l[stepCount - 1] = 1;
-            for(let i = 0; i < l.length; i++) {
+            for (let i = 0; i < l.length; i++) {
                 l[i] = i;
             }
             l.forEach(() => {
@@ -169,11 +167,10 @@ describe('[int-test] streams', function() {
                         resultSub.unsubscribe();
                         if (verifyCount === cSharpTestData.length) {
                             expect(verifyCount).to.equal(cSharpTestData.length, 
-                                `verifyCount (${verifyCount}) should match length of test data: ${cSharpTestData.length}`);
-                                
+                                `verifyCount (${verifyCount}) should match ${''
+                                }length of test data: ${cSharpTestData.length}`);
                             verifyCount++; // to avoid running check in other thread
                             runTimings['emitsResultsForSimpleValueExpressions'] =  performance.now() - ts;
-                            // console.log('emitsResultsForSimpleValueExpressions duration', runTimings['emitsResultsForSimpleValueExpressions']);
                             done();
                         }
                     } else if (msg.name === EventName.ResultUpdate) {
@@ -225,7 +222,6 @@ describe('[int-test] streams', function() {
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
                         runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
-                        // console.log('emitsResultsForLinqBasedQueryAgainstSqliteDatabase', runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase']);
                     });
                 } else if (msg.name === EventName.ResultUpdate) {
                     rows = msg.data.rows;
@@ -383,7 +379,6 @@ describe('[int-test] streams', function() {
                     checkAndExit(done, () => {
                         expect(msg.data.length).to.equal(0, 'After switching ctx, no errors should appear');
                         runTimings['emitsCodecheckAfterSwitchingBufferContext'] =  performance.now() - ts;
-                        // console.log('emitsCodecheckAfterSwitchingBufferContext', runTimings['emitsCodecheckAfterSwitchingBufferContext']);
                     });
                 }
             });

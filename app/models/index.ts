@@ -7,7 +7,6 @@ export * from './editor-change';
 export * from './query-request';
 export * from './query-result';
 export * from './result-page';
-export * from './result-store';
 export * from './tab';
 export * from './template-result';
 export * from './editor-event';

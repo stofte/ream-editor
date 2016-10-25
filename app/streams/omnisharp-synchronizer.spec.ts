@@ -22,11 +22,11 @@ describe('omnisharp-synchronizer', function() {
             let idx = 0;
             const l = [];
             l[stepCount - 1] = 1;
-            for(let i = 0; i < l.length; i++) {
+            for (let i = 0; i < l.length; i++) {
                 l[i] = i;
             }
             l.forEach(() => {
-                it('runs flows multiple times', function(done) {
+                it('runs flows multiple times', function(allDone) {
                     let run1Resolver = null;
                     let run2Resolver = null;
                     let run3Resolver = null;
@@ -44,7 +44,7 @@ describe('omnisharp-synchronizer', function() {
                         if (val) {
                             failures.push(val);
                         }
-                    }
+                    };
                     run1Promise.then(doneHandler);
                     run2Promise.then(doneHandler);
                     run3Promise.then(doneHandler);
@@ -53,12 +53,12 @@ describe('omnisharp-synchronizer', function() {
                             run3Promise.then(() =>  {
                                 setTimeout(() => {
                                     if (failures.length > 0) {
-                                        done(failures);
+                                        allDone(failures);
                                     } else {
-                                        done();
+                                        allDone();
                                     }
                                 }, 100);
-                            })
+                            });
                         })
                     );
                 });

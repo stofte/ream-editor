@@ -103,7 +103,14 @@ export class QueryStream {
                                 .post(method, JSON.stringify(req))
                                 .map(res => {
                                     const data = res.json();
-                                    this.templateCache.add(connectionId, data.Template, initialText, data.LineOffset, data.ColumnOffset, data.Namespace);
+                                    this.templateCache.add(
+                                        connectionId,
+                                        data.Template,
+                                        initialText,
+                                        data.LineOffset,
+                                        data.ColumnOffset,
+                                        data.Namespace
+                                    );
                                     let x = new Message(EventName.QueryTemplateResponse, req.id, <TemplateResponse> {
                                         code: data.Code,
                                         message: data.Message,

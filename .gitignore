@@ -25,3 +25,4 @@ reamquery-log-*
 reamquery.log
 internal-nlog.txt
 .base64-cache
+bower_components

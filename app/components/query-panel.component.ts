@@ -11,12 +11,24 @@ import { EditorDirective } from '../directives/editor.directive';
     selector: 'rm-query-panel',
     template: `
     <div class="rm-query-panel">
-        <button mdl-button mdl-button-type="raised">
-            <mdl-icon>play_arrow</mdl-icon>
-        </button>
-        <rm-context-selector></rm-context-selector>
+        <div class="rm-query-panel__top">
+            <button mdl-button mdl-button-type="raised">
+                <mdl-icon>play_arrow</mdl-icon>
+            </button>
+            <rm-context-selector></rm-context-selector>
+        </div>
         <div>
             {{sessionId}}
+        </div>
+        <div>
+            <paper-dropdown-menu label="Your favourite pastry">
+                <paper-listbox class="dropdown-content">
+                    <paper-item>Croissant</paper-item>
+                    <paper-item>Donut</paper-item>
+                    <paper-item>Financier</paper-item>
+                    <paper-item>Madeleine</paper-item>
+                </paper-listbox>
+            </paper-dropdown-menu>
         </div>
     </div>
 `

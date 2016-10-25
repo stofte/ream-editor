@@ -42,8 +42,19 @@
         <script src="node_modules/reflect-metadata/Reflect.js"></script>
         <script src="node_modules/systemjs/dist/system.src.js"></script>
         <script src="systemjs.config.js"></script>
+        
+        <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+        <link rel="import" href="bower_components/paper-item/paper-item.html">
+        <link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
+        <link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
         <script>
-            System.import('app').catch(function(err){ console.error(err); });
+            // Enables use of webcomponents by using the vaadin brigde, but needs
+            // to wait for components to register before booting angular2.
+            // https://vaadin.com/docs/-/part/elements/angular2-polymer/overview.html
+            document.addEventListener('WebComponentsReady', function() {
+                System.import('app').catch(function(err){ console.error(err); });
+            });
         </script>
     </head>
     <body>

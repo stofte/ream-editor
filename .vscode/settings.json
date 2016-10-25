@@ -3,6 +3,7 @@
 	"typescript.tsdk": "node_modules/typescript/lib",
     "files.exclude": {
 		"node_modules": true,
+		"bower_components": true,
 		"typings": true,
 		"app/**/*.js": true,
 		"app/**/*.js.map": true,

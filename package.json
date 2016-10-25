@@ -24,7 +24,8 @@
     "int-test-travis": "mocha test/**/*.int.js --travis --npgsql",
     "int-test-local-sqlserver": "mocha test/**/*.int.js --local --sqlserver",
     "int-test-local-sqlserver2": "mocha test/**/*.int.js --local --sqlserver2",
-    "int-test-local-npgsql": "mocha test/**/*.int.js --local --npgsql"
+    "int-test-local-npgsql": "mocha test/**/*.int.js --local --npgsql",
+    "install-polymer": "bower install"
   },
   "dependencies": {
     "@angular/common": "2.0.2",
@@ -36,6 +37,7 @@
     "@angular/platform-browser-dynamic": "2.0.2",
     "@angular/router": "3.0.2",
     "@angular/upgrade": "2.0.2",
+    "@vaadin/angular2-polymer": "1.0.0-beta5",
     "angular-in-memory-web-api": "0.1.5",
     "angular2-mdl": "2.2.2",
     "codemirror": "5.18.2",
@@ -52,6 +54,7 @@
     "zone.js": "0.6.25"
   },
   "devDependencies": {
+    "bower": "1.7.9",
     "chai": "3.5.0",
     "cssnano": "3.7.4",
     "electron": "1.4.3",

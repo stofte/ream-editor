@@ -21,7 +21,8 @@
         'codemirror': 'node_modules/codemirror',
         'lodash': 'node_modules/lodash',
         'node-uuid': 'node_modules/node-uuid',
-        'angular2-mdl': 'node_modules/angular2-mdl'
+        'angular2-mdl': 'node_modules/angular2-mdl',
+        '@vaadin/angular2-polymer': 'node_modules/@vaadin/angular2-polymer'
     };
 
     // packages tells the System loader how to load when no filename and/or no extension
@@ -34,7 +35,8 @@
         'codemirror': { main: 'lib/codemirror.js', defaultExtension: 'js' },
         'lodash': { main: 'lodash.js', defaultExtension: 'js' },
         'node-uuid': { main: 'uuid.js', defaultExtension: 'js' },
-        'angular2-mdl': { main: 'bundle/angular2-mdl.js' }
+        'angular2-mdl': { main: 'bundle/angular2-mdl.js' },
+        '@vaadin/angular2-polymer': { main: 'index.js' }
     };
 
     var config = {

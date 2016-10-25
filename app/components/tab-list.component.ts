@@ -68,6 +68,7 @@ export class TabListComponent {
     private draggedTabIndex: number = null;
     private dragTargetTab: number = null;
     private hoverTargetTab: number = null;
+    private isDraggingTimeout = null;
     constructor(
         private tabService: TabService,
         private ref: ChangeDetectorRef 
@@ -111,12 +112,19 @@ export class TabListComponent {
     private dragStart(idx: number, id: string) {
         this.draggedTab = this.currentTabs.find(x => x.id === id);
         this.draggedTabIndex = idx;
-        setTimeout(() => {
+        // needs to run in a timeout, as otherwise the droptarget layers
+        // will interfere with the dragging action and cancel it out.
+        // if the user drops the tab within 100ms, we cancel this timeout.
+        this.isDraggingTimeout = setTimeout(() => {
+            this.isDraggingTimeout = null;
             this.isDragging = true;
         }, 100);
     }
 
     private dragEnd(tablist: HTMLElement) {
+        if (this.isDraggingTimeout) { // set in this.dragStart
+            clearTimeout(this.isDraggingTimeout);
+        }
         this.isDragging = false;
         this.dragTargetTab = null;
         tablist.classList.remove('rm-tablist__current-droptarget');

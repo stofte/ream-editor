@@ -7,6 +7,7 @@ const ts = require('gulp-typescript');
 const tslint = require('gulp-tslint');
 const filter = require('gulp-filter');
 const tsProject = ts.createProject('tsconfig.json');
+const incrProject = ts.createProject('tsconfig.json');
 const inlineb64 = require('postcss-inline-base64');
 const cssnano = require('cssnano');
 const urlrewrite = require('postcss-urlrewrite');
@@ -53,7 +54,7 @@ gulp.task('ts:lint', () => {
 
 gulp.task('ts', () => {
     return tsProject.src()
-        .pipe(tsProject())
+        .pipe(incrProject())
         .js.pipe(gulp.dest('app'))
         ;
 });

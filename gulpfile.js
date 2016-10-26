@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const watch = require('gulp-watch');
+const sass = require('gulp-sass');
 const concat = require('gulp-concat')
 const postcss = require('gulp-postcss');
 const sourcemaps = require('gulp-sourcemaps');
@@ -17,17 +18,13 @@ const DEBUG = !process.env.PACKAGE_BASE;
 const output = process.env.PACKAGE_BASE || '.';
  
 const cssFiles = [
-    'node_modules/normalizecss/normalize.css',
-    'node_modules/bootstrap/dist/css/bootstrap.css',
-    'node_modules/codemirror/lib/codemirror.css',
-    'node_modules/codemirror/addon/lint/lint.css',
-    'resources/fonts/source-code-pro/source-code-pro.css',
-    'resources/fonts/source-sans-pro/source-sans-pro.css',
-    'app/styles/codemirror-hint.css',
-    'app/styles/main.css'
+    'node_modules/material-design-lite/material.min.css',
+    'node_modules/material-design-lite/dist/material.light_blue-yellow.min.css',
+    'app/**/*.css'
 ];
 
 const tsFiles = 'app/**/*.ts';
+const sassFiles = 'app/**/*.scss';
 const jsFiles = [
     'node_modules/zone.js/dist/zone.js',
     'node_modules/reflect-metadata/Reflect.js',
@@ -37,13 +34,18 @@ const jsFiles = [
 const urlRewrites = {
     properties: ['src'],
     rules: [
-        { from: /^\.\.\/fonts\/glyphicons/, to: DEBUG ? 'node_modules/bootstrap/dist/fonts/glyphicons' : 'resources/fonts/glyphicons' },
-        { from: /^(.*)\/SourceCodePro/, to: 'resources/fonts/source-code-pro/$1/SourceCodePro' },
-        { from: /^(.*)\/SourceSansPro/, to: 'resources/fonts/source-sans-pro/$1/SourceSansPro' }
+        { from: /^(.*)\/(resources\/materialicons\/MaterialIcons-Regular.woff2?)/, to: '$2'}
     ]
 };
 
-gulp.task('ts:lint', () => {
+gulp.task('ts', () => {
+    return tsProject.src()
+        .pipe(incrProject())
+        .js.pipe(gulp.dest('app'))
+        ;
+});
+
+gulp.task('ts:lint', ['ts'], () => {
     // this file contains lots of copy-pastaed data, so we ignore it all
     const f = filter(file => !(/editor-testdata.ts$/.test(file.path)));
     return tsProject.src()
@@ -53,14 +55,23 @@ gulp.task('ts:lint', () => {
         ;
 });
 
-gulp.task('ts', () => {
-    return tsProject.src()
-        .pipe(incrProject())
-        .js.pipe(gulp.dest('app'))
-        ;
+gulp.task('ts:bundle', ['ts'], () => {
+    const builder = systemjsBuilder();
+    builder.loadConfigSync('./systemjs.config.js')
+    return builder.buildStatic('app/main.js', 'bundle.js', {
+            minify: false,
+            mangle: false
+        })
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('css', () => {
+gulp.task('sass', function () {
+    return gulp.src(sassFiles)
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('app'));
+});
+
+gulp.task('css', ['sass'], () => {
     return gulp
         .src(cssFiles)
         .pipe(sourcemaps.init())
@@ -75,30 +86,12 @@ gulp.task('css', () => {
         ;
 });
 
-gulp.task('ts:bundle', () => {
-    const builder = systemjsBuilder();
-    builder.loadConfigSync('./systemjs.config.js')
-    return builder.buildStatic('app/main.js', 'bundle.js', {
-            minify: false,
-            mangle: false
-        })
-        .pipe(gulp.dest('./'));
-});
-
 gulp.task('watch', () => {
-    gulp.watch(cssFiles, ['css']);
+    gulp.watch(sassFiles, ['sass', 'css']);
     gulp.watch(tsFiles, ['ts:lint', 'ts']);
 });
 
-gulp.task('watch:ts', () => {
-    gulp.watch(tsFiles, ['ts']);
-});
-
-gulp.task('watch:ts:lint', ['ts:lint'], () => {
-    gulp.watch(tsFiles, ['ts:lint']);
-});
-
-const mainTasks = ['css', 'ts', 'ts:lint'];
+const mainTasks = ['sass', 'css', 'ts', 'ts:lint'];
 const buildOnlyTasks = ['ts:bundle'];
-gulp.task('build', mainTasks.concat(buildOnlyTasks));
-gulp.task('default', ['watch', ...mainTasks]);
+gulp.task('build', [...mainTasks, ...buildOnlyTasks]);
+gulp.task('default', [...mainTasks, 'watch']);

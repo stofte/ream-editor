@@ -7,6 +7,7 @@
 		"typings": true,
 		"app/**/*.js": true,
 		"app/**/*.js.map": true,
+		"app/**/*.css": true,
 		"obj": true,
 		"bin": true,
 		"build": true,

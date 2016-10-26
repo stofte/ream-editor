@@ -3,8 +3,8 @@ import { HttpModule } from '@angular/http';
 import { BrowserModule  } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { TabListComponent, TabViewComponent, QueryPanelComponent, ResultDisplayComponent,
-    ResultListComponent, ExecuteQueryComponent, ContextSelectorComponent,
-    ConnectionManagerComponent, StartPageComponent } from './components/index';
+    ResultListComponent, ExecuteQueryComponent,
+    ConnectionManagerComponent, StartPageComponent, ControlsComponent } from './components/index';
 import { InputStream, OutputStream, StreamManager, EditorStream,
     ResultStream, QueryStream, OmnisharpStream } from './streams/index';
 import { TabService } from './services/index';
@@ -16,7 +16,7 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
         AppComponent,
         TabListComponent,
         QueryPanelComponent,
-        ContextSelectorComponent,
+        ControlsComponent,
         PolymerElement('paper-button'),
         PolymerElement('paper-dialog'),
         PolymerElement('paper-dialog-scrollable'),

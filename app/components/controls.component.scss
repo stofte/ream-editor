@@ -1,0 +1,17 @@
+rm-controls {
+    display: flex;
+    flex-direction: row;
+
+    paper-button {
+        height: 40px;
+        width: 60px;
+        margin-top: 3px;
+        margin-right: 15px;
+        align-self: center;
+    }
+
+    paper-dropdown-menu {
+        width: 100%;
+        align-self: center;
+    }
+}

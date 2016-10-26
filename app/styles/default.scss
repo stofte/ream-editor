@@ -99,8 +99,7 @@
 .mdl-layout__header-row .mdl-button--exit {
     width: 45px;
     min-width: 45px;
-    /*background-color: #C75050;*/
-     /* #E04343; */
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .mdl-button--exit:hover {
@@ -117,11 +116,10 @@
     user-select: none;
     cursor: default;
     display: flex;
-    min-height: 36px;
-    height: 36px;
+    min-height: 37px;
+    height: 37px;
     background: #eee;
     overflow: visible;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .rm-tab-list__tab {

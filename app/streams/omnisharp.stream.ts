@@ -57,8 +57,8 @@ export class OmnisharpStream {
             .filter(x => x.ready)
             .concatMap(x => x.list) // map back to OmnisharpSessionMessage
             // obtain lock
-            .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
-            .map(msg => sync.mapMessage(msg))
+            .delayWhen((msg: OmnisharpSessionMessage) => Observable.fromPromise(sync.queueOperation(msg)))
+            .map((msg: OmnisharpSessionMessage) => sync.mapMessage(msg))
             .flatMap(msg => {
                 if (msg.type === 'context' || msg.type === 'destroy') {
                     return Observable.from<MessageMap>([{ inner: msg, mapped: new Message(null) }]);

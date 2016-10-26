@@ -3,6 +3,7 @@ const watch = require('gulp-watch');
 const concat = require('gulp-concat')
 const postcss = require('gulp-postcss');
 const sourcemaps = require('gulp-sourcemaps');
+const systemjsBuilder = require('gulp-systemjs-builder');
 const ts = require('gulp-typescript');
 const tslint = require('gulp-tslint');
 const filter = require('gulp-filter');
@@ -74,6 +75,16 @@ gulp.task('css', () => {
         ;
 });
 
+gulp.task('ts:bundle', () => {
+    const builder = systemjsBuilder();
+    builder.loadConfigSync('./systemjs.config.js')
+    return builder.buildStatic('app/main.js', 'bundle.js', {
+            minify: false,
+            mangle: false
+        })
+        .pipe(gulp.dest('./'));
+});
+
 gulp.task('watch', () => {
     gulp.watch(cssFiles, ['css']);
     gulp.watch(tsFiles, ['ts:lint', 'ts']);
@@ -88,5 +99,6 @@ gulp.task('watch:ts:lint', ['ts:lint'], () => {
 });
 
 const mainTasks = ['css', 'ts', 'ts:lint'];
-gulp.task('build', mainTasks);
+const buildOnlyTasks = ['ts:bundle'];
+gulp.task('build', mainTasks.concat(buildOnlyTasks));
 gulp.task('default', ['watch', ...mainTasks]);

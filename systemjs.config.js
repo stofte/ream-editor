@@ -14,9 +14,7 @@
         '@angular/forms' : 'node_modules/@angular/forms/bundles/forms.umd.js',
 
         'rxjs': 'node_modules/rxjs',
-        'angular2-in-memory-web-api': 'node_modules/angular-in-memory-web-api',
         '@angular': 'node_modules/@angular',
-        'ng2-bootstrap': 'node_modules/ng2-bootstrap',
         'moment': 'node_modules/moment',
         'codemirror': 'node_modules/codemirror',
         'lodash': 'node_modules/lodash',
@@ -29,8 +27,6 @@
     var packages = {
         'app': { main: 'main.js',  defaultExtension: 'js' },
         'rxjs': { defaultExtension: 'js' },
-        'angular2-in-memory-web-api': { main: 'index.js', defaultExtension: 'js' },
-        'ng2-bootstrap': { main: 'ng2-bootstrap', defaultExtension: 'js' },
         'moment': { main: 'moment.js', defaultExtension: 'js' },
         'codemirror': { main: 'lib/codemirror.js', defaultExtension: 'js' },
         'lodash': { main: 'lodash.js', defaultExtension: 'js' },

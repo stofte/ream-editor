@@ -17,6 +17,9 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
         TabListComponent,
         QueryPanelComponent,
         ContextSelectorComponent,
+        PolymerElement('paper-button'),
+        PolymerElement('paper-dialog'),
+        PolymerElement('paper-dialog-scrollable'),
         PolymerElement('paper-item'),
         PolymerElement('paper-listbox'),
         PolymerElement('paper-dropdown-menu')

@@ -21,6 +21,11 @@
                 throw (msg ? msg : 'assert failed');
             }
         }
+
+        // Polymer components require this to function properly
+        // http://stackoverflow.com/questions/34907719/polymer-paper-element-attributes-and-angular2
+        window.Polymer = window.Polymer || {};
+        window.Polymer.dom = 'shadow';
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="node_modules/material-design-lite/material.min.css">
@@ -44,6 +49,10 @@
         <script src="systemjs.config.js"></script>
         
         <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+        <link rel="import" href="bower_components/paper-button/paper-button.html">
+        <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+        <link rel="import" href="bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+        <link rel="import" href="bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
         <link rel="import" href="bower_components/paper-item/paper-item.html">
         <link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
         <link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">

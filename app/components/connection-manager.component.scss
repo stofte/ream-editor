@@ -1,0 +1,10 @@
+rm-connection-manager {
+    
+    paper-dialog {
+        max-height: calc(100vh - 100px);
+    }
+
+    paper-dialog-scrollable::shadow .scrollable {
+        max-height: calc(100vh - 230px);
+    }
+}

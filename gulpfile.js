@@ -20,6 +20,7 @@ const output = process.env.PACKAGE_BASE || '.';
 const cssFiles = [
     'node_modules/material-design-lite/material.min.css',
     'node_modules/material-design-lite/dist/material.light_blue-yellow.min.css',
+    'node_modules/codemirror/lib/codemirror.css',
     'app/**/*.css'
 ];
 

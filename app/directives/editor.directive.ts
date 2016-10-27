@@ -89,20 +89,20 @@ export class EditorDirective implements OnInit {
     private touched = false;
     editor: CodeMirror.Editor;
     constructor(
-        private editorService: EditorService,
-        private omnisharpService,
-        private tabService: TabService,
-        private mirrorChangeStream /*: MirrorChangeStream*/,
+        // private editorService: EditorService,
+        // private omnisharpService,
+        // private tabService: TabService,
+        // private mirrorChangeStream /*: MirrorChangeStream*/,
         public element: ElementRef, 
-        public renderer: Renderer
+        // public renderer: Renderer
     ) {
         this.editor = CodeMirror.fromTextArea(element.nativeElement, this.editorOptions());
-        mirrorChangeStream.initMirror(this.editor);
-        // todo one time service injection hack
-        if (omnisharpResolver) {
-            omnisharpResolver(omnisharpService);
-            omnisharpResolver = null;
-        }
+        // mirrorChangeStream.initMirror(this.editor);
+        // // todo one time service injection hack
+        // if (omnisharpResolver) {
+        //     omnisharpResolver(omnisharpService);
+        //     omnisharpResolver = null;
+        // }
     }
     
     private codemirrorValueChanged(mirror: any) {
@@ -114,7 +114,7 @@ export class EditorDirective implements OnInit {
         if (fragment === '.' || fragment === ').') {
             CodeMirror.commands.autocomplete(mirror);
         }
-        this.editorService.set(this.current, newValue);
+        // this.editorService.set(this.current, newValue);
     }
     
     ngOnInit() {
@@ -123,7 +123,7 @@ export class EditorDirective implements OnInit {
     
     private editorOptions() {
         return {
-            lineNumbers: true,
+            lineNumbers: false,
             gutters: ['CodeMirror-lint-markers'],
             lint: true,
             smartIndent: false,

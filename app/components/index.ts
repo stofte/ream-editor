@@ -7,3 +7,4 @@ export * from './start-page.component';
 export * from './tab-list.component';
 export * from './tab-view.component';
 export * from './controls.component';
+export * from './editor.component';

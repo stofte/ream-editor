@@ -14,4 +14,8 @@ rm-controls {
         width: 100%;
         align-self: center;
     }
+
+    paper-item {
+        white-space: nowrap;
+    }
 }

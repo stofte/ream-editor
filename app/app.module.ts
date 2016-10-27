@@ -7,7 +7,7 @@ import { TabListComponent, TabViewComponent, QueryPanelComponent, ResultDisplayC
     ConnectionManagerComponent, StartPageComponent, ControlsComponent } from './components/index';
 import { InputStream, OutputStream, StreamManager, EditorStream,
     ResultStream, QueryStream, OmnisharpStream } from './streams/index';
-import { TabService, HotkeyService } from './services/index';
+import { TabService, HotkeyService, ConnectionService } from './services/index';
 import { MdlModule } from 'angular2-mdl';
 import { PolymerElement } from '@vaadin/angular2-polymer';
 
@@ -34,7 +34,8 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
         QueryStream,
         OmnisharpStream,
         TabService,
-        HotkeyService
+        HotkeyService,
+        ConnectionService
     ],
     imports: [
         BrowserModule,

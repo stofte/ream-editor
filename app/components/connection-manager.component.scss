@@ -6,6 +6,62 @@ rm-connection-manager {
     }
 
     paper-dialog-scrollable::shadow .scrollable {
-        max-height: calc(100vh - 230px);
+        max-height: calc(100vh - 290px);
     }
+
+    .rm-connection-manager {
+        &__add-new {
+            display: flex;
+            flex-direction: row;
+            margin-top: 0;
+
+            paper-input {
+                flex-grow: 2;
+                min-width: 30em;
+                margin-right: 20px;
+            }
+
+            paper-dropdown-menu {
+                margin-right: 20px;
+            }
+
+            paper-button {
+                height: 40px;
+                margin-top: 13px;
+            }
+        }
+
+        // gives each connection a container like paper-material,
+        // which doesnt seem to work inside dialog-scrollable element
+        &__card {
+            display: block;
+            margin: 8px 0;
+            padding: 16px;
+            border-radius: 2px;
+            // equivalent to elavation=1
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 5px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 1px -2px rgba(0, 0, 0, 0.2)
+        }
+
+        &__connection {
+            display: flex;
+            flex-direction: row;
+
+            &__text-block {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+
+                &__type {
+                    color: #212121;
+                }
+            }
+            paper-icon-button {
+
+            }
+        }
+    }
+
+
 }

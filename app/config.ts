@@ -8,7 +8,7 @@ const omnisharpPath = path.resolve((IS_LINUX ? `${process.env.HOME}/.ream-editor
 // todo some of this is mirrored in int-helpers.js
 const unitTestData = {
     backendTimeout: 10 * 1000 * CI_MOD,
-    sqliteWorlddbConnectionString: `Data Source=${path.normalize(path.join(__dirname, '../query/sql/world.sqlite'))}`
+    sqliteWorlddbConnectionString: `Data Source=${path.normalize(path.join(process.cwd(), 'query/sql/world.sqlite'))}`
 };
 
 export default {

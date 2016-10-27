@@ -55,13 +55,13 @@ Connection strings are found in `test/int-helpers.js`
 
 TODO
 ----
+- Align directory references in general, esp in typescript code
+- Setup omnisharp before starting streams spec test
 - Table/cell selections
 - Error handling
 - Culture handling
 - Multiple instance handling
 - EF fails if table has no primary key?
-- SQLite EFCore database providers
 - OmniSharp hosting/custom build?
-- Websocket/rx query backend
 - [dotnet run in folder with spaces fails](https://github.com/dotnet/cli/issues/1189)
-- tsconfig.js/es5 blocked on https://github.com/angular/angular/issues/7740
+

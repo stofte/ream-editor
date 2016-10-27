@@ -122,11 +122,20 @@ export class ConnectionManagerComponent implements AfterViewInit  {
         if (this.connStrInputElm.validate()) {
             this.conns.add(new Connection(value, serverType));
             this.connStrInputElm.value = '';
+            if (this.connections.length < 5) {
+                const topVal = parseInt(this.dialogElm.style.top, 10);
+                this.dialogElm.style.top = `${topVal - 40}px`;
+            }
         }
     }
 
     private removeConnection(connection: Connection) {
+        const len = this.connections.length; 
         this.conns.remove(connection);
+        if (len < 5) {
+            const topVal = parseInt(this.dialogElm.style.top, 10);
+            this.dialogElm.style.top = `${topVal + 40}px`;
+        }
     }
 
 

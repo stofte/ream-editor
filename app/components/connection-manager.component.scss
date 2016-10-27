@@ -2,18 +2,17 @@ rm-connection-manager {
     
     paper-dialog {
         max-width: 800px;
-        max-height: calc(100vh - 100px);
+        max-height: calc(100vh - 144px);
     }
 
     paper-dialog-scrollable::shadow .scrollable {
-        max-height: calc(100vh - 290px);
+        max-height: calc(100vh - 352px);
     }
 
     .rm-connection-manager {
         &__add-new {
             display: flex;
             flex-direction: row;
-            margin-top: 0;
 
             paper-input {
                 flex-grow: 2;
@@ -54,7 +53,7 @@ rm-connection-manager {
                 flex-direction: column;
 
                 &__type {
-                    color: #212121;
+                    opacity: 0.6;
                 }
             }
             paper-icon-button {

@@ -8,6 +8,7 @@ import { ConnectionService } from './connection.service';
 export class TabService {
     public currentSessionId: Observable<string>;
     private subject = new Subject<string>();
+    private sessions: Tab[] = [];
 
     constructor() {
         const stream = this.subject.publishReplay(1);
@@ -20,6 +21,19 @@ export class TabService {
     }
 
     public newSession(id: string) {
+        this.sessions.push(<Tab> { id });
         this.subject.next(id);
+    }
+
+    public setContext(id: string, conn: Connection) {
+        const newTab = conn ? <Tab> { id, connectionId: conn.id }
+            : <Tab> { id, connectionId: null };
+        this.sessions = this.sessions
+            .filter(x => x.id !== id)
+            .concat([newTab]);
+    }
+
+    public sessionContext(id: string) {
+        return this.sessions.find(x => x.id === id).connectionId;
     }
 }

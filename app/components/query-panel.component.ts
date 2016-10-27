@@ -14,7 +14,6 @@ import { EditorDirective } from '../directives/editor.directive';
     <div>
         {{sessionId}}
     </div>
-    <rm-connection-manager></rm-connection-manager>
 `
 })
 export class QueryPanelComponent {

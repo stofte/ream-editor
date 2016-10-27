@@ -1,4 +1,4 @@
-import { Component, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { OverlayService } from './services/overlay.service';
 import { TabListComponent } from './components/tab-list.component';
 import { ConnectionManagerComponent } from './components/connection-manager.component';
@@ -34,7 +34,7 @@ const electron = electronRequire('electron').remote;
     <mdl-layout-drawer>
         <mdl-layout-title>Ream</mdl-layout-title>
         <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer()">Connections</a>
+            <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer();showConnectionMgr.emit(true);">Connections</a>
             <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer()">About</a>
         </nav>
     </mdl-layout-drawer>
@@ -43,11 +43,13 @@ const electron = electronRequire('electron').remote;
         <rm-query-panel></rm-query-panel>
     </mdl-layout-content>
 </mdl-layout>
+<rm-connection-manager [show-dialog]="showConnectionMgr"></rm-connection-manager>
 `
 })
 export class AppComponent {
 
     private isMaximized = true;
+    private showConnectionMgr = new EventEmitter<boolean>();
 
     constructor(
         private streamManager: StreamManager,

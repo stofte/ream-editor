@@ -1,7 +1,8 @@
-import { Component, ViewChild, AfterViewInit, ElementRef  } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ElementRef, Input, EventEmitter  } from '@angular/core';
 import { OverlayService } from '../services/overlay.service';
 import { ConnectionService } from '../services/connection.service';
 import { TabService } from '../services/tab.service';
+import { HotkeyService } from '../services/index';
 import { Connection } from '../models/connection';
 
 @Component({
@@ -51,16 +52,21 @@ import { Connection } from '../models/connection';
 `
 })
 export class ConnectionManagerComponent implements AfterViewInit  {
+    @Input('show-dialog') showDialog: EventEmitter<boolean>;
     private newConnectionStringText: string;
     private connectionsSubTitle: string;
     private connections: Connection[];
     private dialogElm: any;
     constructor(
+      private hotkey: HotkeyService,
       private element: ElementRef
         // private connectionManager: OverlayService,
         // private conns: ConnectionService,
         // private tabService: TabService
     ) {
+        // this.showDialog.subscribe(x => {
+        //     console.log('showDialog subscriber', x);
+        // })
         // conns.all
         //     .subscribe(cs => {
         //         this.connections = cs;
@@ -70,10 +76,17 @@ export class ConnectionManagerComponent implements AfterViewInit  {
     }
 
     ngAfterViewInit() {
-        this.dialogElm = this.element.nativeElement.querySelector('#scrolling');
-        setTimeout(() => {
-          this.dialogElm.open();
-        }, 5000);
+        this.dialogElm = this.element.nativeElement.querySelector('paper-dialog');
+        this.showDialog.subscribe(() => {
+            this.dialogElm.open();
+        });
+        this.hotkey.connectionManager.subscribe(val => {
+            if (this.dialogElm.opened) {
+                this.dialogElm.close();
+            } else {
+                this.dialogElm.open();
+            }
+        });
     }
     
     // private closeManager() {

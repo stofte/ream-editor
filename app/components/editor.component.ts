@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ElementRef } from '@angular/core';
 import { TabService } from '../services/index';
 import * as CodeMirror from 'codemirror';
+import 'codemirror/mode/clike/clike';
 
 @Component({
     selector: 'rm-editor',
@@ -30,6 +31,7 @@ export class EditorComponent implements AfterViewInit {
             }
             doc = this.documents[id];
             const oldDoc = this.mirror.swapDoc(doc);
+            this.mirror.setOption('mode', 'text/x-csharp');
             this.documents[this.sessionId] = oldDoc;
             this.sessionId = id;
         });

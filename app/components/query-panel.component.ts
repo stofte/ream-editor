@@ -6,9 +6,7 @@ import { TabService } from '../services/tab.service';
     template: `
     <rm-controls></rm-controls>
     <rm-editor></rm-editor>
-    <div>
-        {{sessionId}}
-    </div>
+    <rm-result-display></rm-result-display>
 `
 })
 export class QueryPanelComponent {

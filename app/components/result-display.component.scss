@@ -1,0 +1,13 @@
+rm-result-display {
+    flex-grow: 1;
+
+    .datatable {
+        text-align: left;
+        margin:0 auto;
+        height: calc(100vh - 339px);
+    }
+
+    .datatable.vertical-scroll {
+        height:100vh;
+    }
+}

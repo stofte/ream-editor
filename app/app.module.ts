@@ -11,6 +11,7 @@ import { TabService, HotkeyService, ConnectionService } from './services/index';
 import { EditorDirective } from './directives/editor.directive';
 import { MdlModule } from 'angular2-mdl';
 import { PolymerElement } from '@vaadin/angular2-polymer';
+import { Angular2DataTableModule } from 'angular2-data-table';
 
 @NgModule({
     declarations: [
@@ -20,7 +21,7 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
         ControlsComponent,
         ConnectionManagerComponent,
         EditorComponent,
-        EditorDirective,
+        ResultDisplayComponent,
         PolymerElement('paper-button'),
         PolymerElement('paper-dialog'),
         PolymerElement('paper-dialog-scrollable'),
@@ -43,7 +44,8 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
     imports: [
         BrowserModule,
         HttpModule,
-        MdlModule
+        MdlModule,
+        Angular2DataTableModule
     ],
     bootstrap: [AppComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

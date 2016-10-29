@@ -69,6 +69,10 @@
     vertical-align: 1px;
 }
 
+.mdl-layout__content {
+    overflow-y: hidden;
+}
+
 /* HEADER ICONS **************************************************************/
 
 .mdl-layout__header-row .mdl-button {

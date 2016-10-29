@@ -39,6 +39,7 @@
     "@angular/router": "3.1.1",
     "@vaadin/angular2-polymer": "1.0.0-beta5",
     "angular-in-memory-web-api": "0.1.5",
+    "angular2-data-table": "^0.12.0",
     "angular2-mdl": "2.2.2",
     "codemirror": "5.18.2",
     "lodash": "4.15.0",

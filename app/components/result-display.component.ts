@@ -12,30 +12,26 @@ class ColumnSizing {
 @Component({
     selector: 'rm-result-display',
     template: `
+    <div class="rm-result-display__output-list">
+        <mdl-chip mdl-label="City, 100 rows">
+            <span mdl-chip-contact class="mdl-color--blue mdl-color-text--white">
+                <iron-icon icon="vaadin-icons:table"></iron-icon>
+            </span>
+        </mdl-chip>
+    </div>
     <datatable
         class='material'
         [rows]='rows'
         [options]='options'>
 
-        <datatable-column name="Name">
-            <template let-value="value">
-                <strong>{{value}}</strong>
-            </template>
-        </datatable-column>
-
-        <datatable-column name="Gender">
-            <template let-row="row" let-value="value">
-                <i [innerHTML]="row['name']"></i> and <i>{{value}}</i>
-            </template>
-        </datatable-column>
-
-        <datatable-column name="Age">
+        <datatable-column *ngFor="let col of columns" name="{{col}}">
         </datatable-column>
 
     </datatable>
 `
 })
 export class ResultDisplayComponent {
+    columns = ['Name', 'Gender', 'Age'];
     rows = [
     {
         "id": 0,

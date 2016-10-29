@@ -4,10 +4,22 @@ rm-result-display {
     .datatable {
         text-align: left;
         margin:0 auto;
-        height: calc(100vh - 339px);
+        height: calc(100vh - 390px);
     }
 
     .datatable.vertical-scroll {
         height:100vh;
+    }
+
+    .rm-result-display {
+        &__output-list {
+            margin: -10px 10px 10px 10px;
+
+            iron-icon {
+                vertical-align: -1px;
+                height: 15px;
+                width: 15px;
+            }
+        }
     }
 }

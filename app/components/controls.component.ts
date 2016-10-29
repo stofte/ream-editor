@@ -39,7 +39,7 @@ export class ControlsComponent implements AfterViewInit {
             this.sessionId = id;
             if (this.selector) {
                 const context = tabs.sessionContext(id);
-                if (context) {
+                if (context !== null && context !== undefined) {
                     for (let i = 0; i < this.connections.length; i++) {
                         if (this.connections[i].id === context) {
                             this.selector.selected = i + 1;

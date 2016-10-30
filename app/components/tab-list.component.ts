@@ -81,8 +81,13 @@ export class TabListComponent {
         if (this.activeIndex >= this.currentTabs.length) {
             this.activeIndex = this.currentTabs.length - 1;
         }
-        const newSession = this.currentTabs[this.activeIndex].id;
-        this.tabService.currentSession(newSession);
+        if (this.currentTabs.length > 0) {
+            const newSession = this.currentTabs[this.activeIndex].id;
+            this.tabService.currentSession(newSession);
+        } else {
+            this.tabService.currentSession(null);
+            this.activeIndex = null;
+        }
     }
 
     private mouseEnter(idx: number) {

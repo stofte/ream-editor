@@ -7,4 +7,10 @@ rm-query-panel {
     display: flex;
     flex-direction: column;
 
+    .rm-query-panel {
+        &__session {
+            display: flex;
+            flex-direction: column;
+        }
+    }
 }

@@ -35,7 +35,7 @@ export class ControlsComponent implements AfterViewInit {
             this.connections = conns;
             this.contextList = ['Code'].concat(conns.map(x => x.connectionString));
         });
-        tabs.currentSessionId.subscribe(id => {
+        tabs.currentSessionId.filter(x => !!x).subscribe(id => {
             this.sessionId = id;
             if (this.selector) {
                 const context = tabs.sessionContext(id);

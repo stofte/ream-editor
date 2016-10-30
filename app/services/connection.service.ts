@@ -26,7 +26,7 @@ export class ConnectionService {
     
     public add(conn: Connection) {
         this.ops.next((conns) => {
-            conn.id = this.getNextValidId(0, conns);
+            conn.id = this.getNextValidId(1, conns);
             return [conn, ...conns];   
         });
     }
@@ -68,7 +68,7 @@ export class ConnectionService {
         localStorage.setItem(this.key, JSON.stringify(conns));
     }
 
-    private getNextValidId(guess = 0, conns: Connection[]): number {
+    private getNextValidId(guess = 1, conns: Connection[]): number {
         if (conns.find(c => c.id === guess)) {
             return this.getNextValidId(guess + 1, conns);
         }

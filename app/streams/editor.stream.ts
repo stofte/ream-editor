@@ -60,7 +60,13 @@ export class EditorStream {
                     .flatMap(msg => {
                         return input.events
                             .filter(e => e.name === EventName.EditorUpdate && e.id === msg.id)
-                            .takeUntil(input.events.first(x => x.name === EventName.SessionDestroy && x.id === msg.id));
+                            .takeUntil(input.events.first(x => x.name === EventName.SessionDestroy && x.id === msg.id))
+                            .startWith(new Message(EventName.EditorUpdate, msg.id, <TextUpdate> {
+                                text: [''],
+                                from: { line: 0, ch: 0 },
+                                to: { line: 0, ch: 0 },
+                                removed: []
+                            }));
                     })
                     .merge(input.events.filter(x => x.name === EventName.SessionDestroy))
                     .scan((buffers: BufferText[], msg: Message, index: number) => {
@@ -88,8 +94,12 @@ export class EditorStream {
         const contextText = input.events.filter(msg => msg.name === EventName.SessionContext)
             .withLatestFrom(editMsgs)
             .map(val => {
+                let txt = '';
                 const b = val[1].find(x => x.id === val[0].id);
-                return new Message(EventName.EditorBufferText, val[0].id, b.getText(), val[0].timestamp);
+                if (b) {
+                    txt = b.getText();                    
+                }
+                return new Message(EventName.EditorBufferText, val[0].id, txt, val[0].timestamp);
             })
             .publishReplay(1);
 
@@ -104,3 +114,4 @@ export class EditorStream {
         contextText.connect();
     }
 }
+	

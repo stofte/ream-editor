@@ -3,6 +3,7 @@ import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
 import { Tab } from '../models/tab';
 import { Connection } from '../models/connection';
 import { ConnectionService } from './connection.service';
+import { InputStream } from '../streams/index';
 
 @Injectable()
 export class TabService {
@@ -10,7 +11,7 @@ export class TabService {
     private subject = new Subject<string>();
     private sessions: Tab[] = [];
 
-    constructor() {
+    constructor(private input: InputStream) {
         const stream = this.subject.publishReplay(1);
         this.currentSessionId = stream;
         stream.connect();
@@ -22,7 +23,13 @@ export class TabService {
 
     public newSession(id: string) {
         this.sessions.push(<Tab> { id });
+        this.input.new(id);
         this.subject.next(id);
+    }
+
+    public deleteSession(id: string) {
+        this.sessions = this.sessions.filter(x => x.id !== id);
+        this.input.destroy(id);
     }
 
     public setContext(id: string, conn: Connection) {
@@ -31,6 +38,7 @@ export class TabService {
         this.sessions = this.sessions
             .filter(x => x.id !== id)
             .concat([newTab]);
+        this.input.setContext(id, conn);
     }
 
     public sessionContext(id: string) {

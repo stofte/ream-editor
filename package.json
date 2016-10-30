@@ -45,6 +45,7 @@
     "lodash": "4.15.0",
     "material-design-lite": "1.2.1",
     "moment": "2.15.0",
+    "ng2-handsontable": "^0.37.1",
     "node-uuid": "1.4.7",
     "normalizecss": "3.0.0",
     "reflect-metadata": "0.1.8",

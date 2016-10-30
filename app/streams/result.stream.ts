@@ -38,7 +38,9 @@ export class ResultStream {
                                 title: socket.values[0],
                                 columns: null,
                                 columnTypes: null,
-                                rows: []
+                                rows: [],
+                                isAtomic: false,
+                                isTabular: true
                             };
                             break;
                         case 'header': 
@@ -74,7 +76,9 @@ export class ResultStream {
             title: msg.values[0].Name,
             columns: [msg.values[0].Name],
             columnTypes: [msg.values[0].Type],
-            rows: [msg.values[1]]
+            rows: [msg.values[1]],
+            isAtomic: true,
+            isTabular: false
         };
         return obj;
     }

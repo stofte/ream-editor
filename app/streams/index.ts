@@ -6,3 +6,4 @@ export * from './omnisharp.stream';
 export * from './input.stream';
 export * from './stream-manager';
 export * from './output.stream'
+export * from './api';

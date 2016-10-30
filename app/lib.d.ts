@@ -32,3 +32,5 @@ declare function Assert(cond: any): void;
 declare function Assert(cond: any, msg: string): void;
 
 type ConnectionType = 'sqlserver' | 'npgsql' | 'sqlite';
+
+declare function Handsontable(elm: HTMLElement, options: any): void;

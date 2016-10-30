@@ -21,7 +21,8 @@
         'node-uuid': 'node_modules/node-uuid',
         'angular2-mdl': 'node_modules/angular2-mdl',
         '@vaadin/angular2-polymer': 'node_modules/@vaadin/angular2-polymer',
-        'angular2-data-table': 'node_modules/angular2-data-table'
+        'angular2-data-table': 'node_modules/angular2-data-table',
+        'ng2-handsontable': 'node_modules/ng2-handsontable'
     };
 
     // packages tells the System loader how to load when no filename and/or no extension
@@ -34,7 +35,8 @@
         'node-uuid': { main: 'uuid.js', defaultExtension: 'js' },
         'angular2-mdl': { main: 'bundle/angular2-mdl.js' },
         '@vaadin/angular2-polymer': { main: 'index.js' },
-        'angular2-data-table': { main: 'release/index.js' }
+        'angular2-data-table': { main: 'release/index.js' },
+        'ng2-handsontable': { main: 'dist/index.js', defaultExtension: 'js' }
     };
 
     var config = {

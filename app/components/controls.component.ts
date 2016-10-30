@@ -7,11 +7,12 @@ import { ExecuteQueryComponent } from './execute-query.component';
 import { ResultListComponent } from './result-list.component';
 import { EditorDirective } from '../directives/editor.directive';
 import { Connection } from '../models/index';
+import { InputStream, OutputStream, EventName } from '../streams/index';
 
 @Component({
     selector: 'rm-controls',
     template: `
-    <paper-button raised><mdl-icon>play_arrow</mdl-icon></paper-button>
+    <paper-button raised [disabled]="playDisabled" (click)="playClickHandler()"><mdl-icon>play_arrow</mdl-icon></paper-button>
     <paper-dropdown-menu label="Context">
         <paper-listbox class="dropdown-content"
             [selected]="0"
@@ -26,9 +27,12 @@ export class ControlsComponent implements AfterViewInit {
     connections: Connection[] = [];
     selector: any;
     sessionId: string = null;
+    playDisabled = false;
     constructor(
         connections: ConnectionService,
         private tabs: TabService,
+        private input: InputStream,
+        private output: OutputStream,
         private elm: ElementRef
     ) {
         connections.all.subscribe(conns => {
@@ -61,6 +65,18 @@ export class ControlsComponent implements AfterViewInit {
     contextSelected(event: any) {
         const idx = this.selector.selected;
         const ctx = idx === 0 ? null : this.connections[idx - 1];
+        console.log('contextSelected');
         this.tabs.setContext(this.sessionId, ctx);
+    }
+
+    playClickHandler() {
+        const id = this.sessionId;
+        this.playDisabled = true;
+        this.output.events
+            .first(msg => msg.id === id && msg.name === EventName.ResultDone)
+            .subscribe(() => {
+                this.playDisabled = false;
+            });
+        this.input.executeBuffer(id);
     }
 }

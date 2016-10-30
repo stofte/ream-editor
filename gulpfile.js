@@ -94,10 +94,10 @@ gulp.task('css', ['sass'], () => {
 
 gulp.task('watch', () => {
     gulp.watch(sassFiles, ['sass', 'css']);
-    gulp.watch(tsFiles, ['ts:lint', 'ts']);
+    gulp.watch(tsFiles, ['ts']);
 });
 
-const mainTasks = ['sass', 'css', 'ts', 'ts:lint'];
-const buildOnlyTasks = ['ts:bundle'];
+const mainTasks = ['sass', 'css', 'ts'];
+const buildOnlyTasks = ['ts:lint', 'ts:bundle'];
 gulp.task('build', [...mainTasks, ...buildOnlyTasks]);
 gulp.task('default', [...mainTasks, 'watch']);

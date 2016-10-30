@@ -88,6 +88,7 @@ export class TabListComponent {
             this.tabService.currentSession(null);
             this.activeIndex = null;
         }
+        this.tabService.deleteSession(id);
     }
 
     private mouseEnter(idx: number) {

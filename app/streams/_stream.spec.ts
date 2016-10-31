@@ -75,6 +75,9 @@ describe('[int-test] streams', function() {
         it('emits autocompletions after switching buffer context', done => {
             emitsCodecheckAfterSwitchingBufferContext(done, 10, 0);
         });
+        it('emits results after swithing buffer context', done => {
+            emitsResultsAfterSwitchingBufferContext(done, 10, 0);
+        });
     });
 
     let runTimings = {  };
@@ -88,7 +91,7 @@ describe('[int-test] streams', function() {
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             function runAllAtOnce(allDone) {
-                this.timeout(backendTimeout * 2);
+                this.timeout(backendTimeout);
 
                 let step1Resolver = null;
                 let step2Resolver = null;
@@ -96,12 +99,14 @@ describe('[int-test] streams', function() {
                 let step4Resolver = null;
                 let step5Resolver = null;
                 let step6Resolver = null;
+                let step7Resolver = null;
                 const step1Promise = new Promise((done) => step1Resolver = done);
                 const step2Promise = new Promise((done) => step2Resolver = done);
                 const step3Promise = new Promise((done) => step3Resolver = done);
                 const step4Promise = new Promise((done) => step4Resolver = done);
                 const step5Promise = new Promise((done) => step5Resolver = done);
                 const step6Promise = new Promise((done) => step6Resolver = done);
+                const step7Promise = new Promise((done) => step7Resolver = done);
 
                 emitsResultsForSimpleValueExpressions(step1Resolver, replayMaxDelay, replayMinDelay);
                 emitsResultsForLinqBasedQueryAgainstSqliteDatabase(step2Resolver, replayMaxDelay, replayMinDelay);
@@ -109,6 +114,7 @@ describe('[int-test] streams', function() {
                 emitsCodecheckForDatabaseQuery(step4Resolver, replayMaxDelay, replayMinDelay);
                 emitsAutocompletionForSimpleStatement(step5Resolver, replayMaxDelay, replayMinDelay);
                 emitsCodecheckAfterSwitchingBufferContext(step6Resolver, replayMaxDelay, replayMinDelay);
+                emitsResultsAfterSwitchingBufferContext(step7Resolver, replayMaxDelay, replayMinDelay);
 
                 const failures = [];
                 // todo do something nicer
@@ -123,19 +129,25 @@ describe('[int-test] streams', function() {
                 step4Promise.then(doneHandler);
                 step5Promise.then(doneHandler);
                 step6Promise.then(doneHandler);
+                step7Promise.then(doneHandler);
 
-                step1Promise.then(() => step2Promise.then(() => step3Promise.then(() => {
-                    step4Promise.then(() => step5Promise.then(() => step6Promise.then(() => {
-                        setTimeout(() => {
-                            runTimings = {};
-                            if (failures.length > 0) {
-                                allDone(failures);
-                            } else {
-                                allDone();
-                            }
-                        }, 100);
-                    })));
-                })));
+                Promise
+                    .all([
+                        step1Promise,
+                        step2Promise,
+                        step3Promise,
+                        step4Promise,
+                        step5Promise,
+                        step6Promise,
+                        step7Promise
+                    ])
+                    .then(() => {
+                        if (failures.length > 0) {
+                            allDone(failures);
+                        } else {
+                            allDone();
+                        }
+                    });
             }
 
             let idx = 0;
@@ -202,11 +214,73 @@ describe('[int-test] streams', function() {
         let rowCount = 0;
         let headers: any[] = null;
         let rows: any[] = null;
+        let gotHeaders = false;
+        let isDone = false;
         const resultSub = output.events
             .filter(msg => msg.id === id)
             .subscribe(msg => {
                 if (msg.name === EventName.ResultDone) {
                     input.destroy(id);
+                    isDone = true;
+                } else if (msg.name === EventName.ResultUpdate) {
+                    rows = msg.data.rows;
+                    headers = msg.data.columns;
+                    gotHeaders = true;
+                }
+                if (gotHeaders && isDone) {
+                    resultSub.unsubscribe();
+                    checkAndExit(done, () => {
+                        let cityColIdx = 0;
+                        expect(headers).to.contain('Name', '"Name" column on table');
+                        for (let i = 0; i < headers.length; i++) {
+                            if (headers[i] === 'Name') {
+                                cityColIdx = i;
+                                break;
+                            }
+                        }
+                        for (let i = 0; i < rows.length; i++) {
+                            expect(rows[0][cityColIdx].substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
+                        }
+                        expect(rows.length).to.equal(83, 'Row count from query');
+                        runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
+                    })
+                }
+            });
+        
+        replaySteps([
+            () => input.new(id, sqliteConnection),
+            {
+                for: cSharpCityFilteringQueryEditorTestData[0].events,
+                fn: (evt) => input.edit(id, evt)
+            }, () => input.executeBuffer(id)
+        ], replayMaxDelay, replayMinDelay);
+    }
+
+
+    function emitsResultsAfterSwitchingBufferContext(done, replayMaxDelay, replayMinDelay) {
+        // is largely a copy of emitsResultsForLinqBasedQueryAgainstSqliteDatabase
+        // but has a different setup
+        const expectedPage = cSharpCityFilteringQueryEditorTestData[0]; 
+        const id = uuid.v4();
+        const ts = performance.now();
+        // console.log(id, 'emitsResultsAfterSwitchingBufferContext');
+        let rowCount = 0;
+        let headers: any[] = null;
+        let rows: any[] = null;
+        let isDone = false;
+        let gotHeaders = false;
+        const resultSub = output.events
+            .filter(msg => msg.id === id)
+            .subscribe(msg => {
+                if (msg.name === EventName.ResultDone) {
+                    input.destroy(id);
+                    isDone = true;
+                } else if (msg.name === EventName.ResultUpdate) {
+                    rows = msg.data.rows;
+                    headers = msg.data.columns;
+                    gotHeaders = true;
+                }
+                if (isDone && gotHeaders) {
                     resultSub.unsubscribe();
                     checkAndExit(done, () => {
                         let cityColIdx = 0;
@@ -223,14 +297,13 @@ describe('[int-test] streams', function() {
                         expect(rows.length).to.equal(83, 'Row count from query');
                         runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
                     });
-                } else if (msg.name === EventName.ResultUpdate) {
-                    rows = msg.data.rows;
-                    headers = msg.data.columns;
                 }
             });
         
         replaySteps([
-            () => input.new(id, sqliteConnection),
+            () => input.new(id),
+            // this is what we're really testing, that switching on an empty buffer is ok.
+            () => input.setContext(id, sqliteConnection),
             { 
                 for: cSharpCityFilteringQueryEditorTestData[0].events,
                 fn: (evt) => input.edit(id, evt)

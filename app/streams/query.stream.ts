@@ -25,6 +25,13 @@ export class QueryStream {
     private socket: Subject<Message> = new Subject<Message>();
     private process: ProcessStream = null;
     private templateCache = new TemplateCache();
+    // the backend uses a single context per connection, so cannot
+    // handle concurrent queries on the same connection.
+    // layout { connectionId : lockStatus }
+    private contextLock = {};
+    // Promise resolvers awaiting the context
+    // layout { connectionId : PromiseResolveFunc[] }
+    private contextQueue = {};
     constructor(
         private editor: EditorStream,
         private input: InputStream,
@@ -33,12 +40,27 @@ export class QueryStream {
         this.process = new ProcessStream(http);
         const executeCodeResponses = input.events.filter(msg => msg.name === EventName.SessionCreate)
             .flatMap(sessionMsg => {
+                const dstrStream = input.events
+                    .filter(msg => msg.id === sessionMsg.id && msg.name === EventName.SessionDestroy);
+                const ctxStream = input.events
+                    .filter(msg => msg.id === sessionMsg.id && msg.name === EventName.SessionContext)
+                    .startWith(sessionMsg)
+                    .takeUntil(dstrStream);
                 return editor.events
                     .filter(msg => msg.name === EventName.EditorExecuteText && msg.id === sessionMsg.id)
-                    .flatMap(msg => {
+                    .withLatestFrom(ctxStream)
+                    .delayWhen(([msg, ctx]) => {
+                        // data is the connection, if any, of the query
+                        if (ctx.data && ctx.data.id) {
+                            return Observable.fromPromise(this.obtainContext(ctx.data.id, msg.id));
+                        } else {
+                            return Observable.from([1]);
+                        }
+                    })
+                    .flatMap(([msg, ctx]) => {
                         let request: any = null;
                         let actionName: string = null;
-                        if (!sessionMsg.data) { // data may be a connection
+                        if (!ctx.data) {
                             request = { id: msg.id, text: msg.data };
                             actionName = this.action('executecode');
                         } else {
@@ -46,14 +68,18 @@ export class QueryStream {
                             request = {
                                 id: msg.id,
                                 text: msg.data,
-                                connectionString: sessionMsg.data.connectionString,
-                                serverType: sessionMsg.data.type
+                                connectionString: ctx.data.connectionString,
+                                serverType: ctx.data.type
                             };
                         }
                         return this.http
                             .post(actionName, request)
                             .map(res => {
                                 const data = res.json();
+                                // use same guard as in the delayWhen, to ensure we release the context
+                                if (ctx.data && ctx.data.id) {
+                                    this.releaseContext(ctx.data.id, msg.id);
+                                }
                                 return new Message(EventName.QueryExecuteResponse, msg.id, {
                                     code: data.Code,
                                     message: data.Message
@@ -166,6 +192,30 @@ export class QueryStream {
         this.process.close();
     }
 
+    private obtainContext(connectionId: number, sessionId: string): Promise<boolean> {
+        if (!this.contextQueue[connectionId]) {
+            this.contextQueue[connectionId] = [];
+        }
+        if (!this.contextLock[connectionId]) {
+            this.contextLock[connectionId] = true;
+            return new Promise<boolean>(done => done(true));
+        } else {
+            let resolver = null;
+            const p = new Promise<boolean>((done) => resolver = done);
+            this.contextQueue[connectionId].push(resolver);
+            return p;
+        }
+    }
+
+    private releaseContext(connectionId: number, sessionId: string) {
+        if (this.contextQueue[connectionId].length > 0) {
+            const [fn] = this.contextQueue[connectionId].splice(0, 1);
+            fn(true);
+        } else {
+            this.contextLock[connectionId] = false;
+        }
+    }
+
     private action(name: string) {
         return `http://localhost:${config.queryEnginePort}/${name}`;
     }
@@ -178,6 +228,7 @@ export class QueryStream {
             type: msg.Type.substring(0, 1).toLowerCase() + msg.Type.substring(1),
             values: msg.Values
         };
+        // console.log('socket', msg.Session, msg.Type, msg.Values);
         this.socket.next(new Message(EventName.QuerySocketOutput, msg.Session, message));
     }
 

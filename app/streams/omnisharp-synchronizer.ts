@@ -89,6 +89,7 @@ class FileNameService {
 class SessionState {
     public id: string;
     public ready: boolean = false;
+    public initialized: boolean = false;
     public fileName: string = null;
     public columnOffset: number = null;
     public lineOffset: number = null;
@@ -102,15 +103,16 @@ class SessionState {
 
     public queueOperation(msg: OmnisharpSessionMessage): Promise<number> {
         if (this.isBlocked(msg)) {
-            // console.log(`queueOperation BLOCK ${msg.type}:${msg.timestamp}`);
+            // console.log(`queueOperation BLCK ${msg.sessionId.substring(0, 8)} ${msg.type}:${msg.timestamp}`);
             let dequeue: Function = null;
             const p = new Promise((done) => dequeue = done);
             this.queue.push({msg , dequeue});
             return p;
         } else {
-            // console.log(`queueOperation PASS ${msg.type}:${msg.timestamp}`);
+            // console.log(`queueOperation PASS ${msg.sessionId.substring(0, 8)} ${msg.type}:${msg.timestamp}`);
             if (msg.type === 'context') {
                 this.ready = false; // if we pass a context, we immediatly invalidate the session
+                this.initialized = true;
             } else if (msg.type === 'destroy') {
                 this.pendingDeletion = true;
             }
@@ -192,8 +194,12 @@ class SessionState {
             // these operations only block if there's an edit inflight/queued or if the session isnt ready
             return !this.ready || this.operationBlockedOnEdit();
         } else if (msg.type === 'context' || msg.type === 'destroy') {
-            // context/destroy blocks on anything in the queues.
-            return this.queue.length > 0 || this.awaiting.length > 0;
+            // context/destroy blocks on anything in the queues,
+            // or if we have an session which has not yet been initialized.
+            // this first flag will allow the first context (from creation),
+            // to bypass, while follow-up context msgs will block, if template
+            // wasnt yet set
+            return (this.initialized && !this.ready) || this.queue.length > 0 || this.awaiting.length > 0;
         }
         return true;
     }

@@ -4,7 +4,7 @@ import { OmnisharpSessionMessage } from './api';
 import { OmnisharpSynchronizer } from './omnisharp-synchronizer';
 import { cSharpAutocompletionRequestTestData } from '../test/editor-testdata';
 import { Observable, Subject } from 'rxjs/Rx';
-import replaySteps from '../test/replay-steps';
+import { replaySteps } from '../test/test-helpers';
 import * as uuid from 'node-uuid';
 
 describe('omnisharp-synchronizer', function() {

@@ -1,5 +1,5 @@
 // rx streams require events to be replayed over time to make any sense.
-export default function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
+export function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
     if (steps.length > 0) {
         let head = steps[0];
         let headArg = undefined;
@@ -28,4 +28,24 @@ export default function replaySteps(steps: any[], timeoutMax = 100, timeoutMin =
         }, timeout);
     }
     return;
+}
+
+// Since "expect" throws inside a subscription handler, the stream crashes as a result.
+// These helper functions aid in avoid crashing the suite
+export function check([done, subber], pred) {
+    try {
+        pred();
+    } catch (exn) {
+        subber.unsubscribe();
+        done(exn);
+    }
+}
+
+export function checkAndExit(done, pred) {
+    try {
+        pred();
+        done();
+    } catch (exn) {
+        done(exn);
+    }
 }

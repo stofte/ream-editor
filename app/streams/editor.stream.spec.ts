@@ -17,6 +17,7 @@ import XSRFStrategyMock from '../test/xsrf-strategy-mock';
 const backendTimeout = config.unitTestData.backendTimeout;
 const fs = electronRequire('fs');
 import { randomTestData } from '../test/editor-testdata';
+import { check, checkAndExit, replaySteps } from '../test/test-helpers';
 
 describe('editor.stream', function() {
     this.timeout(30 * 1000);
@@ -49,17 +50,25 @@ describe('editor.stream', function() {
             const sub = editor.events.filter(x => x.id === id).subscribe(msg => {
                 if (msg.name === EventName.EditorExecuteText) {
                     sub.unsubscribe();
-                    expect(msg.data).to.equal(test.output);
+                    if (idx === randomTestData.length - 1) {
+                        checkAndExit(done, () => {
+                            expect(msg.data).to.equal(test.output);
+                        });
+                    } else {
+                        check([done, () => {}], () => {
+                            expect(msg.data).to.equal(test.output);
+                        });
+                    }
                 }
             });
-            input.new(id);
-            test.events.forEach(data => {
-                input.edit(id, data);
-            });
-            input.executeBuffer(id);
-            if (idx === randomTestData.length - 1) {
-                done();
-            }
+            replaySteps([
+                () => input.new(id),
+                { 
+                    for: test.events,
+                    fn: (evt) => input.edit(id, evt)
+                },
+                () => input.executeBuffer(id)
+            ], 0, 0);
         });
     });
 

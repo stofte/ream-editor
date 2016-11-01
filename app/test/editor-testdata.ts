@@ -297,6 +297,27 @@ export const cSharpTestData = [
 ];
 
 export const randomTestData = [
+    {
+        "output": "city.Take(11)\n",
+        "events": [
+            {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["c"],"removed":[""],"origin":"+input","time":0.004908551792141225},
+            {"from":{"line":0,"ch":1},"to":{"line":0,"ch":1},"text":["i"],"removed":[""],"origin":"+input","time":102.68501558842763},
+            {"from":{"line":0,"ch":2},"to":{"line":0,"ch":2},"text":["t"],"removed":[""],"origin":"+input","time":289.1850633524127},
+            {"from":{"line":0,"ch":3},"to":{"line":0,"ch":3},"text":["y"],"removed":[""],"origin":"+input","time":433.55991963567976},
+            {"from":{"line":0,"ch":4},"to":{"line":0,"ch":4},"text":["."],"removed":[""],"origin":"+input","time":1682.6398493603214},
+            {"from":{"line":0,"ch":5},"to":{"line":0,"ch":5},"text":["T"],"removed":[""],"origin":"+input","time":1931.4097851602396},
+            {"from":{"line":0,"ch":6},"to":{"line":0,"ch":6},"text":["a"],"removed":[""],"origin":"+input","time":2133.920018546774},
+            {"from":{"line":0,"ch":7},"to":{"line":0,"ch":7},"text":["k"],"removed":[""],"origin":"+input","time":2284.224782975934},
+            {"from":{"line":0,"ch":8},"to":{"line":0,"ch":8},"text":["e"],"removed":[""],"origin":"+input","time":2408.7249130525565},
+            {"from":{"line":0,"ch":9},"to":{"line":0,"ch":9},"text":["("],"removed":[""],"origin":"+input","time":2708.3701002741613},
+            {"from":{"line":0,"ch":10},"to":{"line":0,"ch":10},"text":["1"],"removed":[""],"origin":"+input","time":3185.0750574206163},
+            {"from":{"line":0,"ch":11},"to":{"line":0,"ch":11},"text":["0"],"removed":[""],"origin":"+input","time":3338.884905410319},
+            {"from":{"line":0,"ch":12},"to":{"line":0,"ch":12},"text":[")"],"removed":[""],"origin":"+input","time":3758.589871241135},
+            {"from":{"line":0,"ch":13},"to":{"line":0,"ch":13},"text":["",""],"removed":[""],"origin":"+input","time":4371.464851559731},
+            {"from":{"line":0,"ch":11},"to":{"line":1,"ch":0,"xRel":1},"text":["1"],"removed":["0)",""],"origin":"+input","time":7153.93482726995},
+            {"from":{"line":0,"ch":12},"to":{"line":0,"ch":12},"text":[")"],"removed":[""],"origin":"+input","time":8093.129953153537},
+            {"from":{"line":0,"ch":13},"to":{"line":0,"ch":13},"text":["",""],"removed":[""],"origin":"+input","time":8910.249773545851}
+    ]},
     {"output":"y","events":[
         {"from":{"line":0,"ch":0},"to":{"line":0,"ch":0},"text":["x"],"removed":[""],"origin":"+input","time":0.004999999999881766},
         {"from":{"line":0,"ch":0},"to":{"line":0,"ch":1},"text":["y"],"removed":["x"],"origin":"+input","time":2916.135}]

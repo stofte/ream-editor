@@ -16,8 +16,8 @@ import { cSharpTestData, cSharpTestDataExpectedResult, cSharpTestDataExpectedCod
     cSharpAutocompletionExpectedValues, cSharpContextSwitchExpectedCodeChecks, 
     cSharpContextSwitchEditorTestData, cSharpCityFilteringQueryEditorTestData,
     cSharpDatabaseCodeCheckEditorTestData, cSharpDatabaseCodeCheckExpectedErrors } from '../test/editor-testdata';
-import replaySteps from '../test/replay-steps';
 import { EventName, Message } from './api';
+import { check, checkAndExit, replaySteps } from '../test/test-helpers';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
@@ -493,24 +493,3 @@ describe('[int-test] streams', function() {
         });
     });
 });
-
-// Since "expect" throws inside a subscription handler, the stream crashes as a result.
-// These helper functions aid in avoid crashing the suite
-
-function check([done, subber], pred) {
-    try {
-        pred();
-    } catch (exn) {
-        subber.unsubscribe();
-        done(exn);
-    }
-}
-
-function checkAndExit(done, pred) {
-    try {
-        pred();
-        done();
-    } catch (exn) {
-        done(exn);
-    }
-}

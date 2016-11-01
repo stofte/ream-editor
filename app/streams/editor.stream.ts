@@ -11,30 +11,32 @@ class BufferText {
     public edit(update: TextUpdate) {
         const from = update.from;
         const to = update.to;
-        if (update.removed.length !== 1 || update.removed[0] !== '') {
-            for (let i = 1; i <= update.removed.length; i++) {
-                const line = from.line + i - 1;
-                if (i === 1) {
-                    const newLineVal = `${this.lines[line].substring(0, from.ch)}`;
-                    this.lines.splice(line, 1, newLineVal);
-                } else if (i < update.removed.length) {
-                    this.lines.splice(line, 1);
-                } else {
-                    Assert(this.lines[line - 1], 'Expected previous line');
-                    const newLineVal = `${this.lines[line - 1]}${
-                        this.lines[line].substring(to.ch)}`;
-                    this.lines.splice(line - 1, 2, newLineVal);
-                }
-            }
-        }
-        if (update.text.length !== 1) {
-            for (let i = 1; i < update.text.length; i++) {
-                this.lines.splice(from.line + i, 0, update.text[i]);        
-            }
-        } else if (update.text[0] !== '') {
-            const line = from.line;
-            this.lines[line] = `${this.lines[line].substring(0, from.ch)}${
-                update.text[0]}${this.lines[line].substring(to.ch)}`;
+        const additions = [...update.text];
+        const deletions = [...update.removed];
+        let idx = from.line;
+        let isFirst = true;
+        while (additions.length > 0 || deletions.length > 0) {
+            const inserted = additions.shift();
+            const removed = deletions.shift();
+            // Since CM always puts an empty string in either arrays as a "noop",
+            // we should always enter the first branch on the first iteration.
+            // This removed isFirst from the logic of the remaining branches.
+            if (removed !== undefined && inserted !== undefined) { 
+                // both defined, keep line and modify it in place
+                const keep = isFirst ? from.ch : 0;
+                this.lines[idx] = `${this.lines[idx].substring(0, keep)}${inserted}${this.lines[idx].substring(keep + removed.length)}`;
+                idx++; 
+            } else if (inserted !== undefined && removed === undefined) {
+                // only insert, so append new line
+                this.lines.splice(idx, 0, inserted);
+                idx += 2; // skip over the newly inserted line
+            } else if (removed !== undefined) {
+                // only delete, so merge with previous line, while removing the bit that was deleted
+                const removedLine = this.lines[idx];
+                this.lines.splice(idx, 1);
+                this.lines[idx - 1] = `${this.lines[idx - 1]}${removedLine.substring(removed.length)}`;
+            } // else both were empty, and we're done
+            isFirst = false;
         }
     }
     public getText() {
@@ -63,9 +65,9 @@ export class EditorStream {
                             .takeUntil(input.events.first(x => x.name === EventName.SessionDestroy && x.id === msg.id))
                             .startWith(new Message(EventName.EditorUpdate, msg.id, <TextUpdate> {
                                 text: [''],
+                                removed: [''],
                                 from: { line: 0, ch: 0 },
-                                to: { line: 0, ch: 0 },
-                                removed: []
+                                to: { line: 0, ch: 0 }
                             }));
                     })
                     .merge(input.events.filter(x => x.name === EventName.SessionDestroy))

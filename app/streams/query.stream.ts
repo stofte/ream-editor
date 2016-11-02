@@ -25,6 +25,7 @@ export class QueryStream {
     private socket: Subject<Message> = new Subject<Message>();
     private process: ProcessStream = null;
     private templateCache = new TemplateCache();
+    // TODO this actually wont work, since the context can be held after the request returns. the release must happen in the socket handler.
     // the backend uses a single context per connection, so cannot
     // handle concurrent queries on the same connection.
     // layout { connectionId : lockStatus }

@@ -5,8 +5,21 @@ rm-result-display {
         &__output-list {
             display: flex;
             flex-direction: row;
-            margin: -10px 10px 10px 10px;
+            margin: -10px 5px 5px 5px;
             min-height: 36px;
+
+            paper-button {
+                text-transform: initial;
+                color: #333;
+                line-height: 10px;
+                iron-icon {
+                    padding-right: 4px;
+                    margin-top: -3px;
+                }
+                &.active {
+                    background-color: #f3f3f3;
+                }
+            }
 
             mdl-chip {
                 margin-right: 10px;
@@ -20,7 +33,39 @@ rm-result-display {
         }
 
         &__table {
-            height: calc(100vh - 390px);
+            position: relative;
+            height: calc(100vh - 380px);
+            width: 100%;
+
+            &__hider {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100px;
+                background-color: white;
+                z-index: 999;
+            }
+
+            &__hot {
+
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+
+                .colHeader {
+                    display: block;
+                    text-align: left;
+                    cursor: default;
+                }
+                .rowHeader {
+                    opacity: 0.5;
+                    cursor: default;
+                }
+                td {
+                    cursor: default;
+                }
+            }
         }
     }
 }

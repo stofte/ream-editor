@@ -1,6 +1,6 @@
 rm-query-panel {
     position: absolute;
-    top: 37px;
+    top: calc(1px * var(--tab-list-height));
     left: 0;
     right: 0;
     bottom: 0;

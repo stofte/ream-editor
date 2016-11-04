@@ -36,13 +36,17 @@
 }
 
 :root {
+    --font-size-body: 13;
+    --margin: 5;
+
     --primary-bg-color: #f3f3f3;
     --primary-fore-color: #333;
     --primary-border: #ccc;
     --selection-bg-color: #add6ff;
-    --font-size-body: 13;
-
     --tab-inactive-bg-color: #e0e0e0;
+
+    --control-row-height: 25;
+    --tab-list-height: calc(var(--control-row-height) + 5);
 }
 
 html, body {

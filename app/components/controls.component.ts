@@ -14,6 +14,7 @@ const codeLabel = '<Code>';
     selector: 'rm-controls',
     template: `
     <button class="rm-controls__run"
+        (click)="executeBuffer()"
         [disabled]="playDisabled"><i class="material-icons">play_arrow</i></button>
     <select #sel (change)="contextChanged($event, sel)">
         <option *ngFor="let ctx of contextList" [value]="ctx.id">{{contextLabel(ctx.id)}}</option>
@@ -36,7 +37,8 @@ export class ControlsComponent {
             this.contextList = [<Connection> {connectionString: codeLabel}]
                 .concat([...conns]);
         });
-        tabs.currentSessionId.filter(x => !!x).subscribe(id => {
+        tabs.currentSessionId.subscribe(id => {
+            this.sessionId = id;
             // this.sessionId = id;
             // if (this.selector) {
             //     const context = tabs.sessionContext(id);
@@ -75,7 +77,7 @@ export class ControlsComponent {
     //     this.tabs.setContext(this.sessionId, ctx);
     // }
 
-    playClickHandler() {
+    executeBuffer() {
         const id = this.sessionId;
         this.playDisabled = true;
         this.output.events

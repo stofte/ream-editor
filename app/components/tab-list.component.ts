@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Tab } from '../models/tab';
 import { Connection } from '../models/connection';
@@ -24,8 +24,8 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
     <div class="rm-tab-list__tabs" 
         [sortablejs]="currentTabs" [sortablejsOptions]="options">
         <div *ngFor="let tab of currentTabs; let idx = index"
-            class="rm-tab-list__tab {{ activeId === tab.id ?  }}">
-            <button><span>{{tab.title}}</span></button>
+            class="rm-tab-list__tab {{ currentId === tab.id ? 'rm-tab-list__tab--active' : '' }}">
+            <button (click)="clickTab(tab.id)"><span>{{tab.title}}</span></button>
             <span 
                 class="rm-tab-list__tab-closebtn"
                 title="Close"
@@ -41,13 +41,13 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
     </div>
 `
 })
-export class TabListComponent {
+export class TabListComponent implements AfterViewInit {
     options: SortablejsOptions = {
         animation: 150,
         
     };
     private currentTabs: Tab[] = [];
-    private activeId = 0;
+    private currentId: string;
     private isDragging = false;
     private draggedTab: Tab = null;
     private draggedTabIndex: number = null;
@@ -58,15 +58,40 @@ export class TabListComponent {
         private tabService: TabService,
         private ref: ChangeDetectorRef 
     ) {
-        this.newTab();
+        
+    }
+
+    public ngAfterViewInit() {
+        this.tabService.currentSessionId.subscribe(id => {
+            if (!this.currentTabs.find(x => x.id === id)) {
+                console.log('component saw new tab', id)
+                const newTab = this.tabService.sessions.find(x => x.id === id);
+                this.currentTabs.push(newTab);
+            }
+            this.currentId = id;
+        });
+        setTimeout(() => this.tabService.newSession());
     }
 
     private newTab() {
-        const newId = uuid.v4();
-        const runId = runningCount++;
-        this.currentTabs.push(<Tab> { id: newId, title: `Untitled ${runId}` });
-        this.activeId = this.currentTabs.length - 1;
-        this.tabService.newSession(newId);
+        this.tabService.newSession();
+    }
+
+    private clickTab(id: string) {
+        console.log('clickTab', id);
+        this.tabService.currentSession(id);
+    }
+
+    private closeTab(id: string) {
+        let idx = -1;
+        this.currentTabs.forEach((x, i) => {
+            if (x.id === id) idx = i;
+        });
+        Assert(idx !== -1, 'Tab id not found when closing tab');
+        this.currentTabs.splice(idx, 1);
+        this.currentId = null;
+        console.log('closed ' + id,JSON.stringify(this.currentTabs));
+        this.tabService.closeSession(id);
     }
 
     // private getText(idx) {

@@ -36,7 +36,7 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
     </div>
     <div class="rm-tab-list__newbtn">
         <button (click)="newTab()" title="New tab">
-            <span>+</span>
+            <i class="material-icons">add</i>
         </button>
     </div>
 `
@@ -64,7 +64,6 @@ export class TabListComponent implements AfterViewInit {
     public ngAfterViewInit() {
         this.tabService.currentSessionId.subscribe(id => {
             if (!this.currentTabs.find(x => x.id === id)) {
-                console.log('component saw new tab', id)
                 const newTab = this.tabService.sessions.find(x => x.id === id);
                 this.currentTabs.push(newTab);
             }
@@ -78,7 +77,6 @@ export class TabListComponent implements AfterViewInit {
     }
 
     private clickTab(id: string) {
-        console.log('clickTab', id);
         this.tabService.currentSession(id);
     }
 
@@ -90,7 +88,6 @@ export class TabListComponent implements AfterViewInit {
         Assert(idx !== -1, 'Tab id not found when closing tab');
         this.currentTabs.splice(idx, 1);
         this.currentId = null;
-        console.log('closed ' + id,JSON.stringify(this.currentTabs));
         this.tabService.closeSession(id);
     }
 

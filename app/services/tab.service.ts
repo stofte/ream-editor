@@ -32,9 +32,7 @@ export class TabService {
     public newSession(): string {
         const id = uuid.v4();
         this.sessions.push(<Tab> { id, title: `Untitled ${this.tabCounter++}` });
-        if (this.currentId) {
-            this.history.unshift(this.currentId);
-        }
+        this.history = [id].concat(this.currentId ? this.history.filter(x => x !== this.currentId) : []);
         this.currentId = id;
         this.input.new(id);
         this.subject.next(id);
@@ -47,9 +45,12 @@ export class TabService {
         this.input.destroy(id);
         if (this.currentId === id) {
             this.currentId = null;
-            if (this.sessions.length > 0 && this.history.length > 0) {
+            if (this.sessions.length > 0) {
+                console.log('closeSession:history', this.history);
                 const nextId = this.history.shift();
                 this.subject.next(nextId);
+            } else {
+                this.subject.next(null);
             }
         } else {
             console.log('TabService closeSession: was inactive tab')

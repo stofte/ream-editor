@@ -54,7 +54,7 @@ export class EditorComponent implements AfterViewInit {
 
     private editorOptions() {
         return {
-            lineNumbers: false,
+            lineNumbers: true,
             gutters: ['CodeMirror-lint-markers'],
             lint: true,
             smartIndent: false,

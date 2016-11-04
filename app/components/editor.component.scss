@@ -1,12 +1,9 @@
 rm-editor {
     // mimics paper-material
     .rm-editor {
-        margin: 20px -1px;
-        border-radius: 2px;
-        padding: 16px;
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-            0 1px 5px 0 rgba(0, 0, 0, 0.12),
-            0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        margin: 0 0 calc(1px * var(--margin)) 0;
+        border-top: 1px solid var(--primary-border);
+        border-bottom: 1px solid var(--primary-border);
     }
     .CodeMirror {
         min-height: 150px;

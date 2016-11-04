@@ -63,7 +63,8 @@ export class TabListComponent implements AfterViewInit {
 
     public ngAfterViewInit() {
         this.tabService.currentSessionId.subscribe(id => {
-            if (!this.currentTabs.find(x => x.id === id)) {
+            // id might be null if there's no sessions left
+            if (id && !this.currentTabs.find(x => x.id === id)) {
                 const newTab = this.tabService.sessions.find(x => x.id === id);
                 this.currentTabs.push(newTab);
             }
@@ -87,7 +88,9 @@ export class TabListComponent implements AfterViewInit {
         });
         Assert(idx !== -1, 'Tab id not found when closing tab');
         this.currentTabs.splice(idx, 1);
-        this.currentId = null;
+        if (this.currentId === id) {
+            this.currentId = null;
+        }
         this.tabService.closeSession(id);
     }
 

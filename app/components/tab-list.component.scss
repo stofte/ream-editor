@@ -1,0 +1,83 @@
+rm-tab-list {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.rm-tab-list {
+
+    &__tabs {
+
+        user-select: none;
+        cursor: default;
+        display: flex;
+        min-height: 30px;
+        height: 30px;
+        background: var(--primary-bg-color);
+        color: var(--primary-fore-color);
+        overflow: visible;
+
+    }
+
+    &__tab {
+        position: relative;
+
+        > button {
+            height: 100%;
+            // use dark color for inactive tabs
+            background-color: var(--primary-border);
+            color: var(--primary-fore-color);
+            border: 1px solid var(--primary-border);
+            border-left: none;
+            font-size: calc(1px * var(--font-size-body));
+            padding-left: 3px;
+            padding-right: 25px;
+
+            &:focus, &:active {
+                outline: none;
+            }
+        }
+
+        &__droptarget {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            z-index: 3; /* place it above icons to allow dropping anywhere */
+        }
+
+        &--active {
+            > button {
+                background-color: var(--primary-bg-color);
+                border-bottom: 1px solid var(--primary-bg-color);
+            }
+        }
+    }
+
+    &__tab-closebtn {
+        position: absolute;
+        top: 7px;
+        right: 5px;
+        line-height: 11px;
+        padding: 1px;
+        .material-icons {
+            font-size: 15px;
+            font-weight: bold;
+        }
+    }
+
+    &__gutter-droptarget {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 3; /* place it above icons to allow dropping anywhere */
+    }
+
+    &__newbtn {
+        margin-left: 7px;
+        align-self: center;            
+    }
+}

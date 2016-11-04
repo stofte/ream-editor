@@ -29,40 +29,23 @@
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="bundle.css">
-
-        <script src="node_modules/zone.js/dist/zone.js"></script>
-        <script src="node_modules/reflect-metadata/Reflect.js"></script>
-        <script src="node_modules/systemjs/dist/system.src.js"></script>
         <link rel="stylesheet" media="screen" href="bower_components/handsontable/dist/handsontable.full.css">
-        <script src="bower_components/handsontable/dist/handsontable.full.js"></script>
-        <script src="systemjs.config.js"></script>
-        
-        <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
-        <link rel="import" href="bower_components/iron-icons/iron-icons.html">
-        <link rel="import" href="bower_components/paper-button/paper-button.html">
-        <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
-        <link rel="import" href="bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
-        <link rel="import" href="bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-        <link rel="import" href="bower_components/paper-item/paper-item.html">
-        <link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
-        <link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-        <link rel="import" href="bower_components/vaadin-icons/vaadin-icons.html">
-        <link rel="import" href="bower_components/vaadin-core-elements/vaadin-core-elements.html">
-        <link rel="import" href="bower_components/vaadin-combo-box/vaadin-combo-box.html">
 
 
-        <script>
-            // Enables use of webcomponents by using the vaadin brigde, but needs
-            // to wait for components to register before booting angular2.
-            // https://vaadin.com/docs/-/part/elements/angular2-polymer/overview.html
-            document.addEventListener('WebComponentsReady', function() {
-                System.import('app').catch(function(err){ console.error(err); });
-            });
-        </script>
+
     </head>
     <body>
         <rm-app>
             <h2 class="loading-msg">Loading</h2>
         </rm-app>
+
+        <script src="node_modules/zone.js/dist/zone.js"></script>
+        <script src="node_modules/reflect-metadata/Reflect.js"></script>
+        <script src="node_modules/systemjs/dist/system.src.js"></script>
+        <script src="bower_components/handsontable/dist/handsontable.full.js"></script>
+        <script src="systemjs.config.js"></script>
+        <script>
+            System.import('app').catch(function(err){ console.error(err); });
+        </script>
     </body>
 </html>

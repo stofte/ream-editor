@@ -22,7 +22,9 @@
         'angular2-mdl': 'node_modules/angular2-mdl',
         '@vaadin/angular2-polymer': 'node_modules/@vaadin/angular2-polymer',
         'angular2-data-table': 'node_modules/angular2-data-table',
-        'ng2-handsontable': 'node_modules/ng2-handsontable'
+        'ng2-handsontable': 'node_modules/ng2-handsontable',
+        'angular-sortablejs': 'node_modules/angular-sortablejs',
+        'sortablejs': 'node_modules/sortablejs/Sortable.js',
     };
 
     // packages tells the System loader how to load when no filename and/or no extension
@@ -36,7 +38,8 @@
         'angular2-mdl': { main: 'bundle/angular2-mdl.js' },
         '@vaadin/angular2-polymer': { main: 'index.js' },
         'angular2-data-table': { main: 'release/index.js' },
-        'ng2-handsontable': { main: 'dist/index.js', defaultExtension: 'js' }
+        'ng2-handsontable': { main: 'dist/index.js', defaultExtension: 'js' },
+        'angular-sortablejs': { main: 'index.js', defaultExtension: 'js' }
     };
 
     var config = {

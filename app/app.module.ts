@@ -9,9 +9,7 @@ import { InputStream, OutputStream, StreamManager, EditorStream,
     ResultStream, QueryStream, OmnisharpStream } from './streams/index';
 import { TabService, HotkeyService, ConnectionService } from './services/index';
 import { EditorDirective } from './directives/editor.directive';
-import { MdlModule } from 'angular2-mdl';
-import { PolymerElement } from '@vaadin/angular2-polymer';
-import { Angular2DataTableModule } from 'angular2-data-table';
+import { SortablejsModule } from 'angular-sortablejs';
 
 @NgModule({
     declarations: [
@@ -21,13 +19,7 @@ import { Angular2DataTableModule } from 'angular2-data-table';
         ControlsComponent,
         ConnectionManagerComponent,
         EditorComponent,
-        ResultDisplayComponent,
-        PolymerElement('paper-button'),
-        PolymerElement('paper-dialog'),
-        PolymerElement('paper-dialog-scrollable'),
-        PolymerElement('paper-item'),
-        PolymerElement('paper-listbox'),
-        PolymerElement('paper-dropdown-menu')
+        ResultDisplayComponent
     ],
     providers: [
         InputStream,
@@ -44,8 +36,7 @@ import { Angular2DataTableModule } from 'angular2-data-table';
     imports: [
         BrowserModule,
         HttpModule,
-        MdlModule,
-        Angular2DataTableModule
+        SortablejsModule
     ],
     bootstrap: [AppComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

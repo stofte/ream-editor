@@ -18,12 +18,8 @@ const DEBUG = !process.env.PACKAGE_BASE;
 const output = process.env.PACKAGE_BASE || '.';
  
 const cssFiles = [
-    'node_modules/material-design-lite/material.min.css',
-    'node_modules/material-design-lite/dist/material.light_blue-yellow.min.css',
+    'node_modules/normalizecss/normalize.css',
     'node_modules/codemirror/lib/codemirror.css',
-    'node_modules/angular2-data-table/release/datatable.css',
-    'node_modules/angular2-data-table/assets/icons.css',
-    'node_modules/angular2-data-table/release/material.css',
     'app/**/*.css'
 ];
 
@@ -38,8 +34,8 @@ const jsFiles = [
 const urlRewrites = {
     properties: ['src'],
     rules: [
-        { from: /^(.*)\/(resources\/materialicons\/MaterialIcons-Regular.woff2?)/, to: '$2' },
-        { from: /^fonts\/(data-table.*)$/, to: 'node_modules/angular2-data-table/assets/fonts/$1' }
+        { from: /^(.*)\/(resources\/materialicons\/MaterialIcons-Regular.woff2?)$/, to: '$2' },
+        { from: /^\.\.\/\.\.\/(resources\/robotomono)/, to: '$1' },
     ]
 };
 

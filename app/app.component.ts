@@ -9,41 +9,9 @@ const electron = electronRequire('electron').remote;
 @Component({
     selector: 'rm-app',
     template: `
-<mdl-layout mdl-layout-fixed-header mdl-layout-header-seamed #mdlLayout1="mdlLayout">
-    <mdl-layout-header>
-        <mdl-layout-header-row>
-            <mdl-layout-spacer></mdl-layout-spacer>
-            <button mdl-button class="mdl-button--minimize" (click)="minimizeApp()">
-                <mdl-icon>remove</mdl-icon>
-            </button>
-            <div *ngIf="isMaximized">
-                <button mdl-button class="mdl-button--toggle-maximized" (click)="toggleMaximizeApp()">
-                    <mdl-icon>fullscreen_exit</mdl-icon>
-                </button>
-            </div>
-            <div *ngIf="!isMaximized">
-                <button mdl-button class="mdl-button--toggle-maximized" (click)="toggleMaximizeApp()">
-                    <mdl-icon>fullscreen</mdl-icon>
-                </button>
-            </div>
-            <button mdl-button class="mdl-button--exit" (click)="closeApp()">
-                <mdl-icon>clear</mdl-icon>
-            </button>
-        </mdl-layout-header-row>
-    </mdl-layout-header>
-    <mdl-layout-drawer>
-        <mdl-layout-title>Ream</mdl-layout-title>
-        <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer();showConnectionMgr.emit(true);">Connections</a>
-            <a class="mdl-navigation__link" (click)="mdlLayout1.toggleDrawer()">About</a>
-        </nav>
-    </mdl-layout-drawer>
-    <mdl-layout-content>
-        <rm-tab-list></rm-tab-list>
-        <rm-query-panel></rm-query-panel>
-    </mdl-layout-content>
-</mdl-layout>
-<rm-connection-manager [show-dialog]="showConnectionMgr"></rm-connection-manager>
+    <rm-tab-list></rm-tab-list>
+    <rm-query-panel></rm-query-panel>
+    <rm-connection-manager [show-dialog]="showConnectionMgr"></rm-connection-manager>
 `
 })
 export class AppComponent {

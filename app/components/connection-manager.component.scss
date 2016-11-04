@@ -1,4 +1,6 @@
 rm-connection-manager {
+
+    display: none;
     
     paper-dialog {
         max-width: 800px;
@@ -10,6 +12,7 @@ rm-connection-manager {
     }
 
     .rm-connection-manager {
+        
         &__add-new {
             display: flex;
             flex-direction: row;

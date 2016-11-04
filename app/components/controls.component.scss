@@ -1,5 +1,6 @@
 rm-controls {
     max-height: calc(1px * var(--control-row-height));
+    min-height: calc(1px * var(--control-row-height));
     display: flex;
     flex-direction: row;
     margin: calc(1px * var(--margin));

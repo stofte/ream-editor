@@ -17,7 +17,11 @@ const codeLabel = '<Code>';
         (click)="executeBuffer()"
         [disabled]="playDisabled"><i class="material-icons">play_arrow</i></button>
     <select #sel (change)="contextChanged($event, sel)">
-        <option *ngFor="let ctx of contextList" [value]="ctx.id">{{contextLabel(ctx.id)}}</option>
+        <option *ngFor="let ctx of contextList"
+            [value]="ctx.id"
+            [selected]="ctx.id === selectedContext">
+                {{contextLabel(ctx.id)}}
+        </option>
     </select>
 `
 })
@@ -39,6 +43,7 @@ export class ControlsComponent {
         });
         tabs.currentSessionId.subscribe(id => {
             this.sessionId = id;
+            this.selectedContext = tabs.sessionContext(id);
             // this.sessionId = id;
             // if (this.selector) {
             //     const context = tabs.sessionContext(id);
@@ -63,6 +68,7 @@ export class ControlsComponent {
             const id = parseInt(select.value, 10);
             ctx = this.contextList.find(x => x.id === id);
         }
+        this.selectedContext = ctx;
         this.tabs.setContext(this.sessionId, ctx);
     }
 

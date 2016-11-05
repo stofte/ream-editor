@@ -20,8 +20,8 @@ rm-tab-list {
         user-select: none;
         cursor: default;
         display: flex;
-        min-height: calc(1px * var(--tab-list-height));;
-        height: calc(1px * var(--tab-list-height));;
+        min-height: calc(1px * var(--tab-list-height));
+        max-height: calc(1px * var(--tab-list-height));
         background: var(--primary-bg-color);
         color: var(--primary-fore-color);
         overflow: visible;

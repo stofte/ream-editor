@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, Input, ElementRef, ChangeDetectorRef, AfterViewInit, AfterContentChecked, EventEmitter } from '@angular/core';
 import { TableOptions, ColumnMode, SelectionType } from 'angular2-data-table';
 import { QueryResult } from '../models/query-result';
 import { ResultPage } from '../models/result-page';
@@ -15,10 +15,11 @@ class ColumnSizing {
     template: `
     <div class="rm-result-display__output-list">
         <div *ngFor="let output of outputList; let idx = index;">
-            <paper-button (click)="selectResult(idx)" class="{{ idx === activePage ? 'active' : '' }}">
-                <iron-icon icon="vaadin-icons:{{output.icon}}"></iron-icon>
+            <button
+                (click)="selectResult(idx)"
+                class="{{ idx === activePage ? 'active' : '' }}">
                 {{output.text}}
-            </paper-button>
+            </button>
         </div>
     </div>
     <div class="rm-result-display__table">
@@ -36,7 +37,8 @@ export class ResultDisplayComponent implements AfterViewInit {
     loadingList = [];
 
     enableHider = true;
-
+    firstLoad = true;
+    @Input('view-height') public viewHeight: EventEmitter<number>;
     handsontableElm: any;
     tableOptions = {
         data: [],
@@ -97,11 +99,11 @@ export class ResultDisplayComponent implements AfterViewInit {
                 this.handsontableElm.render();
             }
         };
-        this.tableOptions.height = () => {
-            const h = this.elm.nativeElement.querySelector('.rm-result-display__table').clientHeight;
-            return ;
-        };
         this.handsontableElm = new Handsontable(container, this.tableOptions);
+        this.viewHeight.filter(x => x > 0).subscribe(h => {
+            this.handsontableElm.updateSettings({ height: h - 30 });
+            console.log('height emitter', h);
+        });
     }
 
     selectResult(idx: number) {

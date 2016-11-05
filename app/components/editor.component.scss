@@ -1,12 +1,9 @@
 rm-editor {
     // mimics paper-material
     .rm-editor {
-        margin: 0 0 calc(1px * var(--margin)) 0;
         border-top: 1px solid var(--primary-border);
     }
     .CodeMirror {
-        min-height: 150px;
-        max-height: 150px;
         height: 150px;
         font-family: 'Roboto Mono';
         &-gutters {

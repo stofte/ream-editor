@@ -35,7 +35,7 @@ export class QueryPanelComponent implements AfterViewInit {
             this.sessionId = id;
             if (id) {
                 const h = tabs.sessions.find(x => x.id === id).editorHeight;
-                this.editorDefaultHeight =  h;
+                this.editorDefaultHeight = h;
                 this.layout(this.editorDefaultHeight);
             }
         });
@@ -68,7 +68,7 @@ export class QueryPanelComponent implements AfterViewInit {
     }
 
     layout(seperatorOffset: number) {
-        const totalAvail = this.editorPanel.parentElement.clientHeight;
+        const totalAvail = window.innerHeight - 30;
         const cmOffset = Math.max(0, seperatorOffset - 65);
         const edOffset = Math.max(5, seperatorOffset - 30);
         const resHeight = totalAvail - edOffset - 5;

@@ -3,6 +3,7 @@ import { TableOptions, ColumnMode, SelectionType } from 'angular2-data-table';
 import { QueryResult } from '../models/query-result';
 import { ResultPage } from '../models/result-page';
 import { OutputStream, EventName } from '../streams/index';
+import { TabService } from '../services/index';
 
 class ColumnSizing {
     width: number;
@@ -14,12 +15,12 @@ class ColumnSizing {
     selector: 'rm-result-display',
     template: `
     <div class="rm-result-display__output-list">
-        <div *ngFor="let output of outputList; let idx = index;"
+        <div *ngFor="let page of results; let idx = index;"
             class="rm-result-display__tab
-                {{ idx === activePage ? 'rm-result-display__tab--active' : '' }}">
-            <button (click)="selectResult(idx)">
+                {{ page.id === activeId ? 'rm-result-display__tab--active' : '' }}">
+            <button (click)="selectResult(page.id)">
                 <i class="vaadin-icons">&#xe7a5;</i>
-                <span>{{output.text}}</span>
+                <span>{{page.title}}</span>
             </button>
         </div>
     </div>
@@ -30,17 +31,18 @@ class ColumnSizing {
 `
 })
 export class ResultDisplayComponent implements AfterViewInit {
-    resultPages: ResultPage[] = [];
-    outputList = [];
-    activePage: number = null;
-    loadingPages: ResultPage[] = [];
-    loadingList = [];
-    enableHider = true;
-    firstLoad = true;
-    dataLoader: Function = null;
     @Input('view-height') public viewHeight: EventEmitter<number>;
-    handsontableElm: any;
-    tableOptions = {
+    private results: ResultPage[] = [];
+    private activeId: string = null;
+    private sessionId: string;
+    private resetActiveId = true;
+    
+    private enableHider = true;
+    private firstLoad = true;
+    private dataLoader: Function = null;
+    private handsontableElm: any;
+    
+    private tableOptions = {
         data: [],
         columns: [],
         colHeaders: [],
@@ -52,43 +54,30 @@ export class ResultDisplayComponent implements AfterViewInit {
         manualColumnResize: true,
         manualRowResize: true,
         fillHandle: false,
-        // copy-limit is very confusing for enduser, maybe do something else ...
+        // copy-limit is confusing
         copyRowsLimit: 32000,
         copyColsLimit: 32000
     };
 
     constructor(
-        changeRef: ChangeDetectorRef,
-        output: OutputStream,
+        private tabs: TabService,
+        private output: OutputStream,
         private elm: ElementRef
     ) {
+        tabs.currentSessionId.subscribe(id => {
+            this.sessionId = id;
+            this.setSessionResults(id, true);
+        });
+        tabs.tabResultsUpdated.subscribe(id => {
+            if (this.sessionId === id) {
+                this.setSessionResults(id);
+            }
+        });
         output.events
             .filter(msg => msg.name === EventName.ResultStart)
             .subscribe(msg => {
-                this.loadingPages = [];
-                this.loadingList = [];
-            });
-
-        output.events
-            .filter(msg => msg.name === EventName.ResultUpdate)
-            .subscribe(msg => {
-                const tbl = <ResultPage> msg.data;
-                const isFirst = this.resultPages.length === 0;
-                this.loadingPages.push(tbl);
-                this.loadingList.push({
-                    text: tbl.title,
-                    icon: 'table',
-                    count: tbl.rows.length
-                });
-            });
-        output.events
-            .filter(msg => msg.name === EventName.ResultDone)
-            .subscribe(msg => {
-                this.enableHider = false;
-                this.outputList = [...this.loadingList];
-                this.resultPages = [...this.loadingPages];
-                if (this.resultPages.length > 0) {
-                    this.selectResult(0);
+                if (msg.id === this.sessionId) {
+                    this.resetActiveId = true;
                 }
             });
     }
@@ -112,9 +101,25 @@ export class ResultDisplayComponent implements AfterViewInit {
         });
     }
 
-    selectResult(idx: number) {
-        this.activePage = idx;
-        const page = this.resultPages[idx];
+    setSessionResults = (id: string, forceSelect = false) => {
+        if (id) {
+            const tab = this.tabs.sessions.find(x => x.id === id);
+            if (tab && tab.results) {
+                this.results = tab.results;
+                if (forceSelect || this.resetActiveId) {
+                    if (this.results.length > 0) {
+                        this.resetActiveId = false;
+                        this.selectResult(this.results[0].id);
+                    }
+                    this.enableHider = this.results.length === 0;
+                }
+            }
+        }
+    }
+
+    selectResult(id: string) {
+        this.activeId = id;
+        const page = this.results.find(x => x.id === id);
         const data = [];
         page.rows.forEach(row => {
             data.push(page.isAtomic ? [row] : row);

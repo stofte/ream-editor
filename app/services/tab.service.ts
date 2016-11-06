@@ -1,14 +1,16 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
-import { Tab } from '../models/tab';
+import { Tab, ResultPage } from '../models/index';
 import { Connection } from '../models/connection';
 import { ConnectionService } from './connection.service';
-import { InputStream } from '../streams/index';
+import { InputStream, OutputStream, EventName } from '../streams/index';
+
 import * as uuid from 'node-uuid';
 
 @Injectable()
 export class TabService {
     public tabDragging = new EventEmitter<boolean>();
+    public tabResultsUpdated = new EventEmitter<string>();
     public currentSessionId: Observable<string>;
     private subject = new Subject<string>();
     public sessions: Tab[] = [];
@@ -16,7 +18,10 @@ export class TabService {
     private history: string[] = [];
     private tabCounter = 0;
 
-    constructor(private input: InputStream) {
+    constructor(
+        private input: InputStream,
+        private output: OutputStream
+    ) {
         const stream = this.subject.publishReplay(1);
         this.currentSessionId = stream;
         stream.connect();
@@ -36,12 +41,34 @@ export class TabService {
             id, 
             title: `Untitled ${this.tabCounter++}`,
             editorHeight: (150 + 65),
-            executePending: false
+            executePending: false,
+            results: []
         });
         this.history = [id].concat(this.history);
         this.currentId = id;
         this.input.new(id);
         this.subject.next(id);
+        this.output.events
+            .filter(x => x.id === id && (
+                x.name === EventName.ResultStart ||
+                x.name === EventName.ResultUpdate ||
+                x.name === EventName.ResultDone
+            ))
+            .takeUntil(this.input.events.first(x => x.name === EventName.SessionDestroy))
+            .subscribe(res => {
+                const tab = this.sessions.find(x => x.id === id);
+                if (tab) {
+                    if (res.name === EventName.ResultStart) {
+                        tab.results.splice(0);
+                    } else if (res.name === EventName.ResultUpdate) {
+                        tab.results.push(<ResultPage> res.data);
+                    }
+                    console.log('service added page', tab.results.length);
+                    this.tabResultsUpdated.emit(id);
+                }
+            }).add(() => {
+                console.log('closed result subscriber for ', id);
+            });
         return id;
     }
 
@@ -62,12 +89,12 @@ export class TabService {
     }
 
     public setContext(id: string, conn: Connection) {
-        const editorHeight = this.sessions.find(x => x.id === id).editorHeight;
-        const newTab = conn ? <Tab> { id, connectionId: conn.id, editorHeight }
-            : <Tab> { id, connectionId: null, editorHeight };
+        const session = this.sessions.find(x => x.id === id);
+        Assert(session, 'setContext on unknown session');
+        session.connectionId = conn ? conn.id : null;
         this.sessions = this.sessions
             .filter(x => x.id !== id)
-            .concat([newTab]);
+            .concat([session]);
         this.input.setContext(id, conn);
     }
 

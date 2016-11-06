@@ -54,7 +54,8 @@ export class TabService {
                 x.name === EventName.ResultUpdate ||
                 x.name === EventName.ResultDone
             ))
-            .takeUntil(this.input.events.first(x => x.name === EventName.SessionDestroy))
+            .takeUntil(this.input.events
+                .first(x => x.id === id && x.name === EventName.SessionDestroy))
             .subscribe(res => {
                 const tab = this.sessions.find(x => x.id === id);
                 if (tab) {

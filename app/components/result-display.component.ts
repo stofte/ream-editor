@@ -64,7 +64,8 @@ export class ResultDisplayComponent implements AfterViewInit {
         afterUpdateSettings: null,
         afterScrollVertically: null,
         afterScrollHorizontally: null,
-        afterRender: null
+        afterRender: null,
+        afterSelection: null
     };
 
     constructor(
@@ -111,9 +112,17 @@ export class ResultDisplayComponent implements AfterViewInit {
                 this.dataLoader = null;
             }
         };
+        // todo crude delection of other elements when doing stuff in table.
+        // hot does not seem to bubble click events up?
+        this.tableOptions.afterSelection = () => {
+            const elm = <HTMLElement> document.activeElement;
+            if (elm && elm.blur) elm.blur();
+        };
         const scrollH = () => {
             const colOffset = this.hotColPlugin.getFirstVisibleColumn();
             const rowOffset = this.hotRowPlugin.getFirstVisibleRow();
+            const elm = <HTMLElement> document.activeElement;
+            if (elm && elm.blur) elm.blur();
             this.tabs.setResultPageView(
                 this.sessionId,
                 this.activeResult.resultId,

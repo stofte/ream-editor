@@ -5,6 +5,7 @@ import { InputStream } from './input.stream';
 import { EventName, Message } from './api';
 import { WebSocketMessage } from './interfaces';
 import { ResultPage } from '../models/index';
+import * as uuid from 'node-uuid';
 
 @Injectable()
 export class ResultStream {
@@ -35,12 +36,15 @@ export class ResultStream {
                             // assumes message order is preserved
                             tableResult = {
                                 id: socket.session,
+                                resultId: uuid.v4(),
                                 title: socket.values[0],
                                 columns: null,
                                 columnTypes: null,
                                 rows: [],
                                 isAtomic: false,
-                                isTabular: true
+                                isTabular: true,
+                                viewColumnOffset: 0,
+                                viewRowOffset: 0
                             };
                             break;
                         case 'header': 
@@ -73,12 +77,15 @@ export class ResultStream {
         // todo make server json camelCased
         const obj: ResultPage = {
             id: msg.session,
+            resultId: uuid.v4(),
             title: msg.values[0].Name,
             columns: [msg.values[0].Name],
             columnTypes: [msg.values[0].Type],
             rows: [msg.values[1]],
             isAtomic: true,
-            isTabular: false
+            isTabular: false,
+            viewColumnOffset: 0,
+            viewRowOffset: 0
         };
         return obj;
     }

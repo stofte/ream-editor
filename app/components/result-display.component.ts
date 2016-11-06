@@ -17,8 +17,8 @@ class ColumnSizing {
     <div class="rm-result-display__output-list">
         <div *ngFor="let page of results; let idx = index;"
             class="rm-result-display__tab
-                {{ page.id === activeId ? 'rm-result-display__tab--active' : '' }}">
-            <button (click)="selectResult(page.id)">
+                {{ page.resultId === activeId ? 'rm-result-display__tab--active' : '' }}">
+            <button (click)="selectResult(page.resultId)">
                 <i class="vaadin-icons">&#xe7a5;</i>
                 <span>{{page.title}}</span>
             </button>
@@ -33,21 +33,23 @@ class ColumnSizing {
 export class ResultDisplayComponent implements AfterViewInit {
     @Input('view-height') public viewHeight: EventEmitter<number>;
     private results: ResultPage[] = [];
+    private activeResult: ResultPage = null;
     private activeId: string = null;
     private sessionId: string;
     private resetActiveId = true;
+    private scrollToTop = false;
     
     private enableHider = true;
     private firstLoad = true;
     private dataLoader: Function = null;
     private handsontableElm: any;
+    private hotRowPlugin: any;
+    private hotColPlugin: any;
     
     private tableOptions = {
         data: [],
         columns: [],
         colHeaders: [],
-        afterLoadData: null,
-        afterUpdateSettings: null,
         stretchH: 'last',
         height: null,
         rowHeaders: true,
@@ -56,7 +58,12 @@ export class ResultDisplayComponent implements AfterViewInit {
         fillHandle: false,
         // copy-limit is confusing
         copyRowsLimit: 32000,
-        copyColsLimit: 32000
+        copyColsLimit: 32000,
+        afterLoadData: null,
+        afterUpdateSettings: null,
+        afterScrollVertically: null,
+        afterScrollHorizontally: null,
+        afterRender: null
     };
 
     constructor(
@@ -86,7 +93,15 @@ export class ResultDisplayComponent implements AfterViewInit {
         const container = this.elm.nativeElement.querySelector('.rm-result-display__table__hot');
         this.tableOptions.afterLoadData = (isFirstLoad) => {
             if (!isFirstLoad) {
-                requestAnimationFrame(() => this.handsontableElm.render());
+                this.handsontableElm.render();
+            }
+        };
+        this.tableOptions.afterRender = (isForced: boolean) => {
+            if (isForced && this.scrollToTop) {
+                this.scrollToTop = false;
+                const colOffset = this.activeResult.viewColumnOffset;
+                const rowOffset = this.activeResult.viewRowOffset;
+                this.handsontableElm.scrollViewportTo(rowOffset, colOffset);
             }
         };
         this.tableOptions.afterUpdateSettings = () => {
@@ -95,7 +110,24 @@ export class ResultDisplayComponent implements AfterViewInit {
                 this.dataLoader = null;
             }
         };
+        const scrollH = () => {
+            const colOffset = this.hotColPlugin.getFirstVisibleColumn();
+            const rowOffset = this.hotRowPlugin.getFirstVisibleRow();
+            this.tabs.setResultPageView(
+                this.sessionId,
+                this.activeResult.resultId,
+                colOffset,
+                rowOffset
+            );
+        }
+        this.tableOptions.afterScrollVertically = scrollH;
+        this.tableOptions.afterScrollHorizontally = scrollH;
         this.handsontableElm = new Handsontable(container, this.tableOptions);
+        this.hotRowPlugin = this.handsontableElm.getPlugin('autoRowSize');
+        this.hotColPlugin = this.handsontableElm.getPlugin('autoColumnSize');
+        this.hotColPlugin.enablePlugin();
+        this.hotRowPlugin.enablePlugin();
+        
         this.viewHeight.filter(x => x > 0).subscribe(h => {
             this.handsontableElm.updateSettings({ height: h - 30 });
         });
@@ -109,7 +141,8 @@ export class ResultDisplayComponent implements AfterViewInit {
                 if (forceSelect || this.resetActiveId) {
                     if (this.results.length > 0) {
                         this.resetActiveId = false;
-                        this.selectResult(this.results[0].id);
+                        const resultId = tab.activeResultId || this.results[0].resultId;
+                        this.selectResult(resultId);
                     }
                     this.enableHider = this.results.length === 0;
                 }
@@ -119,15 +152,18 @@ export class ResultDisplayComponent implements AfterViewInit {
 
     selectResult(id: string) {
         this.activeId = id;
-        const page = this.results.find(x => x.id === id);
+        const page = this.results.find(x => x.resultId === id);
         const data = [];
         page.rows.forEach(row => {
             data.push(page.isAtomic ? [row] : row);
         });
         // need to wait for updated settings before loading data
+        this.scrollToTop = true;
         this.dataLoader = () => {
             this.handsontableElm.loadData(data);
         };
+        this.activeResult = page;
+        this.tabs.setActiveResult(this.sessionId, id);
         this.handsontableElm.updateSettings({
             colHeaders: [...page.columns],
             columns: page.columns.map(col => {

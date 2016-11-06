@@ -7,4 +7,5 @@ export class Tab {
     public editorHeight: number;
     public executePending: boolean;
     public results: ResultPage[];
+    public activeResultId: string;
 }

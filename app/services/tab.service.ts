@@ -63,7 +63,6 @@ export class TabService {
                     } else if (res.name === EventName.ResultUpdate) {
                         tab.results.push(<ResultPage> res.data);
                     }
-                    console.log('service added page', tab.results.length);
                     this.tabResultsUpdated.emit(id);
                 }
             }).add(() => {
@@ -106,6 +105,18 @@ export class TabService {
     public setExecutePending(id: string, pending: boolean) {
         const session = this.sessions.find(x => x.id === id);
         session.executePending = pending;
+    }
+
+    public setResultPageView(id: string, resultId: string, colOffset: number, rowOffset: number) {
+        const session = this.sessions.find(x => x.id === id);
+        const page = session.results.find(x => x.resultId === resultId);
+        page.viewColumnOffset = colOffset;
+        page.viewRowOffset = rowOffset;
+    }
+    
+    public setActiveResult(id: string, resultId: string) {
+        const session = this.sessions.find(x => x.id === id);
+        session.activeResultId = resultId;
     }
 
     public sessionContext(id: string) {

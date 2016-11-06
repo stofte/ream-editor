@@ -55,6 +55,8 @@ rm-result-display {
                 padding-right: 2px;
             }
             span {
+                -webkit-user-select: none;
+                user-select: none;
                 white-space: nowrap;
                 font-family: 'Roboto Mono';
             }
@@ -93,16 +95,22 @@ rm-result-display {
                 display: block;
                 text-align: left;
                 cursor: default;
+                -webkit-user-select: none;
+                user-select: none;
             }
             .rowHeader {
                 opacity: 0.5;
                 cursor: default;
+                -webkit-user-select: none;
+                user-select: none;
             }
             td {
                 cursor: default;
                 // hot adds the white-space nowrap
                 text-overflow: ellipsis;
                 overflow: hidden;
+                -webkit-user-select: none;
+                user-select: none;
             }
         }
     }

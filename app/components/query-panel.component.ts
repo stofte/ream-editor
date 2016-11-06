@@ -26,6 +26,7 @@ export class QueryPanelComponent implements AfterViewInit {
     editorPanel: HTMLElement;
     resultPanel: HTMLElement;
     resultHeightEvents = new EventEmitter<number>();
+    editorDefaultHeight = 160 + 65;
     constructor(
         private elm: ElementRef,
         tabs: TabService
@@ -38,7 +39,10 @@ export class QueryPanelComponent implements AfterViewInit {
     ngAfterViewInit() {
         this.editorPanel = this.elm.nativeElement.querySelector('.rm-query-panel__editor');
         this.resultPanel = this.elm.nativeElement.querySelector('.rm-query-panel__result');
-        this.layout(150 + 65);
+        this.layout(this.editorDefaultHeight);
+        window.addEventListener('resize', () => {
+            this.layout(this.editorDefaultHeight);
+        });
     }
 
     dragStart() {
@@ -55,16 +59,8 @@ export class QueryPanelComponent implements AfterViewInit {
     }
 
     dragging = (event: MouseEvent) => {
-        // const totalAvail = this.editorPanel.parentElement.clientHeight;
-        // const cmOffset = Math.max(0, event.clientY - 65);
-        // const edOffset = Math.max(5, event.clientY - 30);
-        // const resHeight = totalAvail - edOffset - 5;
-        // this.editorProps.height = cmOffset;
-        // this.editorPanel.style.height = edOffset + 'px';
-        // this.resultPanel.style.height = resHeight + 'px';
+        this.editorDefaultHeight = event.clientY;
         this.layout(event.clientY);
-        // console.log('totalAvail', totalAvail - edOffset - 5);
-        // console.log(cmOffset, edOffset);
     }
 
     layout(seperatorOffset: number) {

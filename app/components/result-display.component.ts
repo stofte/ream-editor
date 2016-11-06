@@ -18,12 +18,10 @@ class ColumnSizing {
         <div *ngFor="let page of results; let idx = index;"
             class="rm-result-display__tab
                 {{ page.resultId === activeId ? 'rm-result-display__tab--active' : '' }}">
-            <button (click)="selectResult(page.resultId)">
-                <i class="vaadin-icons" *ngIf="page.isAtomic">&#xe7e0;</i>
-                <i class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i>
-                <span>{{page.title}}</span>
-            </button>
-        </div>
+            <button (click)="selectResult(page.resultId)"
+                ><i class="vaadin-icons" *ngIf="page.isAtomic">&#xe7e0;</i><i
+                    class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span>{{page.title
+                }}</span></button></div>
     </div>
     <div class="rm-result-display__table">
         <div class="rm-result-display__table__hot"></div>
@@ -39,6 +37,8 @@ export class ResultDisplayComponent implements AfterViewInit {
     private sessionId: string;
     private resetActiveId = true;
     private scrollToTop = false;
+    // hot scroll widget, used for blurActiveElement
+    private scrollWidget = null;
     
     private enableHider = true;
     private firstLoad = true;
@@ -57,6 +57,8 @@ export class ResultDisplayComponent implements AfterViewInit {
         manualColumnResize: true,
         manualRowResize: true,
         fillHandle: false,
+        // todo do something to style inactive selection
+        outsideClickDeselects: true,
         // copy-limit is confusing
         copyRowsLimit: 32000,
         copyColsLimit: 32000,
@@ -100,10 +102,15 @@ export class ResultDisplayComponent implements AfterViewInit {
         };
         this.tableOptions.afterRender = (isForced: boolean) => {
             if (isForced && this.scrollToTop) {
+                this.handsontableElm.deselectCell();
                 this.scrollToTop = false;
                 const colOffset = this.activeResult.viewColumnOffset;
                 const rowOffset = this.activeResult.viewRowOffset;
                 this.handsontableElm.scrollViewportTo(rowOffset, colOffset);
+            }
+            if (!this.scrollWidget) {
+                this.scrollWidget = this.elm.nativeElement.querySelector('.wtHolder');
+                this.scrollWidget.addEventListener('mousedown', this.blurActiveElement);
             }
         };
         this.tableOptions.afterUpdateSettings = () => {
@@ -112,17 +119,12 @@ export class ResultDisplayComponent implements AfterViewInit {
                 this.dataLoader = null;
             }
         };
-        // todo crude delection of other elements when doing stuff in table.
-        // hot does not seem to bubble click events up?
-        this.tableOptions.afterSelection = () => {
-            const elm = <HTMLElement> document.activeElement;
-            if (elm && elm.blur) elm.blur();
-        };
+
+        this.tableOptions.afterSelection = this.blurActiveElement;
         const scrollH = () => {
             const colOffset = this.hotColPlugin.getFirstVisibleColumn();
             const rowOffset = this.hotRowPlugin.getFirstVisibleRow();
-            const elm = <HTMLElement> document.activeElement;
-            if (elm && elm.blur) elm.blur();
+            this.blurActiveElement();
             this.tabs.setResultPageView(
                 this.sessionId,
                 this.activeResult.resultId,
@@ -141,6 +143,14 @@ export class ResultDisplayComponent implements AfterViewInit {
         this.viewHeight.filter(x => x > 0).subscribe(h => {
             this.handsontableElm.updateSettings({ height: h - 30 });
         });
+    }
+
+    // todo crude blurring of other elements when doing stuff in table.
+    // hot doesnt seem to fire mouse events against document like other elements.
+    // fx codemirror looses it's selection if the user clicks the scrollbar dragger.
+    blurActiveElement = () => {
+        const elm = <HTMLElement> document.activeElement;
+        if (elm && elm.blur) elm.blur();
     }
 
     setSessionResults = (id: string, forceSelect = false) => {

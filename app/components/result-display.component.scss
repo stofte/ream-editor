@@ -7,32 +7,61 @@ rm-result-display {
 
 .rm-result-display {
     &__output-list {
+        position: relative;
         display: flex;
         flex-direction: row;
-        min-height: calc(1px * var(--tab-list-height));
-        max-height: calc(1px * var(--tab-list-height));
+        min-height: calc(1px * var(--tab-list-height) - 5px);
+        max-height: calc(1px * var(--tab-list-height) - 5px);
+        margin-top: 3px;
+        margin-bottom: 2px;
 
-        paper-button {
-            text-transform: initial;
-            color: #333;
-            line-height: 10px;
-            iron-icon {
-                padding-right: 4px;
-                margin-top: -3px;
-            }
-            &.active {
-                background-color: #f3f3f3;
+        &::before {
+            content: ' ';
+            display: block;
+            height: 1px;
+            width: 100vw;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            border-bottom: 1px solid var(--primary-border);
+        }
+    }
+
+    &__tab {
+        position: relative;
+        margin: 0 2px;
+
+        &::before {
+            content: ' ';
+            display: block;
+            position: absolute;
+            top: -1px;
+            left: -4px;
+            width: 5px;
+            height: 100%;
+            border-bottom: 1px solid var(--primary-border);
+        }
+
+        button {
+            height: 100%;
+            // use dark color for inactive tabs
+            background-color: var(--tab-inactive-bg-color);
+            color: var(--primary-fore-color);
+            border: 1px solid var(--primary-border);
+            font-size: calc(1px * var(--font-size-body));
+            padding: 0 10px;
+
+            span {
+                white-space: nowrap;
+                font-family: 'Roboto Mono';
             }
         }
 
-        mdl-chip {
-            margin-right: 10px;
-        }
-
-        iron-icon {
-            vertical-align: -1px;
-            height: 15px;
-            width: 15px;
+        &--active {
+            button {
+                background-color: var(--primary-bg-color);
+                border-bottom: 1px solid var(--primary-bg-color);
+            }
         }
     }
 

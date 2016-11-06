@@ -14,11 +14,11 @@ class ColumnSizing {
     selector: 'rm-result-display',
     template: `
     <div class="rm-result-display__output-list">
-        <div *ngFor="let output of outputList; let idx = index;">
-            <button
-                (click)="selectResult(idx)"
-                class="{{ idx === activePage ? 'active' : '' }}">
-                {{output.text}}
+        <div *ngFor="let output of outputList; let idx = index;"
+            class="rm-result-display__tab
+                {{ idx === activePage ? 'rm-result-display__tab--active' : '' }}">
+            <button (click)="selectResult(idx)">
+                <span>{{output.text}}</span>
             </button>
         </div>
     </div>
@@ -96,7 +96,7 @@ export class ResultDisplayComponent implements AfterViewInit {
         const container = this.elm.nativeElement.querySelector('.rm-result-display__table__hot');
         this.tableOptions.afterLoadData = (isFirstLoad) => {
             if (!isFirstLoad) {
-                this.handsontableElm.render();
+                requestAnimationFrame(() => this.handsontableElm.render());
             }
         };
         this.handsontableElm = new Handsontable(container, this.tableOptions);

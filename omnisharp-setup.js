@@ -1,43 +1,24 @@
 // sets up a folder for omnisharp to run off of, using the same dependencies 
 // as the query program. for windows, use LOCALAPPDATA (passed from electron-main),
 // to avoid clashing with other projects/nuget configurations
+
 const fs = require('fs');
 const path = require('path');
+const copy = require('copy');
 
-function createPath(folder) {
-    try {
-        fs.accessSync(folder);
-    } catch (e) {
-        createPath(path.dirname(folder));
-        fs.mkdirSync(folder);
-    }    
-}
+const appPath = process.platform !== 'win32' ?
+    `${process.env.HOME}/.ream-editor/` :
+    `${process.env.LOCALAPPDATA}\\ReamEditor\\`;
 
-function copyFile(fileName, from, to, isDebug) {
-    const toFile = path.join(to, fileName);
-    try {
-        if (isDebug) throw "control flow ftw";
-        fs.accessSync(toFile);
-    } catch (e) {{
-        fs.readFile(path.join(from, fileName) , 'utf-8', (err, value) => {
-            fs.writeFile(path.join(to, fileName), value);
-        });
-    }}
-}
+const dependencies = [
+    // unless we glob, the folder path is mirroed.
+    // this should only match nuget.config
+    'query/*.config', 
+    'query/query/src/ReamQuery/*.json'
+];
+const omnisharpPath = path.normalize(appPath + 'omnisharp');
 
-module.exports = function omnisharpSetup(mode, folder) {
-    const isDebug = mode === 'DEBUG';
-    try {
-        fs.accessSync(folder);
-    } catch (e) {
-        createPath(folder);
-    }
-    let dotnetDir = __dirname + (isDebug ? '/query/query/src/ReamQuery' : '/query');
-    [
-        'NuGet.config',
-        'project.json',
-        'project.lock.json'
-    ].forEach(file => {
-        copyFile(file, dotnetDir, folder, isDebug);
-    });
-}
+dependencies.forEach(dep => 
+    copy(dep, omnisharpPath, (err) => {
+        if (err) console.log('Setup failed', err);
+    }));

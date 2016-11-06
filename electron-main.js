@@ -8,13 +8,6 @@ const BrowserWindow = electron.BrowserWindow;  // Module to create native browse
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
 const MODE = process.argv[2]; // passed by package.json, so absent when running in final build
-const omnisharpSetup = require('./omnisharp-setup');
-const path = require('path');
-
-const omnisharpPath = path.normalize((IS_LINUX ? `${process.env.HOME}/.ream-editor/` : 
-    `${process.env.LOCALAPPDATA}\\ReamEditor\\`) + 'omnisharp');
-
-omnisharpSetup(MODE, omnisharpPath);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

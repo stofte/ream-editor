@@ -59,6 +59,7 @@ export class TabService {
                 const tab = this.sessions.find(x => x.id === id);
                 if (tab) {
                     if (res.name === EventName.ResultStart) {
+                        tab.activeResultId = null;
                         tab.results.splice(0);
                     } else if (res.name === EventName.ResultUpdate) {
                         tab.results.push(<ResultPage> res.data);

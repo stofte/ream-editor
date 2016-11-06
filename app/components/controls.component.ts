@@ -2,10 +2,6 @@ import { Component, AfterViewInit, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { ConnectionService } from '../services/connection.service';
 import { TabService } from '../services/tab.service';
-import { EditorService } from '../services/editor.service';
-import { ExecuteQueryComponent } from './execute-query.component';
-import { ResultListComponent } from './result-list.component';
-import { EditorDirective } from '../directives/editor.directive';
 import { Connection } from '../models/index';
 import { InputStream, OutputStream, EventName } from '../streams/index';
 

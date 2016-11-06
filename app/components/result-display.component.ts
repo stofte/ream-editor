@@ -32,12 +32,11 @@ export class ResultDisplayComponent implements AfterViewInit {
     resultPages: ResultPage[] = [];
     outputList = [];
     activePage: number = null;
-
     loadingPages: ResultPage[] = [];
     loadingList = [];
-
     enableHider = true;
     firstLoad = true;
+    dataLoader: Function = null;
     @Input('view-height') public viewHeight: EventEmitter<number>;
     handsontableElm: any;
     tableOptions = {
@@ -45,6 +44,7 @@ export class ResultDisplayComponent implements AfterViewInit {
         columns: [],
         colHeaders: [],
         afterLoadData: null,
+        afterUpdateSettings: null,
         stretchH: 'last',
         height: null,
         rowHeaders: true,
@@ -99,6 +99,12 @@ export class ResultDisplayComponent implements AfterViewInit {
                 requestAnimationFrame(() => this.handsontableElm.render());
             }
         };
+        this.tableOptions.afterUpdateSettings = () => {
+            if (this.dataLoader) {
+                this.dataLoader();
+                this.dataLoader = null;
+            }
+        };
         this.handsontableElm = new Handsontable(container, this.tableOptions);
         this.viewHeight.filter(x => x > 0).subscribe(h => {
             this.handsontableElm.updateSettings({ height: h - 30 });
@@ -112,6 +118,10 @@ export class ResultDisplayComponent implements AfterViewInit {
         page.rows.forEach(row => {
             data.push(page.isAtomic ? [row] : row);
         });
+        // need to wait for updated settings before loading data
+        this.dataLoader = () => {
+            this.handsontableElm.loadData(data);
+        };
         this.handsontableElm.updateSettings({
             colHeaders: [...page.columns],
             columns: page.columns.map(col => {
@@ -120,6 +130,5 @@ export class ResultDisplayComponent implements AfterViewInit {
                 };
             })
         });
-        this.handsontableElm.loadData(data);
     }
 }

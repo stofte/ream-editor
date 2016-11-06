@@ -22,6 +22,13 @@ declare module CodeMirror {
     const keyMap: any;
     const hint: any;
     const lint: any;
+
+    interface Editor {
+        showHint: any;
+        getCursor: any;
+        getRange: any;
+        findWordAt: any;
+    }
 }
 
 interface IStreamOperation extends Function {

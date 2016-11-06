@@ -44,7 +44,8 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
 export class TabListComponent implements AfterViewInit {
     options: SortablejsOptions = {
         animation: 150,
-        
+        onStart: null,
+        onEnd: null
     };
     private currentTabs: Tab[] = [];
     private currentId: string;
@@ -58,7 +59,12 @@ export class TabListComponent implements AfterViewInit {
         private tabService: TabService,
         private ref: ChangeDetectorRef 
     ) {
-        
+        this.options.onStart = () => {
+            tabService.tabDragging.emit(true);
+        };
+        this.options.onEnd = () => {
+            tabService.tabDragging.emit(false);
+        };
     }
 
     public ngAfterViewInit() {

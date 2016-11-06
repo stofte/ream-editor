@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
 import { Tab } from '../models/tab';
 import { Connection } from '../models/connection';
@@ -8,6 +8,7 @@ import * as uuid from 'node-uuid';
 
 @Injectable()
 export class TabService {
+    public tabDragging = new EventEmitter<boolean>();
     public currentSessionId: Observable<string>;
     private subject = new Subject<string>();
     public sessions: Tab[] = [];

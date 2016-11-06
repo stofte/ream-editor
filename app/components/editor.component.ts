@@ -24,12 +24,17 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         private tabs: TabService,
         private input: InputStream,
         private elm: ElementRef
-    ) { }
+    ) {
+        tabs.tabDragging.subscribe(dragging => {
+            this.mirror.setOption('dragDrop', !dragging);
+        });
+    }
 
     ngAfterViewInit() {
         const txtElm = this.elm.nativeElement.querySelector('textarea');
         this.mirror = CodeMirror.fromTextArea(txtElm, this.editorOptions());
         this.mirror.on('change', this.changeHandler);
+
         this.tabs.currentSessionId.subscribe(id => {
             let doc = null;
             if (!this.documents[id]) {
@@ -74,6 +79,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
             to: event.to
         });
     };
+
 
     private editorOptions() {
         return {

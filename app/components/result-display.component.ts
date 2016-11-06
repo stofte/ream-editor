@@ -18,6 +18,7 @@ class ColumnSizing {
             class="rm-result-display__tab
                 {{ idx === activePage ? 'rm-result-display__tab--active' : '' }}">
             <button (click)="selectResult(idx)">
+                <i class="vaadin-icons">&#xe7a5;</i>
                 <span>{{output.text}}</span>
             </button>
         </div>

@@ -36,6 +36,7 @@ const urlRewrites = {
     rules: [
         { from: /^(.*)\/(resources\/materialicons\/MaterialIcons-Regular.woff2?)$/, to: '$2' },
         { from: /^\.\.\/\.\.\/(resources\/robotomono)/, to: '$1' },
+        { from: /^\.\.\/\.\.\/(resources\/vaadinicons)/, to: '$1' }
     ]
 };
 

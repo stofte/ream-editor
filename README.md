@@ -55,6 +55,7 @@ Connection strings are found in `test/int-helpers.js`
 
 TODO
 ----
+- CodeMirror drag/drop inside editor is broken
 - Align directory references in general, esp in typescript code
 - Setup omnisharp before starting streams spec test
 - Table/cell selections

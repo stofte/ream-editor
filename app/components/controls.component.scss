@@ -24,4 +24,9 @@ rm-controls {
             margin-top: 10px;
         }
     }
+
+    &__context {
+        -webkit-user-select: none;
+        user-select: none;
+    }
 }

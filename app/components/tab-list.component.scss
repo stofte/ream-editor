@@ -53,6 +53,8 @@ rm-tab-list {
             padding-right: 25px;
 
             span {
+                -webkit-user-select: none;
+                user-select: none;
                 white-space: nowrap;
             }
         }

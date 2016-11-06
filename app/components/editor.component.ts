@@ -87,8 +87,6 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
             gutters: ['CodeMirror-lint-markers'],
             lint: true,
             smartIndent: false,
-            matchBrackets: true,
-            viewportMargin: Infinity,
             showCursorWhenSelecting: true,
             mode: 'text/x-csharp'
         };

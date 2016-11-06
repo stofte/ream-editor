@@ -31,8 +31,12 @@ export class TabService {
 
     public newSession(): string {
         const id = uuid.v4();
-        this.sessions.push(<Tab> { id, title: `Untitled ${this.tabCounter++}` });
-        this.history = [id].concat(this.currentId ? this.history.filter(x => x !== this.currentId) : []);
+        this.sessions.push(<Tab> {
+            id, 
+            title: `Untitled ${this.tabCounter++}`,
+            editorHeight: (150 + 65) 
+        });
+        this.history = [id].concat(this.history);
         this.currentId = id;
         this.input.new(id);
         this.subject.next(id);
@@ -46,24 +50,28 @@ export class TabService {
         if (this.currentId === id) {
             this.currentId = null;
             if (this.sessions.length > 0) {
-                console.log('closeSession:history', this.history);
                 const nextId = this.history.shift();
+                this.currentId = nextId;
                 this.subject.next(nextId);
             } else {
                 this.subject.next(null);
             }
-        } else {
-            console.log('TabService closeSession: was inactive tab')
-        }
+        } // else inactive tab, so nothing to announce
     }
 
     public setContext(id: string, conn: Connection) {
-        const newTab = conn ? <Tab> { id, connectionId: conn.id }
-            : <Tab> { id, connectionId: null };
+        const editorHeight = this.sessions.find(x => x.id === id).editorHeight;
+        const newTab = conn ? <Tab> { id, connectionId: conn.id, editorHeight }
+            : <Tab> { id, connectionId: null, editorHeight };
         this.sessions = this.sessions
             .filter(x => x.id !== id)
             .concat([newTab]);
         this.input.setContext(id, conn);
+    }
+
+    public setEditorHeight(id: string, height: number) {
+        const session = this.sessions.find(x => x.id === id);
+        session.editorHeight = height;
     }
 
     public sessionContext(id: string) {

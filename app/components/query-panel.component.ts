@@ -26,13 +26,18 @@ export class QueryPanelComponent implements AfterViewInit {
     editorPanel: HTMLElement;
     resultPanel: HTMLElement;
     resultHeightEvents = new EventEmitter<number>();
-    editorDefaultHeight = 160 + 65;
+    editorDefaultHeight: number;
     constructor(
         private elm: ElementRef,
-        tabs: TabService
+        private tabs: TabService
     ) {
         tabs.currentSessionId.subscribe(id => {
             this.sessionId = id;
+            if (id) {
+                const h = tabs.sessions.find(x => x.id === id).editorHeight;
+                this.editorDefaultHeight =  h;
+                this.layout(this.editorDefaultHeight);
+            }
         });
     }
 
@@ -46,7 +51,6 @@ export class QueryPanelComponent implements AfterViewInit {
     }
 
     dragStart() {
-        console.log('dragStart');
         this.seperatorDragging = true;
         window.addEventListener('mousemove', this.dragging);
         window.addEventListener('mouseup', this.dragStop);
@@ -72,5 +76,8 @@ export class QueryPanelComponent implements AfterViewInit {
         this.editorPanel.style.height = edOffset + 'px';
         this.resultPanel.style.height = resHeight + 'px';
         this.resultHeightEvents.emit(resHeight);
+        if (this.sessionId) {
+            this.tabs.setEditorHeight(this.sessionId, seperatorOffset);
+        }
     }
 }

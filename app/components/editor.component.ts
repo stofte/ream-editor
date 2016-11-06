@@ -67,7 +67,6 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
 
     private changeHandler = (mirror: CodeMirror.Editor, event: CodeMirror.EditorChange): void => {
         const sessionId = mirror.getOption('sessionId');
-        console.log('sessionId', sessionId);
         this.input.edit(sessionId, <TextUpdate> {
             text: event.text,
             removed: event.removed,

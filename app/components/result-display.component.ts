@@ -102,7 +102,6 @@ export class ResultDisplayComponent implements AfterViewInit {
         this.handsontableElm = new Handsontable(container, this.tableOptions);
         this.viewHeight.filter(x => x > 0).subscribe(h => {
             this.handsontableElm.updateSettings({ height: h - 30 });
-            console.log('height emitter', h);
         });
     }
 

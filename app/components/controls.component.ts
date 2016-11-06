@@ -43,22 +43,9 @@ export class ControlsComponent {
         });
         tabs.currentSessionId.subscribe(id => {
             this.sessionId = id;
-            this.selectedContext = tabs.sessionContext(id);
-            // this.sessionId = id;
-            // if (this.selector) {
-            //     const context = tabs.sessionContext(id);
-            //     if (context !== null && context !== undefined) {
-            //         for (let i = 0; i < this.connections.length; i++) {
-            //             if (this.connections[i].id === context) {
-            //                 this.selector.selected = i + 1;
-            //                 break;
-            //             }
-            //         }
-            //     } else {
-            //         // code context
-            //         this.selector.selected = 0;
-            //     }
-            // }
+            if (id) {
+                this.selectedContext = tabs.sessionContext(id);
+            }
         });
     }
 
@@ -75,13 +62,6 @@ export class ControlsComponent {
     contextLabel(id: number) {
         return id ? this.contextList.find(x => x.id === id).connectionString : 'Code';
     }
-
-    // contextSelected(event: any) {
-    //     const idx = this.selector.selected;
-    //     const ctx = idx === 0 ? null : this.connections[idx - 1];
-    //     console.log('contextSelected');
-    //     this.tabs.setContext(this.sessionId, ctx);
-    // }
 
     executeBuffer() {
         const id = this.sessionId;

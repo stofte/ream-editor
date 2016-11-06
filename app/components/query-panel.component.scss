@@ -30,6 +30,7 @@ rm-query-panel {
         background-color: var(--primary-border);
         cursor: ns-resize;
         height: 5px;
+        min-height: 5px;
     }
 
     &__result {

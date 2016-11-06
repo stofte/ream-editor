@@ -66,8 +66,6 @@ export class TabService {
                     }
                     this.tabResultsUpdated.emit(id);
                 }
-            }).add(() => {
-                console.log('closed result subscriber for ', id);
             });
         return id;
     }

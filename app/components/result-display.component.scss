@@ -100,6 +100,9 @@ rm-result-display {
             }
             td {
                 cursor: default;
+                // hot adds the white-space nowrap
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
         }
     }

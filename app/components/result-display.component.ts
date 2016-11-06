@@ -127,7 +127,8 @@ export class ResultDisplayComponent implements AfterViewInit {
             colHeaders: [...page.columns],
             columns: page.columns.map(col => {
                 return {
-                    editor: false
+                    editor: false,
+                    wordWrap: false
                 };
             })
         });

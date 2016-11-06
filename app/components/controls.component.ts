@@ -9,7 +9,7 @@ const codeLabel = '<Code>';
 @Component({
     selector: 'rm-controls',
     template: `
-    <button class="rm-controls__run"
+    <button class="rm-controls__run {{ playDisabled ? 'rm-controls__run--disabled' : '' }}"
         (click)="executeBuffer()"
         [disabled]="playDisabled"><i class="material-icons">play_arrow</i></button>
     <select #sel (change)="contextChanged($event, sel)">
@@ -40,6 +40,7 @@ export class ControlsComponent {
         tabs.currentSessionId.subscribe(id => {
             this.sessionId = id;
             if (id) {
+                this.playDisabled = tabs.sessionExecutePending(id);
                 this.selectedContext = tabs.sessionContext(id);
             }
         });
@@ -65,8 +66,12 @@ export class ControlsComponent {
         this.output.events
             .first(msg => msg.id === id && msg.name === EventName.ResultDone)
             .subscribe(() => {
-                this.playDisabled = false;
+                this.tabs.setExecutePending(id, false);
+                if (this.sessionId === id) {
+                    this.playDisabled = false;
+                }
             });
+        this.tabs.setExecutePending(id, true);
         this.input.executeBuffer(id);
     }
 }

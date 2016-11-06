@@ -34,7 +34,8 @@ export class TabService {
         this.sessions.push(<Tab> {
             id, 
             title: `Untitled ${this.tabCounter++}`,
-            editorHeight: (150 + 65) 
+            editorHeight: (150 + 65),
+            executePending: false
         });
         this.history = [id].concat(this.history);
         this.currentId = id;
@@ -74,7 +75,16 @@ export class TabService {
         session.editorHeight = height;
     }
 
+    public setExecutePending(id: string, pending: boolean) {
+        const session = this.sessions.find(x => x.id === id);
+        session.executePending = pending;
+    }
+
     public sessionContext(id: string) {
         return this.sessions.find(x => x.id === id).connectionId;
+    }
+
+    public sessionExecutePending(id: string) {
+        return this.sessions.find(x => x.id === id).executePending;
     }
 }

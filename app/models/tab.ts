@@ -5,6 +5,7 @@ export class Tab {
     public connectionId: number; // stores a connection reference for the given tab
     public title: string;
     public editorHeight: number;
+    public executePending: boolean;
     // public active: boolean; // is the visible tab
     // public output: any; // which output tab is active for the tab
     // public fileName: string; // used by omnisharp, a tab should have a fixed fileName for a given connection

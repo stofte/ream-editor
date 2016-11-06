@@ -14,5 +14,14 @@ rm-controls {
         border: 1px solid var(--primary-border);
         font-size: calc(1px * var(--font-size-body));
         margin-right: calc(1px * var(--margin));
+
+        &--disabled {
+            opacity: 0.5;
+        }
+
+        .material-icons {
+            line-height: 1px;
+            margin-top: 10px;
+        }
     }
 }

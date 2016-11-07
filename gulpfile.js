@@ -98,3 +98,4 @@ const mainTasks = ['sass', 'css', 'ts'];
 const buildOnlyTasks = ['ts:lint', 'ts:bundle'];
 gulp.task('build', [...mainTasks, ...buildOnlyTasks]);
 gulp.task('default', [...mainTasks, 'watch']);
+gulp.task('lint', ['ts', 'ts:lint']);

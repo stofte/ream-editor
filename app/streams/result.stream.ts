@@ -18,6 +18,7 @@ export class ResultStream {
     }
 
     private handleRunCode = (req: Message): Observable<Message> => {
+        console.log('handleRunCode called', req);
         return new Observable<Message>((obs: Observer<Message>) => {
             // for tables, we need to gather across multiple messages, so store
             // an optional top level ref for the table
@@ -70,6 +71,9 @@ export class ResultStream {
                             break;
                     }
                 });
+            socketSub.add(() => {
+                console.log('socket subscriber was disposed');
+            })
         });
     }
 

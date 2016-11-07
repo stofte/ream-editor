@@ -15,7 +15,7 @@ import { cSharpTestData, cSharpTestDataExpectedResult, cSharpTestDataExpectedCod
     codecheckEditorTestData, cSharpAutocompletionEditorTestData, cSharpAutocompletionRequestTestData,
     cSharpAutocompletionExpectedValues, cSharpContextSwitchExpectedCodeChecks, 
     cSharpContextSwitchEditorTestData, cSharpCityFilteringQueryEditorTestData,
-    cSharpDatabaseCodeCheckEditorTestData, cSharpDatabaseCodeCheckExpectedErrors } from '../test/editor-testdata';
+    cSharpDatabaseCodeCheckEditorTestData, cSharpDatabaseCodeCheckExpectedErrors, randomTestData } from '../test/editor-testdata';
 import { EventName, Message } from './api';
 import { check, checkAndExit, replaySteps } from '../test/test-helpers';
 import * as uuid from 'node-uuid';
@@ -78,6 +78,10 @@ describe('[int-test] streams', function() {
         it('emits results after swithing buffer context', done => {
             emitsResultsAfterSwitchingBufferContext(done, 10, 0);
         });
+
+        it('emits expected diagnostics for invalid query when calling query backend', done => {
+            emitsExpectedDiagnosticsForInvalidQueryWhenCallingQueryBackend(done, 10, 0);
+        });
     });
 
     let runTimings = {  };
@@ -87,7 +91,7 @@ describe('[int-test] streams', function() {
     }
 
     [
-        [0, 10, 20]
+        //[0, 10, 20]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             function runAllAtOnce(allDone) {
@@ -295,7 +299,7 @@ describe('[int-test] streams', function() {
                             expect(rows[0][cityColIdx].substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
-                        runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
+                        runTimings['emitsResultsAfterSwitchingBufferContext'] =  performance.now() - ts;
                     });
                 }
             });
@@ -471,6 +475,32 @@ describe('[int-test] streams', function() {
                 fn: (evt) => input.edit(id, evt)
             },
             () => input.codeCheck(id)
+        ], replayMaxDelay, replayMinDelay);
+    }
+
+
+    function emitsExpectedDiagnosticsForInvalidQueryWhenCallingQueryBackend(done, replayMaxDelay, replayMinDelay) {
+        const ts = performance.now();
+        const id = uuid.v4();
+        let executeTs: number = null;
+        const responseSub = output.events.filter(msg => msg.name === EventName.QueryExecuteResponse).subscribe(msg => {
+            input.destroy(id);
+            responseSub.unsubscribe();
+            checkAndExit(done, () => {
+                expect(msg.data.diagnostics.length).to.be.equal(1, 'Expect single error in query');
+                expect(msg.data.diagnostics[0].Message).to.contain("The name 'y' does not exist");
+                expect(executeTs).to.not.be.null;
+                expect(msg.originalTimestamp).to.equal(executeTs, 'Response should pass execute timestamp');
+            });
+            runTimings['emitsExpectedDiagnosticsForInvalidQueryWhenCallingQueryBackend'] =  performance.now() - ts;
+        });
+        replaySteps([
+            () => input.new(id),
+            {
+                for: randomTestData[1].events,
+                fn: (evt) => input.edit(id, evt)
+            },
+            () => executeTs = input.executeBuffer(id)
         ], replayMaxDelay, replayMinDelay);
     }
 

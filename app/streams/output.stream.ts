@@ -12,8 +12,11 @@ export class OutputStream {
 
     constructor(
         result: ResultStream,
+        query: QueryStream,
         omnisharp: OmnisharpStream
     ) {
-        this.events = result.events.merge(omnisharp.events);
+        this.events = result.events
+            .merge(omnisharp.events)
+            .merge(query.events);
     }
 }

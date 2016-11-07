@@ -83,8 +83,9 @@ export class QueryStream {
                                 }
                                 return new Message(EventName.QueryExecuteResponse, msg.id, {
                                     code: data.Code,
-                                    message: data.Message
-                                });
+                                    message: data.Message,
+                                    diagnostics: data.Diagnostics
+                                }, msg.originalTimestamp);
                         });
                     });
             })

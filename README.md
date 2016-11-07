@@ -17,47 +17,36 @@ Builds
 Developing
 ----------
 
-Prerequisites to run repository code locally
+Development requires a recent [NodeJS/npm](https://nodejs.org/en/) and 
+[.NET Core CLI](https://www.microsoft.com/net/core) installed in the path.
 
-- Latest `dotnet` using [.NET Core SDK Installer](https://github.com/dotnet/cli#installers-and-binaries) 
-- Download the latest [OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`
-- `gulp-cli` should be installed globally (`npm install -g gulp-cli`)
-- `typings` should be installed globally (`npm install -g typings`) 
+To setup a local repository follow these steps:
 
-Restore depedencies
+1. Clone repository with `--recursive` to fetch the `query` (ReamQuery) submodule 
+2. [Setup](https://github.com/stofte/ream-query/blob/master/README.md) ReamQuery and run tests to verify submodule functionality
+3. Download the latest [OmniSharp release](https://github.com/OmniSharp/omnisharp-roslyn/releases) and unzip to `omnisharp`
+4. `gulp-cli` should be installed globally (`npm install -g gulp-cli`)
+5. `typings` should be installed globally (`npm install -g typings`)
+6. `npm install` to restore dependencies
 
-- Follow setup instructions for [ream-query](https://github.com/stofte/ream-query/blob/master/README.md#development)
-- `npm install`
+Build and watch the TypeScript and Sass files, and start the shell:
 
-Build and watch the TypeScript and CSS, and start the shell.
-
-- `gulp` 
-- `npm start`
-
-The shell handles starting the Query and OmniSharp background processes
-as required.
+1. `gulp`
+2. `npm start`
 
 Tests
 -----
 
-Test integration scripts perform basic feature tests against a live database.
-The connectionstrings used can be found in `scripts/connections.json`.
+Tests are primarily integration tests and focus on communication with
+OmniSharp and ReamQuery backends. Currently runs against SQLite
+database found in `query/sql/world.sqlite`.
 
-- `npm run generate-for-sqlserver` scripts for MS SQL Server
-- `npm run generate-for-npgsql` scripts for PostgreSQL
-
-Once the database is updated, the tests can be run using
-
-- `npm run int-test-sqlserver`
-- `npm run int-test-npgsql`
-
-Connection strings are found in `test/int-helpers.js`
+- `npm test`
 
 TODO
 ----
 - CodeMirror drag/drop inside editor is broken
 - Align directory references in general, esp in typescript code
-- Setup omnisharp before starting streams spec test
 - Table/cell selections
 - Error handling
 - Culture handling
@@ -65,4 +54,3 @@ TODO
 - EF fails if table has no primary key?
 - OmniSharp hosting/custom build?
 - [dotnet run in folder with spaces fails](https://github.com/dotnet/cli/issues/1189)
-

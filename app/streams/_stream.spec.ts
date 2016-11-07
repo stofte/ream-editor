@@ -243,7 +243,7 @@ describe('[int-test] streams', function() {
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
                         runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
-                    })
+                    });
                 }
             });
         

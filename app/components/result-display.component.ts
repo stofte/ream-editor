@@ -131,7 +131,7 @@ export class ResultDisplayComponent implements AfterViewInit {
                 colOffset,
                 rowOffset
             );
-        }
+        };
         this.tableOptions.afterScrollVertically = scrollH;
         this.tableOptions.afterScrollHorizontally = scrollH;
         this.handsontableElm = new Handsontable(container, this.tableOptions);
@@ -150,7 +150,9 @@ export class ResultDisplayComponent implements AfterViewInit {
     // fx codemirror looses it's selection if the user clicks the scrollbar dragger.
     blurActiveElement = () => {
         const elm = <HTMLElement> document.activeElement;
-        if (elm && elm.blur) elm.blur();
+        if (elm && elm.blur) {
+            elm.blur();
+        }
     }
 
     setSessionResults = (id: string, forceSelect = false) => {

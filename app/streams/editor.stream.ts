@@ -116,4 +116,3 @@ export class EditorStream {
         contextText.connect();
     }
 }
-	

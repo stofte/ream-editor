@@ -71,7 +71,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
                     this.firstLoad = false;
                     requestAnimationFrame(() => this.mirror.focus());
                 } else {
-                    this.mirror.focus()
+                    this.mirror.focus();
                 }
             });
         });

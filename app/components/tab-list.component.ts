@@ -90,7 +90,9 @@ export class TabListComponent implements AfterViewInit {
     private closeTab(id: string) {
         let idx = -1;
         this.currentTabs.forEach((x, i) => {
-            if (x.id === id) idx = i;
+            if (x.id === id) {
+                idx = i;
+            }
         });
         Assert(idx !== -1, 'Tab id not found when closing tab');
         this.currentTabs.splice(idx, 1);

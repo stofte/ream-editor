@@ -18,17 +18,22 @@ export class ResultStream {
     }
 
     private handleRunCode = (req: Message): Observable<Message> => {
-        console.log('handleRunCode called', req);
         return new Observable<Message>((obs: Observer<Message>) => {
             // for tables, we need to gather across multiple messages, so store
             // an optional top level ref for the table
             // todo: this will fail with interleaving table dumps from the same session, index by table id property 
             let tableResult: ResultPage = null;
             obs.next(new Message(EventName.ResultStart, req.id));
-            // this sub is dependents on the close msg to complete.
             const socketSub = this.query.events
                 .filter(msg => msg.name === EventName.QuerySocketOutput && msg.data.session === req.id)
                 .map(msg => msg.data)
+                .merge(this.query.events.filter(x =>
+                        // if the query fails for some reason, we need to close the stream
+                        x.id === req.id && x.name === EventName.QueryExecuteResponse &&
+                        x.originalTimestamp === req.timestamp &&
+                        // the api only returns errors, so if there's anything here, the query didn't run
+                        x.data.diagnostics && x.data.diagnostics.length > 0
+                    ).map(x => { return { type: 'close', session: x.id }; }))
                 .subscribe(socket => {
                     let page: ResultPage = null;
                     switch (socket.type) {
@@ -71,9 +76,6 @@ export class ResultStream {
                             break;
                     }
                 });
-            socketSub.add(() => {
-                console.log('socket subscriber was disposed');
-            })
         });
     }
 

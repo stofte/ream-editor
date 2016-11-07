@@ -8,25 +8,29 @@ import { Connection } from '../models/connection';
 @Component({
     selector: 'rm-connection-manager',
     template: `
-<paper-button raised onclick="scrolling.open()">scrolling dialog</paper-button>
-
-<paper-dialog id="scrolling">
-    <h2>Connection Manager</h2>
-    <form class="rm-connection-manager__add-new">
-        <paper-input
-            required
-            label="Connection string"
-            (keydown)="connectionInput($event)"></paper-input>
-        <paper-dropdown-menu label="Provider type">
-            <paper-listbox class="dropdown-content" [selected]="0">
-                <paper-item *ngFor="let ptype of providerTypes">{{ptype}}</paper-item>
-            </paper-listbox>
-        </paper-dropdown-menu>
-        <paper-button raised (click)="addConnection()">Add</paper-button>
-    </form>
-    <paper-dialog-scrollable>
-        <div *ngFor="let conn of connections" class="rm-connection-manager__card">
-            <div elevation="1" class="rm-connection-manager__connection">
+<dialog id="connection-mgr-dialog" class="rm-connection-manager">
+    <h2 class="rm-connection-manager__title">Connection Manager</h2>
+    <div class="rm-connection-manager__container">
+        <div class="rm-connection-manager__validation">
+            <form class="rm-connection-manager__add-new" 
+                (submit)="addConnection($event);">
+                
+                <input placeholder="Enter connection string ..." name="connStr" [(ngModel)]="newConnectionStringText">
+                <select #sel (change)="changeProvider(sel.selectedIndex)">
+                    <option *ngFor="let ptype of providerTypes; let idx = index"
+                        [selected]="idx === newConnectionProviderIndex">{{ptype}}</option>
+                </select>
+                <button type="submit">Add</button>
+            </form>
+            <div class="rm-connection-manager__validation__output">
+                <div>{{this.errorMessageText}}</div>
+                <ul *ngIf="sqliteSyntaxHelp">
+                    <li>Data Source=C:\some\where.db;Version=3;</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <div *ngFor="let conn of connections" class="rm-connection-manager__connection">
                 <div class="rm-connection-manager__connection__text-block">
                     <div class="rm-connection-manager__connection__text-block__title">
                         {{conn.connectionString}}
@@ -35,63 +39,58 @@ import { Connection } from '../models/connection';
                         {{providerDisplayName(conn.type)}}
                     </div>
                 </div>
-                <paper-icon-button icon="icons:delete" (click)="removeConnection(conn)"></paper-icon-button>
+                <button (click)="removeConnection(conn)">
+                    <i class="material-icons">delete</i>
+                </button>
             </div>
         </div>
-    </paper-dialog-scrollable>
-    <div class="buttons">
-      <paper-button dialog-dismiss>Close</paper-button>
     </div>
-</paper-dialog>
+    <div class="rm-connection-manager__close">
+        <button (click)="closeDialog()"><i class="material-icons">close</i></button>
+    </div>
+</dialog>
 `
 })
 export class ConnectionManagerComponent implements AfterViewInit  {
-    @Input('show-dialog') showDialog: EventEmitter<boolean>;
     private newConnectionStringText: string;
+    private newConnectionProviderIndex = 1;
+    private errorMessageText = '';
     private connectionsSubTitle: string;
     private connections: Connection[];
-
+    private sqliteSyntaxHelp = false;
     private providerTypes = [
         'SQL Server',
         'PostgreSQL',
         'SQLite'
     ];
 
-    // polymer elements
+    // dom ref to call dialog methods
     private dialogElm: any;
-    private connStrInputElm: any;
-    private connTypeElm: any;
     constructor(
         private hotkey: HotkeyService,
         private element: ElementRef,
         private conns: ConnectionService
-        // private connectionManager: OverlayService,
-        // private tabService: TabService
     ) {
-        conns.all
-            .subscribe(cs => {
-                this.connections = cs;
-                this.connectionsSubTitle = cs.length > 0 ? 
-                    'Current connections' : '<i>No connections</i>';
-            });
+        conns.all.subscribe(cs => this.connections = cs);
     }
 
     ngAfterViewInit() {
-        this.dialogElm = this.element.nativeElement.querySelector('paper-dialog');
-        this.connStrInputElm = this.element.nativeElement
-            .querySelector('.rm-connection-manager__add-new paper-input');
-        this.connTypeElm = this.element.nativeElement
-            .querySelector('.rm-connection-manager__add-new paper-listbox');
-        this.showDialog.subscribe(() => {
-            this.dialogElm.open();
-        });
+        this.dialogElm = this.element.nativeElement.querySelector('dialog');
         this.hotkey.connectionManager.subscribe(val => {
-            if (this.dialogElm.opened) {
+            if (this.dialogElm.open) {
                 this.dialogElm.close();
             } else {
-                this.dialogElm.open();
+                this.reset();
+                this.dialogElm.showModal();
             }
         });
+    }
+
+    private reset() {
+        this.sqliteSyntaxHelp = false;
+        this.errorMessageText = '';
+        this.newConnectionStringText = '';
+        this.newConnectionProviderIndex = 0;
     }
 
     private providerDisplayName(connType: ConnectionType) {
@@ -99,146 +98,44 @@ export class ConnectionManagerComponent implements AfterViewInit  {
             connType === 'npgsql' ? this.providerTypes[1] : this.providerTypes[2];
     }
 
-    private connectionInput(event: KeyboardEvent) {
-        if (event.which === 13) {
-            this.addConnection();
-        }
-    }
-
     private addConnection() {
-        const value = this.connStrInputElm.value;
-        const typeIdx = this.connTypeElm.selected;
-        const serverType: ConnectionType = 
-            typeIdx === 0 ? 'sqlserver' : typeIdx === 1 ? 'npgsql' : 'sqlite';
+        const sqliteRegex = /Data Source\s*=\s*\w.+/;
+        const value = this.newConnectionStringText;
+        const provider: ConnectionType = 
+             this.newConnectionProviderIndex === 0 ? 'sqlserver' : 
+             this.newConnectionProviderIndex === 1 ? 'npgsql' : 'sqlite';
+        let valid = true;
+        this.errorMessageText = '';
         if (value.length === 0) {
-            this.connStrInputElm.errorMessage = 'Enter connection string';
+            this.errorMessageText = 'Enter connection string';
         } else {
             // switch on provider type
-            if (serverType === 'sqlite') {
-                this.connStrInputElm.pattern = 'Data Source\\s*=\\s*[^\\s].+';
-                this.connStrInputElm.errorMessage = 'Format must be "Data Source = C:\\some\\where"';
+            if (provider === 'sqlite' && !sqliteRegex.test(value)) {
+                this.errorMessageText = 'Incorrect format, examples for SQLite:';
+                this.sqliteSyntaxHelp = true;
             }
         }
-        if (this.connStrInputElm.validate()) {
-            this.conns.add(new Connection(value, serverType));
-            this.connStrInputElm.value = '';
-            if (this.connections.length < 5) {
-                const topVal = parseInt(this.dialogElm.style.top, 10);
-                this.dialogElm.style.top = `${topVal - 40}px`;
-            }
+
+        if (!this.errorMessageText) {
+            this.conns.add(new Connection(value, provider));
+            this.newConnectionStringText = '';
         }
+
+        event.preventDefault();
+        return false;
     }
 
     private removeConnection(connection: Connection) {
         const len = this.connections.length; 
         this.conns.remove(connection);
-        if (len < 5) {
-            const topVal = parseInt(this.dialogElm.style.top, 10);
-            this.dialogElm.style.top = `${topVal + 40}px`;
-        }
     }
 
+    private closeDialog() {
+        this.dialogElm.close();
+    }
 
-    // private addNewConnection(value: string, sqlserver: boolean, npgsql: boolean) {
-    //     const serverType: ConnectionType = npgsql ? 'npgsql' : 'sqlserver';
-    //     if (value.length > 0) {
-    //         this.conns.add(new Connection(value, serverType));
-    //         this.newConnectionStringText = '';
-    //     }
-    // }
-    
-    // private editConnection(connection: Connection) {
-    //     connection.temporary = connection.connectionString;
-    //     connection.editing = true;
-    // }
-    
-    // private removeConnection(connection: Connection) {
-    //     this.conns.remove(connection);
-    // }
-    
-    // private stopEditing(connection: Connection, value: string) {
-    //     connection.temporary = value;
-    // }
-    
-    // private updateEditing(connection: Connection, value: string) {
-    //     connection.connectionString = value;
-    //     this.cancelEditing(connection);
-    //     this.conns.update(connection);
-    // }
-    
-    // private cancelEditing(connection: Connection) {
-    //     connection.editing = false;
-    //     connection.temporary = null;
-    // }
+    private changeProvider(idx: number) {
+        this.newConnectionProviderIndex = idx;
+    }
 }
 
-
-// <div class="container-fluid int-test-conn-man" style="background:transparent">
-//     <div class="jumbotron center-block">
-//         <div class="row">
-//             <div class="col-md-12">
-//                 <h2>Connection Manager</h2>
-//             </div>
-//         </div>
-//         <form>
-//             <div class="form-group">
-//                 <label for="connectringStringInp">Add new</label>
-//                 <input type="string" class="form-control" 
-//                     id="connectringStringInp" placeholder="Type/paste connection string and press enter to add"
-//                     #newconnection [(ngModel)]="newConnectionStringText"
-//                     (keyup.enter)="addNewConnection(newconnection.value, typesqlserver.checked, typenpgsql.checked)">
-//             </div>
-//             <div class="radio">
-//                 <label>
-//                     <input type="radio" #typesqlserver name="sqltype" value="sqlserver" checked />
-//                     MS SQLServer
-//                 </label>
-//             </div>
-//             <div class="radio">
-//                 <label>
-//                     <input type="radio" #typenpgsql name="sqltype" value="npgsql" />
-//                     PostgreSQL
-//                 </label>
-//             </div>
-//         </form>
-//         <div class="row">
-//             <div class="col-md-12">
-//                 <table class="table">
-//                     <thead><caption style="white-space: pre" [innerHTML]="connectionsSubTitle"></caption></thead>
-//                     <tbody>
-//                         <tr *ngFor="let conn of connections">
-//                             <td style="vertical-align: middle;">
-//                                 <p *ngIf="!conn.editing" class="pull-right" style="margin-bottom: 0">
-//                                     <span style="font-size: 80%;">
-//                                         {{ conn.type === 'sqlserver' ? 'MS SQLServer' : 'PostgreSQL' }}
-//                                     </span>
-//                                 </p>
-//                                 <p *ngIf="!conn.editing" style="margin-bottom: 0">
-//                                     <span (dblclick)="editConnection(conn)" 
-//                                         style="font-size: 80%;"
-//                                         title="Double-click to edit">{{conn.connectionString}}</span>
-                                   
-//                                 </p>
-//                                 <p *ngIf="conn.editing" style="margin-bottom: 0">
-//                                     <input #editedconn class="form-control"
-//                                         [value]="conn.temporary" 
-//                                         (blur)="stopEditing(conn, editedconn.value)" 
-//                                         (keyup.enter)="updateEditing(conn, editedconn.value)" 
-//                                         (keyup.escape)="cancelEditing(conn)">
-//                                 </p>
-//                             </td>
-//                             <td>
-//                                 <button (click)="removeConnection(conn)" class="btn btn-default pull-right">Remove</button>
-//                             </td>
-//                         </tr>
-//                     </tbody>
-//                 </table>
-//             </div>
-//         </div>
-//         <div class="row">
-//             <div class="col-md-12">
-//                 <p><button type="button" (click)="closeManager()" class="btn btn-default">Close</button></p>
-//             </div>
-//         </div>
-//     </div>
-// </div>

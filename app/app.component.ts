@@ -9,15 +9,14 @@ const electron = electronRequire('electron').remote;
 @Component({
     selector: 'rm-app',
     template: `
+    <rm-connection-manager></rm-connection-manager>
     <rm-tab-list></rm-tab-list>
     <rm-query-panel></rm-query-panel>
-    <rm-connection-manager [show-dialog]="showConnectionMgr"></rm-connection-manager>
 `
 })
 export class AppComponent {
 
     private isMaximized = true;
-    private showConnectionMgr = new EventEmitter<boolean>();
 
     constructor(
         private streamManager: StreamManager,

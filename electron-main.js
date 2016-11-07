@@ -7,7 +7,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
-const MODE = process.argv[2]; // passed by package.json, so absent when running in final build
+const MODE = process.argv[4]; // passed by package.json, so absent when running in final build
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,7 +26,7 @@ app.on('ready', function() {
             label: 'File',
             submenu: [{
                     label: 'Connections',
-                    accelerator: 'CmdOrCtrl+D',
+                    accelerator: 'F4',
                     click: () => 
                         mainWindow.webContents.send('application-event', 'connections-panel'),
                 }, {

@@ -1,6 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { BrowserModule  } from '@angular/platform-browser';
+import { FormsModule }   from '@angular/forms';
 import { AppComponent } from './app.component';
 import { TabListComponent, TabViewComponent, QueryPanelComponent, ResultDisplayComponent,
     ExecuteQueryComponent, EditorComponent,
@@ -36,6 +37,7 @@ import { SortablejsModule } from 'angular-sortablejs';
     imports: [
         BrowserModule,
         HttpModule,
+        FormsModule,
         SortablejsModule
     ],
     bootstrap: [AppComponent],

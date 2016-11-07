@@ -1,69 +1,92 @@
 rm-connection-manager {
+    display: flex;
+    // prevent from participating in regular flex layout
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
 
-    display: none;
-    
-    paper-dialog {
-        max-width: 800px;
-        max-height: calc(100vh - 144px);
+.rm-connection-manager {
+    z-index: 1000;
+    padding: 20px;
+    margin: 0;
+    border: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--dialog-bg-color);
+    color: var(--primary-fore-color);
+
+    &__add-new {
+        height: calc(1px * var(--control-row-height));
+        margin: calc(1px * var(--margin));
+        display: flex;
+        flex-direction: row;
+        input {
+            flex-grow: 1;
+            margin-right: calc(1px * var(--margin));
+        }
+        select {
+            margin-right: calc(1px * var(--margin));
+        }
     }
 
-    paper-dialog-scrollable::shadow .scrollable {
-        max-height: calc(100vh - 352px);
-    }
+    &__connection {
+        margin: calc(1px * var(--margin));
+        margin-bottom: calc(3px * var(--margin));
+        display: flex;
+        flex-direction: row;
+        border: 1px solid transparent;
 
-    .rm-connection-manager {
-        
-        &__add-new {
+        &:hover {
+            border: 1px solid var(--primary-border);
+        }
+
+        &__text-block {
+            flex-grow: 1;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
+            margin: calc(1px * var(--margin));
 
-            paper-input {
-                flex-grow: 2;
-                min-width: 30em;
-                margin-right: 20px;
-            }
-
-            paper-dropdown-menu {
-                margin-right: 20px;
-            }
-
-            paper-button {
-                height: 40px;
-                margin-top: 13px;
+            &__type {
+                opacity: 0.6;
             }
         }
 
-        // gives each connection a container like paper-material,
-        // which doesnt seem to work inside dialog-scrollable element
-        &__card {
-            display: block;
-            margin: 8px 0;
-            padding: 16px;
-            border-radius: 2px;
-            // equivalent to elavation=1
-            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-                  0 1px 5px 0 rgba(0, 0, 0, 0.12),
-                  0 3px 1px -2px rgba(0, 0, 0, 0.2)
-        }
-
-        &__connection {
-            display: flex;
-            flex-direction: row;
-
-            &__text-block {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-
-                &__type {
-                    opacity: 0.6;
-                }
-            }
-            paper-icon-button {
-
-            }
+        button {
+            margin: calc(1px * var(--margin));
         }
     }
 
+    &__title,
+    &__container {
+        min-width: 300px;
+        max-width: 600px;
+        margin-right: auto;
+        margin-left: auto;
+    }
 
+    &__container {
+        height: calc(100% - 60px);
+        overflow-y: auto;
+    }
+
+    &__close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        button {
+            border: none;
+            background: transparent;
+        }
+    }
+
+    &__validation {
+        margin-bottom: calc(10px * var(--margin));
+        &__output {
+
+        }
+    }
 }

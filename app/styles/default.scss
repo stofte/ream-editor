@@ -3,6 +3,7 @@
     --margin: 5;
 
     --primary-bg-color: #f3f3f3;
+    --dialog-bg-color: #fff;
     --primary-fore-color: #333;
     --primary-border: #ccc;
     --selection-bg-color: #add6ff;
@@ -16,4 +17,8 @@ html, body {
     font-size: calc(1px * var(--font-size-body));
     color: var(--primary-fore-color);
     background-color: var(--primary-bg-color);
+}
+
+*, *::after, *::before {
+    box-sizing: border-box;
 }

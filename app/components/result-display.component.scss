@@ -52,7 +52,15 @@ rm-result-display {
             padding: 0 10px;
             .vaadin-icons {
                 font-size: calc(1px * var(--font-size-body) - 2px);
-                padding-right: 4px;
+                margin-right: 4px;
+            }
+            .material-icons {
+                font-size: calc(1px * var(--font-size-body) + 1px);
+                margin-right: 4px;
+                line-height: 1px;
+                vertical-align: -3px;
+                width: 15px;
+                min-width: 15px;
             }
             span {
                 -webkit-user-select: none;
@@ -70,10 +78,35 @@ rm-result-display {
         }
     }
 
+    &__console {
+        position: relative;
+        height: calc(100% - (1px * var(--tab-list-height)));
+        width: 100%;
+        overflow: auto;
+        
+        &__listing {
+            margin: calc(1px * var(--margin));
+            padding: 0;
+        }
+        &__date {
+            font-family: 'Roboto Mono';
+            opacity: 0.5;
+        }
+        &__log {
+            list-style-type: none;
+        }
+    }
+
     &__table {
         position: relative;
         height: calc(100% - (1px * var(--tab-list-height)));
         width: 100%;
+
+        &--inactive {
+            position: absolute;
+            left: 99999px;
+            right: 99999px;
+        }
 
         &__hider {
             position: absolute;

@@ -12,3 +12,4 @@ export * from './template-result';
 export * from './editor-event';
 export * from './text-update';
 export * from './codecheck-query';
+export * from './session-log-message';

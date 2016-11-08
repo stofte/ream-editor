@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
-import { Tab, ResultPage } from '../models/index';
+import { Tab, ResultPage, SessionLogMessage } from '../models/index';
 import { Connection } from '../models/connection';
 import { ConnectionService } from './connection.service';
 import { InputStream, OutputStream, EventName } from '../streams/index';
@@ -10,6 +10,7 @@ import * as uuid from 'node-uuid';
 @Injectable()
 export class TabService {
     public tabDragging = new EventEmitter<boolean>();
+    public logUpdated = new EventEmitter<string>();
     public tabResultsUpdated = new EventEmitter<string>();
     public currentSessionId: Observable<string>;
     private subject = new Subject<string>();
@@ -42,7 +43,8 @@ export class TabService {
             title: `Untitled ${this.tabCounter++}`,
             editorHeight: (150 + 65),
             executePending: false,
-            results: []
+            results: [],
+            sessionLog: []
         });
         this.history = [id].concat(this.history);
         this.currentId = id;
@@ -117,6 +119,13 @@ export class TabService {
     public setActiveResult(id: string, resultId: string) {
         const session = this.sessions.find(x => x.id === id);
         session.activeResultId = resultId;
+        session.consoleActive = false;
+    }
+    
+    public setConsoleActive(id: string) {
+        const session = this.sessions.find(x => x.id === id);
+        session.consoleActive = true;
+        session.activeResultId = null;
     }
 
     public sessionContext(id: string) {
@@ -125,5 +134,15 @@ export class TabService {
 
     public sessionExecutePending(id: string) {
         return this.sessions.find(x => x.id === id).executePending;
+    }
+
+    public sessionLog(id: string, text: string, isError = false) {
+        const tab = this.sessions.find(x => x.id === id);
+        tab.sessionLog.unshift({
+            text,
+            type: isError ? 'error' : 'info',
+            created: new Date()
+        });
+        this.logUpdated.emit(id);
     }
 }

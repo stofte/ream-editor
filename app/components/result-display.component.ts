@@ -225,6 +225,15 @@ export class ResultDisplayComponent implements AfterViewInit {
         const h = date.getHours();
         const m = date.getMinutes();
         const s = date.getSeconds();
-        return `${h < 10 ? '0' : ''}${h}:${m < 10 ? '0' : '' }${m}:${s < 10 ? '0' : '' }${s}`;
+        const ms = date.getMilliseconds();
+
+        const hStr = (h < 10 ? '0' : '') + h;
+        const mStr = (m < 10 ? '0' : '') + m;
+        const sStr = (s < 10 ? '0' : '') + s;
+        let msStr = ('' + ms).substring(0, 3);
+        while (msStr.length < 3) {
+            msStr = '0' + msStr;
+        }
+        return `${hStr}:${mStr}:${sStr}.${msStr}`;
     }
 }

@@ -51,6 +51,16 @@ export class TabService {
         this.input.new(id);
         this.subject.next(id);
         this.output.events
+            .filter(x => x.name === EventName.QueryExecuteResponse)
+            .subscribe(msg => {
+                if (msg.data && msg.data.diagnostics && msg.data.diagnostics.length > 0) {
+                    msg.data.diagnostics.forEach(diag => {
+                        this.sessionLog(msg.id, diag.Message, true);
+                    });
+                    this.sessionLog(msg.id, 'Query errors:', true);
+                }
+            });
+        this.output.events
             .filter(x => x.id === id && (
                 x.name === EventName.ResultStart ||
                 x.name === EventName.ResultUpdate ||

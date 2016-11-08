@@ -83,7 +83,7 @@ rm-result-display {
         height: calc(100% - (1px * var(--tab-list-height)));
         width: 100%;
         overflow: auto;
-        
+
         &__listing {
             margin: calc(1px * var(--margin));
             padding: 0;
@@ -91,9 +91,14 @@ rm-result-display {
         &__date {
             font-family: 'Roboto Mono';
             opacity: 0.5;
+            letter-spacing: -1px;
         }
         &__log {
             list-style-type: none;
+
+            &--error {
+                color: red;
+            }
         }
     }
 

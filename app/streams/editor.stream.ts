@@ -52,10 +52,19 @@ export class EditorStream {
     private eventsConnectable: ConnectableObservable<Message>;
     private bufferedConnectable: ConnectableObservable<Message>;
     private resolver: Function;
+    private codecheckTimeoutMs = 500;
 
-    constructor(
-        private input: InputStream
-    ) {
+    constructor(private input: InputStream) {
+        
+        const codecheckTimeouts = input.events
+            .filter(msg => msg.name === EventName.SessionCreate)
+            .flatMap(msg => 
+                input.events
+                    .filter(x => x.name === EventName.EditorUpdate && x.id === msg.id)
+                    .debounceTime(this.codecheckTimeoutMs)
+                    .takeUntil(input.events.filter(x => x.name === EventName.SessionDestroy && x.id === msg.id)))
+            .map((msg: Message) => new Message(EventName.EditorCodeCheck, msg.id, null, msg.timestamp));
+
         const editMsgs = input
                     .events
                     .filter(msg => msg.name === EventName.SessionCreate)
@@ -108,6 +117,7 @@ export class EditorStream {
         // cleanup this stuff, either we mix or we dont. not this triple-type broadcast
         const obs = input.events
             .merge(runCodeText)
+            .merge(codecheckTimeouts)
             .publish();
         
         this.bufferedTexts = contextText;

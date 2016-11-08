@@ -35,11 +35,6 @@ export class InputStream {
         return msg.timestamp;
     }
 
-    public codeCheck(id: string) {
-        const msg = new Message(EventName.SessionCodeCheck, id);
-        this.subject.next(msg);
-    }
-
     public autoComplete(id: string, query: AutocompletionQuery) {
         this.subject.next(new Message(EventName.SessionAutocompletion, id, query));
     }

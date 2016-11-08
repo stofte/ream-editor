@@ -17,7 +17,7 @@ import { cSharpTestData, cSharpTestDataExpectedResult, cSharpTestDataExpectedCod
     cSharpContextSwitchEditorTestData, cSharpCityFilteringQueryEditorTestData,
     cSharpDatabaseCodeCheckEditorTestData, cSharpDatabaseCodeCheckExpectedErrors, randomTestData } from '../test/editor-testdata';
 import { EventName, Message } from './api';
-import { check, checkAndExit, replaySteps } from '../test/test-helpers';
+import { check, checkAndExit, replaySteps, WaitUntil } from '../test/test-helpers';
 import * as uuid from 'node-uuid';
 const http = electronRequire('http');
 const backendTimeout = config.unitTestData.backendTimeout;
@@ -349,12 +349,15 @@ describe('[int-test] streams', function() {
                 for: firstEdits,
                 fn: (evt) => input.edit(id, evt)
             },
-            () => input.codeCheck(id),
+            new WaitUntil(() => new Promise(done => {
+                output.events
+                    .first(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
+                    .subscribe(() => done(1));
+            })),
             {
                 for: secondEdits,
                 fn: (evt) => input.edit(id, evt)
-            },
-            () => input.codeCheck(id)
+            }
         ], replayMaxDelay, replayMinDelay);
     }
 
@@ -396,12 +399,15 @@ describe('[int-test] streams', function() {
                 for: firstEdits,
                 fn: (evt) => input.edit(id, evt)
             },
-            () => input.codeCheck(id),
+            new WaitUntil(() => new Promise(done => {
+                output.events
+                    .first(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
+                    .subscribe(() => done(1));
+            })),
             {
                 for: secondEdits,
                 fn: (evt) => input.edit(id, evt)
-            },
-            () => input.codeCheck(id)
+            }
         ], replayMaxDelay, replayMinDelay);
     }
 
@@ -466,15 +472,18 @@ describe('[int-test] streams', function() {
                 for: firstEdits, // yields text "city", which is illegal in code buffer
                 fn: (evt) => input.edit(id, evt)
             },
-            () => input.codeCheck(id),
+            new WaitUntil(() => new Promise(done => {
+                output.events
+                    .first(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
+                    .subscribe(() => done(1));
+            })),
             // switch
             () => input.setContext(id, sqliteConnection),
             () => { },
             {
                 for: secondEdits,
                 fn: (evt) => input.edit(id, evt)
-            },
-            () => input.codeCheck(id)
+            }
         ], replayMaxDelay, replayMinDelay);
     }
 

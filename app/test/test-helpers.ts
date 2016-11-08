@@ -5,10 +5,13 @@ export function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
         let headArg = undefined;
         let remaining = steps.slice(1);
         let timeout = Math.random() * timeoutMax + timeoutMin;
+        let isPromiseStep = false;
         if (typeof head === 'number') {
             timeout = head;
             head = remaining[0];
             remaining = remaining.slice(1);
+        } else if (head.constructor && head.constructor.name === WaitUntil.name) {
+            isPromiseStep = true;
         } else if (typeof head !== 'function') {
             let forObj = head;
             timeout = forObj.wait || timeout;
@@ -22,10 +25,16 @@ export function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
             head = forObj.fn;
             headArg = forObj.for[0];
         }
-        setTimeout(() => {
-            head(headArg);
-            replaySteps(remaining, timeoutMax, timeoutMin);
-        }, timeout);
+        if (!isPromiseStep) {
+            setTimeout(() => {
+                head(headArg);
+                replaySteps(remaining, timeoutMax, timeoutMin);
+            }, timeout);
+        } else {
+            head.then(() => {
+                replaySteps(remaining, timeoutMax, timeoutMin);
+            })
+        }
     }
     return;
 }
@@ -48,4 +57,10 @@ export function checkAndExit(done, pred) {
     } catch (exn) {
         done(exn);
     }
+}
+
+export function WaitUntil(gen: () => Promise<boolean>) {
+    this.then = function(cb) {
+        gen().then(cb);
+    };
 }

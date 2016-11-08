@@ -9,7 +9,7 @@ export enum EventName {
 
     SessionCreate,
     SessionExecuteBuffer,
-    SessionCodeCheck,
+    // the editor stream doesnt participate in autocompletion, so its placed in session instead.
     SessionAutocompletion,
     SessionContext,
     SessionDestroy,
@@ -17,6 +17,7 @@ export enum EventName {
     EditorExecuteText, // text intended for execution
     EditorBufferText, // full text of a given buffer, for templating a new session, with the current buffer contents in it
     EditorUpdate, // individual updates from editor
+    EditorCodeCheck,
 
     ResultStart,
     ResultUpdate,

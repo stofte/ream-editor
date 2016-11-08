@@ -47,7 +47,6 @@ export class ResultDisplayComponent implements AfterViewInit {
     private activeResult: ResultPage = null;
     private activeId: string = null;
     private sessionId: string;
-    private resetActiveId = true;
     private scrollToTop = false;
     // hot scroll widget, used for blurActiveElement
     private scrollWidget = null;
@@ -98,13 +97,6 @@ export class ResultDisplayComponent implements AfterViewInit {
                 this.setSessionResults(id);
             }
         });
-        output.events
-            .filter(msg => msg.name === EventName.ResultStart)
-            .subscribe(msg => {
-                if (msg.id === this.sessionId) {
-                    this.resetActiveId = true;
-                }
-            });
     }
 
     ngAfterViewInit() {
@@ -169,22 +161,20 @@ export class ResultDisplayComponent implements AfterViewInit {
         }
     }
 
-    setSessionResults = (id: string, forceSelect = false) => {
+    setSessionResults = (id: string, isSession = false) => {
         if (id) {
             const tab = this.tabs.sessions.find(x => x.id === id);
             this.logMessages = tab.sessionLog;
             if (tab && tab.results) {
                 this.results = tab.results;
-                if (forceSelect || this.resetActiveId) {
-                    if (this.results.length > 0 && !tab.consoleActive) {
-                        this.resetActiveId = false;
-                        const resultId = tab.activeResultId || this.results[0].resultId;
-                        this.selectResult(resultId);
-                    } else {
-                        this.selectConsole();
-                    }
-                    this.enableHider = this.results.length === 0;
+                const restoring = isSession && tab.consoleActive;
+                if (this.results.length > 0 && !restoring) {
+                    const resultId = tab.activeResultId || this.results[0].resultId;
+                    this.selectResult(resultId);
+                } else {
+                    this.selectConsole();
                 }
+                this.enableHider = this.results.length === 0;
             }
         }
     }

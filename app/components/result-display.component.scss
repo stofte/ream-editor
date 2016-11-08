@@ -15,14 +15,11 @@ rm-result-display {
         margin-top: 3px;
         margin-bottom: 2px;
 
-        &::before {
+        &::after {
             content: ' ';
             display: block;
-            height: 1px;
-            width: 100vw;
-            position: absolute;
-            left: 0;
-            bottom: 0;
+            flex-grow: 1;
+            margin-left: -2px;
             border-bottom: 1px solid var(--primary-border);
         }
     }
@@ -38,7 +35,7 @@ rm-result-display {
             top: -1px;
             left: -4px;
             width: 5px;
-            height: 100%;
+            height: calc(100% + 1px);
             border-bottom: 1px solid var(--primary-border);
         }
 

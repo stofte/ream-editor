@@ -29,17 +29,16 @@ rm-tab-list {
 
     &__tab {
         position: relative;
-        margin: 0 2px;
+        margin: 1px 2px 0 2px;
 
         &::before {
             content: ' ';
-            display: block;
+            display: none;
             position: absolute;
             top: -1px;
             left: -4px;
             width: 5px;
             height: 100%;
-            border-bottom: 1px solid var(--primary-border);
         }
 
         > button {

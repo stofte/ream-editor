@@ -41,6 +41,20 @@ app.on('ready', function() {
                 },
             ],
         }, {
+            label: 'View',
+            submenu: [{
+                label: 'Zoom in',
+                accelerator: 'Shift+CmdOrCtrl+Plus',
+                click: () => mainWindow.webContents.send('application-event', 'zoom-view-in')
+            }, {
+                label: 'Zoom reset',
+                click: () => mainWindow.webContents.send('application-event', 'zoom-view-reset')
+            }, {
+                label: 'Zoom out',
+                accelerator: 'Shift+CmdOrCtrl+_',
+                click: () => mainWindow.webContents.send('application-event', 'zoom-view-out')
+            }]
+        }, {
             label: 'Debug',
             submenu: [{
                     label: 'Clear LocalStorage',

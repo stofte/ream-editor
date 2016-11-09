@@ -21,11 +21,6 @@
                 throw (msg ? msg : 'assert failed');
             }
         }
-
-        // Polymer components require this to function properly
-        // http://stackoverflow.com/questions/34907719/polymer-paper-element-attributes-and-angular2
-        window.Polymer = window.Polymer || {};
-        window.Polymer.dom = 'shadow';
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="bundle.css">

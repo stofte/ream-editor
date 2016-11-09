@@ -1,9 +1,7 @@
 import { Component, Input, ElementRef, ChangeDetectorRef, AfterViewInit, AfterContentChecked, EventEmitter } from '@angular/core';
-import { TableOptions, ColumnMode, SelectionType } from 'angular2-data-table';
-import { QueryResult } from '../models/query-result';
-import { ResultPage } from '../models/result-page';
 import { OutputStream, EventName } from '../streams/index';
 import { TabService } from '../services/index';
+import { QueryResult, ResultPage, SessionLogMessage } from '../models/index';
 
 class ColumnSizing {
     width: number;
@@ -15,6 +13,9 @@ class ColumnSizing {
     selector: 'rm-result-display',
     template: `
     <div class="rm-result-display__output-list">
+        <div class="rm-result-display__tab {{ consoleActive ? 'rm-result-display__tab--active' : '' }}">
+        <button (click)="selectConsole()"
+            ><i class="material-icons">message</i><span>Console</span></button></div>
         <div *ngFor="let page of results; let idx = index;"
             class="rm-result-display__tab
                 {{ page.resultId === activeId ? 'rm-result-display__tab--active' : '' }}">
@@ -23,9 +24,20 @@ class ColumnSizing {
                     class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span>{{page.title
                 }}</span></button></div>
     </div>
-    <div class="rm-result-display__table">
+    <div class="rm-result-display__table {{ consoleActive ? 'rm-result-display__table--inactive' : '' }}">
         <div class="rm-result-display__table__hot"></div>
         <div class="rm-result-display__table__hider" *ngIf="enableHider"></div>
+    </div>
+    <div class="rm-result-display__console">
+        <ul class="rm-result-display__console__listing">
+            <li *ngFor="let msg of logMessages"
+                class="rm-result-display__console__log">
+                <span class="rm-result-display__console__date">
+                    {{formatLogDate(msg.created)}}
+                </span>
+                <span class="rm-result-display__console__log--{{msg.type}}">{{msg.text}}</span>
+            </li>
+        </ul>
     </div>
 `
 })
@@ -35,7 +47,6 @@ export class ResultDisplayComponent implements AfterViewInit {
     private activeResult: ResultPage = null;
     private activeId: string = null;
     private sessionId: string;
-    private resetActiveId = true;
     private scrollToTop = false;
     // hot scroll widget, used for blurActiveElement
     private scrollWidget = null;
@@ -70,6 +81,8 @@ export class ResultDisplayComponent implements AfterViewInit {
         afterSelection: null
     };
 
+    private consoleActive = true;
+    private logMessages: SessionLogMessage[] = null;
     constructor(
         private tabs: TabService,
         private output: OutputStream,
@@ -84,13 +97,6 @@ export class ResultDisplayComponent implements AfterViewInit {
                 this.setSessionResults(id);
             }
         });
-        output.events
-            .filter(msg => msg.name === EventName.ResultStart)
-            .subscribe(msg => {
-                if (msg.id === this.sessionId) {
-                    this.resetActiveId = true;
-                }
-            });
     }
 
     ngAfterViewInit() {
@@ -155,24 +161,32 @@ export class ResultDisplayComponent implements AfterViewInit {
         }
     }
 
-    setSessionResults = (id: string, forceSelect = false) => {
+    setSessionResults = (id: string, isSession = false) => {
         if (id) {
             const tab = this.tabs.sessions.find(x => x.id === id);
+            this.logMessages = tab.sessionLog;
             if (tab && tab.results) {
                 this.results = tab.results;
-                if (forceSelect || this.resetActiveId) {
-                    if (this.results.length > 0) {
-                        this.resetActiveId = false;
-                        const resultId = tab.activeResultId || this.results[0].resultId;
-                        this.selectResult(resultId);
-                    }
-                    this.enableHider = this.results.length === 0;
+                const restoring = isSession && tab.consoleActive;
+                if (this.results.length > 0 && !restoring) {
+                    const resultId = tab.activeResultId || this.results[0].resultId;
+                    this.selectResult(resultId);
+                } else {
+                    this.selectConsole();
                 }
+                this.enableHider = this.results.length === 0;
             }
         }
     }
 
+    selectConsole() {
+        this.consoleActive = true;
+        this.activeId = null;
+        this.tabs.setConsoleActive(this.sessionId);
+    }
+
     selectResult(id: string) {
+        this.consoleActive = false;
         this.activeId = id;
         const page = this.results.find(x => x.resultId === id);
         const data = [];
@@ -195,5 +209,21 @@ export class ResultDisplayComponent implements AfterViewInit {
                 };
             })
         });
+    }
+
+    formatLogDate(date: Date) {
+        const h = date.getHours();
+        const m = date.getMinutes();
+        const s = date.getSeconds();
+        const ms = date.getMilliseconds();
+
+        const hStr = (h < 10 ? '0' : '') + h;
+        const mStr = (m < 10 ? '0' : '') + m;
+        const sStr = (s < 10 ? '0' : '') + s;
+        let msStr = ('' + ms).substring(0, 3);
+        while (msStr.length < 3) {
+            msStr = '0' + msStr;
+        }
+        return `${hStr}:${mStr}:${sStr}.${msStr}`;
     }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable, Observer, Subscription, Subject } from 'rxjs/Rx';
-import { ProcessStream, QueryStream } from './index';
+import { ProcessStream, QueryStream, EditorStream } from './index';
 import { InputStream } from './input.stream';
 import { EventName, Message, OmnisharpSessionMessage } from './api';
 import { ProcessHelper } from '../utils/process-helper';
@@ -19,6 +19,7 @@ export class OmnisharpStream {
     constructor(
         private query: QueryStream,
         private input: InputStream,
+        private editor: EditorStream,
         private http: Http
     ) {
         // Used to sync all requests to omnisharp backend.
@@ -30,11 +31,11 @@ export class OmnisharpStream {
         // which the synchronizer will resolve when appropriate.
         const stream = query.events
             .filter(msg => msg.name === EventName.QueryTemplateResponse)
+            .merge(editor.events.filter(msg => msg.name === EventName.EditorCodeCheck))
             .merge(input.events.filter(msg => 
                 msg.name === EventName.SessionCreate ||
                 msg.name === EventName.SessionContext ||
-                msg.name === EventName.SessionAutocompletion || 
-                msg.name === EventName.SessionCodeCheck || 
+                msg.name === EventName.SessionAutocompletion ||
                 msg.name === EventName.SessionDestroy
             ))
             .merge(input.events.filter(msg => msg.name === EventName.EditorUpdate))
@@ -156,7 +157,7 @@ export class OmnisharpStream {
         const event = (msg.name === EventName.SessionCreate || msg.name === EventName.SessionContext) ? 'context' :
             msg.name === EventName.QueryTemplateResponse ? 'buffer-template' :
             msg.name === EventName.SessionAutocompletion ? 'autocompletion' : 
-            msg.name === EventName.SessionCodeCheck ? 'codecheck' : 
+            msg.name === EventName.EditorCodeCheck ? 'codecheck' : 
             msg.name === EventName.SessionDestroy ? 'destroy' : 'edit';
 
         Assert(event && event.length, 'Mapped Message to inner');

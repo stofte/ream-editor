@@ -1,10 +1,11 @@
 import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';
-import { OverlayService } from './services/overlay.service';
+import { HotkeyService } from './services/index';
 import { TabListComponent } from './components/tab-list.component';
 import { ConnectionManagerComponent } from './components/connection-manager.component';
 import { TabViewComponent } from './components/tab-view.component';
 import { StreamManager } from './streams/index';
 const electron = electronRequire('electron').remote;
+const { webFrame } = electronRequire('electron');
 
 @Component({
     selector: 'rm-app',
@@ -20,6 +21,7 @@ export class AppComponent {
 
     constructor(
         private streamManager: StreamManager,
+        private hotkeys: HotkeyService,
         private ref: ChangeDetectorRef
     ) {
         const win = electron.getCurrentWindow();
@@ -33,6 +35,10 @@ export class AppComponent {
             this.isMaximized = true;
             this.ref.detectChanges();
         });
+        hotkeys.zoomView.subscribe(zoomIn => {
+            const lvl = webFrame.getZoomLevel();
+            webFrame.setZoomLevel(lvl + (zoomIn ? 1 : -1));
+        })
     }
 
     minimizeApp() {

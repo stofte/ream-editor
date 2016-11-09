@@ -24,7 +24,8 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
     <div class="rm-tab-list__tabs" 
         [sortablejs]="currentTabs" [sortablejsOptions]="options">
         <div *ngFor="let tab of currentTabs; let idx = index"
-            class="rm-tab-list__tab {{ currentId === tab.id ? 'rm-tab-list__tab--active' : '' }}">
+            class="rm-tab-list__tab {{ currentId === tab.id ? 'rm-tab-list__tab--active' : '' }}"
+            title="{{tab.id}}">
             <button (click)="clickTab(tab.id)"><span>{{tab.title}}</span></button>
             <span 
                 class="rm-tab-list__tab-closebtn"

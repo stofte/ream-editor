@@ -15,14 +15,11 @@ rm-result-display {
         margin-top: 3px;
         margin-bottom: 2px;
 
-        &::before {
+        &::after {
             content: ' ';
             display: block;
-            height: 1px;
-            width: 100vw;
-            position: absolute;
-            left: 0;
-            bottom: 0;
+            flex-grow: 1;
+            margin-left: -2px;
             border-bottom: 1px solid var(--primary-border);
         }
     }
@@ -38,7 +35,7 @@ rm-result-display {
             top: -1px;
             left: -4px;
             width: 5px;
-            height: 100%;
+            height: calc(100% + 1px);
             border-bottom: 1px solid var(--primary-border);
         }
 
@@ -52,13 +49,20 @@ rm-result-display {
             padding: 0 10px;
             .vaadin-icons {
                 font-size: calc(1px * var(--font-size-body) - 2px);
-                padding-right: 4px;
+                margin-right: 4px;
+            }
+            .material-icons {
+                font-size: calc(1px * var(--font-size-body) + 1px);
+                margin-right: 4px;
+                line-height: 1px;
+                vertical-align: -3px;
+                width: 15px;
+                min-width: 15px;
             }
             span {
                 -webkit-user-select: none;
                 user-select: none;
                 white-space: nowrap;
-                font-family: 'Roboto Mono';
             }
         }
 
@@ -70,10 +74,40 @@ rm-result-display {
         }
     }
 
+    &__console {
+        position: relative;
+        height: calc(100% - (1px * var(--tab-list-height)));
+        width: 100%;
+        overflow: auto;
+
+        &__listing {
+            margin: calc(1px * var(--margin));
+            padding: 0;
+        }
+        &__date {
+            font-family: 'Roboto Mono';
+            opacity: 0.5;
+            letter-spacing: -1px;
+        }
+        &__log {
+            list-style-type: none;
+
+            &--error {
+                color: red;
+            }
+        }
+    }
+
     &__table {
         position: relative;
         height: calc(100% - (1px * var(--tab-list-height)));
         width: 100%;
+
+        &--inactive {
+            position: absolute;
+            left: 99999px;
+            right: 99999px;
+        }
 
         &__hider {
             position: absolute;

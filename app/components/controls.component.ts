@@ -69,11 +69,13 @@ export class ControlsComponent {
             .first(msg => msg.id === id && msg.name === EventName.ResultDone)
             .subscribe(() => {
                 this.tabs.setExecutePending(id, false);
+                const duration = performance.now() - timestamp; 
+                this.tabs.sessionLog(id, `Query finished in ${duration.toFixed(0)} ms.`);
                 if (this.sessionId === id) {
                     this.playDisabled = false;
                 }
             });
         this.tabs.setExecutePending(id, true);
-        this.input.executeBuffer(id);
+        const timestamp = this.input.executeBuffer(id);
     }
 }

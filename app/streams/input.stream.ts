@@ -29,13 +29,10 @@ export class InputStream {
         this.subject.next(new Message(EventName.EditorUpdate, id, data));
     }
 
-    public executeBuffer(id: string) {
-        this.subject.next(new Message(EventName.SessionExecuteBuffer, id));
-    }
-
-    public codeCheck(id: string) {
-        const msg = new Message(EventName.SessionCodeCheck, id);
+    public executeBuffer(id: string): number {
+        const msg = new Message(EventName.SessionExecuteBuffer, id);
         this.subject.next(msg);
+        return msg.timestamp;
     }
 
     public autoComplete(id: string, query: AutocompletionQuery) {

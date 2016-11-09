@@ -9,6 +9,9 @@ const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
 const MODE = process.argv[4]; // passed by package.json, so absent when running in final build
 
+const setupOmniSharpDependencies = require('./omnisharp-setup');
+setupOmniSharpDependencies(MODE);
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
@@ -79,7 +82,7 @@ app.on('ready', function() {
 
     // and load the index.html of the app.
     mainWindow.loadURL('file://' + __dirname.replace(/\\/g,'/') + '/index.html');
-    if (MODE === 'DEBUG') {
+    if (MODE === 'DEVELOPMENT') {
         // Open the DevTools.
         mainWindow.maximize();
         mainWindow.webContents.openDevTools();        

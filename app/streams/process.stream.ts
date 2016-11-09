@@ -5,7 +5,12 @@ const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
 
-const REAMQUERY_BASEDIR = path.normalize(`${process.cwd()}/query/query/src/ReamQuery`);
+const _subpath = MODE === 'DEVELOPMENT' ? 
+    '/query/query/src/ReamQuery' :
+    '/resources/app/query';
+const _p = `${process.cwd()}${_subpath}`;
+const REAMQUERY_BASEDIR = path.normalize(_p);
+
 type ProcessType = 'omnisharp' | 'query';
 
 export class ProcessStream {
@@ -35,6 +40,7 @@ export class ProcessStream {
             }
         });
         child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
+            console.log('child_process', error, stdout, stderr);
             if (!this.exitHandler) {
                 // once we've seen the server response, we disable this, since it's unpredictable otherwise,
                 // will return once stdout buffer fills, windows only?

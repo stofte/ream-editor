@@ -10,7 +10,7 @@
   },
   "scripts": {
     "tsc:w": "tsc -w",
-    "start": "electron --require ./omnisharp-setup.js electron-main.js DEBUG",
+    "start": "electron --require ./omnisharp-setup.js electron-main.js DEVELOPMENT",
     "bundle": "node bundle-sfx.js",
     "gulp-build": "gulp build",
     "package_electron_win32": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",

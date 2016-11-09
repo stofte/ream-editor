@@ -26,7 +26,7 @@ export class ProcessHelper {
             cmd = `"${config.dotnetDebugPath}" run -p query/query/src/ReamQuery --server.urls http://localhost:${port}`;
         } else {
             dir = `${dirname}/query`;
-            cmd = `"${dir}/ReamQuery${!IS_LINUX ? '.exe' : ''}"`;
+            cmd = `"${dir}/ReamQuery${!IS_LINUX ? '.exe' : ''}" --server.urls http://localhost:${port}`;
         }
         return { command: cmd, directory: dir };
     }

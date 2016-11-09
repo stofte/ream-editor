@@ -19,6 +19,7 @@ const output = process.env.PACKAGE_BASE || '.';
  
 const cssFiles = [
     'node_modules/normalizecss/normalize.css',
+    'bower_components/handsontable/dist/handsontable.full.css',
     'node_modules/codemirror/lib/codemirror.css',
     'app/**/*.css'
 ];
@@ -28,7 +29,8 @@ const sassFiles = 'app/**/*.scss';
 const jsFiles = [
     'node_modules/zone.js/dist/zone.js',
     'node_modules/reflect-metadata/Reflect.js',
-    'app/**/*.js'
+    'bower_components/handsontable/dist/handsontable.full.js',
+    'bundle-typescript.js'
 ];
 
 const urlRewrites = {
@@ -61,10 +63,16 @@ gulp.task('ts:lint', ['ts'], () => {
 gulp.task('ts:bundle', ['ts'], () => {
     const builder = systemjsBuilder();
     builder.loadConfigSync('./systemjs.config.js')
-    return builder.buildStatic('app/main.js', 'bundle.js', {
+    return builder.buildStatic('app/main.js', 'bundle-typescript.js', {
             minify: false,
             mangle: false
         })
+        .pipe(gulp.dest('./'));
+});
+
+gulp.task('bundle', ['ts:bundle'], () => {
+    return gulp.src(jsFiles)
+        .pipe(concat('bundle.js'))
         .pipe(gulp.dest('./'));
 });
 
@@ -95,7 +103,7 @@ gulp.task('watch', () => {
 });
 
 const mainTasks = ['sass', 'css', 'ts'];
-const buildOnlyTasks = ['ts:lint', 'ts:bundle'];
+const buildOnlyTasks = ['ts:lint', 'bundle'];
 gulp.task('build', [...mainTasks, ...buildOnlyTasks]);
 gulp.task('default', [...mainTasks, 'watch']);
 gulp.task('lint', ['ts', 'ts:lint']);

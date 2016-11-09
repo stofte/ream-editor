@@ -28,3 +28,4 @@ internal-nlog.txt
 bower_components
 bundle.js
 app/**/*.css
+bundle-typescript.js

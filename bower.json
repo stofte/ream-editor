@@ -2,14 +2,6 @@
   "name": "ream-editor",
   "private": true,
   "dependencies": {
-    "paper-button": "PolymerElements/paper-button#1.0.14",
-    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0",
-    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^1.1.5",
-    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#1.4.1",
-    "paper-item": "PolymerElements/paper-item#1.2.1",
-    "paper-listbox": "polymerelements/paper-listbox#1.1.2",
-    "vaadin-core-elements": "^1.2.0",
-    "vaadin-icons": "^1.0.2",
     "handsontable": "^0.28.4"
   }
 }

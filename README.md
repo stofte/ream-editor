@@ -28,6 +28,7 @@ To setup a local repository follow these steps:
 4. `gulp-cli` should be installed globally (`npm install -g gulp-cli`)
 5. `typings` should be installed globally (`npm install -g typings`)
 6. `npm install` to restore dependencies
+7. `npm run bower-install` to install bower dependencies
 
 Build and watch the TypeScript and Sass files, and start the shell:
 

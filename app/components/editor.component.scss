@@ -3,6 +3,7 @@ rm-editor {
     .rm-editor {
         border-top: 1px solid var(--primary-border);
     }
+    // must stuff is defined off in app/styles/mirror-hint.scss and mirror-lint.scss 
     .CodeMirror {
         height: 150px;
         font-family: 'Roboto Mono';

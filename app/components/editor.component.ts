@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/mode/clike/clike';
+import 'codemirror/addon/lint/lint';
 
 @Component({
     selector: 'rm-editor',
@@ -23,6 +24,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     private mirror: CodeMirror.Editor;
     private prevHeight: number;
     private firstLoad = true;
+    // codemirror 
+    private realLint = false;
     constructor(
         private tabs: TabService,
         private input: InputStream,
@@ -36,6 +39,11 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         output.events
             .filter(msg => msg.name === EventName.OmniSharpAutocompletion)
             .subscribe(this.completionSubscriber);
+        tabs.diagnosticsUpdated.subscribe(id => {
+            if (id && this.sessionId === id) {
+                this.mirror.performLint();
+            }
+        })
     }
 
     initializeGlobalCodeMirrorObject() {
@@ -46,6 +54,7 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         CodeMirror.keyMap.default[(mac ? 'Cmd' : 'Ctrl') + '-Space'] = 'autocomplete';
         CodeMirror.registerHelper('hint', 'ajax', this.hintHandler);
         CodeMirror.hint.ajax.async = true;
+        CodeMirror.registerHelper('lint', 'text/x-csharp', this.lintHandler);
     }
 
     ngAfterViewInit() {
@@ -60,11 +69,13 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
                 this.documents[id] = doc;
             }
             doc = this.documents[id];
+            const oldSession = this.sessionId;
+            this.sessionId = id;
             const oldDoc = this.mirror.swapDoc(doc);
             this.mirror.setOption('mode', 'text/x-csharp');
             this.mirror.setOption('sessionId', id);
-            this.documents[this.sessionId] = oldDoc;
-            this.sessionId = id;
+            this.documents[oldSession] = oldDoc;
+
             requestAnimationFrame(() => {
                 if (this.firstLoad) {
                     this.mirror.refresh();
@@ -73,6 +84,8 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
                 } else {
                     this.mirror.focus();
                 }
+                // update error in gutters
+                this.mirror.performLint();
             });
         });
     }
@@ -153,21 +166,18 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         const wordAt = mirror.getRange(wordRange.anchor, wordRange.head);
         let fragment = wordAt;
         let range = {
-            // anchor is the start of the range
+            // anchor is the start of the range, head is the end
             anchor: { line: wordRange.anchor.line, ch: wordRange.anchor.ch },
             head: { line: wordRange.head.line, ch: wordRange.head.ch }
         };
-        console.log('completion text', `"${wordAt}"`);
         if (/\.\s*$/.test(fragment)) {
-            console.log('dot access');
             fragment = '';
             range.anchor.ch = cur.ch;
         } else if (/^\s+$/.test(fragment)) {
-            console.log('was all whitespace');
             fragment = '';
             range.anchor.ch = cur.ch;
         }
-        console.log('omnisharp fragment', `"${fragment}"`);
+        console.log(`completion: "${wordAt}" => "${fragment}" ()`);
         let request = <AutocompletionQuery> {
             column: cur.ch,
             line: cur.line,
@@ -187,11 +197,30 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
         this.input.autoComplete(this.sessionId, request);
     }
 
+    private lintHandler = () => {
+        if (!this.sessionId) {
+            return [];
+        }
+        return this.tabs.sessions
+            .find(x => x.id === this.sessionId)
+            .diagnostics
+            .map(diag => <any> {
+                from: CodeMirror.Pos(diag.line, diag.column),
+                to: CodeMirror.Pos(diag.endLine, diag.endColumn),
+                message: diag.text
+            });        
+    }
+
     private editorOptions() {
         return {
-            lineNumbers: true,
+            lineNumbers: false,
             gutters: ['CodeMirror-lint-markers'],
-            lint: true,
+            lint: {
+                lintOnChange: false,
+                async: false,
+                hasGutters: true,
+                getAnnotations: null
+            },
             smartIndent: false,
             showCursorWhenSelecting: true,
             mode: 'text/x-csharp'

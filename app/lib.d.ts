@@ -28,6 +28,7 @@ declare module CodeMirror {
         getCursor: any;
         getRange: any;
         findWordAt: any;
+        performLint: () => void;
     }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { ReplaySubject, Observable, Subject } from 'rxjs/Rx';
-import { Tab, ResultPage, SessionLogMessage } from '../models/index';
+import { Tab, ResultPage, SessionLogMessage, CodeCheckResult } from '../models/index';
 import { Connection } from '../models/connection';
 import { ConnectionService } from './connection.service';
 import { InputStream, OutputStream, EventName } from '../streams/index';
@@ -12,6 +12,7 @@ export class TabService {
     public tabDragging = new EventEmitter<boolean>();
     public logUpdated = new EventEmitter<string>();
     public tabResultsUpdated = new EventEmitter<string>();
+    public diagnosticsUpdated = new EventEmitter<string>();
     public currentSessionId: Observable<string>;
     private subject = new Subject<string>();
     public sessions: Tab[] = [];
@@ -23,6 +24,27 @@ export class TabService {
         private input: InputStream,
         private output: OutputStream
     ) {
+        output.events
+            .filter(x => x.name === EventName.QueryExecuteResponse)
+            .subscribe(msg => {
+                if (msg.data && msg.data.diagnostics && msg.data.diagnostics.length > 0) {
+                    msg.data.diagnostics.forEach(diag => {
+                        this.sessionLog(msg.id, diag.Message, true);
+                    });
+                    this.sessionLog(msg.id, 'Query errors:', true);
+                }
+            });
+        output.events
+            .filter(x => x.name === EventName.OmniSharpCodeCheck)
+            .subscribe(msg => {
+                const diags = <CodeCheckResult[]> msg.data;
+                const tab = this.sessions.find(x => x.id === msg.id);
+                const len = tab.diagnostics.length;
+                tab.diagnostics.splice(0, tab.diagnostics.length, 
+                    ...diags.filter(x => x.logLevel === 'Error'));
+                this.diagnosticsUpdated.emit(tab.id);
+            });
+
         const stream = this.subject.publishReplay(1);
         this.currentSessionId = stream;
         stream.connect();
@@ -44,22 +66,14 @@ export class TabService {
             editorHeight: (150 + 65),
             executePending: false,
             results: [],
-            sessionLog: []
+            sessionLog: [],
+            diagnostics: []
         });
         this.history = [id].concat(this.history);
         this.currentId = id;
         this.input.new(id);
         this.subject.next(id);
-        this.output.events
-            .filter(x => x.name === EventName.QueryExecuteResponse)
-            .subscribe(msg => {
-                if (msg.data && msg.data.diagnostics && msg.data.diagnostics.length > 0) {
-                    msg.data.diagnostics.forEach(diag => {
-                        this.sessionLog(msg.id, diag.Message, true);
-                    });
-                    this.sessionLog(msg.id, 'Query errors:', true);
-                }
-            });
+
         this.output.events
             .filter(x => x.id === id && (
                 x.name === EventName.ResultStart ||

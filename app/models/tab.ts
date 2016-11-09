@@ -1,4 +1,4 @@
-import { Connection, ResultPage, SessionLogMessage } from './index';
+import { Connection, ResultPage, SessionLogMessage, CodeCheckResult } from './index';
 
 export class Tab {
     public id: string; // primary key for tab
@@ -10,4 +10,5 @@ export class Tab {
     public activeResultId: string;
     public consoleActive: boolean;
     public sessionLog: SessionLogMessage[];
+    public diagnostics: CodeCheckResult[];
 }

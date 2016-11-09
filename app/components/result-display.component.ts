@@ -21,7 +21,8 @@ class ColumnSizing {
                 {{ page.resultId === activeId ? 'rm-result-display__tab--active' : '' }}">
             <button (click)="selectResult(page.resultId)"
                 ><i class="vaadin-icons" *ngIf="page.isAtomic">&#xe7e0;</i><i
-                    class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span>{{page.title
+                    class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span>{{
+                        formatTabularName(page.title, page.rows.length)
                 }}</span></button></div>
     </div>
     <div class="rm-result-display__table {{ consoleActive ? 'rm-result-display__table--inactive' : '' }}">
@@ -225,5 +226,9 @@ export class ResultDisplayComponent implements AfterViewInit {
             msStr = '0' + msStr;
         }
         return `${hStr}:${mStr}:${sStr}.${msStr}`;
+    }
+
+    formatTabularName(name: string, count: number) {
+        return `${name.substring(0, name.length - 2)}[${count}]`;
     }
 }

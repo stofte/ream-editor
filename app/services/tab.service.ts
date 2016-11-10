@@ -162,7 +162,7 @@ export class TabService {
 
     public sessionLog(id: string, text: string, isError = false) {
         const tab = this.sessions.find(x => x.id === id);
-        tab.sessionLog.unshift({
+        tab.sessionLog.push({
             text,
             type: isError ? 'error' : 'info',
             created: new Date()

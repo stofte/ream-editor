@@ -40,7 +40,6 @@ export class ProcessStream {
             }
         });
         child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
-            console.log('child_process', error, stdout, stderr);
             if (!this.exitHandler) {
                 // once we've seen the server response, we disable this, since it's unpredictable otherwise,
                 // will return once stdout buffer fills, windows only?

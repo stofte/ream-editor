@@ -229,6 +229,9 @@ export class ResultDisplayComponent implements AfterViewInit {
     }
 
     formatTabularName(name: string, count: number) {
-        return `${name.substring(0, name.length - 2)}[${count}]`;
+        if (name.endsWith('[]')) {
+            return `${name.substring(0, name.length - 2)}[${count}]`;
+        }
+        return name;
     }
 }

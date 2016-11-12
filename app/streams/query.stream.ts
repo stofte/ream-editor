@@ -222,16 +222,19 @@ export class QueryStream {
         return `http://localhost:${config.queryEnginePort}/${name}`;
     }
 
-    private socketMessageHandler = (msg: any) => {
-        const message: WebSocketMessage = {
-            session: msg.Session,
-            id: msg.Id,
-            parent: msg.Parent,
-            type: msg.Type.substring(0, 1).toLowerCase() + msg.Type.substring(1),
-            values: msg.Values
-        };
-        // console.log('socket', msg.Session, msg.Type, msg.Values);
-        this.socket.next(new Message(EventName.QuerySocketOutput, msg.Session, message));
+    private socketMessageHandler = (messages: any[]) => {
+        messages.map(msg => {
+            return <WebSocketMessage> {
+                session: msg.Session,
+                id: msg.Id,
+                parent: msg.Parent,
+                type: msg.Type.substring(0, 1).toLowerCase() + msg.Type.substring(1),
+                values: msg.Values
+            };
+        })
+        .forEach(msg => {
+            this.socket.next(new Message(EventName.QuerySocketOutput, msg.session, msg));
+        });
     }
 
     private socketErrorHandler = (err) => {

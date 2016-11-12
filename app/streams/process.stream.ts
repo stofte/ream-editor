@@ -6,7 +6,7 @@ const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
 
 const _subpath = MODE === 'DEVELOPMENT' ? 
-    '/query/query/src/ReamQuery' :
+    '/query/src/ReamQuery' :
     '/resources/app/query';
 const _p = `${process.cwd()}${_subpath}`;
 const REAMQUERY_BASEDIR = path.normalize(_p);

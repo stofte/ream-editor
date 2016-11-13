@@ -10,6 +10,7 @@ if "%CI%" == "" (rmdir /s /q %ELECTRON_OUT%)
 if "%CI%" == "" (rmdir /s /q %PACKAGE_BASE%)
 if not "%CI%" == "" (call npm install)
 if not "%CI%" == "" (dotnet restore query)
+if not "%CI%" == "" (set DOTNET_RUNTIME=win81-x64)
 mkdir %PACKAGE_BASE%
 if %errorlevel% neq 0 goto errorexit
 rem https://github.com/npm/npm/issues/2938#issuecomment-11337463

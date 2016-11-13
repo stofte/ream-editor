@@ -48,8 +48,11 @@ build_script:
   - .\scripts\build.cmd
 
 test_script:
-  - npm test
   - npm run int-test
+  - type %ELECTRON_OUT%\resources\app\query\reamquery-*.log
+  - npm test
+  - dir
+  - type reamquery-*.log
 
 after_test:
   - 7z a "%APP_FINAL%" "%ELECTRON_OUT%"

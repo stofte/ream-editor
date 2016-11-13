@@ -1,4 +1,5 @@
 version: 0.1.0.{build}
+os: unstable # https://github.com/electron/spectron#on-appveyor
 branches:
   only:
     - master
@@ -10,7 +11,7 @@ environment:
   CLI_ARCH: x64
   OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta5/omnisharp-win-x64-netcoreapp1.0.zip
   OMNISHARP_ZIP: v1.9-beta5-omnisharp-win-x64-netcoreapp1.zip
-  DOTNETCLI_URL: https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview2/scripts/obtain/dotnet-install.ps1
+  DOTNETCLI_ZIP_URL: https://go.microsoft.com/fwlink/?LinkID=831469
   PACKAGE_BASE: build
   ELECTRON_OUT: ream-editor-win32-x64
   NODE_ENV: PRODUCTION
@@ -27,34 +28,30 @@ install:
   - ps: $env:APP_FINAL="$env:ELECTRON_OUT-$env:APPVEYOR_BUILD_VERSION.zip"
   # upgrades to latest node
   - ps: Install-Product node ''
-  # see https://github.com/enricosada/fsharp-dotnet-cli-samples/blob/master/appveyor.yml
-  # Download install script to install .NET cli in .dotnet dir
-  - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
-  - ps: Invoke-WebRequest "$env:DOTNETCLI_URL" -OutFile ".\scripts\obtain\install.ps1"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
-  - ps: '& .\scripts\obtain\install.ps1 -Channel "preview" -version "$env:CLI_VERSION" -Architecture "$env:CLI_ARCH" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
+  - ps: $env:DOTNET_ZIP_FILE = "$pwd\dotnet.zip"
+  - ps: (New-Object Net.WebClient).DownloadFile("$env:DOTNETCLI_ZIP_URL", "$env:DOTNET_ZIP_FILE")
+  - 7z x %DOTNET_ZIP_FILE% -y -o"%DOTNET_INSTALL_DIR%"
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
 
 before_build:
   # generates the scripts in the working folder
-  - npm run generate-for-sqlserver
   - ps: $sqlInstance = "(local)\SQL2014"
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb;"
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database testdb2;"
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\testdb-sqlserver.sql
-  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\testdb2-sqlserver.sql
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database world;"
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database typetest;"
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\query\sql\world_sqlserver.sql
+  - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\query\sql\typetest_sqlserver.sql
   - dotnet --info
           
 build_script:
   - .\scripts\build.cmd
 
 test_script:
-  - npm run int-test-appveyor
+  - npm run int-test
 
 after_test:
   - 7z a "%APP_FINAL%" "%ELECTRON_OUT%"
 
 artifacts:
   - path: $(APP_FINAL)
-  - path: $(ELECTRON_OUT)\ream-editor.log

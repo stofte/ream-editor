@@ -48,6 +48,7 @@ build_script:
   - .\scripts\build.cmd
 
 test_script:
+  - npm test
   - npm run int-test
 
 after_test:

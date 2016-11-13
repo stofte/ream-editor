@@ -1,10 +1,11 @@
 @echo off
 setlocal
+set REAMQUERY_ZIP=reamquery.zip
+rem CI builds must provide this file as well
+set OMNISHARP_ZIP=omnisharp-win-x64-netcoreapp1.0.zip
 if "%CI%" == "" (echo LOCAL BUILD)
 if "%CI%" == "" (set PACKAGE_BASE=build)
 if "%CI%" == "" (set ELECTRON_OUT=ream-editor-win32-x64)
-if "%CI%" == "" (set OMNISHARP_ZIP=omnisharp-win-x64-netcoreapp1.0.zip)
-if "%CI%" == "" (set REAMQUERY_ZIP=reamquery.zip)
 if "%CI%" == "" (set DOTNET_RUNTIME=win10-x64)
 if "%CI%" == "" (rmdir /s /q %ELECTRON_OUT%)
 if "%CI%" == "" (rmdir /s /q %PACKAGE_BASE%)

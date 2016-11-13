@@ -9,8 +9,8 @@ services:
 environment:
   CLI_VERSION: latest
   CLI_ARCH: x64
-  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta5/omnisharp-win-x64-netcoreapp1.0.zip
-  OMNISHARP_ZIP: v1.9-beta5-omnisharp-win-x64-netcoreapp1.zip
+  OMNISHARP_URL: https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.9-beta19/omnisharp-win-x64-netcoreapp1.0.zip
+  OMNISHARP_ZIP: omnisharp-win-x64-netcoreapp1.0.zip
   DOTNETCLI_ZIP_URL: https://go.microsoft.com/fwlink/?LinkID=831469
   PACKAGE_BASE: build
   ELECTRON_OUT: ream-editor-win32-x64

@@ -10,16 +10,16 @@
   },
   "scripts": {
     "tsc:w": "tsc -w",
-    "start": "electron --require ./omnisharp-setup.js electron-main.js DEVELOPMENT",
+    "start": "electron electron-main.js DEVELOPMENT",
     "bundle": "node bundle-sfx.js",
     "gulp-build": "gulp build",
-    "package_electron_win32": "electron-packager ./%PACKAGE_BASE% --platform=win32 --arch=x64 --overwrite --out=./",
-    "package_electron_linux": "electron-packager ./$PACKAGE_BASE --platform=linux --arch=x64 --overwrite --out=./",
+    "package_electron_win32": "electron-packager ./%PACKAGE_BASE% --no-prune --platform=win32 --arch=x64 --overwrite --out=./",
+    "package_electron_linux": "electron-packager ./$PACKAGE_BASE --no-prune --platform=linux --arch=x64 --overwrite --out=./",
     "lint": "tslint -t verbose -e ./app/test/editor-testdata.ts ./app/**/*.ts",
-    "postinstall": "typings install & echo {} > typings/tslint.json",
+    "postinstall": "cd scripts/startup & npm install & cd ../.. & typings install & echo {} > typings/tslint.json",
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
-    "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js omnisharp-setup.js app/**/*.spec.js",
+    "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
     "int-test-appveyor": "mocha test/**/*.int.js --appveyor --sqlserver",
     "int-test-travis": "mocha test/**/*.int.js --travis --npgsql",
     "int-test-local-sqlserver": "mocha test/**/*.int.js --local --sqlserver",
@@ -85,6 +85,7 @@
     "tslint": "3.15.1",
     "typescript": "2.0.3",
     "typings": "1.3.3",
-    "uglify-js": "2.7.3"
+    "uglify-js": "2.7.3",
+    "unzip": "^0.1.11"
   }
 }

@@ -7,10 +7,12 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
-const MODE = process.argv[4]; // passed by package.json, so absent when running in final build
+const MODE = process.argv[2];
 
-const setupOmniSharpDependencies = require('./omnisharp-setup');
-setupOmniSharpDependencies(MODE);
+// passed by package.json, so absent when running in final build
+if (MODE !== 'DEVELOPMENT') {
+    require('./omnisharp-setup');
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

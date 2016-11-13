@@ -1,15 +1,21 @@
 import { Http, Response } from '@angular/http';
 import { Subject, Observable } from 'rxjs/Rx';
 import { EventName, Message } from './api';
+import config from '../config';
 const child_process = electronRequire('child_process');
 const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
 
-const _subpath = MODE === 'DEVELOPMENT' ? 
+const DEBUG = MODE === 'DEVELOPMENT';
+
+// todo move to process-helper
+const _subpath = DEBUG ? 
     '/query/src/ReamQuery' :
     '/resources/app/query';
 const _p = `${process.cwd()}${_subpath}`;
-const REAMQUERY_BASEDIR = path.normalize(_p);
+const REAMQUERY_BASEDIR = path.resolve(_p);
+const REAMQUERY_DISTDIR = path.resolve(DEBUG ? REAMQUERY_BASEDIR :
+    `${config.omnisharpProjectPath}/src/ReamQuery`);
 
 type ProcessType = 'omnisharp' | 'query';
 
@@ -31,6 +37,7 @@ export class ProcessStream {
         this.options = processType === 'omnisharp' ? {} : { cwd: directory };
         if (processType === 'query') {
             process.env['REAMQUERY_BASEDIR'] = REAMQUERY_BASEDIR;
+            process.env['REAMQUERY_DISTDIR'] = REAMQUERY_DISTDIR;
         }
         this.status.next(new Message(EventName.ProcessStarting));
         let start = new Date().getTime();
@@ -40,6 +47,7 @@ export class ProcessStream {
             }
         });
         child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
+            // console.log('child_process', error, stdout, stderr);
             if (!this.exitHandler) {
                 // once we've seen the server response, we disable this, since it's unpredictable otherwise,
                 // will return once stdout buffer fills, windows only?

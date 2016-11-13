@@ -29,3 +29,4 @@ bower_components
 bundle.js
 app/**/*.css
 bundle-typescript.js
+scripts/startup/node_modules

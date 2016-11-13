@@ -14,6 +14,9 @@ export class ProcessHelper {
         let exePath = `"${dirname}/omnisharp/OmniSharp${!IS_LINUX ? '.exe' : ''}"`;
         let slnPath = IS_LINUX ? config.omnisharpProjectPath.replace(/\\/g, '/')
             : config.omnisharpProjectPath.replace(/\//g, '\\');
+        if (IS_DEBUG) {
+            slnPath = path.resolve(`${__dirname}/../../query/src/ReamQuery`);
+        }
         let cmd = `${exePath} -s ${slnPath} -p ${port}`;
         return { command: cmd, directory: null };
     }

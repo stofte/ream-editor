@@ -44,6 +44,12 @@ database found in `query/sql/world.sqlite`.
 
 - `npm test`
 
+Building
+--------
+
+The editor can be built using the `scripts\build.cmd` and `scripts\build.sh` scripts.
+Script must be run from the repository root folder.
+
 TODO
 ----
 - CodeMirror drag/drop inside editor is broken

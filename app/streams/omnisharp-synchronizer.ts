@@ -25,7 +25,7 @@ class FileNames {
     public getFree(): string {
         if (this.free.length === 0) {
             const bufferType = this.connectionId ? `db${this.connectionId}` : 'code';
-            const newName = path.normalize(`${config.omnisharpProjectPath}/${bufferType}${uuid.v4().replace(/\-/g, '')}.cs`);
+            const newName = path.normalize(`${config.omnisharpSubPath}/${bufferType}${uuid.v4().replace(/\-/g, '')}.cs`);
             this.used.push(newName);
             return newName;
         } else {

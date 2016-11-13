@@ -2,8 +2,16 @@ const path = electronRequire('path');
 // appveyor/travisci sets this var
 const CI_MOD = process.env['CI'] ? 3 : 1;
 
-const omnisharpPath = path.resolve((IS_LINUX ? `${process.env.HOME}/.ream-editor/` : 
-    `${process.env.LOCALAPPDATA}\\ReamEditor\\`) + 'omnisharp');
+let omnisharpPath = path.resolve((IS_LINUX ? `${process.env.HOME}/.ream-editor/` : 
+    `${process.env.LOCALAPPDATA}\\ReamEditor\\`) + 'dist');
+
+if (MODE === 'DEVELOPMENT')
+{
+    omnisharpPath = path.resolve(`${process.cwd()}/query/src/ReamQuery`);
+}
+
+const omnisharpFilePath = MODE === 'DEVELOPMENT' ? omnisharpPath :
+    `${omnisharpPath}/src/ReamQuery`;
 
 // todo some of this is mirrored in int-helpers.js
 const unitTestData = {
@@ -16,6 +24,7 @@ export default {
     omnisharpPort: 2000,
     queryEnginePort: 8111,
     omnisharpProjectPath: omnisharpPath,
+    omnisharpSubPath: omnisharpFilePath,
     dotnetDebugPath: IS_LINUX ? path.normalize('/usr/bin/dotnet')
         : path.normalize('C:/Program Files/dotnet/dotnet.exe')  
 };

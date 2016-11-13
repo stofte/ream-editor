@@ -13,10 +13,14 @@
 		"build": true,
 		"omnisharp": true,
 		"omnisharp-win-x64-netcoreapp1*": true,
-		"omnisharp-ubuntu-x64-netcoreapp1*": true
-	},
-	"search.exclude": {
+		"omnisharp-ubuntu-x64-netcoreapp1*": true,
+		".base64-cache": true,
 		"ream-editor-win32-x64": true,
-		"ream-editor-linux-x64": true
+		"ream-editor-linux-x64": true,
+		"reamquery-*.log": true,
+		"bundle.js": true,
+		"bundle-typescript.js": true,
+		"bundle.css": true,
+		"bundle.css.map": true
 	}
 }

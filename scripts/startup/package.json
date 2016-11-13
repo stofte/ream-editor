@@ -1,0 +1,9 @@
+{
+  "name": "runtimedeps",
+  "private": true,
+  "version": "1.0.0",
+  "description": "runtime dependencies included in final build",
+  "dependencies": {
+    "unzip": "0.1.11"
+  }
+}

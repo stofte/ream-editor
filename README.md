@@ -53,6 +53,7 @@ Script must be run from the repository root folder.
 
 TODO
 ----
+- Investigate node 7 issues
 - CodeMirror drag/drop inside editor is broken
 - Align directory references in general, esp in typescript code
 - Table/cell selections

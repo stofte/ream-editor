@@ -9,11 +9,11 @@ const codeLabel = '<Code>';
 @Component({
     selector: 'rm-controls',
     template: `
-    <button class="rm-controls__run {{ playDisabled ? 'rm-controls__run--disabled' : '' }}"
+    <button class="rm-controls__run int-test-execute-btn {{ playDisabled ? 'rm-controls__run--disabled' : '' }}"
         (click)="executeBuffer()"
         [disabled]="playDisabled"><i class="material-icons">play_arrow</i></button>
     <select #sel
-        class="rm-controls__context"
+        class="rm-controls__context int-test-context-dropdown"
         (change)="contextChanged($event, sel)">
         <option *ngFor="let ctx of contextList"
             [value]="ctx.id"

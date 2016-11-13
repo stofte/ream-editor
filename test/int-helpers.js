@@ -1,6 +1,6 @@
 const path = require('path');
 const helper = require('../scripts/sql-helper');
-const connections = require('../query/query/test/ReamQuery.Test/connections.json');
+// const connections = require('../query/query/test/ReamQuery.Test/connections.json');
 
 // todo probably not the best, required for locating the electron output binary, and launching test
 const IS_LINUX = !process.env.PATHEXT;
@@ -12,10 +12,11 @@ const backendTimeout = 20 * 1000 * CI_MOD;
 const executeJsTimeout = 2 * 1000 * CI_MOD;
 const pauseTimeout = 1000 * CI_MOD;
 
+const packagerOutputPath = `ream-editor-${IS_LINUX ? 'linux' : 'win32'}-x64`; 
 const appPath = path.normalize(`${path.dirname(__dirname)
-    }/ream-editor-${IS_LINUX ? 'linux' : 'win32'}-x64/ream-editor${!IS_LINUX ? '.exe' : '' }`);
+    }/${packagerOutputPath}/ream-editor${!IS_LINUX ? '.exe' : '' }`);
 
-const [connectionString, connectionString2, serverType] = getContextInfo();
+// const [connectionString, connectionString2, serverType] = getContextInfo();
 
 const objectMethods = [
     'Equals',
@@ -24,11 +25,12 @@ const objectMethods = [
     'GetHashCode'  
 ];
 
-const sqlData = new Promise((done, err) => {
-    helper.load(serverType).then(data => {
-        done(data);
-    });
-});
+const sqlData = null;
+// new Promise((done, err) => {
+//     helper.load(serverType).then(data => {
+//         done(data);
+//     });
+// });
 
 function getContextInfo() {
     let cmdLine = process.argv.join(' ');
@@ -93,6 +95,15 @@ function checkHints(client, hints) {
     }, client);
 }
 
+const keyDefs = {
+    F4: '\uE034',
+    Enter: 'Enter',
+    Space: ' ',
+    Backspace: '\uE003'
+};
+
+const sqlitePath = path.resolve(`${__dirname}/../query/sql/world.sqlite`);
+const connectionString = `Data Source=${sqlitePath}`;
 
 module.exports = {
     suiteTimeout,
@@ -100,11 +111,14 @@ module.exports = {
     pauseTimeout,
     executeJsTimeout,
     appPath,
-    connectionString,
-    connectionString2,
+    packagerOutputPath,
     checkTable,
     checkHints,
-    sqlData,
-    objectMethods,
-    serverType
+    keyDefs,
+    connectionString,
+    objectMethods
+    // connectionString,
+    // connectionString2,
+    // sqlData,
+    // serverType
 };

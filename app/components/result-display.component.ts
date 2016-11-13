@@ -21,7 +21,8 @@ class ColumnSizing {
                 {{ page.resultId === activeId ? 'rm-result-display__tab--active' : '' }}">
             <button (click)="selectResult(page.resultId)"
                 ><i class="vaadin-icons" *ngIf="page.isAtomic">&#xe7e0;</i><i
-                    class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span>{{
+                    class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span 
+                        class="int-test-result-tab-title">{{
                         formatTabularName(page.title, page.rows.length)
                 }}</span></button></div>
     </div>

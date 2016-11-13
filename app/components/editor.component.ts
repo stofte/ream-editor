@@ -141,10 +141,9 @@ export class EditorComponent implements AfterViewInit, AfterViewChecked {
     }
 
     private filterDumpMethod(item: any): boolean {
+        console.log('filterDumpMethod', item);
         const isCore = item.MethodHeader.indexOf('Dump(Emitter emitter)') !== -1 &&
-            // todo for some reason omnisharp doesnt see doc comments?
-            // item.Description.indexOf('ReamQuery.Core.Dumper.Dump') !== -1;
-            item.Description === '';
+            item.Description.indexOf('ReamQuery.Core.Dumper.Dump') !== -1;
         const isWrapper = item.MethodHeader.indexOf('Dump()') !== -1 &&
             item.Description.indexOf('DumpWrapper.Dump') !== -1;
         return isCore || isWrapper;

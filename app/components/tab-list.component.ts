@@ -21,12 +21,13 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
 @Component({
     selector: 'rm-tab-list',
     template: `
-    <div class="rm-tab-list__tabs" 
+    <div class="rm-tab-list__tabs int-test-tab-list" 
         [sortablejs]="currentTabs" [sortablejsOptions]="options">
         <div *ngFor="let tab of currentTabs; let idx = index"
-            class="rm-tab-list__tab {{ currentId === tab.id ? 'rm-tab-list__tab--active' : '' }}"
+            class="rm-tab-list__tab int-test-tab {{ currentId === tab.id ? 'rm-tab-list__tab--active' : '' }}"
             title="{{tab.id}}">
-            <button (click)="clickTab(tab.id)"><span>{{tab.title}}</span></button>
+            <button (click)="clickTab(tab.id)"><span 
+                class="int-test-tab-text">{{tab.title}}</span></button>
             <span 
                 class="rm-tab-list__tab-closebtn"
                 title="Close"
@@ -36,7 +37,7 @@ function findParent(elm: HTMLElement, cond: (elm: HTMLElement) => boolean) {
         </div>
     </div>
     <div class="rm-tab-list__newbtn">
-        <button (click)="newTab()" title="New tab">
+        <button (click)="newTab()" title="New tab" class="int-test-tab-new-button">
             <i class="material-icons">add</i>
         </button>
     </div>

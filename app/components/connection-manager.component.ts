@@ -8,7 +8,7 @@ import { Connection } from '../models/connection';
 @Component({
     selector: 'rm-connection-manager',
     template: `
-<dialog id="connection-mgr-dialog" class="rm-connection-manager">
+<dialog id="connection-mgr-dialog" class="rm-connection-manager int-test-conn-man">
     <h2 class="rm-connection-manager__title">Connection Manager</h2>
     <div class="rm-connection-manager__container">
         <div class="rm-connection-manager__validation">

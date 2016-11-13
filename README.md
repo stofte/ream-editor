@@ -42,7 +42,8 @@ Tests are primarily integration tests and focus on communication with
 OmniSharp and ReamQuery backends. Currently runs against SQLite
 database found in `query/sql/world.sqlite`.
 
-- `npm test`
+- `npm test` stress testing of streams and plain regular unit tests
+- `npm run int-test` tests final build (run `build.cmd` or `build.sh` first)
 
 Building
 --------

@@ -45,7 +45,7 @@ const urlRewrites = {
 gulp.task('ts', () => {
     return tsProject.src()
         .pipe(incrProject())
-        .js.pipe(gulp.dest('./'))
+        .js.pipe(gulp.dest('./app'))
         ;
 });
 

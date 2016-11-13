@@ -9,7 +9,8 @@
   "globalDependencies": {
     "codemirror": "registry:dt/codemirror#0.0.0+20160619021621",
     "codemirror-showhint": "registry:dt/codemirror-showhint#0.0.0+20160317120654",
-    "mocha": "registry:dt/mocha#2.2.5+20160720003353"
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+    "node": "registry:dt/node#6.0.0+20161110151007"
   },
   "devDependencies": {}
 }

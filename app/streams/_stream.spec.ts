@@ -57,29 +57,37 @@ describe('[int-test] streams', function() {
     });
 
     describe('single flows', function() {
-        it('emits results for simple value expressions', done => {
+        it('emits results for simple value expressions', function(done) {
+            this.timeout(backendTimeout);
             emitsResultsForSimpleValueExpressions(done, 10, 0);
         });
-        it('emits results for linq based query against sqlite database', done => {
+        it('emits results for linq based query against sqlite database', function(done) {
+            this.timeout(backendTimeout);
             emitsResultsForLinqBasedQueryAgainstSqliteDatabase(done, 10, 0);
         });
-        it('emits codechecks for simple value expressions', done => {
+        it('emits codechecks for simple value expressions', function(done) {
+            this.timeout(backendTimeout);
             emitsCodecheckForSimpleStatement(done, 10, 0);
         });
-        it('emits codechecks for database query', done => {
+        it('emits codechecks for database query', function(done) {
+            this.timeout(backendTimeout);
             emitsCodecheckForDatabaseQuery(done, 10, 0);
         });
-        it('emits autocompletions for simple expression', done => {
+        it('emits autocompletions for simple expression', function(done) {
+            this.timeout(backendTimeout);
             emitsAutocompletionForSimpleStatement(done, 10, 0);
         });
-        it('emits autocompletions after switching buffer context', done => {
+        it('emits autocompletions after switching buffer context', function(done) {
+            this.timeout(backendTimeout);
             emitsCodecheckAfterSwitchingBufferContext(done, 10, 0);
         });
-        it('emits results after swithing buffer context', done => {
+        it('emits results after swithing buffer context', function(done) {
+            this.timeout(backendTimeout);
             emitsResultsAfterSwitchingBufferContext(done, 10, 0);
         });
 
-        it('emits expected diagnostics for invalid query when calling query backend', done => {
+        it('emits expected diagnostics for invalid query when calling query backend', function(done) {
+            this.timeout(backendTimeout);
             emitsExpectedDiagnosticsForInvalidQueryWhenCallingQueryBackend(done, 10, 0);
         });
     });
@@ -91,7 +99,7 @@ describe('[int-test] streams', function() {
     }
 
     [
-        [0, 10, 20]
+        //[0, 10, 20]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             function runAllAtOnce(allDone) {

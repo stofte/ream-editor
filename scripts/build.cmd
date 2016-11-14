@@ -10,6 +10,7 @@ if "%CI%" == "" (set DOTNET_RUNTIME=win10-x64)
 if "%CI%" == "" (rmdir /s /q %ELECTRON_OUT%)
 if "%CI%" == "" (rmdir /s /q %PACKAGE_BASE%)
 if not "%CI%" == "" (call npm install)
+if not "%CI%" == "" (call npm run bower-install)
 if not "%CI%" == "" (dotnet restore query)
 if not "%CI%" == "" (set DOTNET_RUNTIME=win81-x64)
 mkdir %PACKAGE_BASE%

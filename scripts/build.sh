@@ -2,7 +2,7 @@
 if [ "$TRAVIS" = "" ];
 then
     echo "LOCAL BUILD"
-    export PACKAGE_BASE=$TRAVIS_BUILD_DIR/build
+    export PACKAGE_BASE=build
     export ELECTRON_OUT=ream-editor-linux-x64
     export OMNISHARP_ZIP=omnisharp-ubuntu-x64-netcoreapp1.0.tar.gz
     rm -rf $PACKAGE_BASE

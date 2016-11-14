@@ -48,7 +48,6 @@ before_build:
   - 7z x %OMNISHARP_ZIP% -y -o"omnisharp"
           
 build_script:
-  - npm test
   - .\scripts\build.cmd
 
 after_test:

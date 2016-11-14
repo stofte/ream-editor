@@ -21,7 +21,6 @@ if %errorlevel% neq 0 goto errorexit
 rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
 call npm run gulp-build
 if %errorlevel% neq 0 goto errorexit
-call npm run test
 if %errorlevel% neq 0 goto errorexit
 copy index.static.html %PACKAGE_BASE%\index.html
 if %errorlevel% neq 0 goto errorexit
@@ -63,7 +62,10 @@ copy omnisharp-setup.js ..\..\%PACKAGE_BASE%\omnisharp-setup.js
 if %errorlevel% neq 0 goto errorexit
 cd ..\..
 call npm run-script package_electron_win32
+echo starting unit tests
+call npm run test
 type reamquery-*.log
+echo starting build test
 call npm run int-test
 dir %ELECTRON_OUT%
 dir %ELECTRON_OUT%\resources

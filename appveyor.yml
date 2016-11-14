@@ -46,7 +46,7 @@ before_build:
   - dotnet --info
   # npm test runs assumes that there's a "local" omnisharp 
   - 7z x %OMNISHARP_ZIP% -y -o"omnisharp"
-  - npm run build
+  - npm run gulp-build
           
 build_script:
   - npm test

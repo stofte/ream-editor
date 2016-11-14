@@ -47,12 +47,12 @@ before_build:
           
 build_script:
   - .\scripts\build.cmd
-  - npm run test
-  - dir %ELECTRON_OUT%\resources\app\query
-  - type %ELECTRON_OUT%\resources\app\query\reamquery-*.log
   - npm run int-test
   - dir
   - type reamquery-*.log
+  - npm run test
+  - dir %ELECTRON_OUT%\resources\app\query
+  - type %ELECTRON_OUT%\resources\app\query\reamquery-*.log
 
 
 after_test:

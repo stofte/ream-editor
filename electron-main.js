@@ -11,6 +11,7 @@ const MODE = process.argv[2];
 
 // passed by package.json, so absent when running in final build
 if (MODE !== 'DEVELOPMENT') {
+    console.log('calling omnisharp-setup');
     require('./omnisharp-setup');
 }
 

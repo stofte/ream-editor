@@ -16,7 +16,6 @@
     "package_electron_win32": "electron-packager ./%PACKAGE_BASE% --no-prune --platform=win32 --arch=x64 --overwrite --out=./",
     "package_electron_linux": "electron-packager ./$PACKAGE_BASE --no-prune --platform=linux --arch=x64 --overwrite --out=./",
     "lint": "tslint -t verbose -e ./app/test/editor-testdata.ts ./app/**/*.ts",
-    "postinstall": "cd scripts/startup & npm install & cd ../.. & typings install & echo {} > typings/tslint.json",
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
     "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",

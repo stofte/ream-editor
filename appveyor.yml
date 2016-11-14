@@ -44,6 +44,8 @@ before_build:
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\query\sql\world_sqlserver.sql
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\query\sql\typetest_sqlserver.sql
   - dotnet --info
+  # npm test runs assumes that there's a "local" omnisharp 
+  - 7z x %OMNISHARP_ZIP% -y -o"omnisharp"
           
 build_script:
   - .\scripts\build.cmd

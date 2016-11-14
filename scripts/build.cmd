@@ -9,17 +9,19 @@ if "%CI%" == "" (set ELECTRON_OUT=ream-editor-win32-x64)
 if "%CI%" == "" (set DOTNET_RUNTIME=win10-x64)
 if "%CI%" == "" (rmdir /s /q %ELECTRON_OUT%)
 if "%CI%" == "" (rmdir /s /q %PACKAGE_BASE%)
-if not "%CI%" == "" (call npm install)
-if not "%CI%" == "" (call npm run bower-install)
 if not "%CI%" == "" (call npm install -g gulp-cli)
 if not "%CI%" == "" (call npm install -g typings)
+if not "%CI%" == "" (call npm install)
+if not "%CI%" == "" (call npm run bower-install)
 if not "%CI%" == "" (typings install)
 if not "%CI%" == "" (dotnet restore query)
 if not "%CI%" == "" (set DOTNET_RUNTIME=win81-x64)
 mkdir %PACKAGE_BASE%
 if %errorlevel% neq 0 goto errorexit
 rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
-call npm run-script gulp-build
+call npm run gulp-build
+if %errorlevel% neq 0 goto errorexit
+call npm run test
 if %errorlevel% neq 0 goto errorexit
 copy index.static.html %PACKAGE_BASE%\index.html
 if %errorlevel% neq 0 goto errorexit
@@ -61,7 +63,6 @@ copy omnisharp-setup.js ..\..\%PACKAGE_BASE%\omnisharp-setup.js
 if %errorlevel% neq 0 goto errorexit
 cd ..\..
 call npm run-script package_electron_win32
-call npm run test
 type reamquery-*.log
 call npm run int-test
 dir %ELECTRON_OUT%

@@ -65,7 +65,6 @@ cd ..\..
 call npm run-script package_electron_win32
 echo starting unit tests
 call npm run test
-type reamquery-*.log
 del reamquery-*.log
 echo starting build test
 call npm run int-test

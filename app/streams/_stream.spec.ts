@@ -58,7 +58,7 @@ describe('[int-test] streams', function() {
 
     describe('single flows', function() {
         it('emits results for simple value expressions', function(done) {
-            this.timeout(backendTimeout);
+            this.timeout(backendTimeout * 3);
             emitsResultsForSimpleValueExpressions(done, 10, 0);
         });
         it('emits results for linq based query against sqlite database', function(done) {
@@ -99,7 +99,7 @@ describe('[int-test] streams', function() {
     }
 
     [
-        //[0, 10, 20]
+        [0, 10, 20]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             function runAllAtOnce(allDone) {

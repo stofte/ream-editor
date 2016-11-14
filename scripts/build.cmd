@@ -61,8 +61,11 @@ call npm run-script package_electron_win32
 call npm run test
 type reamquery-*.log
 call npm run int-test
+dir %ELECTRON_OUT%
+dir %ELECTRON_OUT%\resources
+dir %ELECTRON_OUT%\resources\app
+dir %ELECTRON_OUT%\resources\app\query
 type %ELECTRON_OUT%\resources\app\query\reamquery-*.log
-dir
 endlocal
 echo Build success
 exit /b 0

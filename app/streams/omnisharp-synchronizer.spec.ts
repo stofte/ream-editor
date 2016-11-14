@@ -177,10 +177,11 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
             const initTimestamps = dependents.map(x => x.timestamp);
             const doneTimestamps = dependents.map(x => x.resolvedTimestamp);
             // check that dependents were not reordered
+            // possibly add some int counter, so we're 100% sure we can order msgs by generation time.
             initTimestamps.forEach((x, i) => {
                 if (i > 0) {
-                    expect(x).to.be.greaterThan(initTimestamps[i - 1], `Init timestamp idx ${i}`);
-                    expect(doneTimestamps[i]).to.be.greaterThan(doneTimestamps[i - 1], `Done timestamp idx ${i}`);
+                    expect(x).to.be.least(initTimestamps[i - 1], `Init timestamp idx ${i}`);
+                    expect(doneTimestamps[i]).to.be.least(doneTimestamps[i - 1], `Done timestamp idx ${i}`);
                 }
             });
             done();

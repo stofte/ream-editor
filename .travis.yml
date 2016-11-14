@@ -15,9 +15,9 @@ addons:
     - libunwind8
     - zlib1g
 
-cache:
-  directories:
-    - node_modules
+# cache:
+#   directories:
+#     - node_modules
 
 env:
   global:

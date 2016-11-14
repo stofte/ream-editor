@@ -25,6 +25,7 @@ cp LICENSE $PACKAGE_BASE/ream-editor-license.txt
 cp electron-main.js $PACKAGE_BASE/electron-main.js
 cp package.json $PACKAGE_BASE/package.json
 cp -a resources/. $PACKAGE_BASE/resources/
+mkdir $PACKAGE_BASE/query
 cp query/src/ReamQuery/nlog.config $PACKAGE_BASE/query/nlog.config
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 cd query

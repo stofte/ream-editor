@@ -29,9 +29,9 @@ env:
 
 before_install:
  - ulimit -n 1024
- - nvm install 6.2
+ - nvm install 6.9
  - echo $DOTNET_INSTALL_DIR
- - wget $OMNISHARP_URL
+ - wget $OMNISHARP_URL -O $OMNISHARP_ZIP
  # https://github.com/dotnet/core/blob/master/release-notes/preview-download.md
  - sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 417A0893

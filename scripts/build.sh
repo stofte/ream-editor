@@ -18,6 +18,9 @@ else
 fi
 export REAMQUERY_ZIP=reamquery.zip
 mkdir -p $PACKAGE_BASE
+mkdir $PACKAGE_BASE/node_modules
+mkdir $PACKAGE_BASE/query
+mkdir $PACKAGE_BASE/omnisharp
 npm run gulp-build
 cp index.static.html $PACKAGE_BASE/index.html
 cp bundle.js $PACKAGE_BASE
@@ -25,9 +28,7 @@ cp LICENSE $PACKAGE_BASE/ream-editor-license.txt
 cp electron-main.js $PACKAGE_BASE
 cp package.json $PACKAGE_BASE
 cp -a resources/. $PACKAGE_BASE/resources/
-mkdir $PACKAGE_BASE/query
 cp query/src/ReamQuery/nlog.config $PACKAGE_BASE/query/nlog.config
-mkdir $PACKAGE_BASE/omnisharp
 tar -xzf $OMNISHARP_ZIP --directory $PACKAGE_BASE/omnisharp
 cd query
 zip -r $REAMQUERY_ZIP .
@@ -38,7 +39,6 @@ dotnet publish query/src/ReamQuery --configuration Release --output $PACKAGE_BAS
 # startup deps
 cd scripts/startup
 npm install
-mkdir $PACKAGE_BASE/node_modules
 cp -a node_modules/. $PACKAGE_BASE/node_modules/
 cp omnisharp-setup.js $PACKAGE_BASE
 cd ../..

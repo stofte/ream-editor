@@ -23,7 +23,6 @@ if %errorlevel% neq 0 goto errorexit
 rem https://github.com/npm/npm/issues/2938#issuecomment-11337463
 call npm run gulp-build
 if %errorlevel% neq 0 goto errorexit
-if %errorlevel% neq 0 goto errorexit
 copy index.static.html %PACKAGE_BASE%\index.html
 if %errorlevel% neq 0 goto errorexit
 copy bundle.js %PACKAGE_BASE%\bundle.js

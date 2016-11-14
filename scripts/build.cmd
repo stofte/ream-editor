@@ -13,7 +13,7 @@ if not "%CI%" == "" (call npm install -g gulp-cli)
 if not "%CI%" == "" (call npm install -g typings)
 if not "%CI%" == "" (call npm install)
 if not "%CI%" == "" (call npm run bower-install)
-if not "%CI%" == "" (typings install)
+if not "%CI%" == "" (call typings install)
 if not "%CI%" == "" (dotnet restore query)
 if not "%CI%" == "" (set DOTNET_RUNTIME=win81-x64)
 mkdir %PACKAGE_BASE%

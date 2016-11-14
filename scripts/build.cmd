@@ -58,6 +58,9 @@ copy omnisharp-setup.js ..\..\%PACKAGE_BASE%\omnisharp-setup.js
 if %errorlevel% neq 0 goto errorexit
 cd ..\..
 call npm run-script package_electron_win32
+call npm run test
+dir
+type reamquery-*.log
 endlocal
 echo Build success
 exit /b 0

@@ -16,6 +16,7 @@ environment:
   DOTNETCLI_ZIP_URL: https://go.microsoft.com/fwlink/?LinkID=831469
   PACKAGE_BASE: build
   ELECTRON_OUT: ream-editor-win32-x64
+  ELECTRON_ENABLE_LOGGING: true
 
 cache:
   - 'node_modules -> package.json' # local npm modules

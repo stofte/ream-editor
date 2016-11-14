@@ -47,6 +47,8 @@ before_build:
           
 build_script:
   - .\scripts\build.cmd
+  - npm Test
+  - npm run int-test
 
 after_test:
   - 7z a "%APP_FINAL%" "%ELECTRON_OUT%"

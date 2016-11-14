@@ -74,7 +74,7 @@ describe('fresh build', function() {
         this.app = new Application({
             path: appPath,
             requireName: 'electronRequire',
-            cwd: `${process.cwd()}/${packagerOutputPath}`
+            cwd: path.resolve(`${process.cwd()}/${packagerOutputPath}`)
         });
         return this.app.start();
     });

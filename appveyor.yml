@@ -1,5 +1,5 @@
 version: 0.1.0.{build}
-os: unstable # https://github.com/electron/spectron#on-appveyor
+# os: unstable # https://github.com/electron/spectron#on-appveyor
 platform: 
   - x64
 branches:

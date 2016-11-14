@@ -19,7 +19,7 @@
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
     "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
-    "int-test": "mocha test/**/*.int.js",
+    "int-test": "mocha --enable-logging test/**/*.int.js",
     "bower-install": "bower install"
   },
   "dependencies": {

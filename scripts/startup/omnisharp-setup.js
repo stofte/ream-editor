@@ -11,6 +11,9 @@ const userStore = process.platform !== 'win32' ?
 const dstPath = path.resolve(`${userStore}/dist`);
 const zipPath = path.resolve(`${__dirname}/reamquery.zip`);
 
+console.log('omnisharp-setup zipPath: ', zipPath)
+console.log('omnisharp-setup dstPath: ', dstPath)
+
 // todo error handling and all that
 rmdir(dstPath, () => {
     fs.createReadStream(zipPath)

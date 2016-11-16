@@ -16,6 +16,7 @@ hgDefaults.editable = false;
 hgDefaults.editorActivationKeys = [];
 hgDefaults.columnHeaderHalign = 'left';
 hgDefaults.halign = 'left';
+hgDefaults.font = '14px Roboto';
 
 class ColumnSizing {
     width: number;

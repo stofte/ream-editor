@@ -36,6 +36,7 @@
     "angular-sortablejs": "0.2.1",
     "angular2-mdl": "2.2.2",
     "codemirror": "5.18.2",
+    "fin-hypergrid": "^1.0.10",
     "lodash": "4.15.0",
     "material-design-lite": "1.2.1",
     "moment": "2.15.0",

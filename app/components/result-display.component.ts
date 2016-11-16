@@ -2,6 +2,9 @@ import { Component, Input, ElementRef, ChangeDetectorRef, AfterViewInit, AfterCo
 import { OutputStream, EventName } from '../streams/index';
 import { TabService } from '../services/index';
 import { QueryResult, ResultPage, SessionLogMessage } from '../models/index';
+import * as Hypergrid from 'fin-hypergrid';
+
+console.log('grid', Hypergrid);
 
 class ColumnSizing {
     width: number;

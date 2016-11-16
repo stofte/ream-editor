@@ -19,10 +19,6 @@
         'codemirror': 'node_modules/codemirror',
         'lodash': 'node_modules/lodash',
         'node-uuid': 'node_modules/node-uuid',
-        'angular2-mdl': 'node_modules/angular2-mdl',
-        '@vaadin/angular2-polymer': 'node_modules/@vaadin/angular2-polymer',
-        'angular2-data-table': 'node_modules/angular2-data-table',
-        'ng2-handsontable': 'node_modules/ng2-handsontable',
         'angular-sortablejs': 'node_modules/angular-sortablejs',
         'sortablejs': 'node_modules/sortablejs/Sortable.js',
         // hypergrid deps:
@@ -55,10 +51,6 @@
         'codemirror': { main: 'lib/codemirror.js', defaultExtension: 'js' },
         'lodash': { main: 'lodash.js', defaultExtension: 'js' },
         'node-uuid': { main: 'uuid.js', defaultExtension: 'js' },
-        'angular2-mdl': { main: 'bundle/angular2-mdl.js' },
-        '@vaadin/angular2-polymer': { main: 'index.js' },
-        'angular2-data-table': { main: 'release/index.js' },
-        'ng2-handsontable': { main: 'dist/index.js', defaultExtension: 'js' },
         'angular-sortablejs': { main: 'index.js', defaultExtension: 'js' },
         'fin-hypergrid': {
             main: './src/Hypergrid.js',

@@ -10,7 +10,6 @@ else
     npm install -g gulp-cli
     npm install -g typings
     npm install
-    npm run bower-install
     typings install
     echo {} > typings/tslint.json
     dotnet restore query

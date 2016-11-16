@@ -19,8 +19,7 @@
     "generate-for-sqlserver": "node scripts/generate-sql.js sqlserver",
     "generate-for-npgsql": "node scripts/generate-sql.js npgsql",
     "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
-    "int-test": "mocha test/**/*.int.js",
-    "bower-install": "bower install"
+    "int-test": "mocha test/**/*.int.js"
   },
   "dependencies": {
     "@angular/common": "2.1.1",
@@ -32,9 +31,7 @@
     "@angular/platform-browser-dynamic": "2.1.1",
     "@angular/router": "3.1.1",
     "@vaadin/angular2-polymer": "1.0.0-beta5",
-    "angular-in-memory-web-api": "0.1.5",
     "angular-sortablejs": "0.2.1",
-    "angular2-mdl": "2.2.2",
     "codemirror": "5.18.2",
     "fin-hypergrid": "^1.0.10",
     "lodash": "4.15.0",
@@ -45,7 +42,6 @@
     "reflect-metadata": "0.1.8",
     "rxjs": "5.0.0-beta.12",
     "systemjs": "0.19.39",
-    "winston": "2.2.0",
     "zone.js": "0.6.25"
   },
   "devDependencies": {

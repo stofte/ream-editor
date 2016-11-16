@@ -251,7 +251,7 @@ describe('[int-test] streams', function() {
                             }
                         }
                         for (let i = 0; i < rows.length; i++) {
-                            expect(rows[0][cityColIdx].substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
+                            expect(rows[i].Name.substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
                         runTimings['emitsResultsForLinqBasedQueryAgainstSqliteDatabase'] =  performance.now() - ts;
@@ -304,7 +304,7 @@ describe('[int-test] streams', function() {
                             }
                         }
                         for (let i = 0; i < rows.length; i++) {
-                            expect(rows[0][cityColIdx].substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
+                            expect(rows[i].Name.substring(0, 2)).to.equal('Ca', 'Name of city starts with "Ca"');
                         }
                         expect(rows.length).to.equal(83, 'Row count from query');
                         runTimings['emitsResultsAfterSwitchingBufferContext'] =  performance.now() - ts;

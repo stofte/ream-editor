@@ -23,6 +23,8 @@ export class ResultStream {
             // an optional top level ref for the table
             // todo: this will fail with interleaving table dumps from the same session, index by table id property 
             let tableResult: ResultPage = null;
+            // todo make backend emit full objs?
+            let rowMapper: Function = null;
             obs.next(new Message(EventName.ResultStart, req.id));
             const socketSub = this.query.events
                 .filter(msg => msg.name === EventName.QuerySocketOutput && msg.data.session === req.id)
@@ -57,10 +59,18 @@ export class ResultStream {
                             Assert(tableResult != null, 'tableResult was null');
                             tableResult.columns = socket.values.map(x => x.Name);
                             tableResult.columnTypes = socket.values.map(x => x.Type);
+                            rowMapper = (vals) => {
+                                const o = Object.create({});
+                                tableResult.columns.forEach((col, idx) => {
+                                    o[col] = vals[idx];
+                                });
+                                return o;
+                            }
                             break;
                         case 'row':
                             Assert(tableResult != null, 'tableResult was null');
-                            tableResult.rows.push(socket.values);
+                            // console.log('mapped ... ', )
+                            tableResult.rows.push(rowMapper(socket.values));
                             break;
                         case 'tableClose':
                             obs.next(new Message(EventName.ResultUpdate, socket.session, tableResult));

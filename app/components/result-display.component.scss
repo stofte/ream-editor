@@ -98,54 +98,21 @@ rm-result-display {
         }
     }
 
-    &__table {
-        position: relative;
-        height: calc(100% - (1px * var(--tab-list-height)));
-        width: 100%;
 
+    &__tables {
         &--inactive {
             position: absolute;
             left: 99999px;
             right: 99999px;
         }
-
-        &__hider {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-bg-color);
-            z-index: 999;
-        }
-
-        &__hot {
-
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-
-            .colHeader {
-                display: block;
-                text-align: left;
-                cursor: default;
-                -webkit-user-select: none;
-                user-select: none;
-            }
-            .rowHeader {
-                opacity: 0.5;
-                cursor: default;
-                -webkit-user-select: none;
-                user-select: none;
-            }
-            td {
-                cursor: default;
-                // hot adds the white-space nowrap
-                text-overflow: ellipsis;
-                overflow: hidden;
-                -webkit-user-select: none;
-                user-select: none;
-            }
-        }
     }
+
+    &__table {
+    
+    }
+}
+
+// hyperfin adds these, doesnt seem to be an issue in hiding them
+body > canvas {
+    display: none;
 }

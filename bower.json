@@ -1,7 +1,0 @@
-{
-  "name": "ream-editor",
-  "private": true,
-  "dependencies": {
-    "handsontable": "^0.28.4"
-  }
-}

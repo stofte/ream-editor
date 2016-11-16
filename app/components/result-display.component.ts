@@ -2,9 +2,20 @@ import { Component, Input, ElementRef, ChangeDetectorRef, AfterViewInit, AfterCo
 import { OutputStream, EventName } from '../streams/index';
 import { TabService } from '../services/index';
 import { QueryResult, ResultPage, SessionLogMessage } from '../models/index';
-import * as Hypergrid from 'fin-hypergrid';
 
-console.log('grid', Hypergrid);
+const Hypergrid = require('fin-hypergrid');
+// disables the checkboxes
+const hgImages = require('fin-hypergrid/images');
+const hgDefaults = require('fin-hypergrid/src/defaults');
+hgImages.checked = new Image();
+hgImages.unchecked = new Image();
+hgDefaults.columnAutosizing = false;
+hgDefaults.showFilterRow = false;
+hgDefaults.unsortable = true;
+hgDefaults.editable = false;
+hgDefaults.editorActivationKeys = [];
+hgDefaults.columnHeaderHalign = 'left';
+hgDefaults.halign = 'left';
 
 class ColumnSizing {
     width: number;
@@ -29,9 +40,8 @@ class ColumnSizing {
                         formatTabularName(page.title, page.rows.length)
                 }}</span></button></div>
     </div>
-    <div class="rm-result-display__table {{ consoleActive ? 'rm-result-display__table--inactive' : '' }}">
-        <div class="rm-result-display__table__hot"></div>
-        <div class="rm-result-display__table__hider" *ngIf="enableHider"></div>
+    <div class="rm-result-display__tables {{ consoleActive ? 'rm-result-display__tables--inactive' : '' }}">
+        <div class="rm-result-display__table"></div>
     </div>
     <div class="rm-result-display__console">
         <ul class="rm-result-display__console__listing">
@@ -52,39 +62,11 @@ export class ResultDisplayComponent implements AfterViewInit {
     private activeResult: ResultPage = null;
     private activeId: string = null;
     private sessionId: string;
-    private scrollToTop = false;
-    // hot scroll widget, used for blurActiveElement
-    private scrollWidget = null;
-    
-    private enableHider = true;
-    private firstLoad = true;
-    private dataLoader: Function = null;
-    private handsontableElm: any;
-    private hotRowPlugin: any;
-    private hotColPlugin: any;
-    
-    private tableOptions = {
-        data: [],
-        columns: [],
-        colHeaders: [],
-        stretchH: 'last',
-        height: null,
-        rowHeaders: true,
-        manualColumnResize: true,
-        manualRowResize: true,
-        fillHandle: false,
-        // todo do something to style inactive selection
-        outsideClickDeselects: true,
-        // copy-limit is confusing
-        copyRowsLimit: 32000,
-        copyColsLimit: 32000,
-        afterLoadData: null,
-        afterUpdateSettings: null,
-        afterScrollVertically: null,
-        afterScrollHorizontally: null,
-        afterRender: null,
-        afterSelection: null
-    };
+    private grids: any[] = [];
+
+    // temp
+    private grid: any;
+    private gridContainer: any;
 
     private consoleActive = true;
     private logMessages: SessionLogMessage[] = null;
@@ -105,54 +87,13 @@ export class ResultDisplayComponent implements AfterViewInit {
     }
 
     ngAfterViewInit() {
-        const container = this.elm.nativeElement.querySelector('.rm-result-display__table__hot');
-        this.tableOptions.afterLoadData = (isFirstLoad) => {
-            if (!isFirstLoad) {
-                this.handsontableElm.render();
-            }
-        };
-        this.tableOptions.afterRender = (isForced: boolean) => {
-            if (isForced && this.scrollToTop) {
-                this.handsontableElm.deselectCell();
-                this.scrollToTop = false;
-                const colOffset = this.activeResult.viewColumnOffset;
-                const rowOffset = this.activeResult.viewRowOffset;
-                this.handsontableElm.scrollViewportTo(rowOffset, colOffset);
-            }
-            if (!this.scrollWidget) {
-                this.scrollWidget = this.elm.nativeElement.querySelector('.wtHolder');
-                this.scrollWidget.addEventListener('mousedown', this.blurActiveElement);
-            }
-        };
-        this.tableOptions.afterUpdateSettings = () => {
-            if (this.dataLoader) {
-                this.dataLoader();
-                this.dataLoader = null;
-            }
-        };
+        this.gridContainer = this.elm.nativeElement.querySelector('.rm-result-display__table');
 
-        this.tableOptions.afterSelection = this.blurActiveElement;
-        const scrollH = () => {
-            const colOffset = this.hotColPlugin.getFirstVisibleColumn();
-            const rowOffset = this.hotRowPlugin.getFirstVisibleRow();
-            this.blurActiveElement();
-            this.tabs.setResultPageView(
-                this.sessionId,
-                this.activeResult.resultId,
-                colOffset,
-                rowOffset
-            );
-        };
-        this.tableOptions.afterScrollVertically = scrollH;
-        this.tableOptions.afterScrollHorizontally = scrollH;
-        this.handsontableElm = new Handsontable(container, this.tableOptions);
-        this.hotRowPlugin = this.handsontableElm.getPlugin('autoRowSize');
-        this.hotColPlugin = this.handsontableElm.getPlugin('autoColumnSize');
-        this.hotColPlugin.enablePlugin();
-        this.hotRowPlugin.enablePlugin();
-        
+        this.grid = new Hypergrid(this.gridContainer, { data: [] });
+        // console.log('grid', this.grid);
         this.viewHeight.filter(x => x > 0).subscribe(h => {
-            this.handsontableElm.updateSettings({ height: h - 30 });
+            this.gridContainer.style.height = `${h - 30}px`;
+            // this.handsontableElm.updateSettings({ height: h - 30 });
         });
     }
 
@@ -179,7 +120,6 @@ export class ResultDisplayComponent implements AfterViewInit {
                 } else {
                     this.selectConsole();
                 }
-                this.enableHider = this.results.length === 0;
             }
         }
     }
@@ -198,22 +138,12 @@ export class ResultDisplayComponent implements AfterViewInit {
         page.rows.forEach(row => {
             data.push(page.isAtomic ? [row] : row);
         });
-        // need to wait for updated settings before loading data
-        this.scrollToTop = true;
-        this.dataLoader = () => {
-            this.handsontableElm.loadData(data);
-        };
-        this.activeResult = page;
-        this.tabs.setActiveResult(this.sessionId, id);
-        this.handsontableElm.updateSettings({
-            colHeaders: [...page.columns],
-            columns: page.columns.map(col => {
-                return {
-                    editor: false,
-                    wordWrap: false
-                };
-            })
+        // console.log('data:', data);
+        this.grid.behavior.setData(data, {
+            filterable: false
         });
+        // this.grid.addProperties();
+        console.log('grid', this.grid);
     }
 
     formatLogDate(date: Date) {

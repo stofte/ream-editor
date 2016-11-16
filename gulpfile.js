@@ -19,7 +19,6 @@ const output = process.env.PACKAGE_BASE || '.';
  
 const cssFiles = [
     'node_modules/normalizecss/normalize.css',
-    'bower_components/handsontable/dist/handsontable.full.css',
     'node_modules/codemirror/lib/codemirror.css',
     'app/**/*.css'
 ];
@@ -29,7 +28,6 @@ const sassFiles = 'app/**/*.scss';
 const jsFiles = [
     'node_modules/zone.js/dist/zone.js',
     'node_modules/reflect-metadata/Reflect.js',
-    'bower_components/handsontable/dist/handsontable.full.js',
     'bundle-typescript.js'
 ];
 
@@ -51,8 +49,7 @@ gulp.task('ts', () => {
 
 gulp.task('ts:lint', ['ts'], () => {
     // this file contains lots of copy-pastaed data, so we ignore it all
-    const f = filter(file => !/editor-testdata.ts$/.test(file.path) &&
-                             !/bower_components/.test(file.path));
+    const f = filter(file => !/editor-testdata.ts$/.test(file.path));
     return tsProject.src()
         .pipe(f)
         .pipe(tslint({ formatter: 'prose' }))

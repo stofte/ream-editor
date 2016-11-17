@@ -16,7 +16,23 @@ hgDefaults.editable = false;
 hgDefaults.editorActivationKeys = [];
 hgDefaults.columnHeaderHalign = 'left';
 hgDefaults.halign = 'left';
-hgDefaults.font = '14px Roboto';
+hgDefaults.columnHeaderForegroundSelectionFont = hgDefaults.columnHeaderFont =
+hgDefaults.rowHeaderFont = hgDefaults.rowHeaderForegroundSelectionFont =
+   hgDefaults.foregroundSelectionFont = hgDefaults.font = '13px Roboto';
+hgDefaults.cellPadding = 5;
+hgDefaults.defaultRowHeight = 17
+hgDefaults.scrollbarHoverOff = 'visible';
+hgDefaults.gridLinesVOverflow = true;
+hgDefaults.hoverCellHighlight.enabled = false;
+hgDefaults.hoverColumnHighlight.enabled = false;
+hgDefaults.hoverRowHighlight.enabled = false;
+hgDefaults.showTreeColumn = false;
+hgDefaults.singleRowSelectionMode = false;
+hgDefaults.sortOnHiddenColumns = false;
+// hgDefaults.rowSelection = false;
+// hgDefaults.columnSelection = false;
+
+console.log(hgDefaults)
 
 class ColumnSizing {
     width: number;

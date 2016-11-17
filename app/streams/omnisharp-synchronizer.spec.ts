@@ -16,7 +16,7 @@ describe('omnisharp-synchronizer', function() {
     });
 
     [
-        [0, 0, 1]
+        [0, 0, 2]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             let idx = 0;
@@ -34,8 +34,8 @@ describe('omnisharp-synchronizer', function() {
                     const run2Promise = new Promise((done) => run2Resolver = done);
                     const run3Promise = new Promise((done) => run3Resolver = done);
 
-                    // omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run1Resolver);
-                    // omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run2Resolver);
+                    omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run1Resolver);
+                    omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run2Resolver);
                     omnisharpSynchronizerSuite(replayMinDelay, replayMaxDelay, sync, run3Resolver);
 
                     const failures = [];
@@ -45,11 +45,11 @@ describe('omnisharp-synchronizer', function() {
                             failures.push(val);
                         }
                     };
-                    // run1Promise.then(doneHandler);
-                    // run2Promise.then(doneHandler);
+                    run1Promise.then(doneHandler);
+                    run2Promise.then(doneHandler);
                     run3Promise.then(doneHandler);
-                    // run1Promise.then(() => 
-                    //     run2Promise.then(() =>  {
+                    run1Promise.then(() => 
+                        run2Promise.then(() =>  {
                             run3Promise.then(() =>  {
                                 setTimeout(() => {
                                     if (failures.length > 0) {
@@ -59,8 +59,8 @@ describe('omnisharp-synchronizer', function() {
                                     }
                                 }, 100);
                             });
-                    //     })
-                    // );
+                        })
+                    );
                 });
             });
         });
@@ -132,7 +132,6 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
     // setup stream
     let idx = 0;
     const subber = subject
-        .do(x => console.log('do => ',sessionId, x.timestamp))
         .map(x => (<OmnisharpSessionMessage> {
             sessionId: x.sessionId,
             timestamp: performance.now(),
@@ -144,7 +143,6 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
         .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
         .map(msg => sync.mapMessage(msg))
         .subscribe(msg => {
-            console.log('subscribe => ', msg.sessionId, msg.timestamp);
             // context msgs should not be delayed, since it doesnt go to omnisharp
             const timeout = msg.type === 'context' ? 0 : (Math.random() * maxDelayMs) + minDelayMs;
             const autoline = msg.type === 'autocompletion' ? msg.autocompletion.line : -1;

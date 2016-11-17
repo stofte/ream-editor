@@ -99,7 +99,7 @@ describe('[int-test] streams', function() {
     }
 
     [
-        //[0, 10, 20]
+        [0, 10, 20]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             function runAllAtOnce(allDone) {

@@ -16,8 +16,7 @@ describe('omnisharp-synchronizer', function() {
     });
 
     [
-        // todo breaks on appveyer if using 0/0 settings?
-        [10, 10, 2]
+        [0, 0, 1]
     ].forEach(([replayMinDelay, replayMaxDelay, stepCount]) => {
         describe(`input delay: ${replayMinDelay} -> ${replayMaxDelay} ms, repeat: ${stepCount}`, () => {
             let idx = 0;

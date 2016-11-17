@@ -148,9 +148,9 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
             // context msgs should not be delayed, since it doesnt go to omnisharp
             const timeout = msg.type === 'context' ? 0 : (Math.random() * maxDelayMs) + minDelayMs;
             const autoline = msg.type === 'autocompletion' ? msg.autocompletion.line : -1;
-            testMsgs.push({ timestamp: msg.timestamp, resolvedTimestamp: performance.now(),
-                type: msg.type, fileName: msg.fileName, lineOffset: msg.lineOffset, autoline });
             subjectCount++;
+            testMsgs.push({ timestamp: msg.timestamp, type: msg.type,
+                fileName: msg.fileName, lineOffset: msg.lineOffset, autoline });
             setTimeout(() => {
                 sync.resolveOperation(msg);
                 // seems more stable if we add a slight delay here?
@@ -166,11 +166,6 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
     stepsDone.then(() => {
         try {
             const events = testMsgs.map(x => x.type);
-            testMsgs.forEach((x, i) => {
-                if (i > 1) {
-                    expect(x.resolvedTimestamp).to.be.greaterThan(testMsgs[i - 1].resolvedTimestamp);
-                }
-            });
             expect(testMsgs.length).to.equal(stepsToReplay.length);
             expect(events.slice(0, 4)).to.deep.equal(['context', 'buffer-template', 'edit', 'edit'], 'Event order, idx 0-3');
             // might be interleaved
@@ -185,14 +180,11 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
             const completions = testMsgs.filter(x => x.type === 'autocompletion').map(x => x.autoline);
             expect(completions).to.deep.equal([11, 21, 32], 'Correct lineOffset on autocompletions');
 
-            const initTimestamps = dependents.map(x => x.timestamp);
-            const doneTimestamps = dependents.map(x => x.resolvedTimestamp);
             // check that dependents were not reordered
-            // possibly add some int counter, so we're 100% sure we can order msgs by generation time.
+            const initTimestamps = dependents.map(x => x.timestamp);
             initTimestamps.forEach((x, i) => {
                 if (i > 0) {
                     expect(x).to.be.least(initTimestamps[i - 1], `Init timestamp idx ${i}`);
-                    expect(doneTimestamps[i]).to.be.least(doneTimestamps[i - 1], `Done timestamp idx ${i}`);
                 }
             });
             done();

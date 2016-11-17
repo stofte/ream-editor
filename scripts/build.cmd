@@ -42,19 +42,6 @@ xcopy node_modules ..\..\%PACKAGE_BASE%\node_modules\ /S /Y
 copy omnisharp-setup.js ..\..\%PACKAGE_BASE%\omnisharp-setup.js
 cd ..\..
 call npm run-script package_electron_win32
-echo starting unit tests
-call npm run test
-del reamquery-*.log
-echo starting build test
-call npm run int-test
-dir %ELECTRON_OUT%
-dir %ELECTRON_OUT%\resources
-dir %ELECTRON_OUT%\resources\app
-dir %ELECTRON_OUT%\resources\app\query
-type %ELECTRON_OUT%\resources\app\query\reamquery-*.log
-type reamquery-*.log
-echo LOCALAPPDATA looks like
-dir %LOCALAPPDATA%\ReamEditor\dist
 endlocal
 echo Build success
 exit /b 0

@@ -15,8 +15,7 @@ const pauseTimeout = 1000 * CI_MOD;
 const packagerOutputPath = `ream-editor-${IS_LINUX ? 'linux' : 'win32'}-x64`; 
 const appPath = path.normalize(`${path.dirname(__dirname)
     }/${packagerOutputPath}/ream-editor${!IS_LINUX ? '.exe' : '' }`);
-console.log('packagerOutputPath', packagerOutputPath);
-console.log('appPath', appPath);
+
 // const [connectionString, connectionString2, serverType] = getContextInfo();
 
 const objectMethods = [

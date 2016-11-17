@@ -71,7 +71,6 @@ describe('fresh build', function() {
 
     before(function () {
         chai.should();
-        console.log(`CWD: "${process.cwd()}/${packagerOutputPath}"`)
         this.app = new Application({
             path: appPath,
             requireName: 'electronRequire',

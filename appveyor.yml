@@ -50,6 +50,8 @@ before_build:
           
 build_script:
   - .\scripts\build.cmd
+
+test_script:
   - npm run test
   - npm run int-test
 

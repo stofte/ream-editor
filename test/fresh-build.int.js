@@ -1,6 +1,7 @@
 const Application = require('spectron').Application
 const chai = require('chai');
 const http = require('http');
+const path = require('path');
 const _ = require('lodash');
 const { 
     checkTable,

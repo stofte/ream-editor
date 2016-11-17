@@ -1,5 +1,4 @@
 version: 0.1.0.{build}
-# os: unstable # https://github.com/electron/spectron#on-appveyor
 platform: 
   - x64
 branches:
@@ -16,7 +15,6 @@ environment:
   DOTNETCLI_ZIP_URL: https://go.microsoft.com/fwlink/?LinkID=831469
   PACKAGE_BASE: build
   ELECTRON_OUT: ream-editor-win32-x64
-  ELECTRON_ENABLE_LOGGING: true
 
 cache:
   - 'node_modules -> package.json' # local npm modules
@@ -38,14 +36,12 @@ install:
   - ps: 'If (-Not(Test-Path $env:OMNISHARP_ZIP)) { Invoke-WebRequest "$env:OMNISHARP_URL" -OutFile "$env:OMNISHARP_ZIP" }'
 
 before_build:
-  # generates the scripts in the working folder
   - ps: $sqlInstance = "(local)\SQL2014"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database world;"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -Q "use master; create database typetest;"
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\query\sql\world_sqlserver.sql
   - ps: sqlcmd -S "$sqlInstance" -U "sa" -P "Password12!" -i $env:APPVEYOR_BUILD_FOLDER\query\sql\typetest_sqlserver.sql
   - dotnet --info
-  # npm test runs assumes that there's a "local" omnisharp 
   - 7z x %OMNISHARP_ZIP% -y -o"omnisharp"
           
 build_script:

@@ -50,7 +50,7 @@ gulp.task('ts', () => {
 
 gulp.task('ts:lint', ['ts'], () => {
     // this file contains lots of copy-pastaed data, so we ignore it all
-    const f = filter(file => !/editor-testdata.ts$/.test(file.path));
+    const f = filter(file => !/editor-testdata.ts$/.test(file.path) && !/typings/.test(file.path));
     return tsProject.src()
         .pipe(f)
         .pipe(tslint({ formatter: 'prose' }))

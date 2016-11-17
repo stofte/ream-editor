@@ -54,7 +54,8 @@ app.on('ready', function() {
                 click: () => mainWindow.webContents.send('application-event', 'zoom-view-in')
             }, {
                 label: 'Zoom reset',
-                click: () => mainWindow.webContents.send('application-event', 'zoom-view-reset')
+                click: () => mainWindow.webContents.send('application-event', 'zoom-view-reset'),
+                enabled: false
             }, {
                 label: 'Zoom out',
                 accelerator: 'Shift+CmdOrCtrl+_',

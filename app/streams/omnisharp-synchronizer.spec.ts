@@ -131,10 +131,12 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
     ];
     // setup stream
     let idx = 0;
-    subject 
+    subject
+        .do(x => console.log('do => ',sessionId, x.timestamp))
         .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
         .map(msg => sync.mapMessage(msg))
         .subscribe(msg => {
+            console.log(sessionId, msg);
             // context msgs should not be delayed, since it doesnt go to omnisharp
             const timeout = msg.type === 'context' ? 0 : (Math.random() * maxDelayMs) + minDelayMs;
             const autoline = msg.type === 'autocompletion' ? msg.autocompletion.line : -1;

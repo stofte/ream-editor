@@ -1,10 +1,14 @@
 // rx streams require events to be replayed over time to make any sense.
-export function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
+export function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10, debug = false) {
+    
     if (steps.length > 0) {
         let head = steps[0];
         let headArg = undefined;
         let remaining = steps.slice(1);
         let timeout = Math.random() * timeoutMax + timeoutMin;
+        if (debug) {
+            console.log('timeout max/min', timeoutMax, '/', timeoutMin, '=>' ,timeout);
+        }
         let isPromiseStep = false;
         if (typeof head === 'number') {
             timeout = head;
@@ -28,11 +32,11 @@ export function replaySteps(steps: any[], timeoutMax = 100, timeoutMin = 10) {
         if (!isPromiseStep) {
             setTimeout(() => {
                 head(headArg);
-                replaySteps(remaining, timeoutMax, timeoutMin);
+                replaySteps(remaining, timeoutMax, timeoutMin, debug);
             }, timeout);
         } else {
             head.then(() => {
-                replaySteps(remaining, timeoutMax, timeoutMin);
+                replaySteps(remaining, timeoutMax, timeoutMin, debug);
             })
         }
     }

@@ -131,7 +131,7 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
     ];
     // setup stream
     let idx = 0;
-    subject
+    const subber = subject
         .do(x => console.log('do => ',sessionId, x.timestamp))
         .delayWhen(msg => Observable.fromPromise(sync.queueOperation(msg)))
         .map(msg => sync.mapMessage(msg))
@@ -147,6 +147,7 @@ function omnisharpSynchronizerSuite(minDelayMs: number, maxDelayMs: number, sync
                 sync.resolveOperation(msg);
                 // seems more stable if we add a slight delay here?
                 if (subjectCount >= stepsToReplay.length) {
+                    subber.unsubscribe();
                     setTimeout(() => stepResolver(), 100);
                 }
             }, timeout);

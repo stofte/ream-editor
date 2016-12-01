@@ -54,7 +54,7 @@ class ColumnSizing {
                 ><i class="vaadin-icons" *ngIf="page.isAtomic">&#xe7e0;</i><i
                     class="vaadin-icons" *ngIf="page.isTabular">&#xe7a5;</i><span 
                         class="int-test-result-tab-title">{{
-                        formatTabularName(page.title, page.rows.length)
+                        formatTabularName(page)
                 }}</span></button></div>
     </div>
     <div class="rm-result-display__tables {{ consoleActive ? 'rm-result-display__tables--inactive' : '' }}">
@@ -179,10 +179,11 @@ export class ResultDisplayComponent implements AfterViewInit {
         return `${hStr}:${mStr}:${sStr}.${msStr}`;
     }
 
-    formatTabularName(name: string, count: number) {
-        if (name.endsWith('[]')) {
-            return `${name.substring(0, name.length - 2)}[${count}]`;
+    formatTabularName(page: ResultPage) {
+        if (page.isAtomic) {
+            return page.title;
+        } else {
+            return `${page.title}[${page.rows.length}]`;
         }
-        return name;
     }
 }

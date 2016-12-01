@@ -131,6 +131,7 @@ describe('fresh build', function() {
         // int object doesnt do much
         return checkHints(suggestionClient, [
             'CompareTo',
+            'Dump',
             ... objectMethods
         ].sort());
     });
@@ -249,6 +250,7 @@ describe('fresh build', function() {
             'Id',
             'Name',
             'Population',
+            'Dump',
             ... objectMethods
         ].sort());
     });

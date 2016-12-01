@@ -17,6 +17,7 @@ export class ProcessHelper {
         if (IS_DEBUG) {
             slnPath = path.resolve(`${__dirname}/../../query/src/ReamQuery`);
         }
+        // DotNet:enablePackageRestore=true
         let cmd = `${exePath} -s ${slnPath} -p ${port}`;
         return { command: cmd, directory: null };
     }

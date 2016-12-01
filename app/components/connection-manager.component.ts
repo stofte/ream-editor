@@ -99,7 +99,7 @@ export class ConnectionManagerComponent implements AfterViewInit  {
     }
 
     private addConnection() {
-        const sqliteRegex = /Data Source\s*=\s*\w.+/;
+        const sqliteRegex = /Data Source\s*=\s*.+/;
         const value = this.newConnectionStringText;
         const provider: ConnectionType = 
              this.newConnectionProviderIndex === 0 ? 'sqlserver' : 

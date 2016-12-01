@@ -40,12 +40,12 @@ export interface TemplateResponse extends BaseResponse {
 }
 
 // socket messages
-export type WebSocketMessageType = 'table'|'header'|'row'|'tableClose'|'singleAtomic'|'singleTabular'|'empty'|'close';
+export type WebSocketMessageType = 'list'|'listValues'|'listClose'|'single'|'close';
 
 export interface WebSocketMessage {
     session: string;
     id: any;
-    parent: any;
+    title: string;
     type: WebSocketMessageType;
     values: any[];
 }

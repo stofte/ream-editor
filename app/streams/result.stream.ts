@@ -11,10 +11,13 @@ import * as uuid from 'node-uuid';
 export class ResultStream {
     public events: Observable<Message>;
     constructor(private query: QueryStream, input: InputStream) {
-        this.events = input
+        const stream = input
             .events
             .filter(msg => msg.name === EventName.SessionExecuteBuffer)
-            .flatMap(this.handleRunCode);
+            .flatMap(this.handleRunCode)
+            .publish();
+        this.events = stream;
+        stream.connect();
     }
 
     private handleRunCode = (req: Message): Observable<Message> => {
@@ -36,16 +39,16 @@ export class ResultStream {
                         // the api only returns errors, so if there's anything here, the query didn't run
                         x.data.diagnostics && x.data.diagnostics.length > 0
                     ).map(x => { return { type: 'close', session: x.id }; }))
-                .subscribe(socket => {
+                .subscribe((socket: WebSocketMessage) => {
                     let page: ResultPage = null;
                     switch (socket.type) {
-                        case 'table':
+                        case 'list':
                             Assert(tableResult == null, 'tableResult was set');
                             // assumes message order is preserved
                             tableResult = {
                                 id: socket.session,
                                 resultId: uuid.v4(),
-                                title: socket.values[0],
+                                title: socket.title,
                                 columns: null,
                                 columnTypes: null,
                                 rows: [],
@@ -55,28 +58,16 @@ export class ResultStream {
                                 viewRowOffset: 0
                             };
                             break;
-                        case 'header': 
+                        case 'listValues':
                             Assert(tableResult != null, 'tableResult was null');
-                            tableResult.columns = socket.values.map(x => x.Name);
-                            tableResult.columnTypes = socket.values.map(x => x.Type);
-                            rowMapper = (vals) => {
-                                const o = Object.create({});
-                                tableResult.columns.forEach((col, idx) => {
-                                    o[col] = vals[idx];
-                                });
-                                return o;
-                            }
+                            const prevLen = tableResult.rows.length;
+                            tableResult.rows = tableResult.rows.concat(socket.values); 
                             break;
-                        case 'row':
-                            Assert(tableResult != null, 'tableResult was null');
-                            // console.log('mapped ... ', )
-                            tableResult.rows.push(rowMapper(socket.values));
-                            break;
-                        case 'tableClose':
+                        case 'listClose':
                             obs.next(new Message(EventName.ResultUpdate, socket.session, tableResult));
                             tableResult = null; // allows next table from session
                             break;
-                        case 'singleAtomic':
+                        case 'single':
                             obs.next(new Message(EventName.ResultUpdate, socket.session, this.mapSingleAtomic(socket)));
                             break;
                         case 'close':
@@ -94,10 +85,10 @@ export class ResultStream {
         const obj: ResultPage = {
             id: msg.session,
             resultId: uuid.v4(),
-            title: msg.values[0].Name,
+            title: msg.title,
             columns: [msg.values[0].Name],
             columnTypes: [msg.values[0].Type],
-            rows: [msg.values[1]],
+            rows: [...msg.values],
             isAtomic: true,
             isTabular: false,
             viewColumnOffset: 0,

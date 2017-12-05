@@ -20,7 +20,6 @@ describe('[int-test] process.stream', function() {
     let processHelper = new ProcessHelper();
     
     before(function() {
-        chai.expect();
         chai.use(sinonChai);
     });
 

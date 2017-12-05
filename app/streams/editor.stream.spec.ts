@@ -28,7 +28,6 @@ describe('editor.stream', function() {
     let processHelper = new ProcessHelper();
     
     before(function() {
-        chai.expect();
         chai.use(sinonChai);
         injector = ReflectiveInjector.resolveAndCreate([
             Http, BrowserXhr, XSRFStrategyMock,
@@ -84,7 +83,13 @@ describe('editor.stream', function() {
             const id = uuid.v4();
             input.new(id);
             test.events.forEach(data => {
-                input.edit(id, data);
+                input.edit(id, <TextUpdate> {
+                    from: data.from,
+                    removed: data.removed,
+                    text: data.text,
+                    timestamp: data.time,
+                    to: data.to
+                });
             });
             input.setContext(id, new Connection('foo', 'sqlite'));
             if (idx === randomTestData.length - 1) {

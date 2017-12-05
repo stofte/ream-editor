@@ -1,5 +1,6 @@
 import * as chai from 'chai';
 import { expect } from 'chai';
+import * as sinonChai from 'sinon-chai';
 import { OmnisharpSessionMessage } from './api';
 import { OmnisharpSynchronizer } from './omnisharp-synchronizer';
 import { cSharpAutocompletionRequestTestData } from '../test/editor-testdata';
@@ -11,7 +12,7 @@ describe('omnisharp-synchronizer', function() {
     let sync: OmnisharpSynchronizer = null;
     
     before(function() {
-        chai.expect();
+        chai.use(sinonChai);
         sync = new OmnisharpSynchronizer();
     });
 

@@ -105,7 +105,7 @@ class SessionState {
         if (this.isBlocked(msg)) {
             // console.log(`queueOperation BLCK ${msg.sessionId.substring(0, 8)} ${msg.type}:${msg.timestamp}`);
             let dequeue: Function = null;
-            const p = new Promise((done) => dequeue = done);
+            const p = new Promise<number>((done) => dequeue = done);
             this.queue.push({msg , dequeue});
             return p;
         } else {

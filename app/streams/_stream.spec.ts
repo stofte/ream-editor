@@ -34,7 +34,6 @@ describe('[int-test] streams', function() {
     let streamManager: StreamManager = null;
     
     before(function() {
-        chai.expect();
         chai.use(sinonChai);
         const injector = ReflectiveInjector.resolveAndCreate([
             Http, BrowserXhr, XSRFStrategyMock,
@@ -363,7 +362,7 @@ describe('[int-test] streams', function() {
             new WaitUntil(() => new Promise(done => {
                 output.events
                     .first(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
-                    .subscribe(() => done(1));
+                    .subscribe(() => done(true));
             })),
             {
                 for: secondEdits,
@@ -413,7 +412,7 @@ describe('[int-test] streams', function() {
             new WaitUntil(() => new Promise(done => {
                 output.events
                     .first(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
-                    .subscribe(() => done(1));
+                    .subscribe(() => done(true));
             })),
             {
                 for: secondEdits,
@@ -486,7 +485,7 @@ describe('[int-test] streams', function() {
             new WaitUntil(() => new Promise(done => {
                 output.events
                     .first(msg => msg.name === EventName.OmniSharpCodeCheck && msg.id === id)
-                    .subscribe(() => done(1));
+                    .subscribe(() => done(true));
             })),
             // switch
             () => input.setContext(id, sqliteConnection),

@@ -31,11 +31,11 @@ export class EditorService {
     
     public errors(tabId: number): Observable<CodeCheckResult> {
         return new Observable<CodeCheckResult>(obs => {
-            setTimeout(function() {
-                obs.next({
-                    messages: []
-                });
-            }, 10000);
+            // setTimeout(function() {
+            //     obs.next({
+            //         messages: []
+            //     });
+            // }, 10000);
         });
     }
 }

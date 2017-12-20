@@ -40,7 +40,9 @@
         'tabz': 'node_modules/tabz',
         'templex': 'node_modules/templex',
         'unstrungify': 'node_modules/unstrungify',
-        'regexp-like': 'node_modules/regexp-like'
+        'regexp-like': 'node_modules/regexp-like',
+        'inject-stylesheet-template': 'node_modules/inject-stylesheet-template',
+        'overrider': 'node_modules/overrider'
     };
 
     // packages tells the System loader how to load when no filename and/or no extension
@@ -51,21 +53,22 @@
         'codemirror': { main: 'lib/codemirror.js', defaultExtension: 'js' },
         'lodash': { main: 'lodash.js', defaultExtension: 'js' },
         'node-uuid': { main: 'uuid.js', defaultExtension: 'js' },
-        'angular-sortablejs': { main: 'index.js', defaultExtension: 'js' },
-        'fin-hypergrid': {
-            main: './src/Hypergrid.js',
-            format: 'cjs',
-            map: {
-                './src/behaviors': './src/behaviors/index.js',
-                './src/dialogs': './src/dialogs/index.js',
-                './src/features': './src/features/index.js',
-                './src/cellRenderers': './src/cellRenderers/index.js',
-                './src/cellEditors': './src/cellEditors/index.js',
-                './images': './images/index.js',
-                './css': './css/index.js',
-                './html': './html/index.js',
-            }
-        },
+        'angular-sortablejs': { main: 'dist/index.js', defaultExtension: 'js' },
+        // 'fin-hypergrid': {
+        //     main: './src/Hypergrid.js',
+        //     format: 'cjs',
+        //     map: {
+        //         './src/behaviors': './src/behaviors/index.js',
+        //         './src/dialogs': './src/dialogs/index.js',
+        //         './src/features': './src/features/index.js',
+        //         './src/cellRenderers': './src/cellRenderers/index.js',
+        //         './src/cellEditors': './src/cellEditors/index.js',
+        //         './images': './images/index.js',
+        //         './css': './css/index.js',
+        //         './html': './html/index.js',
+        //         './renderer': './FUCK/index.js'
+        //     }
+        // },
         'finbars': { main: 'index.js' },
         'fincanvas': { main: 'index.js' },
         'rectangular': { main: 'index.js' },
@@ -88,7 +91,9 @@
         'tabz': { main: 'index.js' },
         'templex': { main: 'index.js' },
         'unstrungify': { main: 'index.js' },
-        'regexp-like': { main: 'index.js' }
+        'regexp-like': { main: 'index.js' },
+        'inject-stylesheet-template': { main: 'index.js' },
+        'overrider': { main: 'index.js' }
     };
 
     var config = {

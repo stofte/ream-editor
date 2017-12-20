@@ -13,7 +13,7 @@
     "gulp-build": "gulp build",
     "package_electron_win32": "electron-packager ./%PACKAGE_BASE% --no-prune --platform=win32 --arch=x64 --overwrite --out=./",
     "package_electron_linux": "electron-packager $PACKAGE_BASE --no-prune --platform=linux --arch=x64 --overwrite --out=./",
-    "test": "electron-mocha --renderer --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
+    "test": "electron-mocha --renderer --debug --require reflect-metadata --require test/mocha-spec-setup.js app/**/*.spec.js",
     "int-test": "mocha test/**/*.int.js"
   },
   "dependencies": {
@@ -38,6 +38,7 @@
     "normalizecss": "3.0.0",
     "reflect-metadata": "0.1.10",
     "rxjs": "5.5.3",
+    "sortablejs": "^1.7.0",
     "systemjs": "0.20.19",
     "zone.js": "0.8.18"
   },

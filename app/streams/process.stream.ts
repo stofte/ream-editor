@@ -7,16 +7,6 @@ const ipc = electronRequire('electron').ipcRenderer;
 const path = electronRequire('path');
 
 const DEBUG = MODE === 'DEVELOPMENT';
-
-// todo move to process-helper
-const _subpath = DEBUG ? 
-    '/query/src/ReamQuery' :
-    '/resources/app/query';
-const _p = `${process.cwd()}${_subpath}`;
-const REAMQUERY_BASEDIR = path.resolve(_p);
-const REAMQUERY_DISTDIR = path.resolve(DEBUG ? REAMQUERY_BASEDIR :
-    `${config.omnisharpProjectPath}/src/ReamQuery`);
-
 type ProcessType = 'omnisharp' | 'query';
 
 export class ProcessStream {
@@ -30,16 +20,9 @@ export class ProcessStream {
     constructor(private http: Http) { }
 
     public start(processType: ProcessType, command: string, directory: string, httpPort: number) {
-        // console.log('process.stream.ctor', processType, command, directory, httpPort);
         this.command = command;
-        this.directory = directory;
         this.httpPort = httpPort;
-        // this.options = processType === 'query' ? { cwd: directory } : { };
-        this.options = processType === 'omnisharp' ? {} : { cwd: directory };
-        if (processType === 'query') {
-            process.env['REAMQUERY_BASEDIR'] = REAMQUERY_BASEDIR;
-            process.env['REAMQUERY_DISTDIR'] = REAMQUERY_DISTDIR;
-        }
+        this.options = processType === 'omnisharp' ? { } : { cwd: `${process.cwd()}\query` };
         this.status.next(new Message(EventName.ProcessStarting));
         let start = new Date().getTime();
         let statusSub = this.status.subscribe(msg => {
@@ -47,8 +30,7 @@ export class ProcessStream {
                 this.cancelCheck = true;
             }
         });
-        child_process.exec(this.command, this.options, (error: string, stdout: string, stderr: string) => {
-            // console.log('child_process', error, stdout, stderr);
+        child_process.exec(this.command, {}, (error: string, stdout: string, stderr: string) => {
             if (!this.exitHandler) {
                 // once we've seen the server response, we disable this, since it's unpredictable otherwise,
                 // will return once stdout buffer fills, windows only?

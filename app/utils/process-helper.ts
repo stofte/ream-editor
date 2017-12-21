@@ -15,7 +15,7 @@ export class ProcessHelper {
         let slnPath = IS_LINUX ? config.omnisharpProjectPath.replace(/\\/g, '/')
             : config.omnisharpProjectPath.replace(/\//g, '\\');
         if (IS_DEBUG) {
-            slnPath = path.resolve(`${__dirname}/../../query/src/ReamQuery`);
+            slnPath = path.resolve(`${__dirname}/../../query`);
         }
         // DotNet:enablePackageRestore=true
         let cmd = `${exePath} -s ${slnPath} -p ${port}`;
@@ -27,7 +27,7 @@ export class ProcessHelper {
         let cmd: string = null;
         if (IS_DEBUG) {
             dir = `${dirname}`;
-            cmd = `"${config.dotnetDebugPath}" run -p query/src/ReamQuery --server.urls http://localhost:${port}`;
+            cmd = `"${config.dotnetDebugPath}" run -p ${process.cwd()}/query/src/ReamQuery.Server --server.urls http://localhost:8111`;
         } else {
             dir = `${dirname}/query`;
             cmd = `"${dir}/ReamQuery${!IS_LINUX ? '.exe' : ''}" --server.urls http://localhost:${port}`;
